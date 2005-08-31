@@ -7,7 +7,7 @@ FunkLoad
 DESCRIPTION
 -----------
 
-FunkLoad is functional and load web tester.
+FunkLoad is a functional and load web tester.
 
 Main FunkLoad features are:
 
