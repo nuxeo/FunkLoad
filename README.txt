@@ -1,5 +1,6 @@
-This folder is the FunkLoad home ($FLOAD_HOME)
-==============================================
+========
+FunkLoad
+========
 *$Id: README.txt 24534 2005-08-26 09:16:42Z bdelbosc $*
 
 
@@ -10,24 +11,44 @@ FunkLoad is functional and load web tester.
 
 Main FunkLoad features are:
 
-* Run a functional test.
-* View in real time the execution of the functional test in your browser.
-* Turn a functional test into a load test (== bench).
-* Easy test customization using configuration file.
-* Produce an ReST or html detail report with:
+* Compatible with pyUnit framework.
 
-  - test, page, request stats and charts.
+* Simulate a true browser navigation (using Richard Jones' webunit) with:
+  - cookies support
+  - fetching css, javascript and images
+  - simulate caching
+  - file uplaod and multipart/form-data submission
+
+* Advanced test runner with many command line options:
+  - color mode
+  - display the page fetched in real time in your browser
+  - debug mode
+
+* Turn a functional test into a load test, just by invoking the bench runner
+  you can simulate a load of hundreds users.
+
+* Detail bench report in ReST or html containing:
+  - bench configuration
+  - tests, pages, requests stats and charts.
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
 
-* Records your actions using a Web browser to write a ftest automatically.
-* Full compatible with PyUnit test case.
+* Easy test customization using configuration file or command line.
+
+* Easy test creation using a TestMaker to records your actions using a Web
+  browser to write a test automatically.
+
+* Web assertion helpers like listHref or getDOM to make assertion on the
+  fetched page.
+
+* CPSTestCase class to ease cps testing.
 
 
 INSTALLATION
 ------------
 
 See the INSTALL.txt file in the FunkLoad package.
+
 
 SYNOPSIS
 --------
@@ -132,21 +153,19 @@ FunkLoad can execute many cycles with different number of CUs.
 USAGE
 -----
 
-To use the demo you need an http server runing on http://localhost/
-
 
 Launching a functional test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. go to the ftests folder::
-
-    cd demo
+1. go to the tests folder::
 
 2. run a functional test like any other unittest::
 
-    python test_XXXX.py
+    python myFile.py
+    # or better use the FunkLoad test runner
+    fl-run-test myFile.py
 
-Note that you can find a detail log in funkload-ftest.log
+See fl-run-test --help for more information about how to launch a test.
 
 
 Launching a bench
@@ -154,15 +173,16 @@ Launching a bench
 
 1. go to the ftests folder::
 
-    cd demo
-
 2. run the bench::
 
-   fl-run-bench test_XXX XXX test_XXX
+     fl-run-bench myFile.py MyTestCase.testSomething
+
+   Note that the clas MyTestCase will use a configuration file named
+   MyTestCase.conf.
 
 3. view the html report::
 
-     fl-build-report
+     fl-build-report --html MyTestCase-bench.xml
 
    Note that you can preview the report for cycles that have been done while
    the bench is still running by invoking the above command.
@@ -182,7 +202,7 @@ Start the credential server::
 
 More options::
 
-  fl-credential-ctl {start|startd|stop|restart|status|log}
+  fl-credential-ctl --help
 
 
 Monitor server
@@ -190,7 +210,7 @@ Monitor server
 
 If you want to monitor the server health during the bench, you have to run a
 monitor xmlrpc server on the target server, this require to install the
-FunkLoad package but you don't need to install TestMaker or Java.
+FunkLoad package.
 
 On the server side init the FunkLoad env as above and ::
 
@@ -222,7 +242,7 @@ Recording a new FunkLoad test
 
 1. Record using TestMaker
 
-* Launch testmaker UI invoking 'TestMaker'
+* Launch testmaker UI
 * Go to 'Tools/New Agent' then 'Record from a Web-Browser'
   set a whaterver name and click to 'Start Recording"
 * Configure your Web Browser to use the TestMaker proxy localhost:8090
@@ -234,56 +254,48 @@ Recording a new FunkLoad test
 
 2. Converting the TestMaker script into a FunkLoad script::
 
-     tm2fl scenario_name.tm
+     fl-import-from-tm-recorder scenario_name.tm
 
-   This will produce a scenario_name.py and scenario_name.conf
+   This will produce a test_ScenarioName.py and ScenarioName.conf
 
 3. Testing
 
    Test is ready to be launch::
 
-     runftest scenario_name
+     fl-run-test test_ScenarioName.py
 
    To check if the scenario is well executed you can invoke firefox to view
-   each step result, edit the configuration file and add the 'view' log::
+   each step result and add debug information::
 
-     [ftests]
-     ...
-     logto = console file view
+     fl-run-test -V -d test_ScenarioName.py
 
-   You need to have a firefox already running.
+   You need to have a firefox already running on the same host.
 
 4. Implement the dynamic part and assertion
 
-  The FunkLoad script is a jython script the jython is provided by TestMaker
-  it is a python 2.1 implementation :(
-
-  TestMaker provide also a java api http://docs.pushtotest.com/tooldocs/
-
-  Look at ftest done in CPS-3-base-ftests or Messager_ftests for more examples.
-
-  Assertion are like unit test assertion but only limited to:
-  `assert_` = failUnless and assertEqual = assertEquals = failUnlessEqual
+  Assertion are like unit test assertion, but you have helpers to parse http
+  response or content
 
   Helper api:
 
-  - self.get(url) or self.post(url, params)
+  - self.get(url, description) or self.post(url, params, description)
+  - self.getLastUrl() -> return the last accessed url taking care or redirects
   - self.getLastBaseUrl() -> return the <base /> href value
-  - self.listUrl() -> return a list of all <a /> href value
-  - self.getLastUrl() -> return the last Url loaded by the follow redirect
+  - self.listHref() -> return a list of all <a /> href value
   - self.getBody -> the html page
 
+  the response returned by get() or post() have a getDOM method to parse the
+  content.
 
 FILES
 -----
 
-
-A ftests folder will contains::
-
-  test_Foo.py       a funkload unit test
-  Foo.conf          a ftest configuration file
-  log/              a log folder
-  report/           a report folder
+  fl-run-test                - run a test
+  fl-run-bench               - run a test in bench mode
+  fl-build-report            - build a bench report
+  fl-import-from-tm-recorder - convert a TestMaker test into a FunkLoad script
+  fl-credential-ctl          - credential controler
+  fl-monitor-ctl             - monitoring controler
 
 
 BUGS

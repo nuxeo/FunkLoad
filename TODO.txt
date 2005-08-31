@@ -4,21 +4,15 @@ python funkload TODO list
 $Id: TODO.txt 24660 2005-08-29 16:23:17Z bdelbosc $
 -------------------------
 
-P1 -> milestone 1.0.0 (1/9/2005)
+P1
 ==
+* add simple demo and out of the box cps demo
 
-* improve funkload.css
-* add monitor charts
-* dump html + preview firefox
+* add global info: bench duration, number of test, number of page, number of
+  req, % error.
+
 * update README -> add a man page
-* demo + demo_cps dans /usr/local/funkload ?
-* adapt tm2fl
 
-* mega bench sur demos2 + debug
-
-
-P2
-==
 * fl-run-bench output
   - add a global timing
   - make a clear result line by cycle
@@ -32,14 +26,19 @@ P2
   - disable img/link auto laod
   - disable caching
 
+* report
+  - chart should display origin (0, 0)
+
 * setup browser agent
 
 * check proxy compatibilty
   - check monitord and credentiald
 
 
-P3
+P2
 ==
+
+* fl-run-test launch all test in //
 
 * launch many ftest in bench mode ?
 

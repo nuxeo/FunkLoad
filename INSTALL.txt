@@ -52,11 +52,11 @@ Only if you want to try the latest unstable sources.
 
 ::
 
-    svn co https://svn.nuxeo.org/priv/funkload/trunk /tmp/funkload
+    svn co https://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
     cd /tmp/funkload/
     python setup.py build
     sudo python setup.py install
 
 
-
 See README.txt for more information about FunkLoad.
+See demo/ for examples.
