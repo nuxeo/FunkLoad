@@ -1,0 +1,69 @@
+=========================
+python funkload TODO list
+=========================
+$Id: TODO.txt 24660 2005-08-29 16:23:17Z bdelbosc $
+-------------------------
+
+P1 -> milestone 1.0.0 (1/9/2005)
+==
+
+* improve funkload.css
+* add monitor charts
+* dump html + preview firefox
+* update README -> add a man page
+* demo + demo_cps dans /usr/local/funkload ?
+* adapt tm2fl
+
+* mega bench sur demos2 + debug
+
+
+P2
+==
+* fl-run-bench output
+  - add a global timing
+  - make a clear result line by cycle
+  - display cycle result before end of threads
+
+* fl-run-test options
+  - immmediate fail + display tb
+  - use regexp to load test
+
+* fl-run-* options
+  - disable img/link auto laod
+  - disable caching
+
+* setup browser agent
+
+* check proxy compatibilty
+  - check monitord and credentiald
+
+
+P3
+==
+
+* launch many ftest in bench mode ?
+
+* use python tcpwatch instead of tm or write a new proxy
+
+* monitor
+  - log a file size (Data.fs)
+  - log bogomips, total ram/swap
+
+* improve report:
+  - css make tabs smaller
+  - add monitoring tab
+  - provide the 5 slowest request with (page #)
+  - add hostname of the bench machine in the config section
+  - view errors from the report
+  - diff report
+    - make a global notation (max STPS approx?)
+
+* use pool of threads
+
+* simulate different IP source
+
+
+BUGS
+====
+
+* in test mode how to close the <funkload> tag ?

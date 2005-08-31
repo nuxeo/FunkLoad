@@ -1,0 +1,3 @@
+include *.txt ChangeLog
+recursive-include funkload *.txt *.py *.css
+recursive-include demo *.txt *.py

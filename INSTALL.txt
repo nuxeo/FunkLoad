@@ -1,0 +1,62 @@
+====================
+FunkLoad INSTALL.txt
+====================
+$Id: INSTALL.txt 24542 2005-08-26 09:41:37Z bdelbosc $
+--------------------
+
+Required packages
+-----------------
+
+  - libexpat1
+  - python 2.3.? (works fine with 2.3.5)
+  - python xml, python-xml debian package
+  - python distutils, python-dev debian package
+  - python Richard Jones' webunit version 1.3.8 ::
+
+    # download targz from http://mechanicalcat.net/tech/webunit/
+    cd /tmp
+    wget http://www.mechanicalcat.net/tech/webunit/webunit-1.3.8.tar.gz
+    tar xzvf webunit-1.3.8.tar.gz
+    cd webunit-1.3.8/
+    python setup.py build
+    sudo python setup.py install
+
+
+Optional packages
+-----------------
+
+  - to produce html report : python-docutils debian package (0.3.7-2 is fine)
+  - to produce charts : python-gdchart debian package (0.6.1-8 is fine)
+  - to have a proxy recorder install TestMaker, this requires a jre 1.4.2
+    (seems fine also with 1.5.0)
+
+     o Unzip TestMaker 4.3.1 from http://downloads.pushtotest.com/TestMaker.zip
+     o export JAVA_HOME=/usr/local/java/jre1.5.0_01
+
+FunkLoad Package installation
+-----------------------------
+::
+
+    # check the latest package at http://public.dev.nuxeo.com/~ben/funkload/
+    cd /tmp
+    wget http://public.dev.nuxeo.com/~ben/funkload/funkload-x.x.x.tgz
+    tar xzvf funkload-x.x.x.tgz
+    cd funkload-x.x.x/
+    python setup.py build
+    sudo python setup.py install
+
+
+Or FunkLoad bleeding edge svn sources
+-------------------------------------
+Only if you want to try the latest unstable sources.
+
+::
+
+    svn co https://svn.nuxeo.org/priv/funkload/trunk /tmp/funkload
+    cd /tmp/funkload/
+    python setup.py build
+    sudo python setup.py install
+
+
+
+See README.txt for more information about FunkLoad.
