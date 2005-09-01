@@ -17,7 +17,7 @@
 # 02111-1307, USA.
 #
 #
-"""Funkload package setup
+"""FunkLoad package setup
 
 $Id: setup.py 24768 2005-08-31 14:01:05Z bdelbosc $
 """
