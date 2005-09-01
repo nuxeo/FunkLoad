@@ -212,9 +212,14 @@ class RenderRst:
     def renderConfig(self):
         """Render bench configuration."""
         config = self.config
-        self.append(rst_title("Bench description", 2))
+        self.append(rst_title("FunkLoad bench report", 1))
+        self.append("**%s.py %s.%s**" % (config['module'],
+                                         config['class'],
+                                         config['method']))
+        self.append('\n' + config['description'])
+
+        self.append(rst_title("Bench configuration", 2))
         self.append("* Launched: %s" % config['time'])
-        self.append("* Bench result: %s" % config['log_xml'])
         self.append("* Server: %s" % config['server_url'])
         self.append("* Cycles: %s" % config['cycles'])
         self.append("* Cycle duration: %ss" % config['duration'])
