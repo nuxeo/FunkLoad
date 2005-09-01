@@ -9,6 +9,9 @@ pkg:
 rpm:
 	python setup.py bdist_rpm
 
+distrib:
+	scp dist/funkload-*.tar.gz cvs.in.nuxeo.com:~/public_public_html/funkload/
+
 install:
 	python setup.py install --install-scripts=/usr/local/bin --install-data=/usr/local
 

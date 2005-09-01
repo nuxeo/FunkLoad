@@ -1,3 +1,4 @@
-include *.txt ChangeLog
-recursive-include funkload *.txt *.py *.css
-recursive-include demo *.txt *.py
+include *.txt ChangeLog Makefile setup.cfg setup.py
+recursive-include src *.py
+recursive-include demo *.txt *.py *.conf
+recursive-include data *.tpl *.css

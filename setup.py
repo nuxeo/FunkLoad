@@ -28,21 +28,47 @@ from src.FunkLoadTestCase import __version__
 setup(
     name = "funkload",
     version = __version__,
-    description = "Functional unit test or load test your web application.",
+    description = "Functional and load web tester.",
     long_description = """FunkLoad is a functional and load web tester.
 
-Main funkload features are:
+Main FunkLoad features are:
 
-* Run a functional test.
-* View in real time the execution of the functional test in your browser.
-* Turn a functional test into a load test (== bench).
-* Easy bench configuration using configuration file.
-* Produce an html detail report with
+* Compatible with pyUnit framework, just use funkload.FunkLoadTestCase
+  instead of unittest.TestCase.
 
-  - tests, pages and requests charts.
+* Truly emulate a web browser (single-threaded) using Richard Jones' webunit:
+
+  - basic auth support
+  - cookies support
+  - fetching css, javascript and images
+  - emulate a browser cache
+  - file upload and multipart/form-data submission
+  - https support
+
+* Advanced test runner with many command line options:
+
+  - color mode
+  - display the page fetched in real time in your browser
+  - debug mode
+
+* Turn a functional test into a load test, just by invoking the bench runner
+  you can identify scalability and performance problems.
+
+* Detail bench report in ReST or html containing:
+
+  - bench configuration
+  - tests, pages, requests stats and charts.
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
 
+* Easy test customization using configuration file or command line.
+
+* Easy test creation using TestMaker recorder, you can use your web browser
+  and produce a FunkLoad test automatically.
+
+* Web assertion helpers.
+
+* Provide a funkload.CPSTestCase class to ease nuxeo CPS testing.
 """,
     author = "Benoit Delbosc",
     author_email = "bdelbosc@nuxeo.com",
