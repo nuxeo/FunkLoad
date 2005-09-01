@@ -176,7 +176,7 @@ Examples
                                        in MyTestCase
   %prog myFile.py -c -u http://localhost MyTestCase
                                      - same in color against localhost
-  %prot myfile.py -V                 - run default set of tests and view in
+  %prog myfile.py -V                 - run default set of tests and view in
                                        real time each page fetch with firefox
   %prog -h                           - more options
 """

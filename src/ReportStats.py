@@ -52,7 +52,7 @@ class AllResponseStat:
         self.per_second [date_s] = self.per_second.setdefault(
             int(date_s), 0) + 1
         self.count += 1
-        if result == 'Successfull':
+        if result == 'Successful':
             self.success += 1
         else:
             self.error += 1
@@ -101,11 +101,11 @@ class PageStat(AllResponseStat):
             new_page = False
         if new_page:
             self.count += 1
-        stat = self.pages.setdefault(self.count, {'result': 'Successfull',
+        stat = self.pages.setdefault(self.count, {'result': 'Successful',
                                                   'duration': 0,})
         if new_page:
             stat['date_s'] = int(float(date))
-        if str(result) != 'Successfull':
+        if str(result) != 'Successful':
             stat['result'] = result
         stat['duration'] += float(duration)
         self.pages[self.count] = stat
@@ -115,7 +115,7 @@ class PageStat(AllResponseStat):
     def finalize(self):
         """Compute avg times."""
         for stat in self.pages.values():
-            if str(stat['result']) == 'Successfull':
+            if str(stat['result']) == 'Successful':
                 if stat.has_key('date_s'):
                     date_s = stat['date_s']
                     self.per_second[date_s] = self.per_second.setdefault(
@@ -155,7 +155,7 @@ class ResponseStat:
     def add(self, rtype, result, url, duration, description=None):
         """Add a new response to stat."""
         self.count += 1
-        if result == 'Successfull':
+        if result == 'Successful':
             self.success += 1
         else:
             self.error += 1
@@ -183,7 +183,7 @@ class ResponseStat:
 class TestStat:
     """Collect test stat for a cycle.
 
-    Stat on successfull test case.
+    Stat on successful test case.
     """
     def __init__(self, cycle, cycle_duration, cvus):
         self.cycle = cycle
@@ -209,7 +209,7 @@ class TestStat:
         self.count += 1
         if traceback is not None:
             self.traceback.append(traceback)
-        if result == 'Successfull':
+        if result == 'Successful':
             self.success += 1
         else:
             self.error += 1

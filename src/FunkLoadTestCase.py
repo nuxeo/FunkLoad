@@ -133,7 +133,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self._browser.css = {}                   # css cache
         self._browser.history = []
         self.step_success = True
-        self.test_status = 'Successfull'
+        self.test_status = 'Successful'
         self.steps = 0
         self.response_count = 0
         self.total_time = 0.0
@@ -394,7 +394,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['description'] = description and quoteattr(description) or '""'
         info['time_start'] = time_start
         info['duration'] = time_stop - time_start
-        info['result'] = self.step_success and 'Successfull' or 'Failure'
+        info['result'] = self.step_success and 'Successful' or 'Failure'
         response_start = '''<response cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s" step="%(step).3i" number="%(number).3i" type="%(type)s" result="%(result)s" url=%(url)s code="%(code)s" description=%(description)s time="%(time_start)s" duration="%(duration)s"''' % info
 
         if not log_body:
@@ -432,7 +432,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['images'] = self.total_images
         info['links'] = self.total_links
         info['result'] = self.test_status
-        if self.test_status != 'Successfull':
+        if self.test_status != 'Successful':
             info['traceback'] = 'traceback=' + quoteattr(' '.join(
                 traceback.format_exception(*sys.exc_info()))) + ' '
         else:

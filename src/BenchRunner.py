@@ -138,7 +138,7 @@ class LoopTestRunner(threading.Thread):
 
 
     def run(self):
-        """Run a ftest in loop during."""
+        """Run a test in loop during."""
         while (running()):
             test_result = unittest.TestResult()
             self.test.clearContext()
@@ -452,7 +452,7 @@ def main():
                       help="Duration of a cycle in seconds.")
     parser.add_option("-m", "--sleep-time-min", type="string",
                       dest="bench_sleep_time_min",
-                      help="Minumum sleep time between request.")
+                      help="Minimum sleep time between request.")
     parser.add_option("-M", "--sleep-time-max", type="string",
                       dest="bench_sleep_time_max",
                       help="Maximum sleep time between request.")

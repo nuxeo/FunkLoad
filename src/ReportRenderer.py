@@ -463,7 +463,7 @@ class RenderHtml(RenderRst):
                        vol_color=self.color_error,
                        bg_color=self.color_bg, plot_color=self.color_plot,
                        line_color=self.color_line,
-                       title='Successfull Tests Per Second', xtitle='CUs',
+                       title='Successful Tests Per Second', xtitle='CUs',
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='STPS', ytitle2="Errors",
                        ylabel_density=50)
@@ -515,7 +515,7 @@ class RenderHtml(RenderRst):
                        vol_color=self.color_error,
                        bg_color=self.color_bg, plot_color=self.color_plot,
                        line_color=self.color_line,
-                       title='Successfull Pages Per Second', xtitle='CUs',
+                       title='Successful Pages Per Second', xtitle='CUs',
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='SPPS', ytitle2="Errors",
                        ylabel_density=50)
