@@ -22,6 +22,7 @@ $Id: FunkLoadTestCase.py 24757 2005-08-31 12:22:19Z bdelbosc $
 import os
 import sys
 import time
+import re
 from types import ListType
 from datetime import datetime
 import unittest
@@ -476,14 +477,20 @@ class FunkLoadTestCase(unittest.TestCase):
             return response.body
         return ''
 
-    def listHref(self):
-        """Return a list of href anchor url present in the html response."""
+    def listHref(self, pattern=None):
+        """Return a list of href anchor url present in the html response.
+
+        that match sub pattern regex if present"""
         response = self._response
         ret = []
         if response is not None:
             a_links = response.getDOM().getByName('a')
             if a_links:
                 ret = [x.href for x in a_links]
+            if pattern is not None:
+                pat = re.compile(pattern)
+                ret = [href for href in ret if pat.search(href) is not None]
+                print ret
         return ret
 
     def getLastBaseUrl(self):

@@ -127,10 +127,8 @@ class CPSTestCase(FunkLoadTestCase):
                 url = url[len(server_url):]
         return url
 
-    def listDocumentHref(self, pattern):
+    def listDocumentHref(self, pattern=None):
         """Return a clean list of document href that matches pattern.
 
         Try to remove server_url and other cps trailings."""
-        return [self.cpsCleanUrl(x) for x in self.listHref()
-                if x.find(pattern) != -1]
-
+        return [self.cpsCleanUrl(x) for x in self.listHref(pattern)]
