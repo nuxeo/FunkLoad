@@ -1,4 +1,13 @@
-2005-08-24  ben  <bdlebosc@nuxeo.com>
+2005-09-02  ben  <bdelbosc@nuxeo.com>
 
-	* use distutils
+	* src/FunkLoadTestCase.py: adding a re.pattern to listHref()
+
+2005-09-02  ben  <bdelbosc@nuxeo.com>
+
+	* packaging 1.0.0
+
+
+2005-09-01  ben  <bdlebosc@nuxeo.com>
+
+	* switch to public svn
 
