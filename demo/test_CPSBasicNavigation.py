@@ -122,38 +122,43 @@ class CPSBasicNavigation(CPSTestCase):
     def test_20_reader(self):
         server_url = self.server_url
 
-        # login in as member -----------------------------------------
-        self.cpsLogin(self.cred_member['login'], self.cred_member['password'],
+        # home page
+        self.get('%s' % server_url,
+                 description='Home page anonymous')
+
+        self.assert_(self.listHref('login_form'), 'No login link found')
+
+        # login page
+        self.get('%s/login_form' % server_url,
+                 description="Login page")
+
+        # login in as member
+        self.cpsLogin(self.cred_member['login'],
+                      self.cred_member['password'],
                       "member")
 
-        # CSS stuff
-        self.get("%s/calendar-win2k-1.css" % server_url,
-                 description="Load calendar css part 1")
-        self.get("%s/calendar.js" % server_url,
-                 description="Load calendar css part 2")
-        self.get("%s/lang/calendar-fr.js" % server_url,
-                 description="Load calendar css part 3")
-        self.get("%s/calendar-setup.js" % server_url,
-                 description="Load calendar css part 4")
-
         # home page
-        self.get("%s/" % server_url, description="View home page")
+        self.get("%s/" % server_url, description="Home page logged")
+
+        # home page in different languages
+        for lang in self.conf_getList('test_20_reader', 'languages'):
+            self.post("%s/cpsportlet_change_language" % server_url,
+                      params=[['lang', lang]],
+                      description="Home page in %s" % lang,
+                      code=[200, 302, 204])
 
         # perso ws
         self.get("%s/workspaces/members/%s" % (server_url, self._cps_login),
                  description="View personal workspace")
 
-        self.get("%s/workspaces/members/%s" % (server_url, self._cps_login),
-                 description="View personal workspace twice")
-
-        # extract a doc link
+        # extract a doc link and view the document
         my_docs = self.listDocumentHref('/workspaces/members/%s/test-' %
                                         self._cps_login)
         self.assert_(my_docs, "no doc found in personal ws")
+
         a_doc = my_docs[int(len(my_docs) * random())]
         self.get("%s%s" % (server_url, a_doc),
                  description="View a user document")
-
 
         # metadata
         self.get("%s%s/cpsdocument_metadata" % (server_url, a_doc),
@@ -166,12 +171,10 @@ class CPSBasicNavigation(CPSTestCase):
         self.get("%s/workspaces/members/%s/exportAtomContentBox?box_url=.cps_boxes_root/nav_content" % (server_url, self._cps_login),
                  description="View section Atom flux")
 
-        # home page twice
-        self.get("%s/" % server_url, description="View home page again")
-
         # section
         self.get("%s/sections/ftest-section" % server_url,
                  description="View the main section")
+
         # extract a doc link
         my_docs = self.listDocumentHref('/sections/ftest-section/test-')
         self.assert_(my_docs, "no doc found in ftest-section")
