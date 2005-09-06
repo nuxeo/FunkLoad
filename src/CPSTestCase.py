@@ -20,7 +20,7 @@
 $Id: CPSTestCase.py 24728 2005-08-31 08:13:54Z bdelbosc $
 """
 import time
-from random import random
+import random
 from Lipsum import Lipsum
 from FunkLoadTestCase import FunkLoadTestCase
 
@@ -32,7 +32,7 @@ class CPSTestCase(FunkLoadTestCase):
     _lipsum = Lipsum()
     _all_langs = ['en', 'fr', 'de', 'it', 'es', 'pt_BR',
                   'nl', 'mg', 'ro', 'eu']
-    _default_langs = _all_langs[4:]
+    _default_langs = _all_langs[:4]
     _cps_login = None
 
 
@@ -134,24 +134,32 @@ class CPSTestCase(FunkLoadTestCase):
         return ret
 
 
-    def cpsCreateSite(self, site_id, manager_id, manager_password,
-                      manager_mail, langs=None):
-        """Create a CPS Site"""
+    def cpsCreateSite(self, admin_id, admin_pwd,
+                      manager_id, manager_password,
+                      manager_mail, langs=None, title=None,
+                      description=None):
+        """Create a CPS Site.
+
+        site_id is taken from server_url."""
+        server_url = self.server_url
+        site_id = server_url.split('/')[-1]
+        base_url = server_url[:-(len(site_id)+1)]
+        self._browser.setBasicAuth(admin_id, admin_pwd)
         params = {"id": site_id,
-                  "title": "CPS Portal",
-                  "description": "A funkload cps test site",
+                  "title": title or "CPS Portal",
+                  "description": description or "A funkload cps test site",
                   "manager_id": manager_id,
                   "manager_password": manager_password,
-                  "manager_password_confirmation": "manager",
+                  "manager_password_confirmation": manager_password,
                   "manager_email": manager_mail,
-                  "manager_sn": "CPS manager",
+                  "manager_sn": "CPS",
                   "manager_givenName": "Manager",
                   "langs_list:list": langs or self._default_langs,
                   "interface": "portlets",
                   "submit": "Create"}
         self.post("%s/manage_addProduct/CPSDefault/manage_addCPSDefaultSite" %
-                  self.server_url, params,
-                  description="Create a CPS Site")
+                  base_url, params, description="Create a CPS Site")
+        self._browser.clearBasicAuth()
 
 
     def cpsCreateGroup(self, group_name):
@@ -183,11 +191,25 @@ class CPSTestCase(FunkLoadTestCase):
 
     def cpsCreateSection(self, parent_url, title,
                          description="ftest section for funkload testing.",
-                         lang="en"):
-        """Create a section.
+                         lang=None):
+        """Create a section."""
+        self.cpsCreateFolder('Section', parent_url, title, description,
+                             lang or self.cpsGetRandomLanguage())
+
+
+    def cpsCreateWorkspace(self, parent_url, title,
+                           description="ftest workspace for funkload testing.",
+                           lang=None):
+        """Create a workspace."""
+        self.cpsCreateFolder('Workspace', parent_url, title, description,
+                             lang or self.cpsGetRandomLanguage())
+
+    def cpsCreateFolder(self, type, parent_url, title,
+                        description, lang):
+        """Create a section or a workspace.
 
         Return the section full url."""
-        params = [["type_name", "Section"],
+        params = [["type_name", type],
                   ["widget__Title", title],
                   ["widget__Description",
                    description],
@@ -195,6 +217,25 @@ class CPSTestCase(FunkLoadTestCase):
                   ["widget__hidden_folder", "0"],
                   ["cpsdocument_create_button", "Create"]]
         self.post("%s/cpsdocument_create_form" % parent_url,
-                  params, "Create a section")
+                  params, "Create a %s" % type)
         return self.getLastBaseUrl()[:-1]
 
+
+    def cpsAddExternalMethod(self, admin_id, admin_pwd,
+                             method_id, module, function,
+                             run_it=True):
+        """Add an External method using the zmi an run it."""
+        server_url = self.server_url
+        self._browser.setBasicAuth(admin_id, admin_pwd)
+        params = [["id", method_id],
+                  ["title", ""],
+                  ["module", module],
+                  ["function", function],
+                  ["submit", " Add "]]
+        self.post("%s/manage_addProduct/ExternalMethod/manage_addExternalMethod" % server_url, params)
+
+        if run_it:
+            self.get('%s/%s' % (server_url, method_id),
+                     description="Execute %s external method" % method_id)
+
+        self._browser.clearBasicAuth()
