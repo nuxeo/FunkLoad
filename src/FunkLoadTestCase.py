@@ -117,17 +117,6 @@ class FunkLoadTestCase(unittest.TestCase):
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
 
-    def logd(self, message):
-        """Debug log."""
-        self.logger.debug(self.meta_method_name +': ' +message)
-
-    def logi(self, message):
-        """Info log."""
-        if hasattr(self, 'logger'):
-            self.logger.info(self.meta_method_name+': '+message)
-        else:
-            print self.meta_method_name+': '+message
-
     def clearContext(self):
         """Resset the testcase."""
         self._browser.clearContext()
@@ -335,6 +324,17 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # logging
     #
+    def logd(self, message):
+        """Debug log."""
+        self.logger.debug(self.meta_method_name +': ' +message)
+
+    def logi(self, message):
+        """Info log."""
+        if hasattr(self, 'logger'):
+            self.logger.info(self.meta_method_name+': '+message)
+        else:
+            print self.meta_method_name+': '+message
+
     def logr(self, message, force=False):
         """Log a result."""
         if force or not self.in_bench_mode or recording():
@@ -490,7 +490,6 @@ class FunkLoadTestCase(unittest.TestCase):
             if pattern is not None:
                 pat = re.compile(pattern)
                 ret = [href for href in ret if pat.search(href) is not None]
-                print ret
         return ret
 
     def getLastBaseUrl(self):
@@ -501,6 +500,18 @@ class FunkLoadTestCase(unittest.TestCase):
             if base:
                 return base[0].href
         return ''
+
+
+    #
+    # extend unittest.TestCase
+    #
+    def setUpCycle(self):
+        """Called on bench mode before a cycle start."""
+        pass
+
+    def tearDownCycle(self):
+        """Called after a cycle in bench mode."""
+        pass
 
 
     #

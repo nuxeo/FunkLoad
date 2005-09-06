@@ -264,9 +264,9 @@ method each get/post request is called a page.
 
   [setUp][page 1]    [page 2] ... [page n]   [tearDown]
   ======================================================> time
-         \___________________________________\ runTest method
-                 \___\ sleeptime_min to sleeptime_max
-         \_______\ page 1 connection time
+         <-----------------------------------> test metho
+                 <---> sleeptime_min to sleeptime_max
+         <------> page 1 connection time
 
 Page
 ~~~~
@@ -292,29 +292,42 @@ take into account).
 Only pages and requests that finish during the 'duration' are taken into
 account for the request and pages statistic
 
+Before a cycle a setUpCycle method is called, after a cycle a tearDownCycle
+method is called, you can use these methods to test differents server
+configuration for each cycle.
+
 ::
 
   Threads
   ^
   |
   |
-  |n           [---test--]   [--------]   [--|---X
-  |...         |                             |
-  |            |                             |
-  |2    [------|--]   [--------]   [-------] | [----X
-  |            |                             |
-  |1 [-------X | [--------]   [-------]   [--|--X
-  |
-  ===================================================> time
-               \______cycle duration_________\
-     \_________\ staging                     \_______\ staging
-     \__\ startupdelay     \__\ sleeptime
+  |n                   [---test--]   [--------]   [--|---X
+  |...
+  |                    |                             |
+  |2            [------|--]   [--------]   [-------] |
+  |                    |                             |
+  |1          [------X | [--------]   [-------]   [--|--X
+  |                    |                             |
+  |[setUpCycle]        |                             |    [tearDownCycle]
+  ===========================================================> time
+                       <------ cycle duration ------->
+   <----- staging ----->                             <---- staging ----->
+              <-> startupdelay    <---> sleeptime
 
 
 Cycles
 ~~~~~~
 
-FunkLoad can execute many cycles with different number of CUs.
+FunkLoad can execute many cycles with different number of CUs, this way you
+can find easily the maximum number of users that your application can
+handle.
+
+Running n cycles with the same CUs is a good way to see how the
+application handle a writing test over time.
+
+Running n cycles with the same CUs with a reading test and a setUpCycle that
+change the application configuration will help you to find the right tuning.
 
 
 ::
@@ -333,8 +346,8 @@ FunkLoad can execute many cycles with different number of CUs.
   |   /           \         /                  \
   |  /             \       /                    \
    ==================================================> time
-        \________\   duration    \_________\
-                    \______\ cycletime
+        <-------->   duration    <--------->
+                    <------> cycletime
 
 
 

@@ -210,6 +210,7 @@ class BenchRunner:
                                   test.conf_get(host, 'description', '')))
         self.monitor_hosts = monitor_hosts
         # keep the test to use the result logger for monitoring
+        # and call setUp/tearDown Cycle
         self.test = test
 
 
@@ -230,6 +231,7 @@ class BenchRunner:
             trace(text)
             trace('-' * (len(text) - 1) + "\n\n")
             monitor_key = '%s:%s:%s' % (self.method_name, cycle, cvus)
+            self.test.setUpCycle()
             self.startMonitor(monitor_key)
             self.startThreads(cycle, cvus)
             self.logging()
@@ -237,6 +239,7 @@ class BenchRunner:
             self.stopThreads()
             self.stopMonitor(monitor_key)
             cycle += 1
+            self.test.tearDownCycle()
             t_stop = time.time()
             trace("* End of cycle, %.2fs elapsed.\n" % (t_stop - t_start))
             success, failures, errors = get_cycle_results()
