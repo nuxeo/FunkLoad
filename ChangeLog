@@ -1,11 +1,17 @@
+2005-09-06  ben  <bdelbosc@nuxeo.com>
+
+	* src/CPSTestCase.py: adding many cps helpers
+
+	* src/BenchRunner.py: new methods: setUpCycle and tearDownCycle to
+	configure bench between cycle, see README.txt for more information.
+
 2005-09-02  ben  <bdelbosc@nuxeo.com>
 
 	* src/FunkLoadTestCase.py: adding a re.pattern to listHref()
 
 2005-09-02  ben  <bdelbosc@nuxeo.com>
 
-	* packaging 1.0.0
-
+	* first public package 1.0.0
 
 2005-09-01  ben  <bdlebosc@nuxeo.com>
 
