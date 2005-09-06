@@ -17,8 +17,6 @@
 #
 """CPS Layer for funkload test.
 
-Author: ben
-
 $Id: CPSTestCase.py 24728 2005-08-31 08:13:54Z bdelbosc $
 """
 import time
@@ -29,7 +27,14 @@ from FunkLoadTestCase import FunkLoadTestCase
 class CPSTestCase(FunkLoadTestCase):
     """Common cps task.
 
-    setUp must set a server_url attrinute."""
+    setUp must set a server_url attribute."""
+    server_url = None
+    _lipsum = Lipsum()
+    _all_langs = ['en', 'fr', 'de', 'it', 'es', 'pt_BR',
+                  'nl', 'mg', 'ro', 'eu']
+    _default_langs = _all_langs[4:]
+    _cps_login = None
+
 
     def cpsLogin(self, login, password, comment=None):
         """Log in a user.
@@ -44,8 +49,7 @@ class CPSTestCase(FunkLoadTestCase):
         self.post("%s/logged_in" % self.server_url, params,
                   description="Log in user [%s] %s" % (login, comment or ''))
         # assume we are logged in if we have a logout link...
-        html = self.getBody()
-        self.assert_(html.find('%s/logout' % self.server_url) >= 0,
+        self.assert_('%s/logout' % self.server_url in self.listHref(),
                      'invalid credential: [%s:%s].' % (login, password))
         self._cps_login = login
 
@@ -59,11 +63,7 @@ class CPSTestCase(FunkLoadTestCase):
 
     def cpsGetRandomLanguage(self):
         """Return a random language."""
-        languages = ["en", "en", "en", "en",
-                     "fr", "fr", "fr", "fr", "fr", # tsss
-                     "de", "it", "es", "pt_BR", "nl", "mg", "ro", "eu"]
-        language_count = len(languages)
-        return languages[int(random()*language_count)]
+        return random.choice(self._all_langs)
 
 
     def cpsSearchDocId(self, doc_id):
@@ -73,11 +73,8 @@ class CPSTestCase(FunkLoadTestCase):
         params = [["SearchableText", doc_id]]
         self.post("%s/search_form" % self.server_url, params,
                   description="Searching doc_id %s" % doc_id)
-        ret_dup = [x for x in self.listHref() if x.endswith(doc_id)]
-        # remove duplicate
-        ret = []
-        [ret.append(x) for x in ret_dup if not ret.count(x)]
-        self.logd('Step %i:   found %s doc_id.' % (self.steps, len(ret)))
+        ret = self.listDocumentHref(pattern='%s$' % doc_id)
+        self.logd('found %i link ends with %s' % (len(ret), doc_id))
         return ret
 
     def cpsCreateNewsItem(self, parent_url):
@@ -85,8 +82,6 @@ class CPSTestCase(FunkLoadTestCase):
 
         return a tuple: (doc_url, doc_id)."""
         language = self.cpsGetRandomLanguage()
-        if not hasattr(self, '_lipsum'):
-            self._lipsum = Lipsum()
         title = self._lipsum.getSubject(uniq=True,
                                         prefix='test %s' % language)
         params = [["type_name", "News Item"],
@@ -130,5 +125,76 @@ class CPSTestCase(FunkLoadTestCase):
     def listDocumentHref(self, pattern=None):
         """Return a clean list of document href that matches pattern.
 
-        Try to remove server_url and other cps trailings."""
-        return [self.cpsCleanUrl(x) for x in self.listHref(pattern)]
+        Try to remove server_url and other cps trailings,
+        return a list of uniq url."""
+        ret = []
+        for href in [self.cpsCleanUrl(x) for x in self.listHref(pattern)]:
+            if href not in ret:
+                ret.append(href)
+        return ret
+
+
+    def cpsCreateSite(self, site_id, manager_id, manager_password,
+                      manager_mail, langs=None):
+        """Create a CPS Site"""
+        params = {"id": site_id,
+                  "title": "CPS Portal",
+                  "description": "A funkload cps test site",
+                  "manager_id": manager_id,
+                  "manager_password": manager_password,
+                  "manager_password_confirmation": "manager",
+                  "manager_email": manager_mail,
+                  "manager_sn": "CPS manager",
+                  "manager_givenName": "Manager",
+                  "langs_list:list": langs or self._default_langs,
+                  "interface": "portlets",
+                  "submit": "Create"}
+        self.post("%s/manage_addProduct/CPSDefault/manage_addCPSDefaultSite" %
+                  self.server_url, params,
+                  description="Create a CPS Site")
+
+
+    def cpsCreateGroup(self, group_name):
+        """Create a cps group."""
+        self.logd("Check that group [%s] exists." % group_name)
+        server_url = self.server_url
+
+        params = [["dirname", "groups"],
+                  ["id", group_name],]
+        params = [["dirname", "groups"],
+                  ["id", ""],
+                  ["widget__group", group_name],
+                  ["widget__members:tokens:default", ""],
+                  ["cpsdirectory_entry_create_form:method", "Create"]]
+        self.post("%s/" % server_url, params)
+        self.assert_(self.getLastUrl().find('psm_entry_created')!=-1,
+                     '%s entry not created last url is %s' % (
+            group_name, self.getLastUrl()))
+
+
+    def cpsSetLocalRole(self, url, name, role):
+        """Grant role to name in url."""
+        self.logd('Grant local role [%s] to [%s]' % (
+            role, name))
+        params = [["member_ids:list", name],
+                  ["member_role", role]]
+        self.post("%s/folder_localrole_add" % url, params)
+
+
+    def cpsCreateSection(self, parent_url, title,
+                         description="ftest section for funkload testing.",
+                         lang="en"):
+        """Create a section.
+
+        Return the section full url."""
+        params = [["type_name", "Section"],
+                  ["widget__Title", title],
+                  ["widget__Description",
+                   description],
+                  ["widget__LanguageSelectorCreation", lang],
+                  ["widget__hidden_folder", "0"],
+                  ["cpsdocument_create_button", "Create"]]
+        self.post("%s/cpsdocument_create_form" % parent_url,
+                  params, "Create a section")
+        return self.getLastBaseUrl()[:-1]
+
