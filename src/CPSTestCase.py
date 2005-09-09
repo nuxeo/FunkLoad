@@ -137,7 +137,8 @@ class CPSTestCase(FunkLoadTestCase):
     def cpsCreateSite(self, admin_id, admin_pwd,
                       manager_id, manager_password,
                       manager_mail, langs=None, title=None,
-                      description=None):
+                      description=None,
+                      interface="portlets"):
         """Create a CPS Site.
 
         site_id is taken from server_url."""
@@ -155,7 +156,7 @@ class CPSTestCase(FunkLoadTestCase):
                   "manager_sn": "CPS",
                   "manager_givenName": "Manager",
                   "langs_list:list": langs or self._default_langs,
-                  "interface": "portlets",
+                  "interface": interface,
                   "submit": "Create"}
         self.post("%s/manage_addProduct/CPSDefault/manage_addCPSDefaultSite" %
                   base_url, params, description="Create a CPS Site")
