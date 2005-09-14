@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 """%(test_name)s FunkLoad test
 
 $Id: $
