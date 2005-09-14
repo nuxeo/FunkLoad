@@ -62,13 +62,16 @@ class Lipsum:
         chars = self.chars
         return ''.join([random.choice(chars) for i in range(length)])
 
-    def getSubject(self, length=5, prefix=None, uniq=False):
+    def getSubject(self, length=5, prefix=None, uniq=False,
+                   length_min=None, length_max=None):
         """Return a subject of length words."""
         subject = []
         if prefix:
             subject.append(prefix)
         if uniq:
             subject.append(self.getUniqWord())
+        if length_min and length_max:
+            length = random.randrange(length_min, length_max+1)
         for i in range(length):
             subject.append(self.getWord())
         return ' '.join(subject).capitalize()
@@ -93,15 +96,62 @@ class Lipsum:
         return '\n'.join([self.getParagraph() for i in range(
             random.randrange(3,length))])
 
+    def getPhoneNumber(self, lang="fr", format="medium"):
+        """Return a random Phone number."""
+        if lang == "en_US":
+            num = []
+            num.append("%3.3i" % random.randrange(0, 999))
+            num.append("%4.4i" % random.randrange(0, 9999))
+            if format == "short":
+                return "-".join(num)
+            num.insert(0, "%3.3i" % random.randrange(0, 999))
+            if format == "medium":
+                return "(%s) %s-%s" % tuple(num)
+            # default long
+            return "+00 1 (%s) %s-%s" % tuple(num)
+
+        # default lang == 'fr':
+        num = ['07']
+        for i in range(4):
+            num.append('%2.2i' % random.randrange(0, 99))
+        if format == "medium":
+            return " ".join(num)
+        elif format == "long":
+            num[0] = '(0)7'
+            return "+33 "+ " ".join(num)
+        # default format == 'short':
+        return "".join(num)
+
+    def getAddress(self, lang="fr"):
+        """Return a random address."""
+        # default lang == fr
+        return "%i %s %s\n%5.5i %s" % (
+            random.randrange(1, 100),
+            random.choice(['rue', 'avenue', 'place', 'boulevard']),
+            self.getSubject(length_min=1, length_max=3),
+            random.randrange(99000, 99999),
+            self.getSubject(length_min=1, length_max=2))
+
 
 if __name__ == '__main__':
-    print 'Word: %s' % (Lipsum().getWord())
-    print 'UniqWord: %s' % (Lipsum().getUniqWord())
-    print 'Subject: %s' % (Lipsum().getSubject())
-    print 'Subject uniq: %s' % (Lipsum().getSubject(uniq=True))
-    print
-    print 'Sentence: %s' % (Lipsum().getSentence())
-    print
-    print 'Paragraph: %s' % (Lipsum().getParagraph())
-    print
-    print 'Message: %s' % (Lipsum().getMessage())
+    print 'Word: %s\n' % (Lipsum().getWord())
+    print 'UniqWord: %s\n' % (Lipsum().getUniqWord())
+    print 'Subject: %s\n' % (Lipsum().getSubject())
+    print 'Subject uniq: %s\n' % (Lipsum().getSubject(uniq=True))
+    print 'Sentence: %s\n' % (Lipsum().getSentence())
+    print 'Paragraph: %s\n' % (Lipsum().getParagraph())
+    print 'Message: %s\n' % (Lipsum().getMessage())
+    print 'Phone number: %s\n' % Lipsum().getPhoneNumber()
+    print 'Phone number fr short: %s\n' % Lipsum().getPhoneNumber(
+        lang="fr", format="short")
+    print 'Phone number fr medium: %s\n' % Lipsum().getPhoneNumber(
+        lang="fr", format="medium")
+    print 'Phone number fr long: %s\n' % Lipsum().getPhoneNumber(
+        lang="fr", format="long")
+    print 'Phone number en_US short: %s\n' % Lipsum().getPhoneNumber(
+        lang="en_US", format="short")
+    print 'Phone number en_US medium: %s\n' % Lipsum().getPhoneNumber(
+        lang="en_US", format="medium")
+    print 'Phone number en_US long: %s\n' % Lipsum().getPhoneNumber(
+        lang="en_US", format="long")
+    print 'Address default: %s' % Lipsum().getAddress()
