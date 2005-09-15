@@ -41,7 +41,7 @@ class Zope(ZopeTestCase):
 
     def test_restart(self):
         self.zopeRestart(self.zope_url, self.admin_id, self.admin_pwd,
-                         time_out=1)
+                         time_out=10)
 
     def test_packZodb(self):
         self.zopePackZodb(self.zope_url, self.admin_id, self.admin_pwd)
