@@ -62,7 +62,7 @@ FunkLoadTestCase
 API
 ---
 
-**FunkLoadTestCase extend the unittest.TestCase with browser capabilities:**
+**FunkLoadTestCase extends the unittest.TestCase with browser capabilities:**
 
 * `self.get(url, params=None, description=None, code=None)`
 
@@ -167,7 +167,7 @@ console.
 ZopeTestCase
 ============
 
-This class extend the FunkLoadTestCase providing common Zope tasks like:
+This class extends the FunkLoadTestCase providing common Zope tasks like:
 
 * `zopeRestart()` Stop and Start Zope server
 
@@ -182,7 +182,7 @@ This class extend the FunkLoadTestCase providing common Zope tasks like:
 CPSTestCase
 ===========
 
-This class extend the ZopeTestCase providing common Nuxeo CPS tasks like:
+This class extends the ZopeTestCase providing common Nuxeo CPS tasks like:
 
 * `cpsCreateSite(...)` build a new cps site
 
