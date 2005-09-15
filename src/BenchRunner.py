@@ -47,7 +47,6 @@ import time
 from datetime import datetime
 import traceback
 import threading
-import threadframe
 from socket import error as SocketError
 from thread import error as ThreadError
 from xmlrpclib import ServerProxy
@@ -322,7 +321,10 @@ class BenchRunner:
 
 
     def dumpThreads(self):
-        """Display all different traceback of Threads."""
+        """Display all different traceback of Threads for debugging.
+
+        Require threadframe module."""
+        import threadframe
         stacks = {}
         frames = threadframe.dict()
         for thread_id, frame in frames.iteritems():
