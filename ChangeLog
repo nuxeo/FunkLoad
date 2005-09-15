@@ -1,5 +1,9 @@
 2005-09-15  ben  <bdlebosc@nuxeo.com>
 
+        * fix threadframe module requirement
+
+        * scripts/fl-*-ctl removing python 2.3 dependency
+
 	* src/ZopeTestCase.py: adding Zope helpers: zopeRestartZope,
 	  zopeFlushCache, zopePackZodb, zopeAddExternalMethod
 
