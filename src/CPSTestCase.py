@@ -22,10 +22,10 @@ $Id: CPSTestCase.py 24728 2005-08-31 08:13:54Z bdelbosc $
 import time
 import random
 from Lipsum import Lipsum
-from FunkLoadTestCase import FunkLoadTestCase
+from ZopeTestCase import ZopeTestCase
 
-class CPSTestCase(FunkLoadTestCase):
-    """Common cps task.
+class CPSTestCase(ZopeTestCase):
+    """Common CPS tasks.
 
     setUp must set a server_url attribute."""
     server_url = None
@@ -34,7 +34,6 @@ class CPSTestCase(FunkLoadTestCase):
                   'nl', 'mg', 'ro', 'eu']
     _default_langs = _all_langs[:4]
     _cps_login = None
-
 
     def cpsLogin(self, login, password, comment=None):
         """Log in a user.
@@ -134,17 +133,30 @@ class CPSTestCase(FunkLoadTestCase):
         return ret
 
 
+    def cpsGuessZopeUrl(self):
+        """Guess a zope url and site_id from a CPS Site url.
+
+        return a tuple (zope_url, site_id)
+        """
+        server_url = self.server_url
+        site_id = server_url.split('/')[-1]
+        zope_url = server_url[:-(len(site_id)+1)]
+        return zope_url, site_id
+
+
     def cpsCreateSite(self, admin_id, admin_pwd,
                       manager_id, manager_password,
                       manager_mail, langs=None, title=None,
                       description=None,
-                      interface="portlets"):
+                      interface="portlets",
+                      zope_url=None,
+                      site_id=None):
         """Create a CPS Site.
 
-        site_id is taken from server_url."""
-        server_url = self.server_url
-        site_id = server_url.split('/')[-1]
-        base_url = server_url[:-(len(site_id)+1)]
+        if zope_url or site_id is not provided guess them from the server_url.
+        """
+        if zope_url is None or site_id is None:
+            zope_url, site_id = self.cpsGuessZopeUrl()
         self._browser.setBasicAuth(admin_id, admin_pwd)
         params = {"id": site_id,
                   "title": title or "CPS Portal",
@@ -159,7 +171,7 @@ class CPSTestCase(FunkLoadTestCase):
                   "interface": interface,
                   "submit": "Create"}
         self.post("%s/manage_addProduct/CPSDefault/manage_addCPSDefaultSite" %
-                  base_url, params, description="Create a CPS Site")
+                  zope_url, params, description="Create a CPS Site")
         self._browser.clearBasicAuth()
 
 
@@ -222,21 +234,3 @@ class CPSTestCase(FunkLoadTestCase):
         return self.getLastBaseUrl()[:-1]
 
 
-    def cpsAddExternalMethod(self, admin_id, admin_pwd,
-                             method_id, module, function,
-                             run_it=True):
-        """Add an External method using the zmi an run it."""
-        server_url = self.server_url
-        self._browser.setBasicAuth(admin_id, admin_pwd)
-        params = [["id", method_id],
-                  ["title", ""],
-                  ["module", module],
-                  ["function", function],
-                  ["submit", " Add "]]
-        self.post("%s/manage_addProduct/ExternalMethod/manage_addExternalMethod" % server_url, params)
-
-        if run_it:
-            self.get('%s/%s' % (server_url, method_id),
-                     description="Execute %s external method" % method_id)
-
-        self._browser.clearBasicAuth()

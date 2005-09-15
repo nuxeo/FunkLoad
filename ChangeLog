@@ -1,13 +1,21 @@
+2005-09-15  ben  <bdlebosc@nuxeo.com>
+
+	* src/ZopeTestCase.py: adding Zope helpers: zopeRestartZope,
+	  zopeFlushCache, zopePackZodb, zopeAddExternalMethod
+
+	* demo/ adding a cps and zope folder
+
 2005-09-14  ben  <bdlebosc@nuxeo.com>
 
 	* src/Lipsum.py: adding random phone number and address generator
 
 2005-09-06  ben  <bdelbosc@nuxeo.com>
 
-	* src/CPSTestCase.py: adding many cps helpers
+	* src/CPSTestCase.py: adding many cps helpers: cpsCreateSite,
+	  cpsCreateSection, ...
 
 	* src/BenchRunner.py: new methods: setUpCycle and tearDownCycle to
-	configure bench between cycle, see README.txt for more information.
+	  configure bench between cycle, see README.txt for more information.
 
 2005-09-02  ben  <bdelbosc@nuxeo.com>
 
