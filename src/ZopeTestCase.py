@@ -84,7 +84,7 @@ class ZopeTestCase(FunkLoadTestCase):
                   ["function", function],
                   ["submit", " Add "]]
         url = zope_url
-        url+ = "/manage_addProduct/ExternalMethod/manage_addExternalMethod"
+        url += "/manage_addProduct/ExternalMethod/manage_addExternalMethod"
         self.post(url, params)
         if run_it:
             self.get('%s/%s' % (server_url, method_id),
