@@ -46,7 +46,7 @@ Main FunkLoad features are:
 
 * Web assertion helpers.
 
-* Provide a funkload.CPSTestCase class to ease nuxeo CPS testing.
+* Provide a funkload.CPSTestCase to ease Zope and nuxeo CPS testing.
 
 
 Installation
@@ -164,19 +164,48 @@ result) and put other log information into a text log and/or output to the
 console.
 
 
+ZopeTestCase
+============
+
+This class extend the FunkLoadTestCase providing common Zope tasks like:
+
+* `zopeRestart()` Stop and Start Zope server
+
+* `zopePackZodb()` Pack a zodb database
+
+* `zopeFlushCache()` Remove all objects from all ZODB in-memory caches
+
+* `zopeAddExternalMethod()` Add an External method an run it
+
+
 
 CPSTestCase
 ===========
 
-This class extend the FunkLoadTestCase providing common Nuxeo CPS tasks like:
+This class extend the ZopeTestCase providing common Nuxeo CPS tasks like:
 
-* `self.cpsLogin(login, password)`
-* `self.cpsLogout()`
-* `self.cpsSearchDocId(doc_id)`
-  Return the list of url that ends with doc_id
-* `self.cpsCreateNewsItem(parent_url)`
-  Create a simple news in the parent_url container
-* more are coming ...
+* `cpsCreateSite(...)` build a new cps site
+
+* `cpsLogin(login, password)` cps log in
+
+* `cpsLogout()`
+
+* `cpsSetLocalRole(url, name, role)` Grant role to name in url
+
+* `cpsCreateGroup(self, group_name)` Create a cps group
+
+* `cpsListDocumentHref(pattern)` Return a clean list of document href that
+  matches pattern.
+
+* `cpsSearchDocId(doc_id)` Return the list of url that ends with doc_id,
+  using catalog search.
+
+* `cpsCreateNewsItem(parent_url)` Create a simple news in the parent_url
+   container
+
+* `cpsCreateSection(parent_url, title, description)`
+
+* `cpsCreateWorkspace(parent_url, title, description)`
 
 
 Test runner
