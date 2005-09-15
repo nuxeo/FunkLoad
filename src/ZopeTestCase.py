@@ -73,7 +73,7 @@ class ZopeTestCase(FunkLoadTestCase):
                                                                 database)
         self.get(url, description="Flush %s Zodb cache" % database)
 
-    def zopeAddExternalMethod(self, zope_url, admin_id, admin_pwd,
+    def zopeAddExternalMethod(self, parent_url, admin_id, admin_pwd,
                               method_id, module, function,
                               run_it=True):
         """Add an External method an run it."""
@@ -83,10 +83,16 @@ class ZopeTestCase(FunkLoadTestCase):
                   ["module", module],
                   ["function", function],
                   ["submit", " Add "]]
-        url = zope_url
+        url = parent_url
         url += "/manage_addProduct/ExternalMethod/manage_addExternalMethod"
-        self.post(url, params)
+        resp = self.post(url, params, code=[200, 302, 400],
+                         description="Adding %s external method" % method_id)
+        if resp.code == 400:
+            if self.getBody().find('is invalid - it is already in use.') == -1:
+                self.fail('Error got 400 on manage_addExternalMethod')
+            else:
+                self.logd('External method already exists')
         if run_it:
-            self.get('%s/%s' % (server_url, method_id),
+            self.get('%s/%s' % (parent_url, method_id),
                      description="Execute %s external method" % method_id)
         self._browser.clearBasicAuth()
