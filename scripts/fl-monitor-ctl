@@ -11,14 +11,14 @@ else
 fi
 
 start() {
-    echo "### monitorctl: Strating monitor server."
+    echo "### monitorctl: Starting monitor server."
     (python $FL_SRC/monitord.py $conf_path  >> $LOGFILE 2>&1 || echo "### monitorctl: ERROR server not started use monitorctl CONF_PATH log for more info") &
 
 }
 
 
 startd() {
-    echo "### monitorctl: Strating monitor server in debug mode:"
+    echo "### monitorctl: Starting monitor server in debug mode:"
     python $FL_SRC/monitord.py $conf_path
 }
 
