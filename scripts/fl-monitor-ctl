@@ -6,8 +6,7 @@ if [ -n "$FL_HOME" ]; then
     FL_SRC=$FL_HOME/funkload
     echo "### Using src in $FL_SRC"
 else
-    # XXX should find this dynamicly
-    FL_SRC=/usr/lib/python2.3/site-packages/funkload
+    FL_SRC=`python -c "import funkload; print funkload.__path__[0]"` || exit -1
 fi
 
 start() {
