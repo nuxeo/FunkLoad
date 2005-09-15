@@ -11,7 +11,7 @@ P1
 * add global info: bench duration, number of test, number of page, number of
   req, % error.
 
-* update README -> add a man page
+* add a man page with the README.txt contents
 
 * fl-run-bench output
   - add a global timing
@@ -47,6 +47,12 @@ P2
 * monitor
   - log a file size (Data.fs)
   - log bogomips, total ram/swap
+  - get more zope information
+     * extract hotspot information
+       http://www.plope.com/Members/chrism/finding_conflict_hotspots
+     * extract cache size/usage
+  - remote control the server to change a configuration file or restart a
+    server
 
 * improve report:
   - css make tabs smaller
