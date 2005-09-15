@@ -67,6 +67,9 @@ P2
 
 * simulate different IP source
 
+* add non-ascii characters to LoremIpsum generator so as to test encoding and
+  l10n features in CPSTestCase
+
 
 BUGS
 ====
