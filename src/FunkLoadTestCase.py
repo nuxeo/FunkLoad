@@ -244,12 +244,15 @@ class FunkLoadTestCase(unittest.TestCase):
             params = None
         else:
             url = url_in
+
         if method == 'get':
-            self.logd('GET: %s ...' % url)
+            self.logd('GET: %s\n\tPage %i: %s ...' % (url, self.steps,
+                                                      description or ''))
         else:
             url = url_in
-            self.logd('POST: %s %s...' % (url, str(params)))
-
+            self.logd('POST: %s %s\n\tPage %i: %s ...' % (url, str(params),
+                                                          self.steps,
+                                                          description or ''))
         # Fetching
         response = self.connect(url, params, code, method, description)
 
