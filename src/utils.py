@@ -21,6 +21,7 @@ $Id: utils.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
 import os
 import sys
+import time
 import logging
 from time import sleep
 from xmlrpclib import ServerProxy
@@ -106,6 +107,8 @@ def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
         hdlr.setFormatter(formatter)
         logger.addHandler(hdlr)
     if log_to.count("xml") and log_path:
+        if os.access(log_path, os.F_OK):
+            os.rename(log_path, log_path + '.bak-' + str(int(time.time())))
         hdlr = logging.FileHandler(log_path)
         logger.addHandler(hdlr)
     logger.setLevel(level)

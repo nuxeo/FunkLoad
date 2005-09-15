@@ -1,5 +1,7 @@
 2005-09-15  ben  <bdlebosc@nuxeo.com>
 
+        * xml result file is resetted at beginning of a test or bench
+
         * fix threadframe module requirement
 
         * scripts/fl-*-ctl removing python 2.3 dependency
