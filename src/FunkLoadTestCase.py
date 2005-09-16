@@ -247,7 +247,7 @@ class FunkLoadTestCase(unittest.TestCase):
             params = params_in
 
         if method == 'get' and params:
-            url = url_in + '?' + urlencode(params_in)
+            url = url_in + '?' + urlencode(params)
             params = None
         else:
             url = url_in
@@ -312,11 +312,11 @@ class FunkLoadTestCase(unittest.TestCase):
         response = self.browse(url, params, description, code, method="get")
         return response
 
-    def exists(self, url):
+    def exists(self, url, params=None):
         """Try a GET on URL return True if the page exists or False."""
-        resp = self.get(url, description="Checking existance",
-                        code=[200, 301, 302, 404])
-        if resp.code == 404:
+        resp = self.get(url, params, description="Checking existance",
+                        code=[200, 301, 302, 404, 503])
+        if resp.code not in [200, 301, 302]:
             self.logd('Page %s not found.' % url)
             return False
         self.logd('Page %s exists.' % url)
