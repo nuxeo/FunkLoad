@@ -145,7 +145,8 @@ def reloadConf():
         group = Group('default')
         g_groups[None] = group
         for line in lines:
-            if line.startswith('#'):
+            line.strip()
+            if not line or line.startswith('#'):
                 continue
             user, password = [x.strip() for x in line.split(CREDENTIAL_SEP, 1)]
             g_passwords[user] = password
