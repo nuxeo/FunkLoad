@@ -196,6 +196,8 @@ class FunkLoadTestCase(unittest.TestCase):
             if etype is HTTPError:
                 self.log_response(value.response, rtype, description,
                                   t_start, t_stop, log_body=True)
+                if self.dumping:
+                    self.dump_content(value.response)
                 raise self.failureException, str(value.response)
             else:
                 self.log_response_error(url, rtype, description, t_start,
@@ -214,6 +216,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self._browser.history.append((rtype, url))
         self.logd(' Done in %.3fs' % t_delta)
         self.log_response(response, rtype, description, t_start, t_stop)
+        if self.dumping:
+            self.dump_content(response)
         return response
 
 
@@ -289,8 +293,6 @@ class FunkLoadTestCase(unittest.TestCase):
         if sleep:
             self.sleep()
         self._response = response
-        if self.dumping:
-            self.dump_content(response)
         return response
 
 
@@ -307,6 +309,15 @@ class FunkLoadTestCase(unittest.TestCase):
         response = self.browse(url, params, description, code, method="get")
         return response
 
+    def exists(self, url):
+        """Try a GET on URL return True if the page exists or False."""
+        resp = self.get(url, description="Checking existance",
+                        code=[200, 301, 302, 404])
+        if resp.code == 404:
+            self.logd('Page %s not found.' % url)
+            return False
+        self.logd('Page %s exists.' % url)
+        return True
 
     def sleep(self):
         """Sleeps a random amount of time.
@@ -452,6 +463,10 @@ class FunkLoadTestCase(unittest.TestCase):
         dump_dir = getattr(self.options, 'dump_dir', None)
         if dump_dir is None:
             return
+        if getattr(response, 'code', 301) in [301, 302]:
+            return
+        if not response.body:
+            return
         if not os.access(dump_dir, os.W_OK):
             os.mkdir(dump_dir, 0775)
         file_path = os.path.abspath(
@@ -460,7 +475,7 @@ class FunkLoadTestCase(unittest.TestCase):
         f.write(response.body)
         f.close()
         if self.viewing:
-            cmd = 'firefox -remote  "openfile(file://%s, new-tab)"' % file_path
+            cmd = 'firefox -remote  "openfile(file://%s,new-tab)"' % file_path
             ret = os.system(cmd)
 
     #
