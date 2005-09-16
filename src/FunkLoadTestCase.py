@@ -23,6 +23,7 @@ import os
 import sys
 import time
 import re
+from socket import error as SocketError
 from types import ListType
 from datetime import datetime
 import unittest
@@ -202,6 +203,8 @@ class FunkLoadTestCase(unittest.TestCase):
             else:
                 self.log_response_error(url, rtype, description, t_start,
                                         t_stop)
+                if etype is SocketError:
+                    raise SocketError("Can't load %s." % url)
                 raise
         t_stop = time.time()
         # Log response
