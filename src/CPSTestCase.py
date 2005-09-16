@@ -210,16 +210,17 @@ class CPSTestCase(ZopeTestCase):
                          description="ftest section for funkload testing.",
                          lang=None):
         """Create a section."""
-        self.cpsCreateFolder('Section', parent_url, title, description,
-                             lang or self.cpsGetRandomLanguage())
+        return self.cpsCreateFolder('Section', parent_url, title, description,
+                                    lang or self.cpsGetRandomLanguage())
 
 
     def cpsCreateWorkspace(self, parent_url, title,
                            description="ftest workspace for funkload testing.",
                            lang=None):
         """Create a workspace."""
-        self.cpsCreateFolder('Workspace', parent_url, title, description,
-                             lang or self.cpsGetRandomLanguage())
+        return self.cpsCreateFolder('Workspace', parent_url, title,
+                                    description,
+                                    lang or self.cpsGetRandomLanguage())
 
     def cpsCreateFolder(self, type, parent_url, title,
                         description, lang):
@@ -237,4 +238,68 @@ class CPSTestCase(ZopeTestCase):
                   params, "Create a %s" % type)
         return self.cpsCleanUrl(self.getLastBaseUrl())
 
+
+    def cpsVerifyGroup(self, group_name):
+        """Check existance or create a cps group."""
+        server_url = self.server_url
+        params = [["dirname", "groups"],
+                  ["id", group_name],]
+        if self.exists("%s/cpsdirectory_entry_view" % server_url, params):
+            self.logd('Group %s exists.')
+        else:
+            params = [["dirname", "groups"],
+                      ["id", ""],
+                      ["widget__group", group_name],
+                      ["widget__members:tokens:default", ""],
+                      ["cpsdirectory_entry_create_form:method", "Create"]]
+            self.post("%s/" % server_url, params)
+            self.assert_(self.getLastUrl().find('psm_entry_created')!=-1,
+                         'Failed to create group %s' % group_name)
+
+    def cpsVerifyUser(self, user_id=None, user_pwd=None,
+                      user_givenName=None, user_sn=None,
+                      user_email=None, groups=None):
+        """Create a cps user as a Member."""
+        if user_id:
+            params = [["dirname", "members"],
+                      ["id", user_id],]
+            if self.exists(
+                "%s/cpsdirectory_entry_view" % self.server_url, params):
+                self.logd('User %s exists.')
+                return user_id, None
+
+        lipsum = self._lipsum
+        sign = lipsum.getUniqWord()
+        user_id = user_id or 'fl_' + sign.lower()
+        user_givenName = user_givenName or lipsum.getWord().capitalize()
+        user_sn = user_sn or user_id.upper()
+        user_email = user_email or "root@127.0.0.01"
+        user_pwd = user_pwd or lipsum.getUniqWord(length_min=6)
+        params = [["dirname", "members"],
+                  ["id", ""],
+                  ["widget__id", user_id],
+                  ["widget__password", user_pwd],
+                  ["widget__confirm", user_pwd],
+                  ["widget__givenName", user_givenName],
+                  ["widget__sn", user_sn],
+                  ["widget__email", user_email],
+                  ["widget__roles:tokens:default", ""],
+                  ["widget__roles:list", "Member"],
+                  ["widget__groups:tokens:default", ""],
+                  ["widget__homeless", "0"],
+                  ["cpsdirectory_entry_create_form:method", "Create"]]
+        for group in groups:
+            params.append(["widget__groups:list", group])
+        self.post("%s/" % self.server_url, params,
+                  description="Create user [%s]" % user_id)
+        self.assert_(self.getLastUrl().find('psm_entry_created')!=-1,
+                     'Failed to create user %s' % user_id)
+        return user_id, user_pwd
+
+    def cpsSetLocalRole(self, url, name, role):
+        """Setup local role role to url."""
+        params = [["member_ids:list", name],
+                  ["member_role", role]]
+        self.post("%s/folder_localrole_add" % url, params,
+                  description="Grant local role %s to %s" % (role, name))
 
