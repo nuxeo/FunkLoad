@@ -58,6 +58,9 @@ def test_getCredential(server):
         user, password = server.getCredential()
         print "### cli: %s   return %s %s" % (call_count, user, password)
         call_count += 1
+    for group in server.listGroups():
+        print "### cli: group %s" % group
+        print "###    content: %s" % server.listCredentials(group)
 
 # ------------------------------------------------------------
 # main

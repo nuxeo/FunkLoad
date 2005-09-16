@@ -145,9 +145,10 @@ def reloadConf():
         group = Group('default')
         g_groups[None] = group
         for line in lines:
-            line.strip()
+            line = line.strip()
             if not line or line.startswith('#'):
                 continue
+            print "line: '%s'" % line
             user, password = [x.strip() for x in line.split(CREDENTIAL_SEP, 1)]
             g_passwords[user] = password
             if not lofc or len(group) < lofc:
@@ -161,7 +162,8 @@ def reloadConf():
         log("getFileCredential use group file %s." % groups_path)
         lines = open(groups_path).readlines()
         for line in lines:
-            if line.startswith('#'):
+            line = line.strip()
+            if not line or line.startswith('#'):
                 continue
             name, users = [x.strip() for x in line.split(CREDENTIAL_SEP, 1)]
             users = filter(None,
@@ -206,7 +208,6 @@ def getFileCredential(group=None):
         g_call_count, group, user, password))
     return (user, password)
 
-
 def getCredential(mode=None, group=None):
     """Return credential according mode or serveur configuration."""
     global g_mode
@@ -221,6 +222,27 @@ def getCredential(mode=None, group=None):
         return getFileCredential(group)
     else:
         raise NotImplemented("mode %s" % choice)
+
+
+def listCredentials(group=None):
+    """Return a list of credentials."""
+    global g_passwords
+    global g_groups
+    if group is None:
+        ret = list(g_passwords)
+    else:
+        users = g_groups[group].users
+        ret = [(user, g_passwords[user]) for user in users]
+    log("listUsers(%s) return (%s)" % (group, ret))
+    return ret
+
+
+def listGroups(group=None):
+    """Return a list of groups."""
+    global g_groups
+    ret = filter(None, g_groups.keys())
+    log("listGroup() return (%s)" % str(ret))
+    return ret
 
 # ------------------------------------------------------------
 # testing
@@ -282,6 +304,8 @@ def main(conf_path=None):
     server.register_function(getRandomCredential)
     server.register_function(getFileCredential)
     server.register_function(getCredential)
+    server.register_function(listCredentials)
+    server.register_function(listGroups)
     log("credential server started.")
 
     # loop

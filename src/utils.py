@@ -138,6 +138,30 @@ def xmlrpc_get_credential(host, port, group=None):
             'No Credential server reachable at %s, use fl-credential-ctl '
             'to start the credential server.' % url)
 
+def xmlrpc_list_groups(host, port):
+    """Get list of groups thru xmlrpc credential_server."""
+    url = "http://%s:%s" % (host, port)
+    server = ServerProxy(url)
+    try:
+        return server.listGroups()
+    except SocketError:
+        raise SocketError(
+            'No Credential server reachable at %s, use fl-credential-ctl '
+            'to start the credential server.' % url)
+
+def xmlrpc_list_credentials(host, port, group=None):
+    """Get list of users thru xmlrpc credential_server."""
+    url = "http://%s:%s" % (host, port)
+    server = ServerProxy(url)
+    try:
+        return server.listCredentials(group)
+    except SocketError:
+        raise SocketError(
+            'No Credential server reachable at %s, use fl-credential-ctl '
+            'to start the credential server.' % url)
+
+
+
 # ------------------------------------------------------------
 # misc
 #
