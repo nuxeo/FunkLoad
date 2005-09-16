@@ -56,9 +56,11 @@ class Lipsum:
         """Return a random word."""
         return random.choice(self.vocab)
 
-    def getUniqWord(self):
+    def getUniqWord(self, length_min=None, length_max=None):
         """Generate a kind of uniq id"""
-        length = random.randrange(5, 9)
+        length_min = length_min or 5
+        length_max = length_max or 9
+        length = random.randrange(length_min, length_max)
         chars = self.chars
         return ''.join([random.choice(chars) for i in range(length)])
 
