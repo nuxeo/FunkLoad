@@ -98,14 +98,18 @@ class CPSTestCase(ZopeTestCase):
                   ["widget__content_rformat", "text"],
                   ["widget__Subject:tokens:default", ""],
                   ["widget__Subject:list", "Business"],
-                  ["widget__publication_date_date", time.strftime('%m/%d/%Y')],
+                  # %m/%m prevent invalid date depending on ui locale
+                  ["widget__publication_date_date", time.strftime('%m/%m/%Y')],
                   ["widget__publication_date_hour", time.strftime('%H')],
                   ["widget__publication_date_minute", time.strftime('%M')],
                   ["cpsdocument_create_button", "Create"]]
         self.post("%s/cpsdocument_create_form" % parent_url, params,
                   description="Creating a news item")
-        doc_url = self.getLastBaseUrl()[:-1]
-        doc_id = doc_url[len(parent_url)+1:]
+        last_url = self.getLastUrl()
+        self.assert_('psm_content_created' in last_url,
+                     'Failed to create [%s] in %s/.' % (title, parent_url))
+        doc_url = self.cpsCleanUrl(self.getLastBaseUrl())
+        doc_id = doc_url.split('/')[-1]
         return doc_url, doc_id
 
     def cpsCleanUrl(self, url_in):
@@ -231,6 +235,6 @@ class CPSTestCase(ZopeTestCase):
                   ["cpsdocument_create_button", "Create"]]
         self.post("%s/cpsdocument_create_form" % parent_url,
                   params, "Create a %s" % type)
-        return self.getLastBaseUrl()[:-1]
+        return self.cpsCleanUrl(self.getLastBaseUrl())
 
 
