@@ -1,3 +1,10 @@
-Ftest_Member:manager
-Ftest_Manager:manager
-Ftest_Reviewer:manager
+# $Id: $
+#
+AdminZope:admin
+AdminCps:manager
+
+# CPS local roles
+FL_Member:fl_member_01,fl_member_02,fl_member_03,fl_member_04,fl_member_05
+FL_Member:fl_member_06,fl_member_07,fl_member_08,fl_member_09,fl_member_10
+FL_Reviewer:fl_review_01,fl_review_02,fl_review_03,fl_review_04
+FL_Manager:fl_manager_01,fl_manager_02
