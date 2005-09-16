@@ -24,6 +24,7 @@ import sys
 import time
 import logging
 from time import sleep
+from socket import error as SocketError
 from xmlrpclib import ServerProxy
 
 
@@ -128,8 +129,14 @@ def trace(message):
 #
 def xmlrpc_get_credential(host, port, group=None):
     """Get credential thru xmlrpc credential_server."""
-    server = ServerProxy("http://%s:%s" % (host, port))
-    return server.getCredential('file', group)
+    url = "http://%s:%s" % (host, port)
+    server = ServerProxy(url)
+    try:
+        return server.getCredential('file', group)
+    except SocketError:
+        raise SocketError(
+            'No Credential server reachable at %s, use fl-credential-ctl '
+            'to start the credential server.' % url)
 
 # ------------------------------------------------------------
 # misc
