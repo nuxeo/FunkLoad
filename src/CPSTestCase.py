@@ -65,6 +65,17 @@ class CPSTestCase(ZopeTestCase):
         return random.choice(self._all_langs)
 
 
+    def cpsChangeUiLanguage(self, lang):
+        """Change the ui language."""
+        # Webunit don't handle referer header
+        # this get redirect to cpsportlet_change_language that return a 204
+        self.get("%s/cpsportlet_change_language" % self.server_url,
+                 params=[['lang', lang]],
+                 description="Change UI language to %s" % lang,
+                 code=[200,302,204])
+        # but the language selector coockie is set
+
+
     def cpsSearchDocId(self, doc_id):
         """Return the list of url that ends with doc_id.
 
@@ -75,42 +86,6 @@ class CPSTestCase(ZopeTestCase):
         ret = self.listDocumentHref(pattern='%s$' % doc_id)
         self.logd('found %i link ends with %s' % (len(ret), doc_id))
         return ret
-
-    def cpsCreateNewsItem(self, parent_url):
-        """Create a random news.
-
-        return a tuple: (doc_url, doc_id)."""
-        language = self.cpsGetRandomLanguage()
-        title = self._lipsum.getSubject(uniq=True,
-                                        prefix='test %s' % language)
-        params = [["type_name", "News Item"],
-                  ["widget__Title", title],
-                  ["widget__Description", self._lipsum.getSubject(10)],
-                  ["widget__LanguageSelectorCreation", language],
-                  ["widget__photo_title", "none"],
-                  ["widget__photo_filename", ""],
-                  ["widget__photo_choice", "keep"],
-                  ["widget__photo", ""],
-                  ["widget__photo_resize", "img_auto_size"],
-                  ["widget__photo_rposition", "left"],
-                  ["widget__photo_subtitle", ""],
-                  ["widget__content", self._lipsum.getMessage()],
-                  ["widget__content_rformat", "text"],
-                  ["widget__Subject:tokens:default", ""],
-                  ["widget__Subject:list", "Business"],
-                  # %m/%m prevent invalid date depending on ui locale
-                  ["widget__publication_date_date", time.strftime('%m/%m/%Y')],
-                  ["widget__publication_date_hour", time.strftime('%H')],
-                  ["widget__publication_date_minute", time.strftime('%M')],
-                  ["cpsdocument_create_button", "Create"]]
-        self.post("%s/cpsdocument_create_form" % parent_url, params,
-                  description="Creating a news item")
-        last_url = self.getLastUrl()
-        self.assert_('psm_content_created' in last_url,
-                     'Failed to create [%s] in %s/.' % (title, parent_url))
-        doc_url = self.cpsCleanUrl(self.getLastBaseUrl())
-        doc_id = doc_url.split('/')[-1]
-        return doc_url, doc_id
 
     def cpsCleanUrl(self, url_in):
         """Try to remove server_url and clean ending."""
@@ -198,12 +173,11 @@ class CPSTestCase(ZopeTestCase):
 
 
     def cpsSetLocalRole(self, url, name, role):
-        """Grant role to name in url."""
-        self.logd('Grant local role [%s] to [%s]' % (
-            role, name))
+        """Setup local role role to url."""
         params = [["member_ids:list", name],
                   ["member_role", role]]
-        self.post("%s/folder_localrole_add" % url, params)
+        self.post("%s/folder_localrole_add" % url, params,
+                  description="Grant local role %s to %s" % (role, name))
 
 
     def cpsCreateSection(self, parent_url, title,
@@ -296,10 +270,40 @@ class CPSTestCase(ZopeTestCase):
                      'Failed to create user %s' % user_id)
         return user_id, user_pwd
 
-    def cpsSetLocalRole(self, url, name, role):
-        """Setup local role role to url."""
-        params = [["member_ids:list", name],
-                  ["member_role", role]]
-        self.post("%s/folder_localrole_add" % url, params,
-                  description="Grant local role %s to %s" % (role, name))
+
+    def cpsCreateNewsItem(self, parent_url):
+        """Create a random news.
+
+        return a tuple: (doc_url, doc_id)."""
+        language = self.cpsGetRandomLanguage()
+        title = self._lipsum.getSubject(uniq=True,
+                                        prefix='test %s' % language)
+        params = [["type_name", "News Item"],
+                  ["widget__Title", title],
+                  ["widget__Description", self._lipsum.getSubject(10)],
+                  ["widget__LanguageSelectorCreation", language],
+                  ["widget__photo_title", "none"],
+                  ["widget__photo_filename", ""],
+                  ["widget__photo_choice", "keep"],
+                  ["widget__photo", ""],
+                  ["widget__photo_resize", "img_auto_size"],
+                  ["widget__photo_rposition", "left"],
+                  ["widget__photo_subtitle", ""],
+                  ["widget__content", self._lipsum.getMessage()],
+                  ["widget__content_rformat", "text"],
+                  ["widget__Subject:tokens:default", ""],
+                  ["widget__Subject:list", "Business"],
+                  # %m/%m prevent invalid date depending on ui locale
+                  ["widget__publication_date_date", time.strftime('%m/%m/%Y')],
+                  ["widget__publication_date_hour", time.strftime('%H')],
+                  ["widget__publication_date_minute", time.strftime('%M')],
+                  ["cpsdocument_create_button", "Create"]]
+        self.post("%s/cpsdocument_create_form" % parent_url, params,
+                  description="Creating a news item")
+        last_url = self.getLastUrl()
+        self.assert_('psm_content_created' in last_url,
+                     'Failed to create [%s] in %s/.' % (title, parent_url))
+        doc_url = self.cpsCleanUrl(self.getLastBaseUrl())
+        doc_id = doc_url.split('/')[-1]
+        return doc_url, doc_id
 
