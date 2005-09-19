@@ -23,7 +23,7 @@ $Id: setup.py 24768 2005-08-31 14:01:05Z bdelbosc $
 """
 from distutils.core import setup
 
-from src.FunkLoadTestCase import __version__
+from src.version import __version__
 
 setup(
     name = "funkload",
