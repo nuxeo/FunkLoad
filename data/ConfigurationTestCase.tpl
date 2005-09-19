@@ -9,6 +9,8 @@ title=%(class_name)s
 description=XXX the TestCase class description
 # the server url to test
 url=%(server_url)s
+# the User-Agent header to send
+#user_agent = Mozilla/5.0 Firefox/1.0.6
 
 
 # ------------------------------------------------------------
