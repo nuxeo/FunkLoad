@@ -35,6 +35,9 @@ class CPSTestCase(ZopeTestCase):
     _default_langs = _all_langs[:4]
     _cps_login = None
 
+    # ------------------------------------------------------------
+    # cps actions
+    #
     def cpsLogin(self, login, password, comment=None):
         """Log in a user.
 
@@ -52,76 +55,11 @@ class CPSTestCase(ZopeTestCase):
                      'invalid credential: [%s:%s].' % (login, password))
         self._cps_login = login
 
-
     def cpsLogout(self):
         """Log out the current user."""
         if self._cps_login is not None:
             self.get('%s/logout' % self.server_url,
                      description="Log out [%s]" % self._cps_login)
-
-
-    def cpsGetRandomLanguage(self):
-        """Return a random language."""
-        return random.choice(self._all_langs)
-
-
-    def cpsChangeUiLanguage(self, lang):
-        """Change the ui language."""
-        # Webunit don't handle referer header
-        # this get redirect to cpsportlet_change_language that return a 204
-        self.get("%s/cpsportlet_change_language" % self.server_url,
-                 params=[['lang', lang]],
-                 description="Change UI language to %s" % lang,
-                 code=[200,302,204])
-        # but the language selector coockie is set
-
-
-    def cpsSearchDocId(self, doc_id):
-        """Return the list of url that ends with doc_id.
-
-        Using catalog search."""
-        params = [["SearchableText", doc_id]]
-        self.post("%s/search_form" % self.server_url, params,
-                  description="Searching doc_id %s" % doc_id)
-        ret = self.listDocumentHref(pattern='%s$' % doc_id)
-        self.logd('found %i link ends with %s' % (len(ret), doc_id))
-        return ret
-
-    def cpsCleanUrl(self, url_in):
-        """Try to remove server_url and clean ending."""
-        url = url_in
-        server_url = self.server_url
-        for ending in ('/', '/view', '/folder_contents',
-                       '/folder_view', '/cpsdocument_metadata',
-                       '/cpsdocument_edit_form'):
-            if url.endswith(ending):
-                url = url[:-len(ending)]
-            if url.startswith(server_url):
-                url = url[len(server_url):]
-        return url
-
-    def listDocumentHref(self, pattern=None):
-        """Return a clean list of document href that matches pattern.
-
-        Try to remove server_url and other cps trailings,
-        return a list of uniq url."""
-        ret = []
-        for href in [self.cpsCleanUrl(x) for x in self.listHref(pattern)]:
-            if href not in ret:
-                ret.append(href)
-        return ret
-
-
-    def cpsGuessZopeUrl(self):
-        """Guess a zope url and site_id from a CPS Site url.
-
-        return a tuple (zope_url, site_id)
-        """
-        server_url = self.server_url
-        site_id = server_url.split('/')[-1]
-        zope_url = server_url[:-(len(site_id)+1)]
-        return zope_url, site_id
-
 
     def cpsCreateSite(self, admin_id, admin_pwd,
                       manager_id, manager_password,
@@ -153,14 +91,9 @@ class CPSTestCase(ZopeTestCase):
                   zope_url, params, description="Create a CPS Site")
         self._browser.clearBasicAuth()
 
-
     def cpsCreateGroup(self, group_name):
         """Create a cps group."""
-        self.logd("Check that group [%s] exists." % group_name)
         server_url = self.server_url
-
-        params = [["dirname", "groups"],
-                  ["id", group_name],]
         params = [["dirname", "groups"],
                   ["id", ""],
                   ["widget__group", group_name],
@@ -168,80 +101,26 @@ class CPSTestCase(ZopeTestCase):
                   ["cpsdirectory_entry_create_form:method", "Create"]]
         self.post("%s/" % server_url, params)
         self.assert_(self.getLastUrl().find('psm_entry_created')!=-1,
-                     '%s entry not created last url is %s' % (
-            group_name, self.getLastUrl()))
-
-
-    def cpsSetLocalRole(self, url, name, role):
-        """Setup local role role to url."""
-        params = [["member_ids:list", name],
-                  ["member_role", role]]
-        self.post("%s/folder_localrole_add" % url, params,
-                  description="Grant local role %s to %s" % (role, name))
-
-
-    def cpsCreateSection(self, parent_url, title,
-                         description="ftest section for funkload testing.",
-                         lang=None):
-        """Create a section."""
-        return self.cpsCreateFolder('Section', parent_url, title, description,
-                                    lang or self.cpsGetRandomLanguage())
-
-
-    def cpsCreateWorkspace(self, parent_url, title,
-                           description="ftest workspace for funkload testing.",
-                           lang=None):
-        """Create a workspace."""
-        return self.cpsCreateFolder('Workspace', parent_url, title,
-                                    description,
-                                    lang or self.cpsGetRandomLanguage())
-
-    def cpsCreateFolder(self, type, parent_url, title,
-                        description, lang):
-        """Create a section or a workspace.
-
-        Return the section full url."""
-        params = [["type_name", type],
-                  ["widget__Title", title],
-                  ["widget__Description",
-                   description],
-                  ["widget__LanguageSelectorCreation", lang],
-                  ["widget__hidden_folder", "0"],
-                  ["cpsdocument_create_button", "Create"]]
-        self.post("%s/cpsdocument_create_form" % parent_url,
-                  params, "Create a %s" % type)
-        return self.cpsCleanUrl(self.getLastBaseUrl())
-
+                         'Failed to create group %s' % group_name)
 
     def cpsVerifyGroup(self, group_name):
         """Check existance or create a cps group."""
         server_url = self.server_url
         params = [["dirname", "groups"],
                   ["id", group_name],]
-        if self.exists("%s/cpsdirectory_entry_view" % server_url, params):
+        if self.exists("%s/cpsdirectory_entry_view" % server_url, params,
+                       description="Check that group [%s] exists."
+                       % group_name):
             self.logd('Group %s exists.')
         else:
-            params = [["dirname", "groups"],
-                      ["id", ""],
-                      ["widget__group", group_name],
-                      ["widget__members:tokens:default", ""],
-                      ["cpsdirectory_entry_create_form:method", "Create"]]
-            self.post("%s/" % server_url, params)
-            self.assert_(self.getLastUrl().find('psm_entry_created')!=-1,
-                         'Failed to create group %s' % group_name)
+            self.cpsCreateGroup(group_name)
 
-    def cpsVerifyUser(self, user_id=None, user_pwd=None,
+    def cpsCreateUser(self, user_id=None, user_pwd=None,
                       user_givenName=None, user_sn=None,
                       user_email=None, groups=None):
-        """Create a cps user as a Member."""
-        if user_id:
-            params = [["dirname", "members"],
-                      ["id", user_id],]
-            if self.exists(
-                "%s/cpsdirectory_entry_view" % self.server_url, params):
-                self.logd('User %s exists.')
-                return user_id, None
+        """Create a cps user with the Member role.
 
+        return login, pwd"""
         lipsum = self._lipsum
         sign = lipsum.getUniqWord()
         user_id = user_id or 'fl_' + sign.lower()
@@ -270,6 +149,86 @@ class CPSTestCase(ZopeTestCase):
                      'Failed to create user %s' % user_id)
         return user_id, user_pwd
 
+    def cpsVerifyUser(self, user_id=None, user_pwd=None,
+                      user_givenName=None, user_sn=None,
+                      user_email=None, groups=None):
+        """Verify if user exists or create him.
+
+        return login, pwd
+
+        if user exists pwd is None.
+        """
+        if user_id:
+            params = [["dirname", "members"],
+                      ["id", user_id],]
+            if self.exists(
+                "%s/cpsdirectory_entry_view" % self.server_url, params):
+                self.logd('User %s exists.')
+                return user_id, None
+
+        return self.cpsCreateUser(user_id, user_pwd, user_givenName,
+                                  user_sn, user_email, groups)
+
+    def cpsSetLocalRole(self, url, name, role):
+        """Setup local role role to url."""
+        params = [["member_ids:list", name],
+                  ["member_role", role]]
+        self.post("%s/folder_localrole_add" % url, params,
+                  description="Grant local role %s to %s" % (role, name))
+
+    def cpsCreateSection(self, parent_url, title,
+                         description="ftest section for funkload testing.",
+                         lang=None):
+        """Create a section."""
+        return self.cpsCreateFolder('Section', parent_url, title, description,
+                                    lang or self.cpsGetRandomLanguage())
+
+    def cpsCreateWorkspace(self, parent_url, title,
+                           description="ftest workspace for funkload testing.",
+                           lang=None):
+        """Create a workspace."""
+        return self.cpsCreateFolder('Workspace', parent_url, title,
+                                    description,
+                                    lang or self.cpsGetRandomLanguage())
+
+    def cpsCreateFolder(self, type, parent_url, title,
+                        description, lang):
+        """Create a section or a workspace.
+
+        Return the section full url."""
+        params = [["type_name", type],
+                  ["widget__Title", title],
+                  ["widget__Description",
+                   description],
+                  ["widget__LanguageSelectorCreation", lang],
+                  ["widget__hidden_folder", "0"],
+                  ["cpsdocument_create_button", "Create"]]
+        self.post("%s/cpsdocument_create_form" % parent_url,
+                  params, "Create a %s" % type)
+        return self.cpsCleanUrl(self.getLastBaseUrl())
+
+    def cpsCreateDocument(self, parent_url):
+        """Create a simple random document.
+
+        return a tuple: (doc_url, doc_id)
+        """
+        language = self.cpsGetRandomLanguage()
+        title = self._lipsum.getSubject(uniq=True,
+                                        prefix='test %s' % language)
+        params = [["type_name", "Document"],
+                  ["widget__Title", title],
+                  ["widget__Description", self._lipsum.getSubject(10)],
+                  ["widget__LanguageSelectorCreation", language],
+                  ["widget__content", self._lipsum.getMessage()],
+                  ["widget__content_rformat", "text"],
+                  ["cpsdocument_create_button", "Create"]]
+        self.post("%s/cpsdocument_create_form" % parent_url, params,
+                  description="Creating a document")
+        self.assert_(self.getLastUrl().find('psm_content_created')!=-1,
+                     'Failed to create [%s] in %s/.' % (title, parent_url))
+        doc_url = self.cpsCleanUrl(self.getLastBaseUrl())
+        doc_id = doc_url.split('/')[-1]
+        return doc_url, doc_id
 
     def cpsCreateNewsItem(self, parent_url):
         """Create a random news.
@@ -306,4 +265,67 @@ class CPSTestCase(ZopeTestCase):
         doc_url = self.cpsCleanUrl(self.getLastBaseUrl())
         doc_id = doc_url.split('/')[-1]
         return doc_url, doc_id
+
+    def cpsChangeUiLanguage(self, lang):
+        """Change the ui language."""
+        # Webunit don't handle referer header
+        # this get redirect to cpsportlet_change_language that return a 204
+        self.get("%s/cpsportlet_change_language" % self.server_url,
+                 params=[['lang', lang]],
+                 description="Change UI language to %s" % lang,
+                 code=[200,302,204])
+        # but the language selector coockie is set
+
+
+    # ------------------------------------------------------------
+    # helpers
+    #
+    def cpsGetRandomLanguage(self):
+        """Return a random language."""
+        return random.choice(self._all_langs)
+
+    def cpsGuessZopeUrl(self):
+        """Guess a zope url and site_id from a CPS Site url.
+
+        return a tuple (zope_url, site_id)
+        """
+        server_url = self.server_url
+        site_id = server_url.split('/')[-1]
+        zope_url = server_url[:-(len(site_id)+1)]
+        return zope_url, site_id
+
+    def cpsSearchDocId(self, doc_id):
+        """Return the list of url that ends with doc_id.
+
+        Using catalog search."""
+        params = [["SearchableText", doc_id]]
+        self.post("%s/search_form" % self.server_url, params,
+                  description="Searching doc_id %s" % doc_id)
+        ret = self.listDocumentHref(pattern='%s$' % doc_id)
+        self.logd('found %i link ends with %s' % (len(ret), doc_id))
+        return ret
+
+    def cpsCleanUrl(self, url_in):
+        """Try to remove server_url and clean ending."""
+        url = url_in
+        server_url = self.server_url
+        for ending in ('/', '/view', '/folder_contents',
+                       '/folder_view', '/cpsdocument_metadata',
+                       '/cpsdocument_edit_form'):
+            if url.endswith(ending):
+                url = url[:-len(ending)]
+            if url.startswith(server_url):
+                url = url[len(server_url):]
+        return url
+
+    def listDocumentHref(self, pattern=None):
+        """Return a clean list of document href that matches pattern.
+
+        Try to remove server_url and other cps trailings,
+        return a list of uniq url."""
+        ret = []
+        for href in [self.cpsCleanUrl(x) for x in self.listHref(pattern)]:
+            if href not in ret:
+                ret.append(href)
+        return ret
 
