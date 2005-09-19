@@ -75,6 +75,7 @@ class CPSBasicNavigation(CPSTestCase):
             self.cpsVerifyGroup(group)
         self.cpsLogout()
 
+
     def test_06_verif_users(self):
         server_url = self.server_url
         self.cpsLogin(self.cred_manager[0], self.cred_manager[1], "manager")
@@ -93,7 +94,7 @@ class CPSBasicNavigation(CPSTestCase):
         login = self.cred_member[0]
         self.cpsLogin(login, self.cred_member[1], "member")
         for i in range(nb_docs):
-            self.cpsCreateNewsItem("%s/workspaces/members/%s" %
+            self.cpsCreateDocument("%s/workspaces/members/%s" %
                                    (server_url, login))
         self.cpsLogout()
 
@@ -133,12 +134,12 @@ class CPSBasicNavigation(CPSTestCase):
         # login in as member -----------------------------------------
         self.cpsLogin(self.cred_member[0], self.cred_member[1],
                       "member")
-        # access ftest ws
+        # access test ws
         self.get("%s/folder_contents" % base_url,
                  description="Folder contents")
 
-        # create a news
-        doc_rurl, doc_id = self.cpsCreateNewsItem(base_url)
+        # create a document
+        doc_rurl, doc_id = self.cpsCreateDocument(base_url)
 
         # pubish a doc
         doc_url = server_url + '/' + doc_rurl
@@ -184,65 +185,84 @@ class CPSBasicNavigation(CPSTestCase):
         return self.steps
 
 
-    def test_30_reader(self):
+    def test_30_reader_anonymous(self):
         server_url = self.server_url
-
-        # home page
         self.get('%s' % server_url,
                  description='Home page anonymous')
 
         self.assert_(self.listHref('login_form'), 'No login link found')
 
-        # login page
         self.get('%s/login_form' % server_url,
                  description="Login page")
 
-        # login in as member
+        self.get("%s/accessibility" % server_url,
+                 description="View accessibility information")
+
+        self.get("%s/advanced_search_form" % server_url,
+                 description="View advanced search form")
+
+        # home page in different languages
+        languages = self.conf_getList('main', 'languages')
+        languages.reverse()             # to end with the first default one
+        for lang in languages:
+            self.cpsChangeUiLanguage(lang)
+            self.get(server_url, description="Logged home page in %s" % lang)
+
+        # XXX TODO check that private page are unaccessible
+
+
+
+    def test_31_reader_member(self):
+        server_url = self.server_url
         self.cpsLogin(self.cred_member[0], self.cred_member[1],
                       "member")
 
-        # home page
         self.get("%s/" % server_url, description="Home page logged")
 
         # home page in different languages
-        for lang in self.conf_getList('main', 'languages'):
-            self.post("%s/cpsportlet_change_language" % server_url,
-                      params=[['lang', lang]],
-                      description="Home page in %s" % lang,
-                      code=[200, 302, 204])
+        languages = self.conf_getList('main', 'languages')
+        languages.reverse()             # to end with the first default one
+        for lang in languages:
+            self.cpsChangeUiLanguage(lang)
+            self.get(server_url, description="Logged home page in %s" % lang)
 
         # perso ws
         self.get("%s/workspaces/members/%s" % (server_url, self._cps_login),
                  description="View personal workspace")
 
-        # extract a doc link and view the document
-        my_docs = self.listDocumentHref('/workspaces/members/%s/test-' %
-                                        self._cps_login)
-        self.assert_(my_docs, "no doc found in personal ws")
 
-        a_doc = my_docs[int(len(my_docs) * random())]
+        # test ws
+        test_ws_url = '%s/workspaces/%s' % (server_url, self.workspace_id)
+        self.get(test_ws_url, description="View FL test workspace")
+
+        # view a random document
+        docs = self.listDocumentHref('workspaces/%s/test-' %
+                                        self.workspace_id)
+        self.assert_(docs, "no doc found in ws %s" % self.workspace_id)
+
+        a_doc = docs[int(len(docs) * random())]
         self.get("%s%s" % (server_url, a_doc),
-                 description="View a user document")
+                 description="View a document")
 
         # metadata
         self.get("%s%s/cpsdocument_metadata" % (server_url, a_doc),
-                 description="View a user document metadata")
+                 description="View a document metadata")
 
         # export rss / atom
-        self.get("%s/workspaces/members/%s/exportRssContentBox?box_url=.cps_boxes_root/nav_content" % (server_url, self._cps_login),
-                 description="View section RSS flux")
+        self.get("%s/exportRssContentBox?box_url=.cps_boxes_root/nav_content"
+                 % test_ws_url, description="View workspace RSS content")
 
-        self.get("%s/workspaces/members/%s/exportAtomContentBox?box_url=.cps_boxes_root/nav_content" % (server_url, self._cps_login),
-                 description="View section Atom flux")
+        self.get("%s/exportAtomContentBox?box_url=.cps_boxes_root/nav_content"
+                 % test_ws_url, description="View workspace Atom flux")
 
         # section
         self.get("%s/sections/%s" % (server_url, self.section_id),
-                 description="View the main section")
+                 description="View FL test section")
 
         # extract a doc link
-        my_docs = self.listDocumentHref('/sections/%s/test-' % self.section_id)
-        self.assert_(my_docs, "no doc found in %s" % self.section_id)
-        a_doc = my_docs[int(len(my_docs) * random())]
+        docs = self.listDocumentHref('/sections/%s/test-' % self.section_id)
+        self.assert_(docs, "no doc found in section %s" % self.section_id)
+        a_doc = docs[int(len(docs) * random())]
 
         self.get("%s%s" % (server_url, a_doc),
                  description="View a published document")
@@ -254,11 +274,8 @@ class CPSBasicNavigation(CPSTestCase):
                  description="View a published document history")
 
         # access common cps pages
-        self.get("%s/accessibility" % server_url,
-                 description="View accessibility information")
-
-        self.get("%s/advanced_search_form" % server_url,
-                 description="View advanced search form")
+        self.get("%s/manage_my_subscriptions_form" % server_url,
+                 description="View my subscription page.")
 
         self.get("%s/cpsdirectory_view" % server_url,
                  description="View directories")
@@ -273,14 +290,6 @@ class CPSBasicNavigation(CPSTestCase):
                   description="View user directory entry")
 
         self.cpsLogout()
-
-
-
-    def test_50_reader(self):
-        server_url = self.server_url
-        # home page
-        self.get('%s' % server_url,
-                 description='Home page anonymous')
 
 
     def tearDown(self):
