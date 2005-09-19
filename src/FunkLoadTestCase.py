@@ -40,9 +40,9 @@ from webunit.webunittest import WebTestCase, HTTPError
 import PatchWebunit
 from utils import get_default_logger, mmn_is_bench, mmn_decode
 from utils import recording, thread_sleep
+from version import __version__
 
 _marker = []
-__version__ = '1.0.0'
 
 # ------------------------------------------------------------
 # Classes
@@ -114,6 +114,8 @@ class FunkLoadTestCase(unittest.TestCase):
 
         # init webunit browser (passing a fake methodName)
         self._browser = WebTestCase(methodName='log')
+        self._browser.user_agent =  self.conf_get('main', 'user_agent',
+                                                  'FunkLoad %s' % __version__)
         self.clearContext()
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
@@ -551,6 +553,9 @@ class FunkLoadTestCase(unittest.TestCase):
         testMethod = getattr(self, self._TestCase__testMethodName)
         try:
             try:
+                self.logd('Starting -----------------------------------\n\t%s'
+                          % self.conf_get(self.meta_method_name, 'description',
+                                          ''))
                 self.setUp()
             except KeyboardInterrupt:
                 raise
