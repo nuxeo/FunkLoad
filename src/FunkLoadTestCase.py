@@ -270,10 +270,12 @@ class FunkLoadTestCase(unittest.TestCase):
             while response.code in (301, 302) and max_redirect_count:
                 # Figure the location - which may be relative
                 newurl = response.headers['Location']
-                url = urljoin(url, newurl)
+                url = urljoin(url_in, newurl)
                 self.logd(' Load redirect link: %s' % url)
                 response = self.connect(url, None, code, 'redirect', None)
                 max_redirect_count -= 1
+            if not max_redirect_count:
+                self.logd(' WARNING Too many redirects give up.')
 
         # Load auto links (css and images)
         if load_auto_links:
