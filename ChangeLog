@@ -1,3 +1,9 @@
+2005-09-19  ben  <bdlebosc@nuxeo.com>
+
+	* Patching webunit to send a User-Agent header
+
+	* src/Lipsum.py handle iso 8859-15 vocabulary
+
 2005-09-16  ben  <bdlebosc@nuxeo.com>
 
         * adding cpsVerifyUser, cpsVerifyGroup, cpsSetLocalRole, improve
