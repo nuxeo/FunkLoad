@@ -87,6 +87,11 @@ API
     from webunit.utility import Upload
     params['file_up'] = Upload('/tmp/foo.txt')
 
+* `self.exists(url, params=None)`
+
+  Return True if the http return code is 200, 301 or 302,
+  return False if return code is 404 or 503.
+
 
 **FunkLoadTestCase adds configuration file helpers:**
 
@@ -190,22 +195,33 @@ This class extends the ZopeTestCase providing common Nuxeo CPS tasks like:
 
 * `cpsLogout()`
 
+* `cpsCreateGroup(group_name)` Create a cps group
+
+* `cpsVerifyGroup(group_name)` Create a cps group if not present
+
+* `cpsCreateUser(...)` Create a cps users
+
+* `cpsVerifyUser(...)` Create a cps users if not present
+
 * `cpsSetLocalRole(url, name, role)` Grant role to name in url
-
-* `cpsCreateGroup(self, group_name)` Create a cps group
-
-* `cpsListDocumentHref(pattern)` Return a clean list of document href that
-  matches pattern.
-
-* `cpsSearchDocId(doc_id)` Return the list of url that ends with doc_id,
-  using catalog search.
-
-* `cpsCreateNewsItem(parent_url)` Create a simple news in the parent_url
-   container
 
 * `cpsCreateSection(parent_url, title, description)`
 
 * `cpsCreateWorkspace(parent_url, title, description)`
+
+* `cpsCreateDocument(parent_url)` Create a random document in the parent_url
+   container
+
+* `cpsCreateNewsItem(parent_url)` Create a simple news in the parent_url
+   container
+
+* `cpsChangeUiLanguage(lang)` Change the ui locale selection
+
+* `cpsListDocumentHref(pattern)` Return a clean list of document href that
+   matches pattern in the previous page fetched.
+
+* `cpsSearchDocId(doc_id)` Return the list of url that ends with doc_id,
+  using catalog search.
 
 
 Test runner
@@ -590,6 +606,9 @@ Files
 
 Bugs
 ====
+
+* WebUnit don't handle Referer header, thus page that redirect to a referer
+  will not work.
 
 * TestMaker recorder (bitmechanic maxq) failed to record post with
   enctype="multipart/form-data" with an input of type file upload.
