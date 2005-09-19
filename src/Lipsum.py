@@ -1,3 +1,4 @@
+# -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 #
@@ -21,36 +22,63 @@ $Id: Lipsum.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
 import random
 
-VOCAB = ('ad', 'aquam', 'albus', 'archaeos', 'arctos', 'argentatus',
-         'arvensis', 'australis', 'biscort' 'borealis', 'brachy', 'bradus',
-         'brevis', 'campus', 'cauda', 'caulos', 'cephalus', 'chilensis',
-         'chloreus', 'cola', 'cristatus', 'cyanos', 'dactylus', 'deca',
-         'dermis', 'delorum', 'di', 'diplo', 'dodeca', 'dolicho',
-         'domesticus', 'dorsum', 'dulcis', 'echinus', 'ennea', 'erythro',
-         'familiaris', 'flora', 'folius', 'fuscus', 'fulvus', 'gaster',
-         'glycis', 'hexa', 'hortensis', 'it', 'indicus', 'lateralis',
-         'leucus', 'lineatus', 'lipsem', 'lutea', 'maculatus', 'major',
-         'maximus', 'melanus', 'minimus', 'minor', 'mono', 'montanus',
-         'morphos', 'mauro', 'niger', 'nona', 'nothos', 'notos',
-         'novaehollandiae', 'novaeseelandiae', 'noveboracensis', 'obscurus',
-         'occidentalis', 'octa', 'oeos', 'officinalis', 'oleum',
-         'orientalis', 'ortho', 'pachys', 'palustris', 'parvus', 'pedis',
-         'pelagius', 'penta', 'petra', 'phyllo', 'phyton', 'platy',
-         'pratensis', 'protos', 'pteron', 'punctatus', 'rhiza', 'rhytis',
-         'rubra', 'rostra', 'rufus', 'sativus', 'saurus', 'sinensis',
-         'stoma', 'striatus', 'silvestris', 'sit', 'so', 'tetra',
-         'tinctorius', 'tomentosus', 'tres tris', 'trich thrix', 'unus',
-         'variabilis', 'variegatus', 'ventrus', 'verrucosus', 'via',
-         'viridis', 'volans', 'vulgaris', 'xanthos', 'zygos')
+# vacabulary simple ascii
+V_ASCII = ('ad', 'aquam', 'albus', 'archaeos', 'arctos', 'argentatus',
+           'arvensis', 'australis', 'biscort' 'borealis', 'brachy', 'bradus',
+           'brevis', 'campus', 'cauda', 'caulos', 'cephalus', 'chilensis',
+           'chloreus', 'cola', 'cristatus', 'cyanos', 'dactylus', 'deca',
+           'dermis', 'delorum', 'di', 'diplo', 'dodeca', 'dolicho',
+           'domesticus', 'dorsum', 'dulcis', 'echinus', 'ennea', 'erythro',
+           'familiaris', 'flora', 'folius', 'fuscus', 'fulvus', 'gaster',
+           'glycis', 'hexa', 'hortensis', 'it', 'indicus', 'lateralis',
+           'leucus', 'lineatus', 'lipsem', 'lutea', 'maculatus', 'major',
+           'maximus', 'melanus', 'minimus', 'minor', 'mono', 'montanus',
+           'morphos', 'mauro', 'niger', 'nona', 'nothos', 'notos',
+           'novaehollandiae', 'novaeseelandiae', 'noveboracensis', 'obscurus',
+           'occidentalis', 'octa', 'oeos', 'officinalis', 'oleum',
+           'orientalis', 'ortho', 'pachys', 'palustris', 'parvus', 'pedis',
+           'pelagius', 'penta', 'petra', 'phyllo', 'phyton', 'platy',
+           'pratensis', 'protos', 'pteron', 'punctatus', 'rhiza', 'rhytis',
+           'rubra', 'rostra', 'rufus', 'sativus', 'saurus', 'sinensis',
+           'stoma', 'striatus', 'silvestris', 'sit', 'so', 'tetra',
+           'tinctorius', 'tomentosus', 'tres', 'tris', 'trich', 'thrix',
+           'unus', 'variabilis', 'variegatus', 'ventrus', 'verrucosus', 'via',
+           'viridis', 'vitis', 'volans', 'vulgaris', 'xanthos', 'zygos',
+           )
 
+# vocabulary with some diacritics
+V_DIAC = ('acanth', 'acro', 'actino', 'adelphe', 'adéno', 'aéro', 'agogue',
+          'agro', 'algie', 'allo', 'amphi', 'andro', 'anti', 'anthropo',
+          'aqui', 'archéo', 'archie', 'auto', 'bio', 'calli', 'cephal',
+          'chiro', 'chromo', 'chrono', 'dactyle', 'démo', 'eco', 'eudaimonia',
+          'êthos', 'géo', 'glyphe', 'gone', 'gramme', 'graphe', 'hiéro',
+          'homo', 'iatrie', 'lipi', 'lipo', 'logie', 'lyco', 'lyse', 'machie',
+          'mélan', 'méta', 'naute', 'nèse', 'pedo', 'phil', 'phobie', 'podo',
+          'polis', 'poly', 'rhino', 'xeno', 'zoo',
+          )
+
+# latin 9 vocabulary
+V_8859_15 = ('jàcánth', 'zâcrö', 'bãctinõ', 'zädelphe', 'kådénô', 'zæró',
+             'agòguê', 'algië', 'allð', 'amphi', 'añdro', 'añti', 'aqúi',
+             'aùtø', 'biø', 'caßi', 'çephal', 'lýco', 'rÿtøñ', 'oþiß',
+             'es', 'du', 'de', 'le', 'as', 'us', 'i', 'ave', 'ov ¼',
+             'zur ½', 'ab ¾',
+             )
+
+# common char to build identifier
 CHARS = "abcdefghjkmnopqrstuvwxyz123456789"
+
+# separator
+SEP = ',' * 10 + ';?!'
 
 class Lipsum:
     """Kind of Lorem ipsum generator."""
 
-    def __init__(self, vocab=VOCAB, chars=CHARS):
+    def __init__(self, vocab=(V_ASCII + V_DIAC + V_8859_15),
+                 chars=CHARS, sep=SEP):
         self.vocab = vocab
         self.chars = chars
+        self.sep = sep
 
     def getWord(self):
         """Return a random word."""
@@ -80,10 +108,11 @@ class Lipsum:
 
     def getSentence(self):
         """Return a random sentence."""
+        sep = self.sep
         length = random.randrange(5, 20)
         sentence = [self.getWord() for i in range(length)]
         for i in range(random.randrange(0, 3)):
-            sentence.insert(random.randrange(length-4)+2, ',')
+            sentence.insert(random.randrange(length-4)+2, random.choice(sep))
         sentence = ' '.join(sentence).capitalize() + '.'
         sentence = sentence.replace(' ,', ',')
         sentence = sentence.replace(',,', ',')
@@ -157,3 +186,4 @@ if __name__ == '__main__':
     print 'Phone number en_US long: %s\n' % Lipsum().getPhoneNumber(
         lang="en_US", format="long")
     print 'Address default: %s' % Lipsum().getAddress()
+
