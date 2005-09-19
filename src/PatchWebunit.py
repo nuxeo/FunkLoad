@@ -188,6 +188,11 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         h.putheader('Authorization', "Basic %s"%self.authinfo)
     h.putheader('Host', host_header)
 
+    # FL Patch -------------------------
+    if self.user_agent:
+        h.putheader('User-Agent', self.user_agent)
+    # FL Patch end ---------------------
+
     # Send cookies
     #  - check the domain, max-age (seconds), path and secure
     #    (http://www.ietf.org/rfc/rfc2109.txt)
