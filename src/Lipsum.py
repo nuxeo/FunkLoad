@@ -74,7 +74,7 @@ SEP = ',' * 10 + ';?!'
 class Lipsum:
     """Kind of Lorem ipsum generator."""
 
-    def __init__(self, vocab=(V_ASCII + V_DIAC + V_8859_15),
+    def __init__(self, vocab=V_ASCII,
                  chars=CHARS, sep=SEP):
         self.vocab = vocab
         self.chars = chars
