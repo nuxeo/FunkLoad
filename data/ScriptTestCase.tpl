@@ -16,7 +16,7 @@ class %(class_name)s(FunkLoadTestCase):
 
     def setUp(self):
         """Setting up test."""
-        self.logd("setUp ----------------------------------------")
+        self.logd("setUp")
         self.server_url = self.conf_get('main', 'url')
         # XXX here you can setup the credential access like this
         # credential_host = self.conf_get('credential', 'host')
