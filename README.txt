@@ -615,6 +615,8 @@ Bugs
   A work around is to record on a version without the
   enctype=mutipart/form-data.
 
+* See the trac tickets: `http://svn.nuxeo.org/trac/pub/report/12`
+
 
 Author
 ======
