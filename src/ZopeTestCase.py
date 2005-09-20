@@ -57,7 +57,7 @@ class ZopeTestCase(FunkLoadTestCase):
         resp = self.post(url, params,
                          description="Packing %s Zodb, removing previous "
                          "revisions of objects that are older than %s day(s)."
-                         % (database, days), code=[200, 500])
+                         % (database, days), code=[200, 302, 500])
         if resp.code == 500:
             if self.getBody().find(
                 "Error Value: The database has already been packed") == -1:
