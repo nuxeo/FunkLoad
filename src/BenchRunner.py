@@ -145,7 +145,10 @@ class LoopTestRunner(threading.Thread):
             if test_result.wasSuccessful():
                 if recording():
                     add_cycle_result('success')
-                    trace('.')
+                    if self.color:
+                        trace(green_str('.'))
+                    else:
+                        trace('.')
             else:
                 if len(test_result.errors):
                     if recording():
