@@ -1,3 +1,9 @@
+2005-09-20  ben  <bdlebosc@nuxeo.com>
+
+	* demo adding simple and README
+
+	* moving TODO and bugs to trac http://svn.nuxeo.org/trac/pub/report/12
+
 2005-09-19  ben  <bdlebosc@nuxeo.com>
 
 	* Patching webunit to send a User-Agent header
