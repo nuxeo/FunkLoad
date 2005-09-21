@@ -48,6 +48,7 @@ Main FunkLoad features are:
 
 * Provide a funkload.CPSTestCase to ease Zope and nuxeo CPS testing.
 
+* Easy to use, see examples in the demo folder.
 
 Installation
 ============

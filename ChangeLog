@@ -1,8 +1,14 @@
+2005-09-21  ben  <bdlebosc@nuxeo.com>
+
+	* #948 Report: provide the 5 slowest requests
+
 2005-09-20  ben  <bdlebosc@nuxeo.com>
 
-	* demo adding simple and README
+	* #941 Demo: provide usefull examples
 
-	* moving TODO and bugs to trac http://svn.nuxeo.org/trac/pub/report/12
+	* moving TODO and bugs to trac:
+	http://svn.nuxeo.org/trac/pub/report/12
+	#number in this ChangeLog are trac ticket number.
 
 2005-09-19  ben  <bdlebosc@nuxeo.com>
 
