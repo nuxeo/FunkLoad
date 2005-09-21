@@ -176,6 +176,8 @@ class TestRst(BaseRst):
 
 class RenderRst:
     """Render stats in ReST format."""
+    slowest_items = 5                   # number of slowest requests to display
+
     def __init__(self, config, stats, monitor, options):
         self.stats = stats
         self.config = config
@@ -191,8 +193,8 @@ class RenderRst:
         else:
             self.with_chart = False
 
-    def getRepresentativeCycle(self):
-        """Return the cycle with the maximum number of steps."""
+    def getRepresentativeCycleStat(self):
+        """Return the cycle stat with the maximum number of steps."""
         stats = self.stats
         max_steps = 0
         cycle_r = None
@@ -203,6 +205,18 @@ class RenderRst:
             if len(steps) > max_steps:
                 max_steps = steps
                 cycle_r = stats[cycle]
+        return cycle_r
+
+    def getBestStpsCycle(self):
+        """Return the cycle with the maximum STPS."""
+        stats = self.stats
+        max_stps = -1
+        cycle_r = None
+        for cycle in self.cycles:
+            stps = stats[cycle]['test'].tps
+            if stps > max_stps:
+                max_stps = stps
+                cycle_r = cycle
         return cycle_r
 
     def append(self, text):
@@ -312,12 +326,36 @@ class RenderRst:
         self.append("**Memory usage**\n\n.. image:: %s_mem.png\n" % host)
         self.append("**Network traffic**\n\n.. image:: %s_net.png\n" % host)
 
+    def renderSlowestRequests(self, number):
+        """Render the n slowest requests of the best cycle."""
+        stats = self.stats
+        self.append(rst_title("%i Slowest requests"% number, 2))
+        cycle = self.getBestStpsCycle()
+        cycle_name = None
+        steps = stats[cycle]['response_step'].keys()
+        items = []
+        for step_name in steps:
+            stat = stats[cycle]['response_step'][step_name]
+            stat.finalize()
+            items.append((stat.avg, stat.step,
+                          stat.type, stat.url, stat.description))
+            if not cycle_name:
+                cycle_name = stat.cvus
+
+        items.sort()
+        items.reverse()
+        self.append('For cycle with %s CUs:\n' % cycle_name)
+        for item in items[:number]:
+            self.append('* In page %s %s: %s took %.3fs\n'
+                        '  %s' % (
+                item[1], item[2], item[3], item[0], item[4]))
+
     def __repr__(self):
         self.renderConfig()
         if not self.cycles:
             self.append('No cycle found')
             return '\n'.join(self.rst)
-        cycle_r = self.getRepresentativeCycle()
+        cycle_r = self.getRepresentativeCycleStat()
 
         if not cycle_r.has_key('test'):
             self.append("No test ended during the bench.")
@@ -327,6 +365,7 @@ class RenderRst:
         self.renderCyclesStat('test', 'Test stats')
         self.renderCyclesStat('page', 'Page stats')
         self.renderCyclesStat('response', 'Request stats')
+        self.renderSlowestRequests(self.slowest_items)
         self.renderMonitors()
         self.renderPageDetail(cycle_r)
         return '\n'.join(self.rst)
@@ -338,7 +377,10 @@ class RenderRst:
 # HTML rendering
 #
 class RenderHtml(RenderRst):
-    """Render stats in html."""
+    """Render stats in html.
+
+    Simply render stuff in ReST than ask docutils to build an html doc.
+    """
     chart_size = (350, 250)
     big_chart_size = (640, 320)
     color_success = 0x00ff00
@@ -722,15 +764,3 @@ class RenderHtml(RenderRst):
         gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
                       image_path,
                       times, net_in, net_out)
-
-
-    color_success = 0x00ff00
-    color_error = 0xff0000
-    color_time = 0x0000ff
-    color_time_min_max = 0xccccee
-    color_grid = 0xcccccc
-    color_line = 0x333333
-    color_plot = 0x003a6b
-    color_bg = 0xffffff
-    color_line = 0x000000
-
