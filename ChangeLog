@@ -1,5 +1,7 @@
 2005-09-21  ben  <bdlebosc@nuxeo.com>
 
+	* #950 Report: display failure and error first part
+
 	* #948 Report: provide the 5 slowest requests
 
 2005-09-20  ben  <bdlebosc@nuxeo.com>
