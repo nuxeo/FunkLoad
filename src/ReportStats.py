@@ -26,6 +26,18 @@ class MonitorStat:
             setattr(self, key, value)
 
 
+class ErrorStat:
+    """Collect Error or Failure stats."""
+    def __init__(self, cycle, step, number, code, header, body, traceback):
+        self.cycle = cycle
+        self.step = step
+        self.number = number
+        self.code = code
+        self.header = header and header.copy() or {}
+        self.body = body or None
+        self.traceback = traceback
+
+
 class AllResponseStat:
     """Collect stat for all response in a cycle."""
     def __init__(self, cycle, cycle_duration, cvus):

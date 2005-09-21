@@ -39,7 +39,7 @@ import xml.parsers.expat
 from optparse import OptionParser, TitledHelpFormatter
 
 from ReportStats import AllResponseStat, PageStat, ResponseStat, TestStat
-from ReportStats import MonitorStat
+from ReportStats import MonitorStat, ErrorStat
 from ReportRenderer import RenderRst, RenderHtml
 from utils import trace
 
@@ -67,6 +67,7 @@ class FunkLoadXmlParser:
         self.stats = {}                 # cycle stats
         self.monitor = {}               # monitoring stats
         self.config = {}
+        self.error = {}
 
     def parse(self, xml_file):
         """Do the parsing."""
@@ -90,6 +91,11 @@ class FunkLoadXmlParser:
             self.config[attrs['key']] = attrs['value']
             if attrs['key'] == 'duration':
                 self.cycle_duration = attrs['value']
+        elif name == 'header':
+            # save header as extra response attribute
+            headers = self.current_element[-2]['attrs'].setdefault(
+                'headers', {})
+            headers[str(attrs['name'])] = str(attrs['value'])
         self.current_element.append({'name': name, 'attrs': attrs})
 
     def handleEndElement(self, name):
@@ -128,6 +134,13 @@ class FunkLoadXmlParser:
             stat.add(attrs['type'], attrs['result'], attrs['url'],
                      attrs['duration'], attrs.get('description'))
             stats['response_step'][step] = stat
+            if attrs['result'] != 'Successful':
+                result = str(attrs['result'])
+                stats = self.error.setdefault(result, [])
+                stats.append(ErrorStat(
+                    attrs['cycle'], attrs['step'], attrs['number'],
+                    attrs.get('code'), attrs.get('headers'),
+                    attrs.get('body'), attrs.get('traceback')))
         elif name == 'monitor':
             host = attrs.get('host')
             stats = self.monitor.setdefault(host, [])
@@ -144,7 +157,7 @@ class FunkLoadXmlParser:
         self.is_recording_cdata = False
         # assume CDATA is encapsulate in a container element
         name = self.current_element[-1]['name']
-        self.current_element[-2][name] = self.current_cdata
+        self.current_element[-2]['attrs'][name] = self.current_cdata
         self.current_cdata = ''
 
     def handleCharacterData(self, data):
@@ -176,12 +189,14 @@ def main():
     if options.html:
         trace("Creating html report: ...")
         html_path = RenderHtml(xml_parser.config, xml_parser.stats,
-                               xml_parser.monitor, options)()
+                               xml_parser.error, xml_parser.monitor,
+                               options)()
         trace("done: \n")
         trace("file://%s\n" % html_path)
     else:
         print str(RenderRst(xml_parser.config, xml_parser.stats,
-                            xml_parser.monitor, options))
+                            xml_parser.error, xml_parser.monitor,
+                            options))
 
 
 if __name__ == '__main__':

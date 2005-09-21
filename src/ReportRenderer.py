@@ -178,9 +178,10 @@ class RenderRst:
     """Render stats in ReST format."""
     slowest_items = 5                   # number of slowest requests to display
 
-    def __init__(self, config, stats, monitor, options):
-        self.stats = stats
+    def __init__(self, config, stats, error, monitor, options):
         self.config = config
+        self.stats = stats
+        self.error = error
         self.monitor = monitor
         self.options = options
         self.rst = []
@@ -350,6 +351,45 @@ class RenderRst:
                         '  %s' % (
                 item[1], item[2], item[3], item[0], item[4]))
 
+    def renderErrors(self):
+        """Render error list."""
+        if not len(self.error):
+            return
+        self.append(rst_title("Failures and Errors", 2))
+        for status in ('Failure', 'Error'):
+            if not self.error.has_key(status):
+                continue
+            stats = self.error[status]
+            errors = {}
+            for stat in stats:
+                header = stat.header
+                key = (stat.code,
+                       header.get('bobo-exception-file'),
+                       header.get('bobo-exception-line'),
+                       )
+                err_list = errors.setdefault(key, [])
+                err_list.append(stat)
+            err_types = errors.keys()
+            err_types.sort()
+            self.append(rst_title(status + 's', 3))
+            for err_type in err_types:
+                stat = errors[err_type][0]
+                if err_type[1]:
+                    self.append('* %s time(s), code: %s, %s\n'
+                                '  in %s, line %s: %s' %(
+                        len(errors[err_type]),
+                        err_type[0],
+                        header.get('bobo-exception-type'),
+                        err_type[1], err_type[2],
+                        header.get('bobo-exception-value')))
+                else:
+                    traceback = stat.traceback and stat.traceback.replace(
+                        'File ', '\n    File ') or 'No traceback.'
+                    self.append('* %s time(s), code: %s::\n\n'
+                                '    %s\n' %(
+                        len(errors[err_type]),
+                        err_type[0], traceback))
+
     def __repr__(self):
         self.renderConfig()
         if not self.cycles:
@@ -368,6 +408,7 @@ class RenderRst:
         self.renderSlowestRequests(self.slowest_items)
         self.renderMonitors()
         self.renderPageDetail(cycle_r)
+        self.renderErrors()
         return '\n'.join(self.rst)
 
 
@@ -393,8 +434,8 @@ class RenderHtml(RenderRst):
     color_bg = 0xffffff
     color_line = 0x000000
 
-    def __init__(self, config, stats, monitor, options):
-        RenderRst.__init__(self, config, stats, monitor, options)
+    def __init__(self, config, stats, error, monitor, options):
+        RenderRst.__init__(self, config, stats, error, monitor, options)
         self.css_file = 'funkload.css'
         self.report_dir = self.css_path = self.rst_path = self.html_path = None
 
