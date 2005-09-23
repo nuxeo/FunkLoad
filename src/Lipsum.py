@@ -124,7 +124,7 @@ class Lipsum:
 
     def getMessage(self, length=7):
         """Return a message paragraph length."""
-        return '\n'.join([self.getParagraph() for i in range(
+        return '\n\n'.join([self.getParagraph() for i in range(
             random.randrange(3,length))])
 
     def getPhoneNumber(self, lang="fr", format="medium"):
