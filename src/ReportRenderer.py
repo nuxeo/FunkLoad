@@ -214,6 +214,8 @@ class RenderRst:
         max_stps = -1
         cycle_r = None
         for cycle in self.cycles:
+            if not stats[cycle].has_key('test'):
+                continue
             stps = stats[cycle]['test'].tps
             if stps > max_stps:
                 max_stps = stps
@@ -268,6 +270,8 @@ class RenderRst:
             klass = AllResponseRst
         self.append(rst_title(title, 2))
         for cycle in self.cycles:
+            if not stats[cycle].has_key(key):
+                continue
             renderer = klass(stats[cycle][key])
             if first:
                 self.append(renderer.render_header(self.with_chart))
