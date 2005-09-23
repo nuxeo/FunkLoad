@@ -11,7 +11,7 @@ from funkload.utils import xmlrpc_get_credential
 class %(class_name)s(FunkLoadTestCase):
     """XXX
 
-    This test use a configuration file %(class_name)sTestCase.conf.
+    This test use a configuration file %(class_name)s.conf.
     """
 
     def setUp(self):
