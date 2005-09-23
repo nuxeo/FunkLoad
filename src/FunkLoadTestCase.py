@@ -341,6 +341,13 @@ class FunkLoadTestCase(unittest.TestCase):
         thread_sleep(s_val)
 
 
+    def setBasicAuth(login, password):
+        """Set http basic authentication."""
+        self._browser.setBasicAuth(admin_id, admin_pwd)
+
+    def clearBasicAuth():
+        """Remove basic authentication."""
+        self._browser.clearBasicAuth()
 
     #------------------------------------------------------------
     # logging

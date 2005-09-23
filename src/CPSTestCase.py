@@ -74,7 +74,7 @@ class CPSTestCase(ZopeTestCase):
         """
         if zope_url is None or site_id is None:
             zope_url, site_id = self.cpsGuessZopeUrl()
-        self._browser.setBasicAuth(admin_id, admin_pwd)
+        self.setBasicAuth(admin_id, admin_pwd)
         params = {"id": site_id,
                   "title": title or "CPS Portal",
                   "description": description or "A funkload cps test site",
@@ -89,7 +89,7 @@ class CPSTestCase(ZopeTestCase):
                   "submit": "Create"}
         self.post("%s/manage_addProduct/CPSDefault/manage_addCPSDefaultSite" %
                   zope_url, params, description="Create a CPS Site")
-        self._browser.clearBasicAuth()
+        self.clearBasicAuth()
 
     def cpsCreateGroup(self, group_name):
         """Create a cps group."""

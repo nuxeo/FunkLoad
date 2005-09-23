@@ -29,7 +29,7 @@ class ZopeTestCase(FunkLoadTestCase):
 
     def zopeRestart(self, zope_url, admin_id, admin_pwd, time_out=600):
         """Stop and Start Zope server."""
-        self._browser.setBasicAuth(admin_id, admin_pwd)
+        self.setBasicAuth(admin_id, admin_pwd)
         params = {"manage_restart:action": "Restart"}
         url = "%s/Control_Panel" % zope_url
         self.post(url, params, description="Restarting Zope server")
@@ -45,12 +45,12 @@ class ZopeTestCase(FunkLoadTestCase):
             else:
                 down = False
 
-        self._browser.clearBasicAuth()
+        self.clearBasicAuth()
 
     def zopePackZodb(self, zope_url, admin_id, admin_pwd,
                      database="main", days=0):
         """Pack a zodb database."""
-        self._browser.setBasicAuth(admin_id, admin_pwd)
+        self.setBasicAuth(admin_id, admin_pwd)
         url = '%s/Control_Panel/Database/%s/manage_pack' % (
             zope_url, database)
         params = {'days:float': str(days)}
@@ -64,11 +64,11 @@ class ZopeTestCase(FunkLoadTestCase):
                 self.fail("Pack_zodb return a code 500.")
             else:
                 self.logd('Zodb has already been packed.')
-        self._browser.clearBasicAuth()
+        self.clearBasicAuth()
 
     def zopeFlushCache(self, zope_url, admin_id, admin_pwd, database="main"):
         """Remove all objects from all ZODB in-memory caches."""
-        self._browser.setBasicAuth(admin_id, admin_pwd)
+        self.setBasicAuth(admin_id, admin_pwd)
         url = "%s/Control_Panel/Database/%s/manage_minimize" % (zope_url,
                                                                 database)
         self.get(url, description="Flush %s Zodb cache" % database)
@@ -77,7 +77,7 @@ class ZopeTestCase(FunkLoadTestCase):
                               method_id, module, function,
                               run_it=True):
         """Add an External method an run it."""
-        self._browser.setBasicAuth(admin_id, admin_pwd)
+        self.setBasicAuth(admin_id, admin_pwd)
         params = [["id", method_id],
                   ["title", ""],
                   ["module", module],
@@ -95,4 +95,4 @@ class ZopeTestCase(FunkLoadTestCase):
         if run_it:
             self.get('%s/%s' % (parent_url, method_id),
                      description="Execute %s external method" % method_id)
-        self._browser.clearBasicAuth()
+        self.clearBasicAuth()

@@ -50,11 +50,11 @@ class Zope(ZopeTestCase):
 
     def test_00_verifyExample(self):
         if not self.exists(self.zope_url + '/Examples'):
-            self._browser.setBasicAuth(self.admin_id, self.admin_pwd)
+            self.setBasicAuth(self.admin_id, self.admin_pwd)
             self.get(self.zope_url +
                      '/manage_importObject?file=Examples.zexp&set_owner:int=1')
             self.assert_('successfully imported' in self.getBody())
-            self._browser.clearBasicAuth()
+            self.clearBasicAuth()
         self.get(self.zope_url + '/Examples')
 
     def test_exampleNavigation(self):
@@ -74,13 +74,13 @@ class Zope(ZopeTestCase):
         server_url = self.zope_url
         self.get("%s/Examples/GuestBook" % server_url)
         server_url = self.zope_url
-        self._browser.setBasicAuth(self.admin_id, self.admin_pwd)
+        self.setBasicAuth(self.admin_id, self.admin_pwd)
         lipsum = Lipsum()
         self.get("%s/Examples/GuestBook/addEntry.html" % server_url)
         params = [["guest_name", lipsum.getWord().capitalize()],
                   ["comments", lipsum.getParagraph()]]
         self.post("%s/Examples/GuestBook/addEntry" % server_url, params)
-        self._browser.clearBasicAuth()
+        self.clearBasicAuth()
 
 
     def test_exampleFileLibrary(self):
