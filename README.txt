@@ -9,14 +9,22 @@ Description
 
 FunkLoad is a functional and load web tester.
 
+Main use cases are:
+
+* Functional regression testing of web projects
+
+* Benching web application and producing detail reports
+
+* Write web agents, like checking if a site is alive
+
+
 Main FunkLoad features are:
 
 * Compatible with pyUnit framework, just use funkload.FunkLoadTestCase
   instead of unittest.TestCase.
 
 * Truly emulate a web browser (single-threaded) using Richard Jones' webunit:
-
-  - basic auth support
+  - basic authentication support
   - cookies support
   - fetching css, javascript and images
   - emulate a browser cache
@@ -25,8 +33,8 @@ Main FunkLoad features are:
 
 * Advanced test runner with many command line options:
 
-  - color mode
-  - display the page fetched in real time in your browser
+  - green/red color mode
+  - display the fetched page in real time in your browser
   - debug mode
 
 * Turn a functional test into a load test, just by invoking the bench runner
@@ -48,7 +56,9 @@ Main FunkLoad features are:
 
 * Provide a funkload.CPSTestCase to ease Zope and nuxeo CPS testing.
 
+
 * Easy to use, see examples in the demo folder.
+
 
 Installation
 ============
@@ -92,6 +102,14 @@ API
 
   Return True if the http return code is 200, 301 or 302,
   return False if return code is 404 or 503.
+
+* `self.setBasicAuth(login, password)`
+
+  Next requests will use the http basic authentication.
+
+* `self.clearBasicAuth()`
+
+  Remove basic auth credential set by setBasicAuth
 
 
 **FunkLoadTestCase adds configuration file helpers:**
