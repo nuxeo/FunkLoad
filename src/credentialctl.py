@@ -21,7 +21,7 @@
 
 $Id: credentialctl.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
-import sys, os
+import sys
 import socket
 from xmlrpclib import ServerProxy
 from ConfigParser import ConfigParser

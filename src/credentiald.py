@@ -32,7 +32,7 @@ import sys, os
 import socket
 from random import random
 from time import gmtime, strftime, sleep
-from ConfigParser import ConfigParser, NoSectionError, NoOptionError
+from ConfigParser import ConfigParser, NoOptionError
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from xmlrpclib import ServerProxy
 

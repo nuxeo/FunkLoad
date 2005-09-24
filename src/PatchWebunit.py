@@ -24,6 +24,7 @@
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
 
+import sys
 import time
 import urlparse
 import httplib
