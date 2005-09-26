@@ -1,29 +1,67 @@
 ========
 FunkLoad
 ========
-*$Id: README.txt 24534 2005-08-26 09:16:42Z bdelbosc $*
+
+:author: Benoit Delbosc
+
+:address: bdelbosc _at_ nuxeo.com
+
+:revision: $Id: DRAFT DRAFT DRAFT $
+
+:Copyright: (C) Copyright 2005 Nuxeo SARL (http://nuxeo.com).
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    version 2 as published by the Free Software Foundation.
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-Description
-===========
+:abstract: This document describes the usage of the FunkLoad_ tool. This tool
+    enables to do functional and load testing of web application.
 
-FunkLoad is a functional and load web tester.
+.. $Id: howto-using_remote_controller.txt 25904 2005-08-17 09:08:38Z madarche $
 
-Main use cases are:
+.. sectnum::    :depth: 2
 
-* Functional regression testing of web projects
-
-* Benching web application and producing detail reports
-
-* Write web agents, like checking if a site is alive
+.. contents::   :depth: 3
 
 
-Main FunkLoad features are:
+Introducing FunkLoad
+====================
 
-* Compatible with pyUnit framework, just use funkload.FunkLoadTestCase
-  instead of unittest.TestCase.
+Credits
+-------
 
-* Truly emulate a web browser (single-threaded) using Richard Jones' webunit:
+Thanks to Frank Cohen's TestMaker_ framework and Richard Jones webunit_
+package.
+
+
+What is FunkLoad ?
+------------------
+
+FunkLoad_ is a functional and load web tester, main use cases are:
+
+* Functional regression testing of web projects.
+
+* Benching web application and producing detail reports.
+
+* Writing web agents, like checking if a site is alive, or scripting any web
+  repetitive task.
+
+
+Main FunkLoad_ features are:
+
+* Pure python package compatible with pyUnit_ framework, just use
+  funkload.FunkLoadTestCase instead of unittest.TestCase.
+
+* Truly emulate a web browser (single-threaded) using Richard Jones'
+  webunit_:
+
   - basic authentication support
   - cookies support
   - fetching css, javascript and images
@@ -47,137 +85,210 @@ Main FunkLoad features are:
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
 
-* Easy test customization using configuration file or command line.
+* Easy test customization using configuration file or command line options.
 
-* Easy test creation using TestMaker recorder, you can use your web browser
-  and produce a FunkLoad test automatically.
+* Easy test creation using TestMaker_ / maxq_ recorder, you can use your web
+  browser and produce a FunkLoad_ test automatically.
 
-* Web assertion helpers.
+* Provide web assertion helpers.
 
-* Provide a funkload.CPSTestCase to ease Zope and nuxeo CPS testing.
-
+* Provide a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
 
 * Easy to use, see examples in the demo folder.
 
 
+Where to find FunkLoad ?
+------------------------
+
+Check the latest package at http://public.dev.nuxeo.com/~ben/funkload/
+
+Or from bleeding edge svn sources, if you want to try the latest unstable
+sources::
+
+    svn co https://svn.nuxeo.org/pub/funkload/trunk funkload
+
+
 Installation
-============
+------------
 
-See the INSTALL.txt file in the FunkLoad package.
-
-
-
-FunkLoadTestCase
-================
-
-API
----
-
-**FunkLoadTestCase extends the unittest.TestCase with browser capabilities:**
-
-* `self.get(url, params=None, description=None, code=None)`
-
-  This emulate a browser http GET link, it will fetch the url submits
-  appropriate cookies, follow redirection, register new cookies, load css
-  and javascript that are not already cached.  This method return a webunit
-  HTTPResponse.
-
-    - url: the url without parameters
-    - params: a dico of parameters that going to be append to the url like
-      `url?key1=value1&...`
-    - description: is used on the bench report to describe the user action
-    - code: is a list of http expected code like [200:301] if the http
-      response is not in the list get will raise a test failure exception
-      if not provided assume that the default list is [200, 301, 302]
-
-* `self.post(url, params=None, description=None, code=None)`
-
-  Same interface than the get() but it use a http post method.
-  You can upload a file by setting a params like this::
-
-    from webunit.utility import Upload
-    params['file_up'] = Upload('/tmp/foo.txt')
-
-* `self.exists(url, params=None)`
-
-  Return True if the http return code is 200, 301 or 302,
-  return False if return code is 404 or 503.
-
-* `self.setBasicAuth(login, password)`
-
-  Next requests will use the http basic authentication.
-
-* `self.clearBasicAuth()`
-
-  Remove basic auth credential set by setBasicAuth
+See the INSTALL.txt_ file for requirement and installation.
 
 
-**FunkLoadTestCase adds configuration file helpers:**
 
-* `self.conf_get(section, key, default=_marker)`
+The FunkLoadTestCase
+====================
 
-  Return an entry from the command line options or configuration file
-  there is also conf_getInt conf_getFloat and conf_getList
-
-
-**FunkLoadTestCase adds assertions helpers:**
-
-* `self.getLastUrl()`
-  Return the last accessed page url taking care of redirects.
-
-* `self.getLastBaseUrl()`
-  Return the <base /> href value of the last accessed page.
-
-* `self.listHref()`
-  Return a list of all <a /> href value of the last accessed page.
-
-* `self.getBody`
-  Return the html page
+FunkLoadTestCase extends the pyUnit_ unittest.TestCase with browser
+capabilities, configuration file helpers and assertions helpers. FunkLoad_
+provides also some tools to generate inputs and communicate with credential
+servers.
 
 
-**The response returned by a get or post are webunit HTTPResponse object:**
+Browser API
+-----------
 
-* response.code is the http response code
+get
+~~~
+::
 
-* response.headers['location'] is the Location http header value
+  get(url, params=None, description=None, ok_codes=None)
 
-* response.body is the html content
+This emulate a browser http GET link, it will fetch the url submits
+appropriate cookies, follow redirection, register new cookies, load css and
+javascript that are not already cached.
+This method return a webunit_ HTTPResponse.
 
-* response.getDOM() is a SimpleDOM interface of the fetched html page, for
-  example you can do extract all h1 title doing a:
-  response.getDOM().getByName('h1'), see the SimpleDOM api instructions for
-  details.
+Parameters:
 
-To generate dummy document contents you can use the funkload.Lipsum api,
-this is a very simple "Lorem ipsum" generator.
+- *url* the url without parameters
+- *params* a dico of parameters that going to be append to the url like
+  `url?key1=value1&...`
+- *description* is used on the bench report to describe the user action
+- *ok_codes* is a list of http expected code like [200:301] if the http
+  response is not in the list `get` will raise a test failure exception,
+  if not provided assume that the default list is [200, 301, 302].
 
-Like normal unittest you can define many tests inside a TestClass::
+post
+~~~~
+::
 
-  from funkload.FunkLoadTestCase import FunkLoadTestCase
-  ...
-  def MyClass(FukLoadTestCase):
-    def Setup(self):
-    ...
-    def test_01_foo(self):
-    ...
-    def test_02_bar(self):
-    ...
-    def tearDown(self):
-    ...
+  post(url, params=None, description=None, ok_codes=None)
 
 
-Configuration
--------------
+Same interface than the get() but it use a http post method.
+You can upload a file by setting a params like this::
+
+  from webunit.utility import Upload
+  params['file_up'] = Upload('/tmp/foo.txt')
+
+
+exists
+~~~~~~
+::
+
+  exists(url, params=None, description="Checking existence")
+
+
+Return True if the http return code is 200, 301 or 302, and return False if
+return code is 404 or 503.
+
+
+setBasicAuth
+~~~~~~~~~~~~
+::
+
+  setBasicAuth(login, password)
+
+Next requests will use the http basic authentication.
+
+
+clearBasicAuth
+~~~~~~~~~~~~~~
+::
+
+  clearBasicAuth()
+
+Remove basic auth credential set by setBasicAuth
+
+
+Configuration file API
+----------------------
 
 A FunkLoadTestCase class uses a configuration file to setup variable
 configuration like the base server url to be tested, the test description,
 credential access, logging files and other test specific parameters. The test
 configuration file have the same name of the FunkLoadTestCase with a '.conf'
-extension. In the previous example the file is MyClass.conf. See documented
-examples in the demo/ folder for more information.
+extension. See documented examples in the demo/ folder.
 
-Note that the configuration file is accessible from a test using self.get_conf
-method.
+conf_get
+~~~~~~~~
+::
+
+  conf_get(section, key, default=_marker)
+
+Return an entry from the configuration file, note that the entry may be
+overriden by a command line option.
+
+Parameters:
+
+- *section* the section in the configuration file.
+- *key* the key.
+- *default* a default value.
+
+
+conf_getInt
+~~~~~~~~~~~
+
+Return an integer.
+
+conf_getFloat
+~~~~~~~~~~~~~
+
+Return a float.
+
+conf_getList
+~~~~~~~~~~~~
+
+Return a list, the default separators is a semi column ':'
+
+
+Assertion helpers API
+---------------------
+
+getLastUrl
+~~~~~~~~~~
+::
+
+  getLastUrl()
+
+Return the last accessed page url taking care of redirects.
+
+
+getLastBaseUrl
+~~~~~~~~~~~~~~
+::
+
+  getLastBaseUrl()
+
+Return the <base /> href value of the last accessed page.
+
+
+listHref
+~~~~~~~~
+::
+
+  listHref()
+
+Return a list of all <a /> href value of the last accessed page.
+
+
+getBody
+~~~~~~~
+::
+
+  getBody()
+
+Return the html page content.
+
+
+The response object
+~~~~~~~~~~~~~~~~~~~
+
+The response returned by a get or post are webunit_ HTTPResponse object
+
+::
+
+  repsonse = self.get(url)
+  print "http response code %s" % response.code
+  print "http header location %s" % response.headers['location']
+
+
+::
+
+  response.getDOM().getByName('h1')
+
+getDOM return a SimpleDOM interface of the fetched html page, see the
+webunit_ SimpleDOM api instructions for details.
 
 
 Logging
@@ -187,69 +298,357 @@ A FunkLoadTestCase store its results in an xml file (like request and test
 result) and put other log information into a text log and/or output to the
 console.
 
+logd
+~~~~
+::
 
-ZopeTestCase
-============
+  logd(message)
 
-This class extends the FunkLoadTestCase providing common Zope tasks like:
+Debug log message
 
-* `zopeRestart()` Stop and Start Zope server
+logi
+~~~~
+::
 
-* `zopePackZodb()` Pack a zodb database
+  logi(message)
 
-* `zopeFlushCache()` Remove all objects from all ZODB in-memory caches
-
-* `zopeAddExternalMethod()` Add an External method an run it
+Information log message
 
 
+Lipsum API
+----------
+
+To generate dummy document contents you can use the funkload.Lipsum api,
+this is a very simple "Lorem ipsum" generator.
+
+You can see some examples by doing::
+
+  python -c "from funkload.Lipsum import main; main()"
+
+
+Lipsum
+~~~~~~
+::
+
+  from funkload.Lipsum import Lipsum
+  lipsum = Lipsum(vocab=V_ASCII, chars=CHARS, sep=SEP)
+
+Parameters:
+
+- *vocab* a list of word, Lipsum provide 3 lists V_ASCII, V_DIAC, V_8859_15
+- *chars* the list of char used to build an identifier
+- *sep* some separators used in sentences like coma, question mark ...
+
+
+getWord
+~~~~~~~
+::
+
+  lipsum.getWord()
+
+Return a random word from the vocabulary.
+
+
+getUniqWord
+~~~~~~~~~~~
+::
+
+  lipsum.getUniqWord(length_min=None, length_max=None):
+
+Generate a kind of uniq id.
+
+
+getSubject
+~~~~~~~~~~
+::
+
+  lipsum.getSubject(length=5, prefix=None, uniq=False,
+                    length_min=None, length_max=None)
+
+Return a subject of length word.
+
+Parameters:
+
+- *length* the number of words in the subject
+- *prefix* a prefix to add at the beginning of a the subject
+- *uniq* add an uniq identifier in the subject
+- *length_min/max* the words length is a random between min and max
+
+
+getSentence
+~~~~~~~~~~~
+::
+
+  lipsum.getSentence()
+
+Return a sentence with some separators and and a ending point.
+
+
+getParagraph
+~~~~~~~~~~~~
+::
+
+  lipsum.getParagraph(length=4)
+
+Return a paragraph of length sentences.
+
+
+getMessage
+~~~~~~~~~~
+::
+
+  lipsum.getMessage(length=7)
+
+Return a message with length Paragraphs.
+
+
+getPhoneNumber
+~~~~~~~~~~~~~~
+::
+
+  lipsum.getPhoneNumber(lang="fr", format="medium")
+
+Return a random phone number.
+
+Parameters:
+
+- *lang* can be fr or en_US
+- *format* can be short, medium or long
+
+
+getAddress
+~~~~~~~~~~
+::
+
+  lipsum.getAddress(lang="fr")
+
+Return a random address.
+
+
+Utils
+-----
+
+To communicate with FunkLoad_ services like the credential server, there are
+some wrappers in the utils module.
+
+xmlrpc_get_credential
+~~~~~~~~~~~~~~~~~~~~~
+::
+
+  from funkload.utils import xmlrpc_get_credential
+  xmlrpc_get_credential(credential_host, credential_port, group=None)
+
+Return a tuple login, password of a user that belong to group if specified.
+
+xmlrpc_list_groups
+~~~~~~~~~~~~~~~~~~
+
+List groups name served by the credential server.
+
+xmlrpc_list_credentials
+~~~~~~~~~~~~~~~~~~~~~~~
+
+List all login/password served by the credential server.
+
+
+Other TestCases
+===============
+
+The ZopeTestCase
+----------------
+
+This class extends the FunkLoadTestCase providing common Zope_ tasks.
+
+zopeRestart
+~~~~~~~~~~~
+::
+
+  zopeRestart(zope_url, admin_id, admin_pwd, time_out=600)
+
+Stop and Start the Zope_ server.
+
+Parameters:
+
+- *zope_url* the zope url.
+- *admin_id* and *admin_pwd* the zope admin credential.
+- *time_out* maximum time to wait until the zope server restart.
+
+zopePackZodb
+~~~~~~~~~~~~
+::
+
+  zopePackZodb(zope_url, admin_id, admin_pwd, database="main", days=0)
+
+Pack a zodb database.
+
+Parameters:
+
+- *database* the database to pack.
+- *days* removing previous revision that are older than *days* ago
+
+
+zopeFlushCache
+~~~~~~~~~~~~~~
+::
+
+  zopeFlushCache(zope_url, admin_id, admin_pwd, database="main")
+
+Remove all objects from all ZODB in-memory caches.
+
+zopeAddExternalMethod
+~~~~~~~~~~~~~~~~~~~~~
+::
+
+  zopeAddExternalMethod(parent_url, admin_id, admin_pwd,
+                        method_id, module, function, run_it=True)
+
+Add an External method an run it.
 
 CPSTestCase
-===========
+-----------
 
-This class extends the ZopeTestCase providing common Nuxeo CPS tasks like:
+This class extends the ZopeTestCase providing common Nuxeo_ CPS_ tasks.
 
-* `cpsCreateSite(...)` build a new cps site
+cpsCreateSite
+~~~~~~~~~~~~~
+::
 
-* `cpsLogin(login, password)` cps log in
+  cpsCreateSite(admin_id, admin_pwd,
+                manager_id, manager_password,
+                manager_mail, langs=None,
+                title=None, description=None,
+                interface="portlets", zope_url=None, site_id=None)
 
-* `cpsLogout()`
+Build a new CPS_ site.
 
-* `cpsCreateGroup(group_name)` Create a cps group
+Parameters:
 
-* `cpsVerifyGroup(group_name)` Create a cps group if not present
+- *admin_id* and *admin_pwd* the zope admin credential.
+- *manager_id* and *manager_pwd* the cps manager credential.
+- *zope_url* the Zope_ server url. [*]
+- *site_id* the CPS_ site id. [*]
 
-* `cpsCreateUser(...)` Create a cps users
+[*] if the zope_url and site_id is not given we guess it using the server_url
 
-* `cpsVerifyUser(...)` Create a cps users if not present
 
-* `cpsSetLocalRole(url, name, role)` Grant role to name in url
+cpsLogin
+~~~~~~~~
+::
 
-* `cpsCreateSection(parent_url, title, description)`
+  cpsLogin(login, password)
 
-* `cpsCreateWorkspace(parent_url, title, description)`
+CPS log in.
 
-* `cpsCreateDocument(parent_url)` Create a random document in the parent_url
-   container
+cpsLogout
+~~~~~~~~~
 
-* `cpsCreateNewsItem(parent_url)` Create a simple news in the parent_url
-   container
+Logout the user logged in using cpsLogin.
 
-* `cpsChangeUiLanguage(lang)` Change the ui locale selection
+cpsCreateGroup
+~~~~~~~~~~~~~~
+::
 
-* `cpsListDocumentHref(pattern)` Return a clean list of document href that
-   matches pattern in the previous page fetched.
+  cpsCreateGroup(group_name)
 
-* `cpsSearchDocId(doc_id)` Return the list of url that ends with doc_id,
-  using catalog search.
+Create a CPS_ group.
+
+cpsVerifyGroup
+~~~~~~~~~~~~~~
+::
+
+  cpsVerifyGroup(group_name)
+
+Create a CPS_ group if not present.
+
+cpsCreateUser
+~~~~~~~~~~~~~
+::
+
+  cpsCreateUser(user_id=None, user_pwd=None,
+                user_givenName=None, user_sn=None,
+                user_email=None, groups=None):
+
+
+Create a CPS_ users.
+
+cpsVerifyUser
+~~~~~~~~~~~~~
+
+Create a CPS_ users if not present.
+
+
+cpsSetLocalRole
+~~~~~~~~~~~~~~~
+::
+
+  cpsSetLocalRole(url, name, role)
+
+Grant role to name in url.
+
+cpsCreateSection
+~~~~~~~~~~~~~~~~
+::
+
+  cpsCreateSection(parent_url, title, description)
+
+
+cpsCreateWorkspace
+~~~~~~~~~~~~~~~~~~
+::
+
+  cpsCreateWorkspace(parent_url, title, description)
+
+
+cpsCreateDocument
+~~~~~~~~~~~~~~~~~
+::
+
+  cpsCreateDocument(parent_url)
+
+Create a random document in the parent_url container.
+
+cpsCreateNewsItem
+~~~~~~~~~~~~~~~~~
+::
+
+  cpsCreateNewsItem(parent_url)
+
+Create a simple news in the parent_url container.
+
+cpsChangeUiLanguage
+~~~~~~~~~~~~~~~~~~~
+::
+
+  cpsChangeUiLanguage(lang)
+
+Change the ui locale selection
+
+
+cpsListDocumentHref
+~~~~~~~~~~~~~~~~~~~
+::
+
+  cpsListDocumentHref(pattern)
+
+Return a clean list of document href that matches pattern in the previous
+page fetched.
+
+cpsSearchDocId
+~~~~~~~~~~~~~~
+::
+
+  cpsSearchDocId(doc_id)
+
+Return the list of url that ends with doc_id, using catalog search.
 
 
 Test runner
 ===========
 
-A FunkLoad test can be used like a standard unittest using a unittest.main()
+A FunkLoad_ test can be used like a standard unittest using a unittest.main()
 and a 'python MyFile.py'.
 
-To ease testing FunkLoad come with an advanced test runner to override
+To ease testing FunkLoad_ come with an advanced test runner to override
 the static configuration file.
 
 
@@ -383,7 +782,7 @@ configuration for each cycle.
 Cycles
 ~~~~~~
 
-FunkLoad can execute many cycles with different number of CUs, this way you
+FunkLoad_ can execute many cycles with different number of CUs, this way you
 can find easily the maximum number of users that your application can
 handle.
 
@@ -418,6 +817,8 @@ change the application configuration will help you to find the right tuning.
 Bench runner
 ============
 
+Usage
+-----
 ::
 
   fl-run-bench [options] file class.method
@@ -472,7 +873,7 @@ Usage
 
   fl-build-report [options] xmlfile
 
-fl-build-report analyze a FunkLoad bench xml result file and output a report.
+fl-build-report analyze a FunkLoad_ bench xml result file and output a report.
 
 
 Examples
@@ -505,7 +906,7 @@ Credential server
 =================
 
 If you are writing a bench that requires to be logged with different users
-FunkLoad provides an xmlrpc credential server to serve login/pwd between the
+FunkLoad_ provides an xmlrpc credential server to serve login/pwd between the
 different threads.
 
 It requires 2 files (like unix /etc/passwd and /etc/group) the passwd file
@@ -528,15 +929,7 @@ More options::
 
   fl-credential-ctl --help
 
-See the demo/ folder for example of credential configuration file.
-
-To get credential from a FunkLoad test::
-  from funkload.utils import xmlrpc_get_credential
-  user, pwd = xmlrpc_get_credential(credential_host, credential_port)
-
-To get credential from a group::
-  reviewer, pwd = xmlrpc_get_credential(credential_host, credential_port,
-                                       'Reviewer')
+See the demo/cmf folder for example of credential configuration file.
 
 
 Monitor server
@@ -544,9 +937,9 @@ Monitor server
 
 If you want to monitor the server health during the bench, you have to run a
 monitor xmlrpc server on the target server, this require to install the
-FunkLoad package.
+FunkLoad_ package.
 
-On the server side init the FunkLoad env as above and ::
+On the server side init the FunkLoad_ env as above and ::
 
   # edit monitor.conf if needed and run
   fl-monitor-ctl $FLOAD_HOME/lib/monitor.conf start
@@ -574,19 +967,22 @@ Note that you can monitor multiple hosts.
 Recording a new FunkLoad test
 =============================
 
-1. Record using TestMaker
+TestMaker_ java framework include a maxq_ proxy recorder, see INSTALL.txt_ for
+information on how to install TestMaker.
+
+1. Record using TestMaker_
 
   * Launch testmaker UI
   * Go to 'Tools/New Agent' then 'Record from a Web-Browser'
     set a whatever name and click to 'Start Recording"
-  * Configure your Web Browser to use the TestMaker proxy `localhost:8090`
+  * Configure your Web Browser to use the TestMaker_ proxy `localhost:8090`
   * Play your scenario
   * Click on `End Recording`
   * Save the tm script into the proper location and set a file_name like
     `scenario_name.tm`
-  * Close TestMaker
+  * Close TestMaker_
 
-2. Converting the TestMaker script into a FunkLoad script::
+2. Converting the TestMaker_ script into a FunkLoad_ script::
 
      fl-import-from-tm-recorder scenario_name.tm
 
@@ -609,38 +1005,22 @@ Recording a new FunkLoad test
 
   * Use the configuration file for settings like server_url
   * Use a credential server if you want to make bench with different users
-  * Add assertion using FunkLoad helpers
-
-
-Files
-=====
-
-  fl-run-test                - run a test
-  fl-run-bench               - run a test in bench mode
-  fl-build-report            - build a bench report
-  fl-import-from-tm-recorder - convert a TestMaker test into a FunkLoad script
-  fl-credential-ctl          - credential controller
-  fl-monitor-ctl             - monitoring controller
+  * Add assertion using FunkLoad_ helpers
 
 
 Bugs
 ====
 
-* WebUnit don't handle Referer header, thus page that redirect to a referer
-  will not work.
-
-* TestMaker recorder (bitmechanic maxq) failed to record post with
-  enctype="multipart/form-data" with an input of type file upload.
-  A work around is to record on a version without the
-  enctype=mutipart/form-data.
-
-* See the trac tickets: `http://svn.nuxeo.org/trac/pub/report/12`
+* See the trac tickets: http://svn.nuxeo.org/trac/pub/report/12
 
 
-Author
-======
-
-* Benoit Delbosc bdelbosc@nuxeo.com
-  Credits goes to Frank Cohen's TestMaker framework and Richard Jones
-  webunit package.
-
+.. _FunkLoad: http://public.dev.nuxeo.com/~ben/funkload/
+.. _TestMaker: http://www.pushtotest.com/
+.. _webunit: http://mechanicalcat.net/tech/webunit/
+.. _pyUnit: http://pyunit.sourceforge.net/
+.. _INSTALL.txt: INSTALL.html
+.. _maxq: http://maxq.tigris.org/
+.. _Zope: http://www.zope.org/
+.. _Cmf: http://www.zope.org/Products/CMF/
+.. _Nuxeo: http://www.nuxeo.com/
+.. _CPS: http://www.cps-project.org/
