@@ -74,12 +74,10 @@ h1.title {
 h2 {
   font-size: 140%;
   margin-bottom: 0.5em;
-  border-bottom: 1px solid #aaa;
 }
 h3 {
   font-size: 120%;
   margin-bottom: 0.5em;
-  border-bottom: 1px solid #ccc;
 }
 h4 {
   font-size: 110%;
@@ -192,4 +190,15 @@ table.docutils th {
 table.docutils td p, table.docutils th p {
   margin: 0;
   padding: 0;
+}
+
+div.contents p.topic-title, div.abstract p.topic-title {
+  font-weight: bold;
+}
+
+pre.address {
+  display: inline;
+  border: none;
+  padding: 0;
+  margin: 0;
 }
