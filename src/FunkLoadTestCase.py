@@ -93,9 +93,9 @@ class FunkLoadTestCase(unittest.TestCase):
             section = 'bench'
         else:
             section = 'ftest'
-        expect_codes = self.conf_getList(section, 'expect_codes',
-                                         [200, 301, 302])
-        self.expect_codes = map(int, expect_codes)
+        ok_codes = self.conf_getList(section, 'ok_codes', [200, 301, 302],
+                                     quiet=True)
+        self.ok_codes = map(int, ok_codes)
         self.sleep_time_min = self.conf_getFloat(section, 'sleep_time_min', 0)
         self.sleep_time_max = self.conf_getFloat(section, 'sleep_time_max', 0)
         self.log_to = self.conf_get(section, 'log_to', 'console file')
@@ -115,7 +115,8 @@ class FunkLoadTestCase(unittest.TestCase):
         # init webunit browser (passing a fake methodName)
         self._browser = WebTestCase(methodName='log')
         self._browser.user_agent =  self.conf_get('main', 'user_agent',
-                                                  'FunkLoad %s' % __version__)
+                                                  'FunkLoad/%s' % __version__,
+                                                  quiet=True)
         self.clearContext()
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
@@ -139,7 +140,7 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # configuration file utils
     #
-    def conf_get(self, section, key, default=_marker):
+    def conf_get(self, section, key, default=_marker, quiet=False):
         """Return an entry from the options or configuration file."""
         # check for a command line options
         opt_key = '%s_%s' %(section, key)
@@ -152,7 +153,8 @@ class FunkLoadTestCase(unittest.TestCase):
         try:
             val = self._config.get(section, key)
         except (NoSectionError, NoOptionError):
-            self.logi('[%s] %s not found' % (section, key))
+            if not quiet:
+                self.logi('[%s] %s not found' % (section, key))
             if default is _marker:
                 raise
             val = default
@@ -160,17 +162,17 @@ class FunkLoadTestCase(unittest.TestCase):
         return val
 
 
-    def conf_getInt(self, section, key, default=_marker):
+    def conf_getInt(self, section, key, default=_marker, quiet=False):
         """Return an integer from th econfiguration file."""
-        return int(self.conf_get(section, key, default))
+        return int(self.conf_get(section, key, default, quiet))
 
-    def conf_getFloat(self, section, key, default=_marker):
+    def conf_getFloat(self, section, key, default=_marker, quiet=False):
         """Return a float from th econfiguration file."""
-        return float(self.conf_get(section, key, default))
+        return float(self.conf_get(section, key, default, quiet))
 
-    def conf_getList(self, section, key, default=_marker):
+    def conf_getList(self, section, key, default=_marker, quiet=False):
         """Return a list from th econfiguration file."""
-        value = self.conf_get(section, key, default)
+        value = self.conf_get(section, key, default, quiet)
         if value is default:
             return value
         if value.count(':'):
@@ -183,11 +185,11 @@ class FunkLoadTestCase(unittest.TestCase):
     # browser simulation
     #
 
-    def connect(self, url, params, code, rtype, description):
+    def connect(self, url, params, ok_codes, rtype, description):
         """Handle fetching, logging, errors and history."""
         t_start = time.time()
         try:
-            response = self._browser.fetch(url, params, ok_codes=code)
+            response = self._browser.fetch(url, params, ok_codes=ok_codes)
         except:
             etype, value, tb = sys.exc_info()
             t_stop = time.time()
@@ -227,15 +229,15 @@ class FunkLoadTestCase(unittest.TestCase):
 
 
     def browse(self, url_in, params_in=None,
-               description=None, code=None,
+               description=None, ok_codes=None,
                method='post',
                follow_redirect=True, load_auto_links=True,
                sleep=True):
         """Simulate a browser."""
         self._response = None
         # ok codes
-        if code is None:
-            code = self.expect_codes
+        if ok_codes is None:
+            ok_codes = self.ok_codes
         if type(params_in) is ListType:
             # convert list into a dict
             params = {}
@@ -263,7 +265,7 @@ class FunkLoadTestCase(unittest.TestCase):
                                                           self.steps,
                                                           description or ''))
         # Fetching
-        response = self.connect(url, params, code, method, description)
+        response = self.connect(url, params, ok_codes, method, description)
 
         # Check redirection
         if follow_redirect and response.code in (301, 302):
@@ -274,7 +276,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 newurl = response.headers['Location']
                 url = urljoin(url_in, newurl)
                 self.logd(' Load redirect link: %s' % url)
-                response = self.connect(url, None, code, 'redirect', None)
+                response = self.connect(url, None, ok_codes, 'redirect', None)
                 max_redirect_count -= 1
             if not max_redirect_count:
                 self.logd(' WARNING Too many redirects give up.')
@@ -303,23 +305,25 @@ class FunkLoadTestCase(unittest.TestCase):
         return response
 
 
-    def post(self, url, params=None, description=None, code=None):
+    def post(self, url, params=None, description=None, ok_codes=None):
         """POST method on url with params."""
         self.steps += 1
-        response = self.browse(url, params, description, code, method="post")
+        response = self.browse(url, params, description, ok_codes,
+                               method="post")
         return response
 
 
-    def get(self, url, params=None, description=None, code=None):
+    def get(self, url, params=None, description=None, ok_codes=None):
         """GET method on url adding params."""
         self.steps += 1
-        response = self.browse(url, params, description, code, method="get")
+        response = self.browse(url, params, description, ok_codes,
+                               method="get")
         return response
 
-    def exists(self, url, params=None, description="Checking existance"):
+    def exists(self, url, params=None, description="Checking existence"):
         """Try a GET on URL return True if the page exists or False."""
         resp = self.get(url, params, description=description,
-                        code=[200, 301, 302, 404, 503])
+                        ok_codes=[200, 301, 302, 404, 503])
         if resp.code not in [200, 301, 302]:
             self.logd('Page %s not found.' % url)
             return False

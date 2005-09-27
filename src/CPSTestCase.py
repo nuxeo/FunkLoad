@@ -273,7 +273,7 @@ class CPSTestCase(ZopeTestCase):
         self.get("%s/cpsportlet_change_language" % self.server_url,
                  params=[['lang', lang]],
                  description="Change UI language to %s" % lang,
-                 code=[200,302,204])
+                 ok_codes=[200,302,204])
         # but the language selector coockie is set
 
 

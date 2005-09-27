@@ -57,7 +57,7 @@ class ZopeTestCase(FunkLoadTestCase):
         resp = self.post(url, params,
                          description="Packing %s Zodb, removing previous "
                          "revisions of objects that are older than %s day(s)."
-                         % (database, days), code=[200, 302, 500])
+                         % (database, days), ok_codes=[200, 302, 500])
         if resp.code == 500:
             if self.getBody().find(
                 "Error Value: The database has already been packed") == -1:
@@ -85,7 +85,7 @@ class ZopeTestCase(FunkLoadTestCase):
                   ["submit", " Add "]]
         url = parent_url
         url += "/manage_addProduct/ExternalMethod/manage_addExternalMethod"
-        resp = self.post(url, params, code=[200, 302, 400],
+        resp = self.post(url, params, ok_codes=[200, 302, 400],
                          description="Adding %s external method" % method_id)
         if resp.code == 400:
             if self.getBody().find('is invalid - it is already in use.') == -1:

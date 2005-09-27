@@ -206,7 +206,7 @@ class BenchRunner:
 
         # setup monitoring
         monitor_hosts = []                  # list of (host, port, descr)
-        for host in test.conf_get('monitor', 'hosts', '').split():
+        for host in test.conf_get('monitor', 'hosts', '', quiet=True).split():
             host = host.strip()
             monitor_hosts.append((host, test.conf_getInt(host, 'port'),
                                   test.conf_get(host, 'description', '')))
@@ -403,8 +403,8 @@ class BenchRunner:
                   'configuration_file': self.config_path,
                   'server_url': self.test_url,
                   'log_xml': self.result_path,}
-        for (host, prot, desc) in self.monitor_hosts:
-            config['host'] = desc
+        for (host, port, desc) in self.monitor_hosts:
+            config[host] = desc
         self.test.open_result_log(**config)
 
     def logr_close(self):
