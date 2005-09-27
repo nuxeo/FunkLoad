@@ -6,7 +6,9 @@ FunkLoad
 
 :address: bdelbosc _at_ nuxeo.com
 
-:revision: $Id: DRAFT DRAFT DRAFT $
+:version: FunkLoad/1.1.0
+
+:revision: $Id$
 
 :Copyright: (C) Copyright 2005 Nuxeo SARL (http://nuxeo.com).
     This program is free software; you can redistribute it and/or
@@ -24,8 +26,6 @@ FunkLoad
 :abstract: This document describes the usage of the FunkLoad_ tool. This tool
     enables to do functional and load testing of web application.
 
-.. $Id: howto-using_remote_controller.txt 25904 2005-08-17 09:08:38Z madarche $
-
 .. sectnum::    :depth: 2
 
 .. contents::   :depth: 3
@@ -33,13 +33,6 @@ FunkLoad
 
 Introducing FunkLoad
 ====================
-
-Credits
--------
-
-Thanks to Frank Cohen's TestMaker_ framework and Richard Jones webunit_
-package.
-
 
 What is FunkLoad ?
 ------------------
@@ -94,7 +87,7 @@ Main FunkLoad_ features are:
 
 * Provide a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
 
-* Easy to use, see examples in the demo folder.
+* Easy to use, see examples in the demo_ folder.
 
 
 Where to find FunkLoad ?
@@ -114,14 +107,28 @@ Installation
 See the INSTALL.txt_ file for requirement and installation.
 
 
+Examples
+--------
+
+See the demo_ folder contents and a report_ example.
+
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
+.. _report: http://public.dev.nuxeo.com/~ben/funkload/report-example.pdf
+
+Credits
+-------
+
+Thanks to Frank Cohen's TestMaker_ framework and Richard Jones webunit_
+package.
+
 
 The FunkLoadTestCase
 ====================
 
 FunkLoadTestCase extends the pyUnit_ unittest.TestCase with browser
 capabilities, configuration file helpers and assertions helpers. FunkLoad_
-provides also some tools to generate inputs and communicate with credential
-servers.
+provides also some tools to generate random inputs and communicate with
+credential servers.
 
 
 Browser API
@@ -169,8 +176,8 @@ exists
   exists(url, params=None, description="Checking existence")
 
 
-Return True if the http return code is 200, 301 or 302, and return False if
-return code is 404 or 503.
+Return True if the http response code is 200, 301 or 302, and return False if
+http code is 404 or 503, other codes will raise a test failure exception.
 
 
 setBasicAuth
@@ -234,6 +241,10 @@ Return a list, the default separators is a semi column ':'
 
 Assertion helpers API
 ---------------------
+
+FunkLoad_ uses the unittest assertion (``assert_``, ``assertEquals``,
+``fail``, ...), but provides some methods to check the http response.
+
 
 getLastUrl
 ~~~~~~~~~~
@@ -525,10 +536,11 @@ Parameters:
 
 - *admin_id* and *admin_pwd* the zope admin credential.
 - *manager_id* and *manager_pwd* the cps manager credential.
-- *zope_url* the Zope_ server url. [*]
-- *site_id* the CPS_ site id. [*]
+- *zope_url* the Zope_ server url [*]_.
+- *site_id* the CPS_ site id.
 
-[*] if the zope_url and site_id is not given we guess it using the server_url
+.. [*] if the zope_url and site_id is not given we guess it using the
+       server_url
 
 
 cpsLogin
@@ -660,7 +672,7 @@ Usage
 
 
 Examples
-~~~~~~~~
+--------
 ::
 
   fl-run-test myFile.py              - run default set of tests
@@ -677,7 +689,7 @@ Examples
 
 
 Options
-~~~~~~~
+-------
 ::
 
   --help, -h              show this help message and exit
@@ -702,19 +714,28 @@ Benching
 ========
 
 The same FunkLaod test can be turned into a load test, just by invoking the
-bench runner fl-run-bench.
+bench runner ``fl-run-bench``.
 
+Since it uses significant CPU resources. Make sure that performance limits
+are not hit by FunkLoad_ before your server's limit is reached.
 
-Definition
-----------
+Principle
+---------
+
+Here are some definitions used in bench mode:
 
 * CUs: Concurrent Users, which is the number of threads.
-* Test: a FunkLoad functional test.
-* cycle: a bench with a number of CUs: Staging up + logging + Staging down.
-* STPS: Average of Successful Tests Per Second during a cycle
-* SPPS: Average of Successfully Page Per Second during a cycle
+* STPS: Average of Successful Tests Per Second during a cycle.
+* SPPS: Average of Successfully Page Per Second during a cycle.
 * RPS: Average Request Per Second, successfully or not.
 * max[STPS|SPPS|RPS]: maximum of STPS|SPPS|RPS for a cycle.
+
+Page
+~~~~
+
+A page is an http get/post request with associated sub requests like
+redirects, images or links (css, js files). This is what users see as a
+single page.
 
 
 Test
@@ -727,17 +748,9 @@ method each get/post request is called a page.
 
   [setUp][page 1]    [page 2] ... [page n]   [tearDown]
   ======================================================> time
-         <-----------------------------------> test metho
-                 <---> sleeptime_min to sleeptime_max
-         <------> page 1 connection time
-
-Page
-~~~~
-
-A page is an http get/post request with associated sub requests like
-redirects, images or links (css, js files). This is what users see as a
-single page.
-
+         <----------------------------------> test method
+                 <--> sleeptime_min to sleeptime_max
+         <-----> page 1 connection time
 
 Cycle
 ~~~~~
@@ -809,23 +822,23 @@ change the application configuration will help you to find the right tuning.
   |   /           \         /                  \
   |  /             \       /                    \
    ==================================================> time
-        <-------->   duration    <--------->
-                    <------> cycletime
+        <------->   duration     <-------->
+                    <-----> cycle sleep time
 
 
 
 Bench runner
-============
+------------
 
 Usage
------
+~~~~~
 ::
 
   fl-run-bench [options] file class.method
 
 
 Examples
---------
+~~~~~~~~
 ::
 
   fl-run-bench myFile.py MyTestCase.testSomething
@@ -840,7 +853,7 @@ Examples
 
 
 Options
--------
+~~~~~~~
 ::
 
   --help, -h              show this help message and exit
@@ -865,7 +878,9 @@ Options
 Bench report
 ============
 
-To produce an html or ReST report you need to invoke the fl-build-report:
+To produce an html or ReST report you need to invoke the ``fl-build-report``,
+you can easily produce PDF report using Firefox 'Print To File' in
+PostScript then use the ps2pdf converter.
 
 Usage
 -----
@@ -873,7 +888,8 @@ Usage
 
   fl-build-report [options] xmlfile
 
-fl-build-report analyze a FunkLoad_ bench xml result file and output a report.
+``fl-build-report`` analyze a FunkLoad_ bench xml result file and output a
+report.
 
 
 Examples
