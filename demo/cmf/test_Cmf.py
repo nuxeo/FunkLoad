@@ -119,9 +119,7 @@ class Cmf(CmfTestCase):
                   ["submit", " Add "]]
         self.post("%s/manage_addProduct/CMFDefault/manage_addCMFSite" %
                   zope_url, params, description="Create a CMF Site")
-        self.get("%s/finish_portal_construction" % server_url,
-                 "Finish portal construction")
-        self.get(server_url, "View home page")
+        self.get(server_url, description="View home page")
         self.clearBasicAuth()
 
 
