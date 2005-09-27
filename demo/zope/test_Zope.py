@@ -106,6 +106,15 @@ class Zope(ZopeTestCase):
         self.post("%s/Examples/ShoppingCart/addItems" % server_url, params)
 
 
+    def test_anonymous_reader(self):
+        server_url = self.zope_url
+        self.get("%s/Examples/Navigation/Mammals/Whales" % server_url)
+        self.get("%s/Examples/GuestBook" % server_url)
+        self.get("%s/Examples/GuestBook/addEntry.html" % server_url)
+        params = [["sort", 'date'],
+                  ["reverse:int", "0"]]
+        self.get("%s/Examples/FileLibrary/index_html" % server_url, params)
+        self.get("%s/Examples/ShoppingCart" % server_url)
 
     def tearDown(self):
         """Setting up test."""
