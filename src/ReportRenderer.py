@@ -33,9 +33,13 @@ except ImportError:
 #
 def rst_title(title, level=1):
     """Return a rst title."""
-    rst_level = ['=', '-', '~']
-    rst = ['', title]
-    rst.append(rst_level[level-1] * len(rst[-1]))
+    rst_level = ['=', '=', '-', '~']
+    if level == 0:
+        rst = [rst_level[level] * len(title)]
+    else:
+        rst = ['']
+    rst.append(title)
+    rst.append(rst_level[level] * len(title))
     rst.append('')
     return '\n'.join(rst)
 
@@ -119,7 +123,7 @@ class AllResponseRst(BaseRst):
 
 class PageRst(AllResponseRst):
     """Page rendering."""
-    header = "     CUs    SPPS maxSRPS   TOTAL SUCCESS   " \
+    header = "     CUs    SPPS maxSPPS   TOTAL SUCCESS   " \
     "ERROR     MIN     AVG     MAX"
     image_names = ['pages_spps', 'pages']
 
@@ -229,11 +233,15 @@ class RenderRst:
     def renderConfig(self):
         """Render bench configuration."""
         config = self.config
-        self.append(rst_title("FunkLoad bench report", 1))
+        self.append(rst_title("FunkLoad bench report", 0))
         self.append("**%s.py %s.%s**" % (config['module'],
                                          config['class'],
                                          config['method']))
+
         self.append('\n' + config['description'])
+        self.append("")
+        self.append(".. sectnum::    :depth: 2")
+        self.append(".. contents::   :depth: 3")
 
         self.append(rst_title("Bench configuration", 2))
         self.append("* Launched: %s" % config['time'])
@@ -546,6 +554,8 @@ class RenderHtml(RenderRst):
         stps = []
         cvus = []
         for cycle in self.cycles:
+            if not stats[cycle].has_key('test'):
+                continue
             test = stats[cycle]['test']
             stps.append(test.tps)
             errors.append(test.error_percent)
