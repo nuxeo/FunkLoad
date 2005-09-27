@@ -1,16 +1,21 @@
 # FunkLoad test configuration file
 # $Id: $
 
+
 # ------------------------------------------------------------
 # Main section
 #
 [main]
 title=%(class_name)s
 description=XXX the TestCase class description
+
 # the server url to test
 url=%(server_url)s
-# the User-Agent header to send
-#user_agent = Mozilla/5.0 Firefox/1.0.6
+
+# the User-Agent header to send default is 'FunkLoad/1.xx' examples:
+#user_agent = Opera/8.0 (Windows NT 5.1; U; en)
+#user_agent = Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
+#user_agent = Mozilla/5.0 (X11; U; Linux i686; en; rv:1.7.10) Gecko/20050912 Firefox/1.0.6
 
 
 # ------------------------------------------------------------
@@ -57,8 +62,8 @@ log_path = %(test_name)s-test.log
 # result_path = path to store the xml result file
 result_path = %(test_name)s-test.xml
 
-# expect_codes = list of successfull HTTP response code
-expect_codes =  200:301:302
+# ok_codes = list of successfull HTTP response code default is 200:301:302
+# ok_codes =  200:301:302
 
 # sleeptime_min = minimum amount of time in seconds to sleep between requests
 #                 to the host
@@ -93,6 +98,6 @@ cycle_time = 1
 log_to = file
 log_path = %(test_name)s-bench.log
 result_path = %(test_name)s-bench.xml
-expect_codes =  200:301:302
+#ok_codes =  200:301:302
 sleep_time_min = 0
 sleep_time_max = 2
