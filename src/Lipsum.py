@@ -164,7 +164,8 @@ class Lipsum:
             self.getSubject(length_min=1, length_max=2))
 
 
-if __name__ == '__main__':
+def main():
+    """Testing."""
     print 'Word: %s\n' % (Lipsum().getWord())
     print 'UniqWord: %s\n' % (Lipsum().getUniqWord())
     print 'Subject: %s\n' % (Lipsum().getSubject())
@@ -187,3 +188,6 @@ if __name__ == '__main__':
         lang="en_US", format="long")
     print 'Address default: %s' % Lipsum().getAddress()
 
+
+if __name__ == '__main__':
+    main()
