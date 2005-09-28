@@ -376,7 +376,7 @@ def main(conf_path):
 
     if is_server_running(host, port):
         log("Server already running on %s:%s." % (host, port))
-        sys.exit(-1)
+        return
 
     g_monitor.start()
 
