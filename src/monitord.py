@@ -369,15 +369,16 @@ def main(conf_path):
     log("Use configuration file: %s." % conf_path)
     reloadConf()
 
-    g_monitor.start()
-
     # setup and launch xml rpc server
     host = g_conf.get('server', 'host')
     port = int(g_conf.get('server', 'port'))
 
+
     if is_server_running(host, port):
         log("Server already running on %s:%s." % (host, port))
-        return
+        sys.exit(-1)
+
+    g_monitor.start()
 
     log("Init XMLRPC server %s:%s." % (host, port))
     server = MySimpleXMLRPCServer((host, port))
