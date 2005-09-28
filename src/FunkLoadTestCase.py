@@ -330,6 +330,27 @@ class FunkLoadTestCase(unittest.TestCase):
         self.logd('Page %s exists.' % url)
         return True
 
+
+    def waitUntilAvailable(self, url, time_out=20, sleep_time=2):
+        """Wait until url is available.
+
+        Try a get on url every sleep_time until server is reached or
+        time is out."""
+        time_start = time.time()
+        down = True
+        while(down):
+            time.sleep(sleep_time)
+            try:
+                response = self._browser.fetch(url, None,
+                                               ok_codes=[200,301,302])
+            except SocketError:
+                if time.time() - time_start > time_out:
+                    self.fail('Time out service not available after %ss' %
+                              time_out)
+            else:
+                down = False
+
+
     def sleep(self):
         """Sleeps a random amount of time.
 
