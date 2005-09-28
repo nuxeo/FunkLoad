@@ -39,18 +39,27 @@ What is FunkLoad ?
 
 FunkLoad_ is a functional and load web tester, main use cases are:
 
-* Functional regression testing of web projects.
+* Functional testing of web projects and thus regression testing.
 
-* Benching web application and producing detail reports.
+* Performance testing tool by loading the web application and monitoring
+  your servers it helps you to pinpoint bottlenecks, giving a detail
+  report of performance measurement.
 
-* Writing web agents, like checking if a site is alive, or scripting any web
-  repetitive task.
+* Load testing tool to expose bugs that do not surface in cursory testing,
+  like volume testing or longevity testing.
+
+* Stress testing tool to overwhelming the web application resources and test
+  the application recoverability.
+
+* Writing web agents by scripting any web repetitive task, like checking if
+  a site is alive.
 
 
 Main FunkLoad_ features are:
 
-* Pure python package compatible with pyUnit_ framework, just use
-  funkload.FunkLoadTestCase instead of unittest.TestCase.
+* Functional test are pure python script using the pyUnit_ framework like
+  normal unit test, python enable complex scenarios to handle real world
+  app.
 
 * Truly emulate a web browser (single-threaded) using Richard Jones'
   webunit_:
@@ -64,19 +73,22 @@ Main FunkLoad_ features are:
 
 * Advanced test runner with many command line options:
 
-  - green/red color mode
+  - set the target server url
   - display the fetched page in real time in your browser
   - debug mode
+  - green/red color mode
 
 * Turn a functional test into a load test, just by invoking the bench runner
   you can identify scalability and performance problems.
 
-* Detail bench report in ReST or html containing:
+* Detail bench report in ReST or HTML (PDF via ps2pdf) containing:
 
   - bench configuration
   - tests, pages, requests stats and charts.
+  - 5 slowest requests
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
+  - http error summary list
 
 * Easy test customization using configuration file or command line options.
 
@@ -878,7 +890,7 @@ Options
 Bench report
 ============
 
-To produce an html or ReST report you need to invoke the ``fl-build-report``,
+To produce an HTML or ReST report you need to invoke the ``fl-build-report``,
 you can easily produce PDF report using Firefox 'Print To File' in
 PostScript then use the ps2pdf converter.
 
