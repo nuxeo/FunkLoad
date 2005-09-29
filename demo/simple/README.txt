@@ -51,6 +51,9 @@ your responsablity as it can result a DOS in bench mode.
    default stack size used by a thread, for example try a `ulimit -s 2048`
    before running the bench.
 
+   Performance limits are hit by FunkLoad before apache's limit is reached,
+   since it uses significant CPU resources.
+
 4/ Build the report::
 
    fl-build-report --html simple-bench.xml
