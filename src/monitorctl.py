@@ -112,7 +112,7 @@ def main(conf_path, action="action_monitor", key=None):
     except socket.error, msg:
         if action=="status" or verbose or '111' not in str(msg):
             print "### cli: Server is not running: %s" % msg
-        if action == 'stop':
+        if action in ('stop', 'status'):
             ret = 0
         else:
             ret = -1
