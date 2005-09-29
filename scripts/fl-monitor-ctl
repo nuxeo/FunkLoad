@@ -23,7 +23,7 @@ startd() {
 
 
 stop() {
-    echo "### monitorctl: Stopping monitor server:"
+    echo "### monitorctl: Stopping monitor server."
     python $FL_SRC/monitorctl.py $conf_path stop
 }
 
@@ -95,7 +95,6 @@ case "$1" in
         stop
         sleep 1
         start
-        status
         ;;
     test|check)
         test_server

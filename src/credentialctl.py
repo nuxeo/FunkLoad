@@ -24,7 +24,7 @@ $Id: credentialctl.py 24649 2005-08-29 14:20:19Z bdelbosc $
 import sys
 import socket
 from xmlrpclib import ServerProxy
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 
 USAGE = """
 Usage: ./credentialctl.py CONF_FILE [status|reload|stop|test_credential]
@@ -36,18 +36,22 @@ def usage():
     """Display usage."""
     print USAGE
 
-def action_getStatus(server):
+def action_getStatus(server, verbose=True):
     """Test the getStatus method."""
-    print "### cli: srv status: %s" % server.getStatus()
+    status = server.getStatus()
+    if verbose:
+        print "### cli: srv status: %s" % status
 
-def action_stopServer(server):
+def action_stopServer(server, verbose=True):
     """Ask the server to stop."""
-    print "### cli: srv stopServer."
+    if verbose:
+        print "### cli: srv stopServer."
     server.stopServer()
 
-def action_reloadConf(server):
+def action_reloadConf(server, verbose=True):
     """Ask the server to reload the configuration file."""
-    print "### cli: ask srv to reloadConf."""
+    if verbose:
+        print "### cli: ask srv to reloadConf."""
     server.reloadConf()
 
 def test_getCredential(server):
@@ -74,26 +78,37 @@ def main():
     conf_path = sys.argv[1]
     action = sys.argv[2]
     conf = ConfigParser()
-    print "### cli: Use configuration file: %s." % conf_path
     conf.read(conf_path)
+    try:
+        verbose = int(conf.get('client', 'verbose'))
+    except NoOptionError, NoSectionError:
+        verbose = True
+    if verbose:
+        print "### cli: Use configuration file: %s." % conf_path
     host = conf.get('server', 'host')
     port = int(conf.get('server', 'port'))
-    print "### cli: Init XMLRPC proxy http://%s:%s." % (host, port)
+    if verbose:
+        print "### cli: Init XMLRPC proxy http://%s:%s." % (host, port)
     server = ServerProxy("http://%s:%s" % (host, port))
 
     # check the srv status first
     try:
-        action_getStatus(server)
+        action_getStatus(server, verbose or action=="status")
     except socket.error, msg:
-        print "### cli: Server is not running: %s" % msg
-        sys.exit(-1)
+        if action=="status" or verbose or '111' not in str(msg):
+            print "### cli: Server is not running: %s" % msg
+        if action == 'stop':
+            ret = 0
+        else:
+            ret = -1
+        sys.exit(ret)
 
     if action == "status":
         sys.exit(0)
     elif action == "reload":
-        action_reloadConf(server)
+        action_reloadConf(server, verbose)
     elif action == "stop":
-        action_stopServer(server)
+        action_stopServer(server, verbose)
     elif action in ("test", "test_credential"):
         test_getCredential(server)
         action_getStatus(server)

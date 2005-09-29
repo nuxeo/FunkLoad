@@ -195,6 +195,8 @@ class Monitor(Thread):
         self.setInterface(interface)
         self.setHost(host)
         self.checkKernelRev()
+        # this makes threads endings if main stop with a KeyboardInterupt
+        self.setDaemon(1)
 
     def setInterval(self, interval):
         """Set the interval between monitoring."""
