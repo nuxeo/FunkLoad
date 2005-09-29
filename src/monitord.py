@@ -349,7 +349,7 @@ def is_server_running(host, port):
     server = ServerProxy("http://%s:%s" % (host, port))
     try:
         server.getStatus()
-    except socket.error, msg:
+    except socket.error:
         return 0
     return 1
 

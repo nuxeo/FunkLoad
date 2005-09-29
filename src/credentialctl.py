@@ -71,7 +71,6 @@ def test_getCredential(server):
 #
 def main():
     """Control credentiald server."""
-    check_status = 0
     if len(sys.argv) != 3:
         usage()
         sys.exit(-1)
@@ -81,7 +80,7 @@ def main():
     conf.read(conf_path)
     try:
         verbose = int(conf.get('client', 'verbose'))
-    except NoOptionError, NoSectionError:
+    except (NoOptionError, NoSectionError):
         verbose = True
     if verbose:
         print "### cli: Use configuration file: %s." % conf_path
@@ -95,7 +94,7 @@ def main():
     try:
         action_getStatus(server, verbose or action=="status")
     except socket.error, msg:
-        if action=="status" or verbose or '111' not in str(msg):
+        if action == "status" or verbose or '111' not in str(msg):
             print "### cli: Server is not running: %s" % msg
         if action in ('stop', 'status'):
             ret = 0
