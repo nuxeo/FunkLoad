@@ -277,6 +277,7 @@ class RenderRst:
         elif key == 'response':
             klass = AllResponseRst
         self.append(rst_title(title, 2))
+        renderer = None
         for cycle in self.cycles:
             if not stats[cycle].has_key(key):
                 continue
@@ -285,7 +286,8 @@ class RenderRst:
                 self.append(renderer.render_header(self.with_chart))
                 first = False
             self.append(renderer.render_stat())
-        self.append(renderer.render_footer())
+        if renderer is not None:
+            self.append(renderer.render_footer())
 
     def renderCyclesStepStat(self, step):
         """Render a step stats for all cycle."""
