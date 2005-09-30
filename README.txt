@@ -248,7 +248,7 @@ Return a float.
 conf_getList
 ~~~~~~~~~~~~
 
-Return a list, the default separators is a semi column ':'
+Return a list, the default separators is a double point ':'
 
 
 Assertion helpers API
