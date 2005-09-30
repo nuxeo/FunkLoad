@@ -41,6 +41,7 @@ import PatchWebunit
 from utils import get_default_logger, mmn_is_bench, mmn_decode
 from utils import recording, thread_sleep
 from version import __version__
+from xmlrpclib import ServerProxy
 
 _marker = []
 
@@ -331,6 +332,43 @@ class FunkLoadTestCase(unittest.TestCase):
         return True
 
 
+    def xmlrpc_call(self, url, method_name, params, description=None):
+        """Call an xml rpc url with params.
+
+        url is something like http://server:port/methodName
+        params are the parameters list.
+        """
+        self.steps += 1
+        self.logd('XMLRPC: %s::%s\n\tCall %i: %s ...' % (url, method_name,
+                                                         self.steps,
+                                                         description or ''))
+        response = None
+        t_start = time.time()
+        try:
+            server = ServerProxy(url)
+            method = getattr(server, method_name)
+            response = method(*params)
+        except:
+            etype, value, tb = sys.exc_info()
+            t_stop = time.time()
+            t_delta = t_stop - t_start
+            self.total_time += t_delta
+            self.step_success = False
+            self.test_status = 'Failure'
+            self.logd(' Failed in %.3fs' % t_delta)
+            self.log_xmlrpc_response(url, method_name, description, response,
+                                     t_start, t_stop, -1)
+            raise
+        t_stop = time.time()
+        t_delta = t_stop - t_start
+        self.total_time += t_delta
+        self.total_pages += 1
+        self.logd(' Done in %.3fs' % t_delta)
+        self.log_xmlrpc_response(url, method_name, description, response,
+                                 t_start, t_stop, 200)
+        return response
+
+
     def waitUntilAvailable(self, url, time_out=20, sleep_time=2):
         """Wait until url is available.
 
@@ -465,6 +503,28 @@ class FunkLoadTestCase(unittest.TestCase):
                 headers,
                 '  <body><![CDATA[\n%s\n]]>\n  </body>' % response.body,
                 '</response>'])
+        self.logr(message)
+
+    def log_xmlrpc_response(self, url, method, description, response,
+                            time_start, time_stop, code):
+        """Log a response."""
+        self.response_count += 1
+        info = {}
+        info['cycle'] = self.cycle
+        info['cvus'] = self.cvus
+        info['thread_id'] = self.thread_id
+        info['suite_name'] = self.suite_name
+        info['test_name'] = self.test_name
+        info['step'] = self.steps
+        info['number'] = self.response_count
+        info['type'] = 'xmlrpc'
+        info['url'] = quoteattr(url + '/' + method)
+        info['code'] = code
+        info['description'] = description and quoteattr(description) or '""'
+        info['time_start'] = time_start
+        info['duration'] = time_stop - time_start
+        info['result'] = self.step_success and 'Successful' or 'Failure'
+        message = '''<response cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s" step="%(step).3i" number="%(number).3i" type="%(type)s" result="%(result)s" url=%(url)s code="%(code)s" description=%(description)s time="%(time_start)s" duration="%(duration)s" />"''' % info
         self.logr(message)
 
 
