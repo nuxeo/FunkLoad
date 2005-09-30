@@ -77,7 +77,7 @@ class AllResponseStat:
         """Compute avg times."""
         if self.finalized:
             return
-        if self.total:
+        if self.count:
             self.avg = self.total / float(self.count)
         self.min = min(self.max, self.min)
         if self.error:
