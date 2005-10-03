@@ -284,14 +284,15 @@ class CPSTestCase(ZopeTestCase):
         """Return a random language."""
         return random.choice(self._all_langs)
 
-    def cpsGuessZopeUrl(self):
+    def cpsGuessZopeUrl(self, cps_url=None):
         """Guess a zope url and site_id from a CPS Site url.
 
         return a tuple (zope_url, site_id)
         """
-        server_url = self.server_url
-        site_id = server_url.split('/')[-1]
-        zope_url = server_url[:-(len(site_id)+1)]
+        if cps_url is None:
+            cps_url = self.server_url
+        site_id = cps_url.split('/')[-1]
+        zope_url = cps_url[:-(len(site_id)+1)]
         return zope_url, site_id
 
     def cpsSearchDocId(self, doc_id):
