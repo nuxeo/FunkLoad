@@ -37,7 +37,7 @@ Introducing FunkLoad
 What is FunkLoad ?
 ------------------
 
-FunkLoad_ is a functional and load web tester, writtent in Python, whose
+FunkLoad_ is a functional and load web tester, written in Python, whose
 main use cases are:
 
 * Functional testing of web projects, and thus regression testing as well.
