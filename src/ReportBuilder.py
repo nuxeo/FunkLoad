@@ -108,7 +108,7 @@ class FunkLoadXmlParser:
             stat = stats.setdefault(
                 'test', TestStat(cycle, self.cycle_duration,
                                  attrs['cvus']))
-            stat.add(attrs['result'], attrs['pages'],
+            stat.add(attrs['result'], attrs['pages'], attrs.get('xmlrpc', 0),
                      attrs['redirects'], attrs['images'], attrs['links'],
                      attrs['connection_duration'], attrs.get('traceback'))
             stats['test'] = stat

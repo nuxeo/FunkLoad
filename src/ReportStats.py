@@ -107,7 +107,7 @@ class PageStat(AllResponseStat):
 
     def add(self, date, result, duration, rtype):
         """Add a new response to stat."""
-        if str(rtype) in ('post', 'get'):
+        if str(rtype) in ('post', 'get', 'xmlrpc'):
             new_page = True
         else:
             new_page = False
@@ -211,10 +211,11 @@ class TestStat:
         self.error_percent = 0
         self.traceback = []
         self.pages = self.images = self.redirects = self.links = 0
+        self.xmlrpc = 0
         self.tps = 0
         self.finalized = False
 
-    def add(self, result, pages, redirects, images, links,
+    def add(self, result, pages, xmlrpc, redirects, images, links,
             duration, traceback=None):
         """Add a new response to stat."""
         self.finalized = False
@@ -230,6 +231,7 @@ class TestStat:
         self.min = min(self.min, float(duration))
         self.total += float(duration)
         self.pages = max(self.pages, int(pages))
+        self.xmlrpc = max(self.xmlrpc, int(xmlrpc))
         self.redirects = max(self.redirects, int(redirects))
         self.images = max(self.images, int(images))
         self.links = max(self.links, int(links))
