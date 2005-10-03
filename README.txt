@@ -127,7 +127,7 @@ Examples
 See the demo_ folder contents and a report_ example.
 
 .. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
-.. _report: http://public.dev.nuxeo.com/~ben/funkload/report-example.pdf
+.. _report: http://funkload.nuxeo.org/report-example.pdf
 
 Credits
 -------
@@ -1066,7 +1066,7 @@ Bugs
 * See the trac tickets: http://svn.nuxeo.org/trac/pub/report/12
 
 
-.. _FunkLoad: http://public.dev.nuxeo.com/~ben/funkload/
+.. _FunkLoad: http://funkload.nuxeo.org/
 .. _TestMaker: http://www.pushtotest.com/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _pyUnit: http://pyunit.sourceforge.net/
