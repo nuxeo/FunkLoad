@@ -134,6 +134,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_time = 0.0
         self.total_pages = self.total_images = 0
         self.total_links = self.total_redirects = 0
+        self.total_xmlrpc = 0
+        self.clearBasicAuth()
         #self.logd('# FunkLoadTestCase.clearContext done')
 
 
@@ -332,37 +334,42 @@ class FunkLoadTestCase(unittest.TestCase):
         return True
 
 
-    def xmlrpc_call(self, url, method_name, params, description=None):
-        """Call an xml rpc url with params.
-
-        url is something like http://server:port/methodName
-        params are the parameters list.
-        """
+    def xmlrpc_call(self, url_in, method_name, params=None, description=None):
+        """Call an xml rpc method_name on url with params."""
         self.steps += 1
-        self.logd('XMLRPC: %s::%s\n\tCall %i: %s ...' % (url, method_name,
+        self.logd('XMLRPC: %s::%s\n\tCall %i: %s ...' % (url_in, method_name,
                                                          self.steps,
                                                          description or ''))
         response = None
         t_start = time.time()
+        if self._authinfo is not None:
+            url = url_in.replace('//', '//'+self._authinfo)
+        else:
+            url = url_in
         try:
             server = ServerProxy(url)
             method = getattr(server, method_name)
-            response = method(*params)
+            if params is not None:
+                response = method(*params)
+            else:
+                response = method()
         except:
             etype, value, tb = sys.exc_info()
             t_stop = time.time()
             t_delta = t_stop - t_start
             self.total_time += t_delta
             self.step_success = False
-            self.test_status = 'Failure'
+            self.test_status = 'Error'
             self.logd(' Failed in %.3fs' % t_delta)
             self.log_xmlrpc_response(url, method_name, description, response,
                                      t_start, t_stop, -1)
+            if etype is SocketError:
+                raise SocketError("Can't access %s." % url)
             raise
         t_stop = time.time()
         t_delta = t_stop - t_start
         self.total_time += t_delta
-        self.total_pages += 1
+        self.total_xmlrpc += 1
         self.logd(' Done in %.3fs' % t_delta)
         self.log_xmlrpc_response(url, method_name, description, response,
                                  t_start, t_stop, 200)
@@ -375,18 +382,17 @@ class FunkLoadTestCase(unittest.TestCase):
         Try a get on url every sleep_time until server is reached or
         time is out."""
         time_start = time.time()
-        down = True
-        while(down):
-            time.sleep(sleep_time)
+        while(True):
             try:
                 response = self._browser.fetch(url, None,
                                                ok_codes=[200,301,302])
             except SocketError:
                 if time.time() - time_start > time_out:
-                    self.fail('Time out service not available after %ss' %
-                              time_out)
+                    self.fail('Time out service %s not available after %ss' %
+                              (url, time_out))
             else:
-                down = False
+                return
+            time.sleep(sleep_time)
 
 
     def sleep(self):
@@ -407,10 +413,13 @@ class FunkLoadTestCase(unittest.TestCase):
     def setBasicAuth(self, login, password):
         """Set http basic authentication."""
         self._browser.setBasicAuth(login, password)
+        self._authinfo = '%s:%s@' % (login, password)
+
 
     def clearBasicAuth(self):
         """Remove basic authentication."""
         self._browser.clearBasicAuth()
+        self._authinfo = None
 
     #------------------------------------------------------------
     # logging
@@ -518,7 +527,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['step'] = self.steps
         info['number'] = self.response_count
         info['type'] = 'xmlrpc'
-        info['url'] = quoteattr(url + '/' + method)
+        info['url'] = quoteattr(url + '#' + method)
         info['code'] = code
         info['description'] = description and quoteattr(description) or '""'
         info['time_start'] = time_start
@@ -542,6 +551,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['connection_duration'] = self.total_time
         info['requests'] = self.response_count
         info['pages'] = self.total_pages
+        info['xmlrpc'] = self.total_xmlrpc
         info['redirects'] = self.total_redirects
         info['images'] = self.total_images
         info['links'] = self.total_links
@@ -551,7 +561,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 traceback.format_exception(*sys.exc_info()))) + ' '
         else:
             info['traceback'] = ''
-        text = '''<testResult cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s"  time="%(time_start)s" result="%(result)s" steps="%(steps)s" duration="%(duration)s" connection_duration="%(connection_duration)s" requests="%(requests)s" pages="%(pages)s" redirects="%(redirects)s" images="%(images)s" links="%(links)s" %(traceback)s/>''' % info
+        text = '''<testResult cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s"  time="%(time_start)s" result="%(result)s" steps="%(steps)s" duration="%(duration)s" connection_duration="%(connection_duration)s" requests="%(requests)s" pages="%(pages)s" xmlrpc="%(xmlrpc)s" redirects="%(redirects)s" images="%(images)s" links="%(links)s" %(traceback)s/>''' % info
         self.logr(text)
 
 
