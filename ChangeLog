@@ -1,3 +1,9 @@
+2005-10-03  ben  <bdelbosc@nuxeo.com>
+
+	* src/ReportRenderer.py fixing network traffic stats #971
+
+	* add xmlrpc_call to test/bench XML RPC
+
 2005-09-21  ben  <bdlebosc@nuxeo.com>
 
 	* #950 Report: display failure and error first part
