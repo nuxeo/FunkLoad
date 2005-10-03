@@ -64,6 +64,10 @@ Optional packages
 Installation
 ------------
 
+ **The 1.1.0 version will be release very soon (before 10/9/2005)**
+
+ **you should try the svn sources instead of the old 1.0.0 package.**
+
 From a package::
 
     # check the latest package at http://public.dev.nuxeo.com/~ben/funkload/
