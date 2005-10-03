@@ -9,4 +9,6 @@ You can find 3 examples of FunkLoad usage here:
 
 * zope: a basic ZopeTestCase example
 
-* cps: an advanced usage with a credential server
+* cmf: an advanced usage with a credential server
+
+* xmlrpc: a simple xml rpc bench of the credential server
