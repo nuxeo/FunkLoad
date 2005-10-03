@@ -148,7 +148,6 @@ def reloadConf():
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            print "line: '%s'" % line
             user, password = [x.strip() for x in line.split(CREDENTIAL_SEP, 1)]
             g_passwords[user] = password
             if not lofc or len(group) < lofc:
