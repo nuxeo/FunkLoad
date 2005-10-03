@@ -37,18 +37,19 @@ Introducing FunkLoad
 What is FunkLoad ?
 ------------------
 
-FunkLoad_ is a functional and load web tester, main use cases are:
+FunkLoad_ is a functional and load web tester, writtent in Python, whose
+main use cases are:
 
-* Functional testing of web projects and thus regression testing.
+* Functional testing of web projects, and thus regression testing as well.
 
-* Performance testing tool by loading the web application and monitoring
-  your servers it helps you to pinpoint bottlenecks, giving a detail
+* Performance testing: by loading the web application and monitoring
+  your servers it helps you to pinpoint bottlenecks, giving a detailed
   report of performance measurement.
 
 * Load testing tool to expose bugs that do not surface in cursory testing,
   like volume testing or longevity testing.
 
-* Stress testing tool to overwhelming the web application resources and test
+* Stress testing tool to overwhelm the web application resources and test
   the application recoverability.
 
 * Writing web agents by scripting any web repetitive task, like checking if
@@ -57,31 +58,32 @@ FunkLoad_ is a functional and load web tester, main use cases are:
 
 Main FunkLoad_ features are:
 
-* Functional test are pure python script using the pyUnit_ framework like
-  normal unit test, python enable complex scenarios to handle real world
-  app.
+* Functional test are pure Python scripts using the pyUnit_ framework like
+  normal unit test. Python enable complex scenarios to handle real world
+  applications.
 
-* Truly emulate a web browser (single-threaded) using Richard Jones'
+* Truly emulates a web browser (single-threaded) using Richard Jones'
   webunit_:
 
   - basic authentication support
   - cookies support
   - fetching css, javascript and images
-  - emulate a browser cache
+  - emulating a browser cache
   - file upload and multipart/form-data submission
   - https support
 
-* Advanced test runner with many command line options:
+* Advanced test runner with many command-line options:
 
   - set the target server url
   - display the fetched page in real time in your browser
   - debug mode
   - green/red color mode
 
-* Turn a functional test into a load test, just by invoking the bench runner
+* Turn a functional test into a load test: just by invoking the bench runner
   you can identify scalability and performance problems.
 
-* Detail bench report in ReST or HTML (PDF via ps2pdf) containing:
+* Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
+  containing:
 
   - bench configuration
   - tests, pages, requests stats and charts.
@@ -90,14 +92,14 @@ Main FunkLoad_ features are:
     charts.
   - http error summary list
 
-* Easy test customization using configuration file or command line options.
+* Easy test customization using a configuration file or command line options.
 
-* Easy test creation using TestMaker_ / maxq_ recorder, you can use your web
+* Easy test creation using TestMaker_ / maxq_ recorder, so you can use your web
   browser and produce a FunkLoad_ test automatically.
 
-* Provide web assertion helpers.
+* Provides web assertion helpers.
 
-* Provide a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
+* Provides a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
 
 * Easy to use, see examples in the demo_ folder.
 
@@ -105,7 +107,7 @@ Main FunkLoad_ features are:
 Where to find FunkLoad ?
 ------------------------
 
-Check the latest package at http://public.dev.nuxeo.com/~ben/funkload/
+Check the latest package at http://funkload.nuxeo.org/
 
 Or from bleeding edge svn sources, if you want to try the latest unstable
 sources::
@@ -152,10 +154,10 @@ get
 
   get(url, params=None, description=None, ok_codes=None)
 
-This emulate a browser http GET link, it will fetch the url submits
+This emulates a browser http GET link. It will fetch the url, submits
 appropriate cookies, follow redirection, register new cookies, load css and
 javascript that are not already cached.
-This method return a webunit_ HTTPResponse.
+This method returns a webunit_ HTTPResponse.
 
 Parameters:
 
@@ -174,7 +176,7 @@ post
   post(url, params=None, description=None, ok_codes=None)
 
 
-Same interface than the get() but it use a http post method.
+Same interface than the get() but it uses a http post method.
 You can upload a file by setting a params like this::
 
   from webunit.utility import Upload
@@ -220,8 +222,8 @@ xmlrpc_call
 
   xmlrpc_call(url, method_name, params=None, description=None)
 
-Call the ``method_name`` at ``url`` using xmlrpclib, you can use the
-setBasicAuth_ method before to handle the http basic authentication, note
+Call the ``method_name`` at ``url`` using xmlrpclib. You can use the
+setBasicAuth_ method before to handle the http basic authentication. Note
 that due to xmlrpclib limitation you can not use an http proxy.
 
 Parameters:
@@ -236,7 +238,7 @@ Configuration file API
 ----------------------
 
 A FunkLoadTestCase class uses a configuration file to setup variable
-configuration like the base server url to be tested, the test description,
+configuration, like the base server url to be tested, the test description,
 credential access, logging files and other test specific parameters. The test
 configuration file have the same name of the FunkLoadTestCase with a '.conf'
 extension. See documented examples in the demo/ folder.
@@ -247,7 +249,7 @@ conf_get
 
   conf_get(section, key, default=_marker)
 
-Return an entry from the configuration file, note that the entry may be
+Return an entry from the configuration file. Note that the entry may be
 overriden by a command line option.
 
 Parameters:
@@ -750,7 +752,7 @@ Benching
 The same FunkLaod test can be turned into a load test, just by invoking the
 bench runner ``fl-run-bench``.
 
-Since it uses significant CPU resources. Make sure that performance limits
+Since it uses significant CPU resources, make sure that performance limits
 are not hit by FunkLoad_ before your server's limit is reached.
 
 Principle
@@ -775,7 +777,7 @@ single page.
 Test
 ~~~~
 
-A test is made with 3 methods setUp/test_name/tearDown, during the test_name
+A test is made with 3 methods: setUp/test_name/tearDown. During the test_name
 method each get/post request is called a page.
 
 ::
@@ -795,7 +797,7 @@ test in a loop.
 
 Once all threads have been started we start to record stats.
 
-Only tests that ends during the 'duration' period are taken into account
+Only tests that end during the 'duration' period are taken into account
 for the test stats (in the representation below test like [---X are not
 take into account).
 
@@ -833,8 +835,8 @@ FunkLoad_ can execute many cycles with different number of CUs, this way you
 can find easily the maximum number of users that your application can
 handle.
 
-Running n cycles with the same CUs is a good way to see how the
-application handle a writing test over time.
+Running n cycles with the same CUs is a good way to see how the application
+handles a writing test over time.
 
 Running n cycles with the same CUs with a reading test and a setUpCycle that
 change the application configuration will help you to find the right tuning.
