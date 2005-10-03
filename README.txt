@@ -209,6 +209,28 @@ clearBasicAuth
 
 Remove basic auth credential set by setBasicAuth
 
+XML RPC API
+-----------
+
+You can test or bench xmlrpc services using the following API.
+
+xmlrpc_call
+~~~~~~~~~~~
+::
+
+  xmlrpc_call(url, method_name, params=None, description=None)
+
+Call the ``method_name`` at ``url`` using xmlrpclib, you can use the
+setBasicAuth_ method before to handle the http basic authentication, note
+that due to xmlrpclib limitation you can not use an http proxy.
+
+Parameters:
+
+- *url* the url of the xmlrpc server
+- *method_name* the name of the procedure to call
+- *params* a list of parameters to pass to the method
+- *description* is used on the bench report to describe the action
+
 
 Configuration file API
 ----------------------
