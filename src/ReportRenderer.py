@@ -264,6 +264,7 @@ class RenderRst:
         self.append("* %s redirect(s)" % test.redirects)
         self.append("* %s link(s)" % test.links)
         self.append("* %s image(s)" % test.images)
+        self.append("* %s XML RPC call(s)" % test.xmlrpc)
         self.append('')
 
     def renderCyclesStat(self, key, title):
@@ -762,14 +763,12 @@ class RenderHtml(RenderRst):
         load_avg_5 = [float(x.loadAvg5min) for x in stats]
         load_avg_15 = [float(x.loadAvg15min) for x in stats]
 
-        net_in_start = int(stats[0].receiveBytes)
-        net_out_start = int(stats[0].transmitBytes)
-        net_in = [(int(x.receiveBytes) - net_in_start)/1024 for x in stats]
-        net_out = [(int(x.transmitBytes) - net_out_start)/1024 for x in stats]
-
+        net_in = [None]
+        net_out = [None]
         cpu_usage = [0]
         for i in range(1, len(stats)):
-            if not hasattr(stats[i], 'CPUTotalJiffies'):
+            if not (hasattr(stats[i], 'CPUTotalJiffies') and
+                    hasattr(stats[i-1], 'CPUTotalJiffies')):
                 cpu_usage.append(None)
             else:
                 dt = ((long(stats[i].IDLTotalJiffies) +
@@ -783,6 +782,24 @@ class RenderHtml(RenderRst):
                 else:
                     ttl = None
                 cpu_usage.append(ttl)
+            if not (hasattr(stats[i], 'receiveBytes') and
+                    hasattr(stats[i-1], 'receiveBytes')):
+                net_in.append(None)
+            else:
+                net_in.append((int(stats[i].receiveBytes) -
+                               int(stats[i-1].receiveBytes)) /
+                              (1024 * (float(stats[i].time) -
+                                       float(stats[i-1].time))))
+
+            if not (hasattr(stats[i], 'transmitBytes') and
+                    hasattr(stats[i-1], 'transmitBytes')):
+                net_out.append(None)
+            else:
+                net_out.append((int(stats[i].transmitBytes) -
+                                int(stats[i-1].transmitBytes))/
+                              (1024 * (float(stats[i].time) -
+                                       float(stats[i-1].time))))
+
 
         image_path = str(os.path.join(self.report_dir, '%s_load.png' % host))
 
@@ -816,7 +833,7 @@ class RenderHtml(RenderRst):
         image_path = str(os.path.join(self.report_dir, '%s_net.png' % host))
         gdchart.option(format=gdchart.GDC_PNG,
                        title=title,
-                       ylabel_fmt='%.0f kB',
+                       ylabel_fmt='%.0f kB/s',
                        ytitle='network',)
         gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
                       image_path,
