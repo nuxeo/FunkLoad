@@ -3,7 +3,7 @@ FunkLoad demo
 =============
 $Id$
 
-You can find 3 examples of FunkLoad usage here:
+You can find 4 examples of FunkLoad usage here:
 
 * simple: an example on how to use test and bench runner
 
