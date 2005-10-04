@@ -12,7 +12,8 @@ fi
 start() {
     echo "### monitorctl: Starting monitor server."
     (python $FL_SRC/monitord.py $conf_path  >> $LOGFILE 2>&1 || echo "### monitorctl: ERROR server not started use monitorctl CONF_PATH log for more info") &
-
+    # let the server starts
+    sleep 1
 }
 
 
