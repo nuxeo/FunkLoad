@@ -70,9 +70,9 @@ Installation
 
 From a package::
 
-    # check the latest package at http://public.dev.nuxeo.com/~ben/funkload/
+    # check the latest package at http://funkload.nuxeo.org/
     cd /tmp
-    wget http://public.dev.nuxeo.com/~ben/funkload/funkload-x.x.x.tgz
+    wget http://funkload.nuxeo.com/~ben/funkload/funkload-x.x.x.tgz
     tar xzvf funkload-x.x.x.tgz
     cd funkload-x.x.x/
     python setup.py build
@@ -106,7 +106,7 @@ See README.txt_ for more information about FunkLoad_.
 See demo_ folder for other examples.
 
 
-.. _FunkLoad: http://public.dev.nuxeo.com/~ben/funkload/
+.. _FunkLoad: http://funkload.nuxeo.org/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _TestMaker: http://www.pushtotest.com/
 .. _README.txt: README.html
