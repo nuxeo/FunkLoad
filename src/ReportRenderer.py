@@ -224,6 +224,9 @@ class RenderRst:
             if stps > max_stps:
                 max_stps = stps
                 cycle_r = cycle
+        if cycle_r is None and len(self.cycles):
+            # no test ends during a cycle return the first one
+            cycle_r = self.cycles[0]
         return cycle_r
 
     def append(self, text):
@@ -289,6 +292,10 @@ class RenderRst:
             self.append(renderer.render_stat())
         if renderer is not None:
             self.append(renderer.render_footer())
+        else:
+            self.append('Sorry no %s have finished during a cycle, '
+                        'the cycle duration is too short.\n' % key)
+
 
     def renderCyclesStepStat(self, step):
         """Render a step stats for all cycle."""
@@ -348,6 +355,8 @@ class RenderRst:
         self.append(rst_title("%i Slowest requests"% number, 2))
         cycle = self.getBestStpsCycle()
         cycle_name = None
+        if not (cycle and stats[cycle].has_key('response_step')):
+            return
         steps = stats[cycle]['response_step'].keys()
         items = []
         for step_name in steps:
@@ -412,9 +421,7 @@ class RenderRst:
             return '\n'.join(self.rst)
         cycle_r = self.getRepresentativeCycleStat()
 
-        if not cycle_r.has_key('test'):
-            self.append("No test ended during the bench.")
-        else:
+        if cycle_r.has_key('test'):
             self.renderTestContent(cycle_r['test'])
 
         self.renderCyclesStat('test', 'Test stats')
