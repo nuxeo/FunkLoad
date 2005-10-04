@@ -16,6 +16,10 @@ server (section main url key).
 
 Then you need to edit the passwords.txt file to set the Zope admin credential.
 
+If your zope admin is not called ``admin`` add your credential to the
+`passwords.txt` file and edit the `groups.txt` file to add your login in the
+``AdminZope`` group.
+
 To run the test::
 
   fl-credential-ctl credential.conf start
@@ -24,3 +28,10 @@ To run the test::
 You can view the debug information::
 
   fl-run-test -cd test_Zope.py
+
+If something goes wrong try to view the html output::
+
+  fl-run-test -cdV test_Zope.py
+
+
+Note that all errors are logged in the xml output file ``cmf-test.xml``.
