@@ -64,7 +64,7 @@ Optional packages
 Installation
 ------------
 
- **The 1.1.0 version will be release very soon (before 10/9/2005)**
+ **The 1.1.0 version will be released very soon (before 10/9/2005)**
 
  **you should try the svn sources instead of the old 1.0.0 package.**
 
@@ -88,9 +88,22 @@ sources::
     sudo python setup.py install
 
 
+
+Test it
+-------
+
+Go to the demo/xmlrpc folder then::
+
+  make test
+
+To test benching and report building just::
+
+  make bench
+
+
 See README.txt_ for more information about FunkLoad_.
 
-See demo_ folder for examples.
+See demo_ folder for other examples.
 
 
 .. _FunkLoad: http://public.dev.nuxeo.com/~ben/funkload/

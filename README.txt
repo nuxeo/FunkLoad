@@ -987,9 +987,9 @@ See the demo/cmf folder for example of credential configuration file.
 Monitor server
 ==============
 
-If you want to monitor the server health during the bench, you have to run a
-monitor xmlrpc server on the target server, this require to install the
-FunkLoad_ package.
+If you want to monitor a linux server health during the bench, you have to
+run a monitor xmlrpc server on the target server, this require to install
+the FunkLoad_ package.
 
 On the server side init the FunkLoad_ env as above and ::
 
@@ -1013,7 +1013,9 @@ Then on your bench host edit your test configuration file and this section::
   port = 8008
 
 Then run the bench, the report will include server stats.
-Note that you can monitor multiple hosts.
+
+Note that you can monitor multiple hosts and that the monitor is linux
+specific.
 
 
 Recording a new FunkLoad test
