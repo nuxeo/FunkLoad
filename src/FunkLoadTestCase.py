@@ -373,6 +373,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self.logd(' Done in %.3fs' % t_delta)
         self.log_xmlrpc_response(url, method_name, description, response,
                                  t_start, t_stop, 200)
+        self.sleep()
         return response
 
 
