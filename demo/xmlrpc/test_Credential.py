@@ -38,10 +38,6 @@ class Credential(FunkLoadTestCase):
         ret = self.xmlrpc_call(server_url, 'listGroups',
                                description="list groups from the group file")
         self.logd('ret %s' % ret)
-        ret = self.xmlrpc_call(server_url, 'listGroups',
-                               description="list groups from the group file")
-        self.logd('ret %s' % ret)
-
 
     def tearDown(self):
         """Setting up test."""
