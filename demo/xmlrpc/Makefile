@@ -1,12 +1,10 @@
-# Makefile of WGPerf Cps tests
-# See README.txt for usage
-# $Id: $
-.PHONY: clean all build test doc log RAZ pack start stop
-.PHONY:	clean all
+# Makefile of FunkLoad xmlrpc demo
+.PHONY: clean all start stop restart status
+.PHONY:	test credential_test bench credential_bench
 .PHONY:	start_monitor stop_monitor restart_monitor
 .PHONY:	start_credential stop_credential restart_credential
 
-CREDCTL := fl-credential-ctl credential.conf
+CREDCTL := fl-credential-ctl cred.conf
 MONCTL := fl-monitor-ctl monitor.conf
 
 ifdef URL
@@ -32,11 +30,10 @@ bench: credential_bench
 credential_bench:
 	$(CREDCTL) start
 	-$(MONCTL) start
-	-fl-run-bench -C -c 1:40:80:100:120:140:160:200 -d 10 test_Credential.py Credential.test_credential $(FLOPS)
+	-fl-run-bench -C -c 1:20:40:60:80:100 -d 10 test_Credential.py Credential.test_credential $(FLOPS)
 	-fl-build-report credential-bench.xml --html
 	-$(MONCTL) stop
 	$(CREDCTL) stop
-
 
 
 # monitor ctl
@@ -72,4 +69,3 @@ restart: restart_monitor restart_credential
 
 clean:
 	-find . "(" -name "*~" -or  -name ".#*" ")" -print0 | xargs -0 rm -f
-
