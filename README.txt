@@ -280,6 +280,7 @@ Assertion helpers API
 
 FunkLoad_ uses the unittest assertion (``assert_``, ``assertEquals``,
 ``fail``, ...), but provides some methods to check the http response.
+After fetching a page you can use the following methods.
 
 
 getLastUrl
@@ -304,9 +305,10 @@ listHref
 ~~~~~~~~
 ::
 
-  listHref()
+  listHref(pattern=None)
 
-Return a list of all <a /> href value of the last accessed page.
+Return a list of href anchor url present in the last html response,
+filtering href using the ``pattern`` regex if present.
 
 
 getBody
@@ -315,7 +317,7 @@ getBody
 
   getBody()
 
-Return the html page content.
+Return the last response content.
 
 
 The response object

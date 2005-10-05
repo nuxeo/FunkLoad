@@ -599,16 +599,16 @@ class FunkLoadTestCase(unittest.TestCase):
         return ''
 
     def getBody(self):
-        """Return the current response content."""
+        """Return the last response content."""
         response = self._response
         if response is not None:
             return response.body
         return ''
 
     def listHref(self, pattern=None):
-        """Return a list of href anchor url present in the html response.
+        """Return a list of href anchor url present in the last html response.
 
-        that match sub pattern regex if present"""
+        Filtering href using the pattern regex if present."""
         response = self._response
         ret = []
         if response is not None:
