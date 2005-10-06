@@ -754,9 +754,6 @@ Benching
 The same FunkLaod test can be turned into a load test, just by invoking the
 bench runner ``fl-run-bench``.
 
-Since it uses significant CPU resources, make sure that performance limits
-are not hit by FunkLoad_ before your server's limit is reached.
-
 Principle
 ---------
 
@@ -911,6 +908,34 @@ Options
                           Startup delay between thread.
   --color, -C             Colored output
 
+
+
+Tips
+----
+
+Here are few remarks/advices to obtain workable metrics.
+
+* Since it uses significant CPU resources, make sure that performance limits
+  are not hit by FunkLoad_ before your server's limit is reached.
+  Check this by launching a bench from another host.
+
+* Always use description in post/get/xmlrpc_call, this improve the
+  readability of the report.
+
+* A good benching test should not be too long so you can bench faster usign
+  a short cycle duration.
+
+* The cycle duration should be long enought (~5 times the test duration).
+
+* A benching test must have the same number of page and in the same
+  order.
+
+* You should use many cycles with the same step interval to produce readable
+  charts (1:10:20:30:40:50:60 vs 1:10:100)
+
+* Having a cycle with one user give a usefull reference.
+
+* Use a Makefile to make reproductible bench.
 
 
 Bench report
