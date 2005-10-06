@@ -10,51 +10,51 @@ else
 fi
 
 start() {
-    echo "### monitorctl: Starting monitor server."
-    (python $FL_SRC/monitord.py $conf_path  >> $LOGFILE 2>&1 || echo "### monitorctl: ERROR server not started use monitorctl CONF_PATH log for more info") &
+    echo "### fl-monitor-ctl: Starting monitor server."
+    (python $FL_SRC/monitord.py $conf_path  >> $LOGFILE 2>&1 || echo "### fl-monitor-ctl: ERROR server not started use fl-monitor-ctl CONF_PATH log for more info") &
     # let the server starts
     sleep 1
 }
 
 
 startd() {
-    echo "### monitorctl: Starting monitor server in debug mode:"
+    echo "### fl-monitor-ctl: Starting monitor server in debug mode:"
     python $FL_SRC/monitord.py $conf_path
 }
 
 
 stop() {
-    echo "### monitorctl: Stopping monitor server."
+    echo "### fl-monitor-ctl: Stopping monitor server."
     python $FL_SRC/monitorctl.py $conf_path stop
 }
 
 test_server() {
-    echo "### monitorctl: Testing monitor server:"
+    echo "### fl-monitor-ctl: Testing monitor server:"
     python $FL_SRC/monitorctl.py $conf_path test
 }
 
 status() {
-    echo "### monitorctl: Checking monitor server status:"
+    echo "### fl-monitor-ctl: Checking monitor server status:"
     python $FL_SRC/monitorctl.py $conf_path status
 }
 
 reload() {
-    echo "### monitorctl: Checking monitor server reload:"
+    echo "### fl-monitor-ctl: Checking monitor server reload:"
     python $FL_SRC/monitorctl.py $conf_path reload
 }
 
 record() {
-    echo "### monitorctl: Recording key $1"
+    echo "### fl-monitor-ctl: Recording key $1"
     python $FL_SRC/monitorctl.py $conf_path monitor_start $1
 }
 
 get_result() {
-    echo "### monitorctl: Result for key $1"
+    echo "### fl-monitor-ctl: Result for key $1"
     python $FL_SRC/monitorctl.py $conf_path monitor_get $1
 }
 
 record_stop() {
-    echo "### monitorctl: Stop recording key $1"
+    echo "### fl-monitor-ctl: Stop recording key $1"
     python $FL_SRC/monitorctl.py $conf_path monitor_stop $1
 }
 
@@ -101,7 +101,7 @@ case "$1" in
         test_server
         ;;
     log)
-        echo "### monitorctl: tail -f $LOGFILE"""
+        echo "### fl-monitor-ctl: tail -f $LOGFILE"""
         tail -f $LOGFILE
         ;;
     *)
