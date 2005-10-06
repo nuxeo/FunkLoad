@@ -64,17 +64,13 @@ Optional packages
 Installation
 ------------
 
- **The 1.1.0 version will be released very soon (before 10/9/2005)**
-
- **you should try the svn sources instead of the old 1.0.0 package.**
-
 From a package::
 
     # check the latest package at http://funkload.nuxeo.org/
     cd /tmp
-    wget http://funkload.nuxeo.com/~ben/funkload/funkload-x.x.x.tgz
-    tar xzvf funkload-x.x.x.tgz
-    cd funkload-x.x.x/
+    wget http://funkload.nuxeo.org/funkload-1.1.0.tar.gz
+    tar xzvf funkload-1.1.0.tar.gz
+    cd funkload-1.1.0/
     python setup.py build
     sudo python setup.py install
 
