@@ -188,3 +188,11 @@ def get_funkload_data_path():
         return '/usr/local/funkload'
     else:
         return os.path.join(fl_home, 'data')
+
+
+def is_html(text):
+    """Simple check that return True if the text is an html page."""
+    if '<html' in text[:300].lower():
+        return True
+    return False
+
