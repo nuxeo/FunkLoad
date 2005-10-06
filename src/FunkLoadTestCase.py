@@ -130,7 +130,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self.step_success = True
         self.test_status = 'Successful'
         self.steps = 0
-        self.response_count = 0
+        self.page_responses = 0
+        self.total_responses = 0
         self.total_time = 0.0
         self.total_pages = self.total_images = 0
         self.total_links = self.total_redirects = 0
@@ -291,6 +292,7 @@ class FunkLoadTestCase(unittest.TestCase):
             page = response.body
             t_start = time.time()
             try:
+                # pageImages is patched to log_response on all links
                 self._browser.pageImages(url, page, self)
             except HTTPError, error:
                 t_stop = time.time()
@@ -312,6 +314,7 @@ class FunkLoadTestCase(unittest.TestCase):
     def post(self, url, params=None, description=None, ok_codes=None):
         """POST method on url with params."""
         self.steps += 1
+        self.page_responses = 0
         response = self.browse(url, params, description, ok_codes,
                                method="post")
         return response
@@ -320,6 +323,7 @@ class FunkLoadTestCase(unittest.TestCase):
     def get(self, url, params=None, description=None, ok_codes=None):
         """GET method on url adding params."""
         self.steps += 1
+        self.page_responses = 0
         response = self.browse(url, params, description, ok_codes,
                                method="get")
         return response
@@ -339,6 +343,7 @@ class FunkLoadTestCase(unittest.TestCase):
     def xmlrpc_call(self, url_in, method_name, params=None, description=None):
         """Call an xml rpc method_name on url with params."""
         self.steps += 1
+        self.page_responses = 0
         self.logd('XMLRPC: %s::%s\n\tCall %i: %s ...' % (url_in, method_name,
                                                          self.steps,
                                                          description or ''))
@@ -459,7 +464,8 @@ class FunkLoadTestCase(unittest.TestCase):
     def log_response_error(self, url, rtype, description, time_start,
                            time_stop):
         """Log a response that raise an unexpected exception."""
-        self.response_count += 1
+        self.total_responses += 1
+        self.page_responses += 1
         info = {}
         info['cycle'] = self.cycle
         info['cvus'] = self.cvus
@@ -467,7 +473,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['suite_name'] = self.suite_name
         info['test_name'] = self.test_name
         info['step'] = self.steps
-        info['number'] = self.response_count
+        info['number'] = self.page_responses
         info['type'] = rtype
         info['url'] = quoteattr(url)
         info['code'] = -1
@@ -483,7 +489,8 @@ class FunkLoadTestCase(unittest.TestCase):
     def log_response(self, response, rtype, description, time_start, time_stop,
                      log_body=False):
         """Log a response."""
-        self.response_count += 1
+        self.total_responses += 1
+        self.page_responses += 1
         info = {}
         info['cycle'] = self.cycle
         info['cvus'] = self.cvus
@@ -491,7 +498,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['suite_name'] = self.suite_name
         info['test_name'] = self.test_name
         info['step'] = self.steps
-        info['number'] = self.response_count
+        info['number'] = self.total_responses
         info['type'] = rtype
         info['url'] = quoteattr(response.url)
         info['code'] = response.code
@@ -520,7 +527,8 @@ class FunkLoadTestCase(unittest.TestCase):
     def log_xmlrpc_response(self, url, method, description, response,
                             time_start, time_stop, code):
         """Log a response."""
-        self.response_count += 1
+        self.total_responses += 1
+        self.page_responses += 1
         info = {}
         info['cycle'] = self.cycle
         info['cvus'] = self.cvus
@@ -528,7 +536,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['suite_name'] = self.suite_name
         info['test_name'] = self.test_name
         info['step'] = self.steps
-        info['number'] = self.response_count
+        info['number'] = self.total_responses
         info['type'] = 'xmlrpc'
         info['url'] = quoteattr(url + '#' + method)
         info['code'] = code
@@ -552,7 +560,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['time_start'] = time_start
         info['duration'] = time_stop - time_start
         info['connection_duration'] = self.total_time
-        info['requests'] = self.response_count
+        info['requests'] = self.total_responses
         info['pages'] = self.total_pages
         info['xmlrpc'] = self.total_xmlrpc
         info['redirects'] = self.total_redirects
