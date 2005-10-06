@@ -919,10 +919,10 @@ Here are few remarks/advices to obtain workable metrics.
   are not hit by FunkLoad_ before your server's limit is reached.
   Check this by launching a bench from another host.
 
-* Always use description in post/get/xmlrpc_call, this improve the
+* Always use description in post/get/xmlrpc_call, this improves the
   readability of the report.
 
-* A good benching test should not be too long so you can bench faster usign
+* A good benching test should not be too long so you can bench faster using
   a short cycle duration.
 
 * The cycle duration should be long enought (~5 times the test duration).
