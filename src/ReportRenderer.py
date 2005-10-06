@@ -329,7 +329,7 @@ class RenderRst:
                 self.append(rst_title("PAGE %s: %s" % (
                     a_step.step, a_step.description or a_step.url), 3))
             self.append('* Req: %s, %s, url %s' % (a_step.number,
-                                            a_step.type, a_step.url))
+                                                   a_step.type, a_step.url))
             self.append('')
             self.renderCyclesStepStat(step_name)
 
