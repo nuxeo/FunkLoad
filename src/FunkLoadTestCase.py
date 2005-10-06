@@ -498,7 +498,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['suite_name'] = self.suite_name
         info['test_name'] = self.test_name
         info['step'] = self.steps
-        info['number'] = self.total_responses
+        info['number'] = self.page_responses
         info['type'] = rtype
         info['url'] = quoteattr(response.url)
         info['code'] = response.code
@@ -536,7 +536,7 @@ class FunkLoadTestCase(unittest.TestCase):
         info['suite_name'] = self.suite_name
         info['test_name'] = self.test_name
         info['step'] = self.steps
-        info['number'] = self.total_responses
+        info['number'] = self.page_responses
         info['type'] = 'xmlrpc'
         info['url'] = quoteattr(url + '#' + method)
         info['code'] = code
