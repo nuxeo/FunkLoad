@@ -39,7 +39,7 @@ from webunit.webunittest import WebTestCase, HTTPError
 
 import PatchWebunit
 from utils import get_default_logger, mmn_is_bench, mmn_decode
-from utils import recording, thread_sleep
+from utils import recording, thread_sleep, is_html
 from version import __version__
 from xmlrpclib import ServerProxy
 
@@ -285,7 +285,8 @@ class FunkLoadTestCase(unittest.TestCase):
                 self.logd(' WARNING Too many redirects give up.')
 
         # Load auto links (css and images)
-        if load_auto_links:
+        response.is_html = is_html(response.body)
+        if load_auto_links and response.is_html:
             self.logd(' Load css and images...')
             page = response.body
             t_start = time.time()
@@ -322,6 +323,7 @@ class FunkLoadTestCase(unittest.TestCase):
         response = self.browse(url, params, description, ok_codes,
                                method="get")
         return response
+
 
     def exists(self, url, params=None, description="Checking existence"):
         """Try a GET on URL return True if the page exists or False."""
@@ -628,7 +630,6 @@ class FunkLoadTestCase(unittest.TestCase):
             if base:
                 return base[0].href
         return ''
-
 
     #
     # extend unittest.TestCase
