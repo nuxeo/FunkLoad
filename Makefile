@@ -15,6 +15,9 @@ build:
 pkg:
 	python setup.py sdist
 
+egg:
+	python setup.py bdist_egg
+
 rpm:
 	python setup.py bdist_rpm
 
