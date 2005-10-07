@@ -1,6 +1,6 @@
-====================
-FunkLoad CHANGES.txt
-====================
+================
+FunkLoad CHANGES
+================
 
 :author: Benoit Delbosc
 

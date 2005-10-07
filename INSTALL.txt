@@ -1,6 +1,6 @@
-====================
-FunkLoad INSTALL.txt
-====================
+================
+FunkLoad INSTALL
+================
 
 :author: Benoit Delbosc
 
@@ -41,7 +41,7 @@ Required packages
 
   Note that webunit_ is also available using easy_install_::
 
-    easy_install webunit
+    sudo easy_install webunit
 
 
 Optional packages
