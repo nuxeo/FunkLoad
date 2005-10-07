@@ -155,7 +155,6 @@ code, pre {
   background-color: #eee;
   color: #000;
   overflow: auto;
-  border-radius: 5px;
   margin: 0.5em 1em;
 }
 
@@ -192,6 +191,23 @@ table.docutils td p, table.docutils th p {
   padding: 0;
 }
 
+table.docutils th.field-name {
+  border: 1px solid #CCC;
+}
+
+th.field-name {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+td.field-body {
+  font-size: 1.5em;
+}
+
+tr.field {
+  border: none;
+}
+
 div.contents p.topic-title, div.abstract p.topic-title {
   font-weight: bold;
 }
@@ -202,3 +218,4 @@ pre.address {
   padding: 0;
   margin: 0;
 }
+
