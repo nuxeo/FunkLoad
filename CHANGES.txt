@@ -17,7 +17,7 @@ FunkLoad CHANGES.txt
 FunkLoad SVN trunk
 ------------------
 
-:Location: http://svn.nuxeo.org/pub/funkload/trunk
+:Location: http://svn.nuxeo.org/pub/funkload/trunk/
 
 
 
@@ -26,7 +26,7 @@ FunkLoad 1.1.0
 
 :Package: http://funkload.nuxeo.org/funkload-1.1.0.tar.gz
 
-:Svn: http://funkload.nuxeo.org/pub/funkload/tags/1.1.0/
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.1.0/
 
 :Released date: 2005-10-09
 
