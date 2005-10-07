@@ -28,7 +28,7 @@ FunkLoad 1.1.0
 
 :Svn: http://svn.nuxeo.org/pub/funkload/tags/1.1.0/
 
-:Released date: 2005-10-09
+:Released date: 2005-10-07
 
 New features
 ~~~~~~~~~~~~
