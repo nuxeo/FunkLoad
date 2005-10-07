@@ -112,7 +112,9 @@ Check the latest package at http://funkload.nuxeo.org/
 Or from bleeding edge svn sources, if you want to try the latest unstable
 sources::
 
-    svn co https://svn.nuxeo.org/pub/funkload/trunk funkload
+    svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
+
+See CHANGES.txt_ file for information about distribution contents.
 
 
 Installation
@@ -1100,6 +1102,7 @@ Bugs
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _pyUnit: http://pyunit.sourceforge.net/
 .. _INSTALL.txt: INSTALL.html
+.. _CHANGES.txt: CHANGES.html
 .. _maxq: http://maxq.tigris.org/
 .. _Zope: http://www.zope.org/
 .. _Cmf: http://www.zope.org/Products/CMF/

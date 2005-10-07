@@ -64,6 +64,8 @@ Optional packages
 Installation
 ------------
 
+See CHANGES.txt_ to know which package to install.
+
 From a package::
 
     # check the latest package at http://funkload.nuxeo.org/
@@ -78,11 +80,13 @@ From a package::
 Or from bleeding edge svn sources, if you want to try the latest unstable
 sources::
 
-    svn co https://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
+    svn co http://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
     cd /tmp/funkload/
     python setup.py build
     sudo python setup.py install
 
+
+easy_install_ funkload is comming soon ...
 
 
 Test it
@@ -90,6 +94,7 @@ Test it
 
 Go to the demo/xmlrpc folder then::
 
+  cd demo/xmlrpc/
   make test
 
 To test benching and report building just::
@@ -97,7 +102,11 @@ To test benching and report building just::
   make bench
 
 
+--------------------------
+
 See README.txt_ for more information about FunkLoad_.
+
+See CHANGES.txt_ for information on FunkLoad_ packages.
 
 See demo_ folder for other examples.
 
@@ -106,5 +115,6 @@ See demo_ folder for other examples.
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _TestMaker: http://www.pushtotest.com/
 .. _README.txt: README.html
+.. _CHANGES.txt: CHANGES.html
 .. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
 .. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall
