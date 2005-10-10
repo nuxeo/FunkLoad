@@ -1,0 +1,9 @@
+New releases should be announced to:
+
+- testdriven.com
+- zope.org
+- cheeseshop
+- freshmeat
+- http://agiletesting.blogspot.com/ (mailto: grig at gheorghiu.net)
+- Daily Python URL! (mailto: effbot)
+
