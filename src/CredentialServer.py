@@ -136,7 +136,7 @@ class BaseCredentialServer:
 
     def getStatus(self):
         """Return a status."""
-        return "%s running pid = %s" % (self.__class__, os.getpid())
+        return "%s running pid = %s" % (self.__class__.__name__, os.getpid())
 
     def listCredentials(self, group=None):
         """Return a list of credentials."""

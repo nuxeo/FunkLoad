@@ -82,14 +82,15 @@ Usage: %prog CONF_FILE [status|reload|stop|test]
         server = self.server
         if action is None:
             action = self.action
-        self.log('credential-ctl %s: ' % action)
+        self.log('Credential %s: ' % action)
         is_running = self.isServerRunning()
         if action == 'status':
             if is_running:
                 ret = server.getStatus()
                 self.log('%s\n' % ret, force=True)
             else:
-                self.log('%s not available.' % self.url, force=True)
+                self.log('Credential server: %s is not available.\n' %
+                         self.url, force=True)
             return 0
         elif action == 'stop':
             if is_running:
@@ -103,7 +104,7 @@ Usage: %prog CONF_FILE [status|reload|stop|test]
             else:
                 return self.startServer(action=='startd')
         elif not is_running:
-            self.log('%s not available.\n' % self.url)
+            self.log('Credential server: %s is not available.\n' % self.url)
             return -1
         elif action == 'reload':
             ret = server.reloadConf()
