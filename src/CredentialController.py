@@ -71,7 +71,7 @@ Usage: %prog CONF_FILE [status|reload|stop|test]
 
     def startServer(self, debug=False):
         """Start a credential server."""
-        from credentiald import CredentialServer
+        from CredentialServer import CredentialServer
         argv = ['credentiald.py', self.conf_path]
         if debug:
             argv.append('-dv')
