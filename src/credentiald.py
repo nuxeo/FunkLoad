@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 #
@@ -31,38 +29,20 @@ $Id: credentiald.py 24649 2005-08-29 14:20:19Z bdelbosc $
 import sys, os
 import socket
 from random import random
-from time import gmtime, strftime, sleep
+from time import sleep
 from ConfigParser import ConfigParser, NoOptionError
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from xmlrpclib import ServerProxy
+import logging
+from optparse import OptionParser, TitledHelpFormatter
 
-CONF_PATH = "credential.conf"
-CREDENTIAL_SEP = ':'                    # login:password
-USERS_SEP = ','                         # group_name:user1, user2
+from utils import create_daemon, get_default_logger, trace
+
 
 # ------------------------------------------------------------
 # globals
 #
 g_quit = 0                              # flag to stop the xml server
-g_conf_path = ''                        # the credential configuration path
-g_call_count = 0                        # number of getCredential call
-
-g_mode = 'file'                         # file or random mode
-g_groups = {}                           # map of groups
-g_passwords = {}                        # user pwd
-
-
-# ------------------------------------------------------------
-# utils
-#
-def get_time_stamp():
-    """Return a time stamp string."""
-    return strftime('%Y-%m-%dT%H-%M-%S', gmtime())
-
-def log(msg):
-    """Print to stdout and flush."""
-    print get_time_stamp() + " srv " + msg
-    sys.stdout.flush()
 
 
 # ------------------------------------------------------------
@@ -107,212 +87,293 @@ class Group:
 # rpc to manage the server
 #
 class MySimpleXMLRPCServer(SimpleXMLRPCServer):
+    """SimpleXMLRPCServer with allow_reuse_address."""
     # this property set SO_REUSEADDR which tells the operating system to allow
     # code to connect to a socket even if it's waiting for other potential
     # packets
     allow_reuse_address = True
 
 
-def stopServer():
-    """Stop the server."""
-    global g_quit
-    log("""stopServer stopping credential server.""")
-    g_quit = 1
-    return 1
+
+# ------------------------------------------------------------
+# Service Classes
+#
+
+class BaseCredentialServer:
+    """Base class for credential server."""
+    def __init__(self, conf_path, logger):
+        """Initialiase"""
+        self.logger = logger
+        self.conf_path = conf_path
+        conf = ConfigParser()
+        conf.read(conf_path)
+        self.conf = conf
+
+    def logd(self, message):
+        """Debug log."""
+        self.logger.debug(message)
+
+    def log(self, message):
+        """Log information."""
+        self.logger.info(message)
+
+    # xml rpc
+    #
+    def stopServer(self):
+        """Stop the server."""
+        global g_quit
+        self.log("stopServer stopping credential server.")
+        g_quit = 1
+        return 1
+
+    def reloadConf(self):
+        """Reload the configuration file."""
+        raise NotImplementedError
+
+    def getCredential(self, group=None):
+        """Return a (login, password)."""
+        raise NotImplementedError
+
+    def getStatus(self):
+        """Return a status."""
+        return "%s running pid = %s" % (self.__class__, os.getpid())
+
+    def listCredentials(self, group=None):
+        """Return a list of credentials."""
+        raise NotImplementedError
+
+    def listGroups(self, group=None):
+        """Return a list of groups."""
+        raise NotImplementedError
 
 
-def getStatus():
-    """Return the server status."""
-    global g_mode, g_groups
-    return "Server running mode %s: %s" % (g_mode, g_groups.values())
+class RandomCredentialServer(BaseCredentialServer):
+    """A random credential server."""
+    def __init__(self, conf_path, logger):
+        BaseCredentialServer.__init__(self, conf_path, logger)
+        self._call_count = 0
+
+    def getCredential(self, group=None):
+        """Return a (login, password)."""
+        self._call_count += 1
+        ran = int(random() * 1000)
+        user = 'user_%s' % ran
+        password = 'pwd_%s' % ran
+        self.logd("%s getRandomCredential() return (%s, %s)" % (
+            self._call_count, user, password))
+        return (user, password)
 
 
-def reloadConf():
-    """Reload the configuration file."""
-    global g_conf_path, g_mode, g_groups, g_passwords
+class FileCredentialServer(BaseCredentialServer):
+    """A server that render credentials using pwd and group files."""
+    CREDENTIAL_SEP = ':'                    # login:password
+    USERS_SEP = ','                         # group_name:user1, user2
 
-    conf = ConfigParser(defaults={'FLOAD_HOME':
-                                  os.getenv('FLOAD_HOME','.')})
-    conf.read(g_conf_path)
-    g_mode = conf.get('server', 'mode')
-    if g_mode == 'file':
-        # load credential file
+    def __init__(self, conf_path, logger):
+        BaseCredentialServer.__init__(self, conf_path, logger)
+        self.lofc = 0
+        self._call_count = 0
+        self.mode = 'file'
+        self._groups = {}
+        self._passwords = {}
+        self._loadConf()
+
+    def _loadConf(self):
+        """Load a configuration file."""
+        conf = self.conf
         credentials_path = conf.get('server', 'credentials_path')
-        lofc = conf.getint('server', 'loop_on_first_credentials')
-        log("getFileCredential use credential file %s." % credentials_path)
-        lines = open(credentials_path).readlines()
-        g_groups = {}
-        group = Group('default')
-        g_groups[None] = group
-        for line in lines:
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            user, password = [x.strip() for x in line.split(CREDENTIAL_SEP, 1)]
-            g_passwords[user] = password
-            if not lofc or len(group) < lofc:
-                group.add(user)
-
-        # load group file
+        self.lofc = conf.getint('server', 'loop_on_first_credentials')
+        self._loadPasswords(credentials_path)
         try:
             groups_path = conf.get('server', 'groups_path')
+            self._loadGroups(groups_path)
         except NoOptionError:
-            return 1
-        log("getFileCredential use group file %s." % groups_path)
-        lines = open(groups_path).readlines()
+            pass
+
+    def _loadPasswords(self, file_path):
+        """Load a password file."""
+        self.logd("getFileCredential use credential file %s." % file_path)
+        lines = open(file_path).readlines()
+        self._groups = {}
+        group = Group('default')
+        self._groups[None] = group
         for line in lines:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            name, users = [x.strip() for x in line.split(CREDENTIAL_SEP, 1)]
-            users = filter(None,
-                           [user.strip() for user in users.split(USERS_SEP)])
-            group = g_groups.setdefault(name, Group(name))
+            user, password = [x.strip() for x in line.split(
+                self.CREDENTIAL_SEP, 1)]
+            self._passwords[user] = password
+            if not self.lofc or len(group) < self.lofc:
+                group.add(user)
+
+    def _loadGroups(self, file_path):
+        """Load a group file."""
+        self.logd("getFileCredential use group file %s." % file_path)
+        lines = open(file_path).readlines()
+        for line in lines:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            name, users = [x.strip() for x in line.split(
+                self.CREDENTIAL_SEP, 1)]
+            users = filter(
+                None, [user.strip() for user in users.split(self.USERS_SEP)])
+            group = self._groups.setdefault(name, Group(name))
             for user in users:
-                if lofc and len(group) >= lofc:
+                if self.lofc and len(group) >= self.lofc:
                     break
-                if g_passwords.has_key(user):
+                if self._passwords.has_key(user):
                     group.add(user)
                 else:
-                    log('Missing password for %s in group %s' % (user, name))
+                    self.logd('Missing password for %s in group %s' % (user,
+                                                                       name))
 
-    return 1
-
-
-# ------------------------------------------------------------
-# rpc services
-#
-def getRandomCredential():
-    """Return a (login, password)."""
-    global g_call_count
-    g_call_count += 1
-    ran = int(random()*1000)
-    user = 'user_%s' % ran
-    password = 'pwd_%s' % ran
-    log("%s getRandomCredential() return (%s, %s)" % (
-        g_call_count, user, password))
-    return (user, password)
+    def reloadConf(self):
+        """Reload the configuration file."""
+        self._loadConf()
 
 
-def getFileCredential(group=None):
-    """Return a credential from group if specified.
+    def getCredential(self, group=None):
+        """Return a credential from group if specified.
 
-    Credential are taken incrementally in a loop.
-    """
-    global g_passwords, g_groups, g_call_count
-    g_call_count += 1
-    user = g_groups[group].next()
-    password = g_passwords[user]
-    log("%s getFileCredential(%s) return (%s, %s)" % (
-        g_call_count, group, user, password))
-    return (user, password)
-
-def getCredential(mode=None, group=None):
-    """Return credential according mode or serveur configuration."""
-    global g_mode
-    if mode is None:
-        choice = g_mode
-    else:
-        choice = mode
-
-    if choice == 'random':
-        return getRandomCredential()
-    elif choice == 'file':
-        return getFileCredential(group)
-    else:
-        raise NotImplemented("mode %s" % choice)
+        Credential are taken incrementally in a loop.
+        """
+        self._call_count += 1
+        user = self._groups[group].next()
+        password = self._passwords[user]
+        self.logd("%s getFileCredential(%s) return (%s, %s)" % (
+            self._call_count, group, user, password))
+        return (user, password)
 
 
-def listCredentials(group=None):
-    """Return a list of credentials."""
-    global g_passwords
-    global g_groups
-    if group is None:
-        ret = list(g_passwords)
-    else:
-        users = g_groups[group].users
-        ret = [(user, g_passwords[user]) for user in users]
-    log("listUsers(%s) return (%s)" % (group, ret))
-    return ret
+    def listCredentials(self, group=None):
+        """Return a list of credentials."""
+        if group is None:
+            ret = list(self._passwords)
+        else:
+            users = self._groups[group].users
+            ret = [(user, self._passwords[user]) for user in users]
+        self.logd("listUsers(%s) return (%s)" % (group, ret))
+        return ret
 
 
-def listGroups(group=None):
-    """Return a list of groups."""
-    global g_groups
-    ret = filter(None, g_groups.keys())
-    log("listGroup() return (%s)" % str(ret))
-    return ret
-
-# ------------------------------------------------------------
-# testing
-#
-def test_getCredential(repeat=10):
-    """Test getCredential."""
-    for i in range(repeat):
-        getCredential(mode='file')
-    for i in range(repeat):
-        getCredential(mode='random')
-
-
-def is_server_running(host, port):
-    """Check if the server is already running."""
-    server = ServerProxy("http://%s:%s" % (host, port))
-    try:
-        server.getStatus()
-    except socket.error, msg:
-        return 0
-    return 1
+    def listGroups(self, group=None):
+        """Return a list of groups."""
+        ret = filter(None, self._groups.keys())
+        self.logd("listGroup() return (%s)" % str(ret))
+        return ret
 
 
 
 # ------------------------------------------------------------
 # main
 #
-def main(conf_path=None):
-    """Init and run XMLRPC Server."""
-    global g_conf_path, g_quit, CONF_PATH
 
-    if conf_path is None:
-        if len(sys.argv) >= 2:
-            conf_path = sys.argv[1]
+class CredentialServer:
+    """The credential server Runner."""
+
+    usage = """%prog [options] config_file
+
+%prog launch a credential server.
+"""
+    def __init__(self, argv=None):
+        self.server = None
+        if argv is None:
+            argv = sys.argv
+        conf_path, options = self.parseArgs(argv)
+        # read conf
+        conf = ConfigParser()
+        conf.read(conf_path)
+        self.conf_path = conf_path
+        self.host = conf.get('server', 'host')
+        self.port = int(conf.get('server', 'port'))
+        if self.isServerRunning():
+            trace("Server already running on %s:%s." % (self.host, self.port))
+            sys.exit(0)
+        try:
+            self.pid_path = conf.get('server', 'pid_path')
+        except NoOptionError:
+            self.pid_path = 'credentiald.pid'
+        self.mode = conf.get('server', 'mode')
+        log_path = conf.get('server', 'log_path')
+        if not options.debug:
+            trace('Starting credential server as daemon\n')
+            create_daemon()
+        if options.verbose:
+            level = logging.DEBUG
         else:
-            conf_path = CONF_PATH
+            level = logging.INFO
+        if options.debug:
+            log_to = 'file console'
+        else:
+            log_to = 'file'
+        self.logger = get_default_logger(log_to, log_path,
+                                         level=level,
+                                         name='credentiald')
+        self.initServer()
+        self.run()
 
-    g_conf_path = conf_path
+    def isServerRunning(self):
+        """Check if the server is already running."""
+        server = ServerProxy("http://%s:%s" % (self.host, self.port))
+        try:
+            server.getStatus()
+        except socket.error:
+            return False
+        return True
 
-    # load credentials files
-    reloadConf()
+    def parseArgs(self, argv):
+        """Parse programs args."""
+        parser = OptionParser(self.usage, formatter=TitledHelpFormatter())
+        parser.add_option("-q", "--quiet", action="store_true",
+                          help="Minimal output")
+        parser.add_option("-v", "--verbose", action="store_true",
+                          help="Verbose output")
+        parser.add_option("-d", "--debug", action="store_true",
+                          help="debug mode not in background")
 
-    #test_getCredential(20)
+        options, args = parser.parse_args(argv)
+        if len(args) == 0:
+            parser.error("Missing configuration file")
+        return args[-1], options
 
-    # setup rpc server
-    conf = ConfigParser(defaults={'FLOAD_HOME':
-                                  os.getenv('FLOAD_HOME','.')})
-    conf.read(g_conf_path)
-    host = conf.get('server', 'host')
-    port = int(conf.get('server', 'port'))
-    if is_server_running(host, port):
-        log("Server already running on %s:%s." % (host, port))
-        return
+    def initServer(self):
+        """init the XMLRPC Server."""
+        logger = self.logger
+        mode = self.mode
+        if mode == 'file':
+            credential = FileCredentialServer(self.conf_path, logger)
+        elif mode == 'random':
+            credential = RandomCredentialServer(self.conf_path, logger)
+        else:
+            raise NotImplementedError("mode %s" % mode)
 
-    log("Init XMLRPC server %s:%s." % (host, port))
-    server = MySimpleXMLRPCServer((host, port))
-    server.register_function(getStatus)
-    server.register_function(reloadConf)
-    server.register_function(stopServer)
-    server.register_function(getRandomCredential)
-    server.register_function(getFileCredential)
-    server.register_function(getCredential)
-    server.register_function(listCredentials)
-    server.register_function(listGroups)
-    log("credential server started.")
+        # setup rpc
+        logger.info("Init XMLRPC server %s:%s." % (self.host, self.port))
+        server = MySimpleXMLRPCServer((self.host, self.port))
+        server.register_function(credential.stopServer)
+        server.register_function(credential.getStatus)
+        server.register_function(credential.reloadConf)
+        server.register_function(credential.getCredential)
+        server.register_function(credential.listCredentials)
+        server.register_function(credential.listGroups)
+        self.server = server
 
-    # loop
-    while not g_quit:
-        server.handle_request()
-    sleep(1)
-    server.server_close()
+    def run(self):
+        """Init and run XMLRPC Server."""
+        global g_quit
+        pid = os.getpid()
+        server = self.server
+        open(self.pid_path, "w").write(str(pid))
+        self.logger.info("credential server pid=%i started." % pid)
+        while not g_quit:
+            server.handle_request()
+        sleep(1)
+        server.server_close()
+        self.logger.info("credential server pid=%i stopped." % pid)
+        os.remove(self.pid_path)
 
 
 if __name__ == '__main__':
-    main()
+    CredentialServer()

@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 #
@@ -22,97 +20,114 @@
 $Id: credentialctl.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
 import sys
-import socket
+from socket import error as SocketError
 from xmlrpclib import ServerProxy
-from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+from ConfigParser import ConfigParser
+from optparse import OptionParser, TitledHelpFormatter
+from utils import trace
 
-USAGE = """
-Usage: ./credentialctl.py CONF_FILE [status|reload|stop|test_credential]
+class CredentialController:
+    """A credential server controller."""
+
+    usage = """\
+Usage: %prog CONF_FILE [status|reload|stop|test]
 """
-CONF_PATH = "credential.conf"
+    def __init__(self, argv=None):
+        if argv is None:
+            argv = sys.argv
+        conf_path, self.action, options = self.parseArgs(argv)
+        # read conf
+        conf = ConfigParser()
+        conf.read(conf_path)
+        host = conf.get('server', 'host')
+        self.conf_path = conf_path
+        port = int(conf.get('server', 'port'))
+        self.verbose = options.verbose or int(conf.get('client', 'verbose'))
+        self.url = 'http://%s:%s/' % (host, port)
+        self.server = ServerProxy(self.url)
 
+    def isServerRunning(self):
+        """Check if the server is running."""
+        try:
+            self.server.getStatus()
+        except SocketError:
+            return False
+        return True
 
-def usage():
-    """Display usage."""
-    print USAGE
+    def parseArgs(self, argv):
+        """Parse programs args."""
+        parser = OptionParser(self.usage, formatter=TitledHelpFormatter())
+        parser.add_option("-v", "--verbose", action="store_true",
+                          help="Verbose output")
+        options, args = parser.parse_args(argv)
+        if len(args) != 3:
+            parser.error("Missing configuration file %s" % args)
+        return args[1], args[2], options
 
-def action_getStatus(server, verbose=True):
-    """Test the getStatus method."""
-    status = server.getStatus()
-    if verbose:
-        print "### cli: srv status: %s" % status
+    def log(self, message, force=False):
+        """Log a message."""
+        if force or self.verbose:
+            trace(message)
 
-def action_stopServer(server, verbose=True):
-    """Ask the server to stop."""
-    if verbose:
-        print "### cli: srv stopServer."
-    server.stopServer()
+    def startServer(self, debug=False):
+        """Start a credential server."""
+        from credentiald import CredentialServer
+        argv = ['credentiald.py', self.conf_path]
+        if debug:
+            argv.append('-dv')
+        return CredentialServer(argv)
 
-def action_reloadConf(server, verbose=True):
-    """Ask the server to reload the configuration file."""
-    if verbose:
-        print "### cli: ask srv to reloadConf."""
-    server.reloadConf()
-
-def test_getCredential(server):
-    """Test the getCredential method."""
-    call_count = 0
-    for i in range(10):
-        print "### cli: %s getCredential() ..." % call_count
-        user, password = server.getCredential()
-        print "### cli: %s   return %s %s" % (call_count, user, password)
-        call_count += 1
-    for group in server.listGroups():
-        print "### cli: group %s" % group
-        print "###    content: %s" % server.listCredentials(group)
+    def __call__(self, action=None):
+        """Call the xml rpc action"""
+        server = self.server
+        if action is None:
+            action = self.action
+        self.log('credential-ctl %s: ' % action)
+        is_running = self.isServerRunning()
+        if action == 'status':
+            if is_running:
+                ret = server.getStatus()
+                self.log('%s\n' % ret, force=True)
+            else:
+                self.log('%s not available.' % self.url, force=True)
+            return 0
+        elif action == 'stop':
+            if is_running:
+                ret = server.stopServer()
+                self.log('done.\n')
+            else:
+                self.log('server is not running.\n')
+        elif 'start' in action:
+            if is_running:
+                self.log('already running.\n')
+            else:
+                return self.startServer(action=='startd')
+        elif not is_running:
+            self.log('%s not available.\n' % self.url)
+            return -1
+        elif action == 'reload':
+            ret = server.reloadConf()
+            self.log('done\n')
+        elif action == 'test':
+            for i in range(10):
+                self.log("%s getCredential() ... " % i)
+                user, password = server.getCredential()
+                self.log(" return %s %s\n" % (user, password))
+            for group in server.listGroups():
+                self.log("group %s\n" % group)
+                self.log("  content: %s\n" % server.listCredentials(group))
+        else:
+            raise NotImplementedError('Unknow action %s' % action)
+        return 0
 
 # ------------------------------------------------------------
 # main
 #
 def main():
     """Control credentiald server."""
-    if len(sys.argv) != 3:
-        usage()
-        sys.exit(-1)
-    conf_path = sys.argv[1]
-    action = sys.argv[2]
-    conf = ConfigParser()
-    conf.read(conf_path)
-    try:
-        verbose = int(conf.get('client', 'verbose'))
-    except (NoOptionError, NoSectionError):
-        verbose = True
-    if verbose:
-        print "### cli: Use configuration file: %s." % conf_path
-    host = conf.get('server', 'host')
-    port = int(conf.get('server', 'port'))
-    if verbose:
-        print "### cli: Init XMLRPC proxy http://%s:%s." % (host, port)
-    server = ServerProxy("http://%s:%s" % (host, port))
-
-    # check the srv status first
-    try:
-        action_getStatus(server, verbose or action=="status")
-    except socket.error, msg:
-        if action == "status" or verbose or '111' not in str(msg):
-            print "### cli: Server is not running: %s" % msg
-        if action in ('stop', 'status'):
-            ret = 0
-        else:
-            ret = -1
-        sys.exit(ret)
-
-    if action == "status":
-        sys.exit(0)
-    elif action == "reload":
-        action_reloadConf(server, verbose)
-    elif action == "stop":
-        action_stopServer(server, verbose)
-    elif action in ("test", "test_credential"):
-        test_getCredential(server)
-        action_getStatus(server)
-    else:
-        usage()
+    ctl = CredentialController()
+    ret = ctl()
+    sys.exit(ret)
 
 if __name__ == '__main__':
     main()
