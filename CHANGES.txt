@@ -23,7 +23,7 @@ New features
 ~~~~~~~~~~~~
 
 * Credential: refactored in pure python and create true unix daemon
-
+  credential.conf server section have 2 new keys: log_path and pid_path
 
 FunkLoad 1.1.0
 --------------
