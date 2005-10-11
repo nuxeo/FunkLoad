@@ -19,6 +19,10 @@ FunkLoad SVN trunk
 
 :Location: http://svn.nuxeo.org/pub/funkload/trunk/
 
+New features
+~~~~~~~~~~~~
+
+* Credential: refactored in pure python and create true unix daemon
 
 
 FunkLoad 1.1.0
