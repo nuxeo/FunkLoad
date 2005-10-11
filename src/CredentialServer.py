@@ -269,7 +269,6 @@ class FileCredentialServer(BaseCredentialServer):
 # ------------------------------------------------------------
 # main
 #
-
 class CredentialServer:
     """The credential server Runner."""
 
@@ -277,6 +276,9 @@ class CredentialServer:
 
 %prog launch a credential server.
 """
+    default_log_path = 'credentiald.log'
+    default_pid_path = 'credentiald.pid'
+
     def __init__(self, argv=None):
         self.server = None
         if argv is None:
@@ -294,9 +296,12 @@ class CredentialServer:
         try:
             self.pid_path = conf.get('server', 'pid_path')
         except NoOptionError:
-            self.pid_path = 'credentiald.pid'
+            self.pid_path = self.default_pid_path
         self.mode = conf.get('server', 'mode')
-        log_path = conf.get('server', 'log_path')
+        try:
+            log_path = conf.get('server', 'log_path')
+        except NoOptionError:
+            log_path = self.default_log_path
         if not options.debug:
             trace('Starting credential server as daemon\n')
             create_daemon()
