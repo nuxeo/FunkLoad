@@ -171,7 +171,7 @@ def xmlrpc_get_credential(host, port, group=None):
     url = "http://%s:%s" % (host, port)
     server = ServerProxy(url)
     try:
-        return server.getCredential('file', group)
+        return server.getCredential(group)
     except SocketError:
         raise SocketError(
             'No Credential server reachable at %s, use fl-credential-ctl '
