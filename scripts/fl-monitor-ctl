@@ -1,112 +1,31 @@
-#!/bin/bash
-# manage the monitor server
-# $Id: fl-monitor-ctl 24514 2005-08-25 15:54:36Z bdelbosc $
+#!/usr/bin/python
 
-if [ -n "$FL_HOME" ]; then
-    FL_SRC=$FL_HOME/funkload
-    echo "### Using src in $FL_SRC"
-else
-    FL_SRC=`python -c "import funkload; print funkload.__path__[0]"` || exit -1
-fi
+# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# Author: bdelbosc@nuxeo.com
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+#
+"""Simple client that control the monitor server."""
 
-start() {
-    echo "### fl-monitor-ctl: Starting monitor server."
-    (python $FL_SRC/monitord.py $conf_path  >> $LOGFILE 2>&1 || echo "### fl-monitor-ctl: ERROR server not started use fl-monitor-ctl CONF_PATH log for more info") &
-    # let the server starts
-    sleep 1
-}
+import sys
+from funkload.Monitor import MonitorController
 
+def main():
+    """Control monitor server."""
+    ctl = MonitorController()
+    sys.exit(ctl())
 
-startd() {
-    echo "### fl-monitor-ctl: Starting monitor server in debug mode:"
-    python $FL_SRC/monitord.py $conf_path
-}
-
-
-stop() {
-    echo "### fl-monitor-ctl: Stopping monitor server."
-    python $FL_SRC/monitorctl.py $conf_path stop
-}
-
-test_server() {
-    echo "### fl-monitor-ctl: Testing monitor server:"
-    python $FL_SRC/monitorctl.py $conf_path test
-}
-
-status() {
-    echo "### fl-monitor-ctl: Checking monitor server status:"
-    python $FL_SRC/monitorctl.py $conf_path status
-}
-
-reload() {
-    echo "### fl-monitor-ctl: Checking monitor server reload:"
-    python $FL_SRC/monitorctl.py $conf_path reload
-}
-
-record() {
-    echo "### fl-monitor-ctl: Recording key $1"
-    python $FL_SRC/monitorctl.py $conf_path monitor_start $1
-}
-
-get_result() {
-    echo "### fl-monitor-ctl: Result for key $1"
-    python $FL_SRC/monitorctl.py $conf_path monitor_get $1
-}
-
-record_stop() {
-    echo "### fl-monitor-ctl: Stop recording key $1"
-    python $FL_SRC/monitorctl.py $conf_path monitor_stop $1
-}
-
-
-
-usage() {
-    echo "Usage: $0 CONF_PATH {start|startd|stop|restart|status|log|record [KEY]|stop_record [KEY]|get [KEY]}"
-}
-
-LOGFILE=monitord.log
-
-if [ ! -f $1 ]; then
-    usage
-    exit 1
-fi
-
-conf_path=$1
-shift
-
-case "$1" in
-    start)
-        start;;
-    startd)
-        startd;;
-    stop)
-        stop;;
-    status)
-        status;;
-    reload|force-reload)
-        reload
-        status;;
-    get|result|stat)
-        get_result $2;;
-    record|monitor_start)
-        record $2;;
-    stop_record|monitor_stop|record_stop)
-        record_stop $2;;
-    restart)
-        stop
-        sleep 1
-        start
-        ;;
-    test|check)
-        test_server
-        ;;
-    log)
-        echo "### fl-monitor-ctl: tail -f $LOGFILE"""
-        tail -f $LOGFILE
-        ;;
-    *)
-        usage
-        exit 1
-        ;;
-esac
-
+if __name__ == '__main__':
+    main()
