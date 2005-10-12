@@ -23,12 +23,12 @@ import sys
 
 from Lipsum import Lipsum
 from XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
-from BaseCredential import BaseCredentialServer
+from CredentialBase import CredentialBaseServer
 
 # ------------------------------------------------------------
 # Server
 #
-class RandomCredentialServer(XmlRpcBaseServer, BaseCredentialServer):
+class RandomCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
     """A random credential server."""
     server_name = "random_credential"
     method_names = XmlRpcBaseServer.method_names + [

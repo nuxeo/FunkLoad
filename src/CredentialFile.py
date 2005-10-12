@@ -23,7 +23,7 @@ import sys
 from ConfigParser import NoOptionError
 
 from XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
-from BaseCredential import BaseCredentialServer
+from CredentialBase import CredentialBaseServer
 
 
 # ------------------------------------------------------------
@@ -68,7 +68,7 @@ class Group:
 # ------------------------------------------------------------
 # Server
 #
-class FileCredentialServer(XmlRpcBaseServer, BaseCredentialServer):
+class FileCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
     """A file credential server."""
     server_name = "file_credential"
     method_names = XmlRpcBaseServer.method_names + [

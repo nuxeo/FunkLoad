@@ -20,8 +20,7 @@
 $Id$
 """
 
-
-class BaseCredentialServer:
+class CredentialBaseServer:
     """Interface of a Credential server."""
 
     def getCredential(self, group=None):
