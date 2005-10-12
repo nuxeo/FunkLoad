@@ -88,7 +88,6 @@ Start %prog XML/RPC daemon.
             self.pid_path = conf.get('server', 'pid_path')
         except NoOptionError:
             self.pid_path = self.default_pid_path
-        self.mode = conf.get('server', 'mode')
         try:
             log_path = conf.get('server', 'log_path')
         except NoOptionError:
