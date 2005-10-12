@@ -90,6 +90,7 @@ def create_daemon():
         else:
             os._exit(0)
     else:
+        sleep(.5)
         os._exit(0)
     import resource
     maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
