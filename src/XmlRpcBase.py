@@ -130,7 +130,8 @@ Start %prog XML/RPC daemon.
     def _init_cb(self, conf, options):
         """init procedure intend to be implemented by subclasses.
 
-        conf is a ConfigParser."""
+        This method is called before to switch in daemon mode.
+        conf is a ConfigParser object."""
         pass
 
     def logd(self, message):
