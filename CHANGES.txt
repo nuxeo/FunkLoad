@@ -22,8 +22,9 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
-* Credential: refactored in pure python and create true unix daemon
-  credential.conf server section have 2 new keys: log_path and pid_path
+* Credential and Monitor services have been refactored they are now true
+  unix daemon service, controllers are now in pure python (no more bash).
+
 
 FunkLoad 1.1.0
 --------------
