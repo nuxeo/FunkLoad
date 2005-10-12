@@ -156,6 +156,13 @@ def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
     return logger
 
 
+def close_logger(name):
+    """Close the logger."""
+    logger = logging.getLogger(name)
+    for hdlr in logger.handlers:
+        logger.removeHandler(hdlr)
+
+
 def trace(message):
     """Simple print to stdout
 
