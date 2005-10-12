@@ -28,7 +28,7 @@ from xmlrpclib import ServerProxy
 import logging
 from optparse import OptionParser, TitledHelpFormatter
 
-from utils import create_daemon, get_default_logger, trace
+from utils import create_daemon, get_default_logger, close_logger, trace
 
 
 def is_server_running(host, port):
@@ -83,7 +83,7 @@ Start %prog XML/RPC daemon.
         conf.read(conf_path)
         self.conf_path = conf_path
         self.host = conf.get('server', 'host')
-        self.port = int(conf.get('server', 'port'))
+        self.port = conf.getint('server', 'port')
         try:
             self.pid_path = conf.get('server', 'pid_path')
         except NoOptionError:
@@ -100,13 +100,6 @@ Start %prog XML/RPC daemon.
 
         trace('Starting %s server at http://%s:%s/' % (self.server_name,
                                                        self.host, self.port))
-        # daemon mode
-        if not options.debug:
-            trace(' as daemon.\n')
-            create_daemon()
-        else:
-            trace(' in debug mode.\n')
-
         # init logger
         if options.verbose:
             level = logging.DEBUG
@@ -117,12 +110,29 @@ Start %prog XML/RPC daemon.
         else:
             log_to = 'file'
         self.logger = get_default_logger(log_to, log_path, level=level,
-                                         name=self.__class__.__name__)
+                                         name=self.server_name)
+        # subclass init
+        self._init_cb(conf, options)
+
+        # daemon mode
+        if not options.debug:
+            trace(' as daemon.\n')
+            close_logger(self.server_name)
+            create_daemon()
+            # re init the logger
+            self.logger = get_default_logger(log_to, log_path, level=level,
+                                             name=self.server_name)
+        else:
+            trace(' in debug mode.\n')
+
         # init rpc
         self.initServer()
 
-        # run the server
-        self.run()
+    def _init_cb(self, conf, options):
+        """init procedure intend to be implemented by subclasses.
+
+        conf is a ConfigParser."""
+        pass
 
     def logd(self, message):
         """Debug log."""
@@ -150,6 +160,7 @@ Start %prog XML/RPC daemon.
         self.log("Init XML/RPC server %s:%s." % (self.host, self.port))
         server = MySimpleXMLRPCServer((self.host, self.port))
         for method_name in self.method_names:
+            self.logd('register %s' % method_name)
             server.register_function(getattr(self, method_name))
         self.server = server
 
@@ -165,6 +176,8 @@ Start %prog XML/RPC daemon.
         server.server_close()
         self.log("XML/RPC server pid=%i stopped." % pid)
         os.remove(self.pid_path)
+
+    __call__ = run
 
     # RPC
     #
@@ -207,7 +220,7 @@ Execute action on the XML/RPC server.
         conf.read(conf_path)
         self.host = conf.get('server', 'host')
         self.conf_path = conf_path
-        self.port = int(conf.get('server', 'port'))
+        self.port = conf.getint('server', 'port')
         self.url = 'http://%s:%s/' % (self.host, self.port)
         self.verbose = not options.quiet
         self.server = ServerProxy(self.url)
@@ -226,14 +239,15 @@ Execute action on the XML/RPC server.
     def log(self, message, force=False):
         """Log a message."""
         if force or self.verbose:
-            trace(message)
+            trace(str(message))
 
     def startServer(self, debug=False):
         """Start an XML/RPC server."""
         argv = ['cmd', self.conf_path]
         if debug:
             argv.append('-dv')
-        return self.server_class(argv)
+        daemon = self.server_class(argv)
+        daemon.run()
 
     def __call__(self, action=None):
         """Call the xml rpc action"""
@@ -253,9 +267,11 @@ Execute action on the XML/RPC server.
                 ret = server.stopServer()
                 self.log('Server %s is stopped.\n' % self.url)
                 is_running = False
-            else:
+            elif action == 'stop':
                 self.log('No server reachable at %s.\n' % self.url)
-        if 'start' in action:
+            if action == 'restart':
+                self('start')
+        elif 'start' in action:
             if is_running:
                 self.log('Server %s is already running.\n' % self.url)
             else:
