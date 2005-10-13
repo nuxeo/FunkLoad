@@ -135,7 +135,8 @@ class ResponseRst(BaseRst):
 
     def __init__(self, stats):
         BaseRst.__init__(self, stats)
-        self.image_names = [name + str(stats.number)
+        # XXX quick fix for #1017
+        self.image_names = [name + str(stats.step) + '.' + str(stats.number)
                             for name in self.image_names]
 
     def render_stat(self):
@@ -236,14 +237,13 @@ class RenderRst:
         """Render bench configuration."""
         config = self.config
         self.append(rst_title("FunkLoad bench report", 0))
-        self.append("**%s.py %s.%s**" % (config['module'],
-                                         config['class'],
-                                         config['method']))
-
-        self.append('\n' + config['description'])
-        self.append("")
+        description = "Bench result of **%s.py %s.%s**: " % (
+            config['module'], config['class'], config['method'])
+        description += config['description']
+        self.append('\n:abstract: ' + description)
+        self.append('')
         self.append(".. sectnum::    :depth: 2")
-        self.append(".. contents::   :depth: 3")
+        self.append(".. contents:: Table of contents")
 
         self.append(rst_title("Bench configuration", 2))
         self.append("* Launched: %s" % config['time'])
@@ -717,7 +717,7 @@ class RenderHtml(RenderRst):
                 cvus.append(str(resp.cvus))
                 number = resp.number
         image_path = str(os.path.join(self.report_dir,
-                                      'request_%s.png' % number))
+                                      'request_%s.png' % step))
         title = str('Request %s response time' % step)
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_time_min_max,

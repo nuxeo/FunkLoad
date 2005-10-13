@@ -28,6 +28,12 @@ New features
 * Switching from distutils to setuptools using EasyInstall_, installing
   FunkLoad is now just a question of ``sudo easy_install funkload``.
 
+Bug fixes
+~~~~~~~~~
+
+* fix #1017 Report: request charts is alway the same.
+
+
 FunkLoad 1.1.0
 --------------
 
