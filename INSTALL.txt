@@ -14,7 +14,7 @@ FunkLoad INSTALL
 
 .. sectnum::    :depth: 2
 
-.. contents::   :depth: 3
+.. contents:: Table of Contents
 
 
 Required packages

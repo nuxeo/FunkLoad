@@ -195,6 +195,37 @@ table.docutils th.field-name {
   border: 1px solid #CCC;
 }
 
+div.abstract {
+  padding: 0.5em;
+  background-color: #eef;
+  border: 1px solid #838183;
+  margin: 0.5em 1em;
+}
+
+div.abstract {
+  padding: 0.5em;
+  background-color: #eef;
+  border: 1px solid #838183;
+  margin: 0.5em 1em;
+}
+
+div.warning, div.note {
+  padding: 0.5em;
+  background-color: #fee;
+  border: 1px solid #838183;
+  margin: 0.5em 1em;
+}
+
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+}
+
+div.abstract p.topic-title {
+  font-weight: bold
+}
+
+
 th.field-name {
   font-weight: bold;
   font-size: 1.5em;
@@ -208,9 +239,14 @@ tr.field {
   border: none;
 }
 
-div.contents p.topic-title, div.abstract p.topic-title {
-  font-weight: bold;
+
+div.contents p.first a {
+  font-size: 150%;
+  border-bottom: 1px solid #888;
+  color: #fcb100;
 }
+
+div.contents a  { text-decoration: none }
 
 pre.address {
   display: inline;

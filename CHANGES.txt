@@ -10,8 +10,7 @@ FunkLoad CHANGES
 
 :abstract: This document describes changes between FunkLoad_ versions.
 
-.. contents::   :depth: 3
-
+.. contents:: Table of Contents
 
 
 FunkLoad SVN trunk

@@ -28,7 +28,7 @@ FunkLoad
 
 .. sectnum::    :depth: 2
 
-.. contents::   :depth: 3
+.. contents:: Table of Contents
 
 
 Introducing FunkLoad
