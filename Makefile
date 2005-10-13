@@ -1,15 +1,13 @@
 .PHONY: build pkg install clean rpm doc
 
-# In order to generate HTML docs, you will need to install
-# Docutils (http://docutils.sourceforge.net/).
-# For example on a Debian system:
-# $ sudo apt-get install python-docutils
 HTML_DOCS := README.html INSTALL.html CHANGES.html
-CSS_FILE := data/funkload.css
+CSS_FILE := src/data/funkload.css
 
-RST2HTML := rst2html -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
+RST2HTML := rst2html.py -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
 
-build:
+build: build_src egg
+
+build_src:
 	python setup.py build
 
 pkg:

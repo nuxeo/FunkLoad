@@ -22,8 +22,11 @@ New features
 ~~~~~~~~~~~~
 
 * Credential and Monitor services have been refactored they are now true
-  unix daemon service, controllers are now in pure python (no more bash).
+  unix daemon service, controllers are now in pure python (no more bash
+  scripts).
 
+* Switching from distutils to setuptools using EasyInstall_, installing
+  FunkLoad is now just a question of ``sudo easy_install funkload``.
 
 FunkLoad 1.1.0
 --------------
@@ -104,6 +107,7 @@ See README.txt_ for more information about FunkLoad_.
 
 
 .. _FunkLoad: http://funkload.nuxeo.org/
+.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _README.txt: README.html
 .. _INSTALL.txt: INSTALL.html
 .. _971: http://svn.nuxeo.org/trac/pub/ticket/971

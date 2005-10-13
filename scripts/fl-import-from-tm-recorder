@@ -24,7 +24,7 @@ $Id: ftest_utils.py 22915 2005-06-09 15:38:07Z bdelbosc $
 import os
 import re
 from optparse import OptionParser, TitledHelpFormatter
-from funkload.utils import get_funkload_data_path, trace
+from funkload.utils import trace
 
 class TMImportProgram:
     """See usage."""
@@ -113,9 +113,8 @@ Then you can use
 
     def writeScript(self):
         """Write the FunkLoad test script."""
-        tpl_path = os.path.join(get_funkload_data_path(),
-                                'ScriptTestCase.tpl')
-        tpl = open(tpl_path).read()
+        from pkg_resources import resource_string
+        tpl = resource_string('funkload', 'data/ScriptTestCase.tpl')
         content = tpl % {'scenario': self.scenario,
                          'test_name': self.test_name,
                          'class_name': self.class_name}
@@ -128,9 +127,8 @@ Then you can use
 
     def writeConfiguration(self):
         """Write the FunkLoad configuration test script."""
-        tpl_path = os.path.join(get_funkload_data_path(),
-                                'ConfigurationTestCase.tpl')
-        tpl = open(tpl_path).read()
+        from pkg_resources import resource_string
+        tpl = resource_string('funkload', 'data/ConfigurationTestCase.tpl')
         content = tpl % {'server_url': self.server_url,
                          'test_name': self.test_name,
                          'class_name': self.class_name}

@@ -20,13 +20,12 @@
 $Id: ReportRenderer.py 24736 2005-08-31 08:59:54Z bdelbosc $
 """
 import os
-from utils import get_funkload_data_path
 try:
     import gdchart
     g_has_gdchart = 1
 except ImportError:
     g_has_gdchart = 0
-
+from shutil import copyfile
 
 # ------------------------------------------------------------
 # ReST rendering
@@ -456,9 +455,9 @@ class RenderHtml(RenderRst):
     color_bg = 0xffffff
     color_line = 0x000000
 
-    def __init__(self, config, stats, error, monitor, options):
+    def __init__(self, config, stats, error, monitor, options, css_file=None):
         RenderRst.__init__(self, config, stats, error, monitor, options)
-        self.css_file = 'funkload.css'
+        self.css_file = css_file
         self.report_dir = self.css_path = self.rst_path = self.html_path = None
 
     def prepareReportDirectory(self):
@@ -487,16 +486,24 @@ class RenderHtml(RenderRst):
     def copyCss(self):
         """Copy the css to the report dir."""
         css_file = self.css_file
-        css_src_path = os.path.join(get_funkload_data_path(), css_file)
-        css_dest_path = os.path.join(self.report_dir, css_file)
-        self._copyFile(css_src_path, css_dest_path)
+        if css_file is not None:
+            copyfile(css_file, css_dest_path)
+            css_dest_path = os.path.join(self.report_dir, css_file)
+        else:
+            # use the one in our package_data
+            from pkg_resources import resource_string
+            css_content = resource_string('funkload', 'data/funkload.css')
+            css_dest_path = os.path.join(self.report_dir, 'funkload.css')
+            f = open(css_dest_path, 'w')
+            f.write(css_content)
+            f.close()
         self.css_path = css_dest_path
 
     def copyXmlResult(self):
         """Make a copy of the xml result."""
         xml_src_path = self.options.xml_file
         xml_dest_path = os.path.join(self.report_dir, 'funkload.xml')
-        self._copyFile(xml_src_path, xml_dest_path)
+        copyfile(xml_src_path, xml_dest_path)
 
     def generateHtml(self):
         """Ask docutils to convert our rst file into html."""
@@ -509,11 +516,6 @@ class RenderHtml(RenderRst):
         publish_cmdline(writer_name='html', argv=cmd_argv)
         self.html_path = html_path
 
-    def _copyFile(self, src, dest):
-        """Copy src to dest."""
-        f = open(dest, 'w')
-        f.write(open(src).read())
-        f.close()
 
     def render(self):
         """Create the html report."""
