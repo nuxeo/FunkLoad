@@ -33,6 +33,8 @@ Bug fixes
 
 * fix # 1017_ Report: request charts is alway the same.
 
+* fix # 1000_ easy_install failed to install funkload.
+
 
 FunkLoad 1.1.0
 --------------
@@ -121,3 +123,4 @@ See README.txt_ for more information about FunkLoad_.
 .. _948: http://svn.nuxeo.org/trac/pub/ticket/948
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
 .. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
+.. _1000: http://svn.nuxeo.org/trac/pub/ticket/1000
