@@ -1,0 +1,118 @@
+================
+FunkLoad INSTALL
+================
+
+:author: Benoit Delbosc
+
+:address: bdelbosc _at_ nuxeo.com
+
+:version: FunkLoad/1.1.0
+
+:revision: $Id$
+
+:abstract: This document describes how to install the FunkLoad_ tool.
+
+.. sectnum::    :depth: 1
+
+.. contents:: Table of Contents
+
+
+Required packages
+-----------------
+
+* libexpat1
+* works fine with python 2.3.5, looks like ok with python 2.4
+* python xml, for example on a Debian system::
+
+    sudo apt-get install python-xml
+
+* python distutils, on a Debian system::
+
+    sudo apt-get install python-dev
+
+* For FunkLoad_ > 1.1.0 you need to use EasyInstall_, download ez_setup.py_,
+  and run it::
+
+    cd /tmp
+    wget http://peak.telecommunity.com/dist/ez_setup.py
+    sudo python ez_setup.py
+
+ This will download and install the appropriate setuptools egg for your
+ Python version.
+
+
+Optional packages
+-----------------
+
+* to produce charts : python-gdchart (0.6.1-8 is fine), on Debian::
+
+   apt-get install python-gdchart
+
+* to have a proxy recorder install TestMaker, this requires a jre 1.4.2
+  (seems fine also with 1.5.0)
+
+   - Unzip TestMaker 4.3.1 from http://downloads.pushtotest.com/TestMaker.zip
+   - you need to export your JAVA_HOME (like /usr/local/java/jre1.5.0_01)
+
+
+Installation
+------------
+
+Easy installation
+~~~~~~~~~~~~~~~~~
+
+::
+
+  sudo easy_install funkload
+
+This will install FunkLoad_, webunit_ and docutils_ eggs.
+
+
+If one of these packages were previously installed without using
+EasyInstall_, you should try with a ``--delete-conflicting`` option, see
+easy_install_ documentation.
+
+
+Development version
+~~~~~~~~~~~~~~~~~~~
+
+If you want to try the latest unstable sources from svn ::
+
+    svn co http://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
+    cd /tmp/funkload/
+    python setup.py build
+    sudo python setup.py install
+
+
+Test it
+-------
+
+Go to the demo/xmlrpc folder then::
+
+  cd demo/xmlrpc/
+  make test
+
+To test benching and report building just::
+
+  make bench
+
+
+--------------------------
+
+See README.txt_ for more information about FunkLoad_.
+
+See CHANGES.txt_ for information on FunkLoad_ packages.
+
+See demo_ folder for other examples.
+
+
+.. _FunkLoad: http://funkload.nuxeo.org/
+.. _webunit: http://mechanicalcat.net/tech/webunit/
+.. _TestMaker: http://www.pushtotest.com/
+.. _README.txt: README.html
+.. _CHANGES.txt: CHANGES.html
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
+.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
+.. _ez_setup.py: http://peak.telecommunity.com/dist/ez_setup.py
+.. _docutils: http://docutils.sourceforge.net/
