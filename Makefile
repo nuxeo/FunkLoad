@@ -1,30 +1,35 @@
-.PHONY: build pkg install clean rpm doc
+# FunkLoad Makefile
+# $Id: $
+#
+.PHONY: build pkg sdist egg install clean rpm doc
 
 HTML_DOCS := README.html INSTALL.html CHANGES.html
 CSS_FILE := src/data/funkload.css
-
 RST2HTML := rst2html.py -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
+TARGET := cvs.in.nuxeo.com:~/public_public_html/funkload/
 
-build: build_src egg
+# a for alpha, b for beta
+PKGTAG := egg_info --tag-build=a --tag-svn-revision
 
-build_src:
+build:
 	python setup.py build
 
-pkg:
-	python setup.py sdist
+pkg: sdist egg
+
+sdist:
+	python setup.py $(PKGTAG) sdist
 
 egg:
-	python setup.py bdist_egg
+	python setup.py $(PKGTAG) bdist_egg
 
-rpm:
-	python setup.py bdist_rpm
 
 distrib: doc
-	-scp dist/funkload-*.tar.gz cvs.in.nuxeo.com:~/public_public_html/funkload/
-	scp ${HTML_DOCS} cvs.in.nuxeo.com:~/public_public_html/funkload/
+	-scp dist/funkload-*.tar.gz $(TARGET)
+	-scp dist/funkload-*.egg $(TARGET)
+	scp ${HTML_DOCS} $(TARGET)
 
 install:
-	python setup.py install --install-scripts=/usr/local/bin --install-data=/usr/local
+	python setup.py install
 
 doc: ${HTML_DOCS}
 
