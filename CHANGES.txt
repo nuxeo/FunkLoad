@@ -31,7 +31,7 @@ New features
 Bug fixes
 ~~~~~~~~~
 
-* fix #1017 Report: request charts is alway the same.
+* fix # 1017_ Report: request charts is alway the same.
 
 
 FunkLoad 1.1.0
@@ -120,3 +120,4 @@ See README.txt_ for more information about FunkLoad_.
 .. _950: http://svn.nuxeo.org/trac/pub/ticket/950
 .. _948: http://svn.nuxeo.org/trac/pub/ticket/948
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
+.. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
