@@ -1,4 +1,0 @@
-include *.txt ChangeLog Makefile setup.cfg setup.py
-recursive-include src *.py
-recursive-include demo *.txt *.py *.conf Makefile
-recursive-include data *.tpl *.css
