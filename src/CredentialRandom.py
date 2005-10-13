@@ -28,7 +28,7 @@ from CredentialBase import CredentialBaseServer
 # ------------------------------------------------------------
 # Server
 #
-class RandomCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
+class CredentialRandomServer(XmlRpcBaseServer, CredentialBaseServer):
     """A random credential server."""
     server_name = "random_credential"
     method_names = XmlRpcBaseServer.method_names + [
@@ -73,9 +73,9 @@ class RandomCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
 # ------------------------------------------------------------
 # Controller
 #
-class RandomCredentialController(XmlRpcBaseController):
+class CredentialRandomController(XmlRpcBaseController):
     """A random credential controller."""
-    server_class = RandomCredentialServer
+    server_class = CredentialRandomServer
 
     def test(self):
         """Testing credential server."""
@@ -95,7 +95,7 @@ class RandomCredentialController(XmlRpcBaseController):
 #
 def main():
     """Control credentiald server."""
-    ctl = RandomCredentialController()
+    ctl = CredentialRandomController()
     sys.exit(ctl())
 
 if __name__ == '__main__':

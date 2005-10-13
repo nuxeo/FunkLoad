@@ -68,7 +68,7 @@ class Group:
 # ------------------------------------------------------------
 # Server
 #
-class FileCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
+class CredentialFileServer(XmlRpcBaseServer, CredentialBaseServer):
     """A file credential server."""
     server_name = "file_credential"
     method_names = XmlRpcBaseServer.method_names + [
@@ -96,7 +96,7 @@ class FileCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
 
     def _loadPasswords(self, file_path):
         """Load a password file."""
-        self.logd("getFileCredential use credential file %s." % file_path)
+        self.logd("CredentialFile use credential file %s." % file_path)
         lines = open(file_path).readlines()
         self._groups = {}
         group = Group('default')
@@ -113,7 +113,7 @@ class FileCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
 
     def _loadGroups(self, file_path):
         """Load a group file."""
-        self.logd("getFileCredential use group file %s." % file_path)
+        self.logd("CredentialFile use group file %s." % file_path)
         lines = open(file_path).readlines()
         for line in lines:
             line = line.strip()
@@ -141,7 +141,7 @@ class FileCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
         """
         user = self._groups[group].next()
         password = self._passwords[user]
-        self.logd("getFileCredential(%s) return (%s, %s)" % (
+        self.logd("getCredential(%s) return (%s, %s)" % (
             group, user, password))
         return (user, password)
 
@@ -166,9 +166,9 @@ class FileCredentialServer(XmlRpcBaseServer, CredentialBaseServer):
 # ------------------------------------------------------------
 # Controller
 #
-class FileCredentialController(XmlRpcBaseController):
+class CredentialFileController(XmlRpcBaseController):
     """A file credential controller."""
-    server_class = FileCredentialServer
+    server_class = CredentialFileServer
 
     def test(self):
         """Testing credential server."""
@@ -188,7 +188,7 @@ class FileCredentialController(XmlRpcBaseController):
 #
 def main():
     """Control credentiald server."""
-    ctl = FileCredentialController()
+    ctl = CredentialFileController()
     sys.exit(ctl())
 
 if __name__ == '__main__':
