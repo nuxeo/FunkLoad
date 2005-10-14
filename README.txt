@@ -26,6 +26,10 @@ FunkLoad
 :abstract: This document describes the usage of the FunkLoad_ tool. This tool
     enables to do functional and load testing of web application.
 
+
+
+
+
 .. sectnum::    :depth: 2
 
 .. contents:: Table of Contents
@@ -107,15 +111,30 @@ Main FunkLoad_ features are:
 Where to find FunkLoad ?
 ------------------------
 
-Check the latest package at http://funkload.nuxeo.org/
+Either:
 
-Or from bleeding edge svn sources, if you want to try the latest unstable
-sources::
+.. * Latest stable package using EasyInstall_::
+..    easy_install funkload
+
+* Check the latest stable package on the `python cheese shop`_
+
+* EasyInstall_ latest snapshot_ ::
+
+   easy_install funkload==dev
+
+* Try the bleeding edge svn sources::
 
     svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
 
+
+
 See CHANGES.txt_ file for information about distribution contents.
 
+
+.. _`python cheese shop`: http://www.python.org/pypi/funkload/
+.. _snapshot: http://funkload.nuxeo.org/funkload-1.2.0a_r28275-py2.3.egg#egg=funkload-dev
+
+.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 
 Installation
 ------------
