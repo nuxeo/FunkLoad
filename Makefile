@@ -8,11 +8,16 @@ CSS_FILE := src/data/funkload.css
 RST2HTML := rst2html.py -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
 TARGET := cvs.in.nuxeo.com:~/public_public_html/funkload/
 
-# a for alpha, b for beta
-PKGTAG := egg_info --tag-build=a --tag-svn-revision
+# use a for alpha, b for beta, rc for release candidate
+ifdef TAG
+	PKGTAG := egg_info --tag-build=$(TAG) --tag-svn-revision
+else
+    PKGTAG :=
+endif
+
 
 build:
-	python setup.py build
+	python setup.py $(PKGTAG) build
 
 pkg: sdist egg
 
@@ -29,7 +34,7 @@ distrib: doc
 	scp ${HTML_DOCS} $(TARGET)
 
 install:
-	python setup.py install
+	python setup.py $(PKGTAG) install
 
 doc: ${HTML_DOCS}
 
