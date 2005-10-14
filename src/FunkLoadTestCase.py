@@ -39,8 +39,7 @@ from webunit.webunittest import WebTestCase, HTTPError
 
 import PatchWebunit
 from utils import get_default_logger, mmn_is_bench, mmn_decode
-from utils import recording, thread_sleep, is_html
-from version import __version__
+from utils import recording, thread_sleep, is_html, get_version
 from xmlrpclib import ServerProxy
 
 _marker = []
@@ -116,7 +115,7 @@ class FunkLoadTestCase(unittest.TestCase):
         # init webunit browser (passing a fake methodName)
         self._browser = WebTestCase(methodName='log')
         self._browser.user_agent =  self.conf_get('main', 'user_agent',
-                                                  'FunkLoad/%s' % __version__,
+                                                  'FunkLoad/%s' % get_version(),
                                                   quiet=True)
         self.clearContext()
         #self.logd('# FunkLoadTestCase._funkload_init done')
@@ -451,7 +450,7 @@ class FunkLoadTestCase(unittest.TestCase):
     def open_result_log(self, **kw):
         """Open the result log."""
         xml = ['<funkload version="%s" time="%s">' % (
-            __version__, datetime.now().isoformat())]
+            get_version(), datetime.now().isoformat())]
         for key, value in kw.items():
             xml.append('<config key="%s" value=%s />' % (
                 key, quoteattr(str(value))))

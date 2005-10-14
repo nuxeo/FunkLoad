@@ -212,6 +212,12 @@ def xmlrpc_list_credentials(host, port, group=None):
 # ------------------------------------------------------------
 # misc
 #
+def get_version():
+    """Retrun the FunkLoad package version."""
+    from pkg_resources import get_distribution
+    return get_distribution('funkload').version
+
+
 _COLOR = {'green': "\x1b[32;01m",
           'red': "\x1b[31;01m",
           'reset': "\x1b[0m"
