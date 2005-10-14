@@ -722,7 +722,7 @@ class RenderHtml(RenderRst):
                        vol_color=self.color_error,
                        bg_color=self.color_bg, plot_color=self.color_plot,
                        line_color=self.color_line,
-                       title='Requests per second', xtitle='CUs',
+                       title='Requests Per Second', xtitle='CUs',
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='RPS', ytitle2="Errors",
                        ylabel_density=50,
