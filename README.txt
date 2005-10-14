@@ -118,23 +118,21 @@ Either:
 
 * Check the latest stable package on the `python cheese shop`_
 
-* EasyInstall_ latest snapshot_ ::
+* EasyInstall_ snapshot are on http://funkload.nuxeo.org/ ::
 
-   easy_install funkload==dev
+   easy_install http://funkload.nuxeo.org/funkload-xxxx.egg
 
-* Try the bleeding edge svn sources::
+* Bleeding edge svn sources::
 
     svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
-
 
 
 See CHANGES.txt_ file for information about distribution contents.
 
 
 .. _`python cheese shop`: http://www.python.org/pypi/funkload/
-.. _snapshot: http://funkload.nuxeo.org/funkload-1.2.0a_r28275-py2.3.egg#egg=funkload-dev
-
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+
 
 Installation
 ------------
