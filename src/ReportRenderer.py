@@ -46,7 +46,7 @@ def rst_title(title, level=1):
 class BaseRst:
     """Base class for ReST renderer."""
     fmt_int = "%7d"
-    fmt_float = "%7.2f"
+    fmt_float = "%7.3f"
     fmt_percent = "%6.2f%%"
     fmt_deco = "======= "
     header = " Not implemented"
