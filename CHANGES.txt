@@ -35,6 +35,8 @@ Bug fixes
 
 * fix # 1000_ easy_install failed to install funkload.
 
+* fix # 1009_ Report: remove error scale in graph if there is no errors.
+
 
 FunkLoad 1.1.0
 --------------
@@ -124,3 +126,4 @@ See README.txt_ for more information about FunkLoad_.
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
 .. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
 .. _1000: http://svn.nuxeo.org/trac/pub/ticket/1000
+.. _1009: http://svn.nuxeo.org/trac/pub/ticket/1009

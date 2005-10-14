@@ -180,7 +180,8 @@ class TestRst(BaseRst):
 
 class RenderRst:
     """Render stats in ReST format."""
-    slowest_items = 5                   # number of slowest requests to display
+    # number of slowest requests to display
+    slowest_items = 5
 
     def __init__(self, config, stats, error, monitor, options):
         self.config = config
@@ -565,13 +566,18 @@ class RenderHtml(RenderRst):
         errors = []
         stps = []
         cvus = []
+        has_error = False
         for cycle in self.cycles:
             if not stats[cycle].has_key('test'):
                 continue
             test = stats[cycle]['test']
             stps.append(test.tps)
-            errors.append(test.error_percent)
+            error = test.error_percent
+            if error:
+                has_error = True
+            errors.append(error)
             cvus.append(str(test.cvus))
+        color_error = has_error and self.color_error or self.color_bg
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_success, self.color_success),
                        vol_color=self.color_error,
@@ -580,7 +586,8 @@ class RenderHtml(RenderRst):
                        title='Successful Tests Per Second', xtitle='CUs',
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='STPS', ytitle2="Errors",
-                       ylabel_density=50)
+                       ylabel_density=50,
+                       ytitle2_color=color_error, ylabel2_color=color_error)
         gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
                       self.getChartSize(cvus),
                       image_path,
@@ -597,15 +604,20 @@ class RenderHtml(RenderRst):
         delay_min = []
         spps = []
         cvus = []
+        has_error = False
         for cycle in self.cycles:
             page = stats[cycle]['page']
             delay.append(page.avg)
             delay_min.append(page.min)
             delay_max.append(page.max)
             spps.append(page.rps)
-            errors.append(page.error_percent)
+            error = page.error_percent
+            if error:
+                has_error = True
+            errors.append(error)
             cvus.append(str(page.cvus))
 
+        color_error = has_error and self.color_error or self.color_bg
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_time_min_max,
                                   self.color_time_min_max, self.color_time),
@@ -618,12 +630,12 @@ class RenderHtml(RenderRst):
                        ytitle='Duration', ytitle2="Errors",
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
-                       GDC_HLC_CONNECTING)
+                       GDC_HLC_CONNECTING,
+                       ytitle2_color=color_error, ylabel2_color=color_error)
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
                       cvus, (delay_max, delay_min, delay), errors)
-
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_success, self.color_success),
                        vol_color=self.color_error,
@@ -650,15 +662,20 @@ class RenderHtml(RenderRst):
         delay_min = []
         rps = []
         cvus = []
+        has_error = False
         for cycle in self.cycles:
             resp = stats[cycle]['response']
             delay.append(resp.avg)
             delay_min.append(resp.min)
             delay_max.append(resp.max)
             rps.append(resp.rps)
-            errors.append(resp.error_percent)
+            error = resp.error_percent
+            if error:
+                has_error = True
+            errors.append(error)
             cvus.append(str(resp.cvus))
 
+        color_error = has_error and self.color_error or self.color_bg
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_time_min_max,
                                   self.color_time_min_max, self.color_time),
@@ -671,7 +688,8 @@ class RenderHtml(RenderRst):
                        ytitle='Duration', ytitle2="Errors",
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
-                       GDC_HLC_CONNECTING)
+                       GDC_HLC_CONNECTING,
+                       ytitle2_color=color_error, ylabel2_color=color_error)
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
@@ -685,7 +703,8 @@ class RenderHtml(RenderRst):
                        title='Requests per second', xtitle='CUs',
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='RPS', ytitle2="Errors",
-                       ylabel_density=50)
+                       ylabel_density=50,
+                       ytitle2_color=color_error, ylabel2_color=color_error)
         gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
                       self.getChartSize(cvus),
                       image2_path,
@@ -701,6 +720,7 @@ class RenderHtml(RenderRst):
         delay_min = []
         cvus = []
         number = 0
+        has_error = False
         for cycle in self.cycles:
             resp = stats[cycle]['response_step'].get(step)
             if resp is None:
@@ -713,12 +733,16 @@ class RenderHtml(RenderRst):
                 delay.append(resp.avg)
                 delay_min.append(resp.min)
                 delay_max.append(resp.max)
-                errors.append(resp.error_percent)
+                error = resp.error_percent
+                if error:
+                    has_error = True
+                errors.append(error)
                 cvus.append(str(resp.cvus))
                 number = resp.number
         image_path = str(os.path.join(self.report_dir,
                                       'request_%s.png' % step))
         title = str('Request %s response time' % step)
+        color_error = has_error and self.color_error or self.color_bg
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_time_min_max,
                                   self.color_time_min_max, self.color_time),
@@ -731,8 +755,8 @@ class RenderHtml(RenderRst):
                        ytitle='Duration', ytitle2="Errors",
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
-                       GDC_HLC_CONNECTING)
-
+                       GDC_HLC_CONNECTING,
+                       ytitle2_color=color_error, ylabel2_color=color_error)
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
