@@ -237,19 +237,26 @@ class RenderRst:
     def renderConfig(self):
         """Render bench configuration."""
         config = self.config
-        self.append(rst_title("FunkLoad bench report", 0))
-        description = "Bench result of **%s.py %s.%s**: " % (
-            config['module'], config['class'], config['method'])
-        description += config['description']
-        self.append('\n:abstract: ' + description)
+        self.append(rst_title("FunkLoad_ bench report", 0))
         self.append('')
+        date = config['time'][:19].replace('T', ' ')
+        self.append(':date: ' + date)
+        description = "Bench result of ``%s.%s``: " % (config['class'],
+                                                       config['method'])
+        description += config['description']
+        self.append(':abstract: ' + description)
+        self.append('')
+        self.append(".. _FunkLoad: http://funkload.nuxeo.org/")
         self.append(".. sectnum::    :depth: 2")
         self.append(".. contents:: Table of contents")
 
         self.append(rst_title("Bench configuration", 2))
-        self.append("* Launched: %s" % config['time'])
+        self.append("* Launched: %s" % date)
+        self.append("* Test: ``%s.py %s.%s``" % (config['module'],
+                                                 config['class'],
+                                                 config['method']))
         self.append("* Server: %s" % config['server_url'])
-        self.append("* Cycles: %s" % config['cycles'])
+        self.append("* Cycles of concurrent users: %s" % config['cycles'])
         self.append("* Cycle duration: %ss" % config['duration'])
         self.append("* Sleeptime between request: from %ss to %ss" % (
             config['sleep_time_min'], config['sleep_time_max']))
@@ -257,12 +264,16 @@ class RenderRst:
                     config['sleep_time'])
         self.append("* Startup delay between thread: %ss" %
                     config['startup_delay'])
-        self.append("* FunkLoad version: %s" % config['version'])
+        self.append("* FunkLoad_ version: %s" % config['version'])
         self.append("")
 
     def renderTestContent(self, test):
         """Render global information about test content."""
         self.append(rst_title("Test content", 2))
+        config = self.config
+        self.append('The test ``%s.%s`` contents: ' % (config['class'],
+                                                       config['method']))
+        self.append('')
         self.append("* %s page(s)" % test.pages)
         self.append("* %s redirect(s)" % test.redirects)
         self.append("* %s link(s)" % test.links)
@@ -270,7 +281,7 @@ class RenderRst:
         self.append("* %s XML RPC call(s)" % test.xmlrpc)
         self.append('')
 
-    def renderCyclesStat(self, key, title):
+    def renderCyclesStat(self, key, title, description=''):
         """Render a type of stats for all cycles."""
         stats = self.stats
         first = True
@@ -281,6 +292,9 @@ class RenderRst:
         elif key == 'response':
             klass = AllResponseRst
         self.append(rst_title(title, 2))
+        if description:
+            self.append(description)
+            self.append('')
         renderer = None
         for cycle in self.cycles:
             if not stats[cycle].has_key(key):
@@ -369,10 +383,11 @@ class RenderRst:
 
         items.sort()
         items.reverse()
-        self.append('For cycle with %s CUs:\n' % cycle_name)
+        self.append('Slowest average response time during the best cycle '
+                    'with **%s** CUs:\n' % cycle_name)
         for item in items[:number]:
-            self.append('* In page %s %s: %s took %.3fs\n'
-                        '  %s' % (
+            self.append('* In page %s %s: %s took **%.3fs**\n'
+                        '  `%s`' % (
                 item[1], item[2], item[3], item[0], item[4]))
 
     def renderErrors(self):
@@ -424,9 +439,16 @@ class RenderRst:
         if cycle_r.has_key('test'):
             self.renderTestContent(cycle_r['test'])
 
-        self.renderCyclesStat('test', 'Test stats')
-        self.renderCyclesStat('page', 'Page stats')
-        self.renderCyclesStat('response', 'Request stats')
+        self.renderCyclesStat('test', 'Test stats',
+                              'The number of Successful **Test** Per Second '
+                              '(STPS) over Concurrent Users (CUs).')
+        self.renderCyclesStat('page', 'Page stats',
+                              'The number of Successful **Page** Per Second '
+                              '(SPPS) over Concurrent Users (CUs).\n'
+                              'Note that an XML RPC call count like a page.')
+        self.renderCyclesStat('response', 'Request stats',
+                              'The number of **Request** Per Second (RPS) '
+                              'successful or not over Concurrent Users (CUs).')
         self.renderSlowestRequests(self.slowest_items)
         self.renderMonitors()
         self.renderPageDetail(cycle_r)
@@ -836,7 +858,8 @@ class RenderHtml(RenderRst):
 
         image_path = str(os.path.join(self.report_dir, '%s_load.png' % host))
 
-        title = str('%s: cpu usage and loadavg 1, 5 and 15min' % host)
+        title = str('%s: cpu usage (green 1=100%%) and loadavg 1(red), '
+                    '5 and 15 min' % host)
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(0x00ff00, 0xff0000, 0x0000ff),
                        vol_color=0xff0000,
@@ -852,7 +875,7 @@ class RenderHtml(RenderRst):
                       image_path,
                       times, cpu_usage, load_avg_1, load_avg_5, load_avg_15)
 
-        title = str('%s memory and swap usage' % host)
+        title = str('%s memory (green) and swap (red) usage' % host)
         image_path = str(os.path.join(self.report_dir, '%s_mem.png' % host))
         gdchart.option(format=gdchart.GDC_PNG,
                        title=title,
@@ -862,7 +885,7 @@ class RenderHtml(RenderRst):
                       image_path,
                       times, mem_used, swap_used)
 
-        title = str('%s network in/out' % host)
+        title = str('%s network in (green)/out (red)' % host)
         image_path = str(os.path.join(self.report_dir, '%s_net.png' % host))
         gdchart.option(format=gdchart.GDC_PNG,
                        title=title,

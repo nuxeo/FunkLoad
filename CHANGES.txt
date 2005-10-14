@@ -37,6 +37,7 @@ Bug fixes
 
 * fix # 1009_ Report: remove error scale in graph if there is no errors.
 
+* fix # 1008_ Report: missing legend
 
 FunkLoad 1.1.0
 --------------
@@ -115,15 +116,15 @@ See README.txt_ for more information about FunkLoad_.
 
 
 
-
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _README.txt: README.html
 .. _INSTALL.txt: INSTALL.html
-.. _971: http://svn.nuxeo.org/trac/pub/ticket/971
-.. _950: http://svn.nuxeo.org/trac/pub/ticket/950
-.. _948: http://svn.nuxeo.org/trac/pub/ticket/948
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
-.. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
+.. _948: http://svn.nuxeo.org/trac/pub/ticket/948
+.. _950: http://svn.nuxeo.org/trac/pub/ticket/950
+.. _971: http://svn.nuxeo.org/trac/pub/ticket/971
 .. _1000: http://svn.nuxeo.org/trac/pub/ticket/1000
+.. _1008: http://svn.nuxeo.org/trac/pub/ticket/1008
 .. _1009: http://svn.nuxeo.org/trac/pub/ticket/1009
+.. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
