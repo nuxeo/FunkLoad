@@ -129,5 +129,8 @@ Main FunkLoad features are:
     install_requires = ['webunit  == 1.3.8',
                         'docutils >= 0.3.7'],
     zip_safe=True,
-    package_data={'funkload': ['data/*.txt', 'data/*.tpl', 'data/*.css']},
+    package_data={'funkload': ['data/*',
+                               'demo/simple/*', 'demo/zope/*',
+                               'demo/cmf/*', 'demo/xmlrpc/*',
+                               'demo/*.txt']},
     )
