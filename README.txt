@@ -145,7 +145,10 @@ Examples
 
 See the demo_ folder contents and a report_ example.
 
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
+For package installed using easy_install_ you need to run
+``fl-install-demo`` to extract the demo examples.
+
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/demo/
 .. _report: http://funkload.nuxeo.org/report-example.pdf
 
 Credits
@@ -1027,7 +1030,7 @@ More options::
 
   fl-credential-ctl --help
 
-See the demo/cmf folder for example of credential configuration file.
+See the funkload-demo/cmf example for a credential configuration file.
 
 
 Monitor server
