@@ -28,6 +28,9 @@ New features
 * Switching from distutils to setuptools using EasyInstall_, installing
   FunkLoad is now just a question of ``sudo easy_install funkload``.
 
+* Moving demo examples into the egg, just type ``fl-install-demo`` to extract
+  the demo folder
+
 Bug fixes
 ~~~~~~~~~
 
