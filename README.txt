@@ -118,13 +118,13 @@ Either:
 
 * Check the latest stable package on the `python cheese shop`_
 
-* EasyInstall_ snapshot are on http://funkload.nuxeo.org/ ::
+* EasyInstall_ the latest snapshot ::
 
-   easy_install http://funkload.nuxeo.org/funkload-xxxx.egg
+   sudo easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
 
 * Bleeding edge svn sources::
 
-    svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
+   svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
 
 
 See CHANGES.txt_ file for information about distribution contents.
