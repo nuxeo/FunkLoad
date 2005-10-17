@@ -109,7 +109,8 @@ Main FunkLoad features are:
     scripts=['scripts/fl-monitor-ctl', 'scripts/fl-credential-ctl',
              'scripts/fl-run-bench', 'scripts/fl-run-test',
              'scripts/fl-build-report',
-             'scripts/fl-import-from-tm-recorder'],
+             'scripts/fl-import-from-tm-recorder',
+             'scripts/fl-install-demo'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
