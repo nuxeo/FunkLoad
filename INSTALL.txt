@@ -66,9 +66,13 @@ Installation
 
 See CHANGES.txt_ to know which package to install.
 
-From a package::
+the 1.1.0 package
+~~~~~~~~~~~~~~~~~
+
+::
 
     # check the latest package at http://funkload.nuxeo.org/
+
     cd /tmp
     wget http://funkload.nuxeo.org/funkload-1.1.0.tar.gz
     tar xzvf funkload-1.1.0.tar.gz
@@ -77,8 +81,25 @@ From a package::
     sudo python setup.py install
 
 
-Or from bleeding edge svn sources, if you want to try the latest unstable
-sources::
+Latest easy_install snapshot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+  sudo easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
+
+This will install FunkLoad_, webunit_ and docutils_ eggs.
+
+If one of these packages were previously installed without using
+EasyInstall_, you should try with a ``--delete-conflicting`` option, see
+easy_install_ documentation.
+
+
+
+Development version
+~~~~~~~~~~~~~~~~~~~
+
+If you want to try the latest unstable sources from svn ::
 
     svn co http://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
     cd /tmp/funkload/
@@ -86,13 +107,11 @@ sources::
     sudo python setup.py install
 
 
-easy_install_ funkload is comming soon ...
-
 
 Test it
 -------
 
-Go to the demo/xmlrpc folder then::
+Go to the demo/xmlrpc [*]_ folder then::
 
   cd demo/xmlrpc/
   make test
@@ -100,6 +119,9 @@ Go to the demo/xmlrpc folder then::
 To test benching and report building just::
 
   make bench
+
+.. [*] with package installed with easy_install_ you need to run
+       ``fl-install-demo`` to extract the examples.
 
 
 --------------------------
@@ -117,4 +139,6 @@ See demo_ folder for other examples.
 .. _README.txt: README.html
 .. _CHANGES.txt: CHANGES.html
 .. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
-.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
+.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _docutils: http://docutils.sourceforge.net/

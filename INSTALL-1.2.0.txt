@@ -37,8 +37,8 @@ Required packages
     wget http://peak.telecommunity.com/dist/ez_setup.py
     sudo python ez_setup.py
 
- This will download and install the appropriate setuptools egg for your
- Python version.
+  This will download and install the appropriate setuptools egg for your
+  Python version.
 
 
 Optional packages
@@ -61,16 +61,25 @@ Installation
 Easy installation
 ~~~~~~~~~~~~~~~~~
 
-::
+Install the latest stable package::
 
   sudo easy_install funkload
 
 This will install FunkLoad_, webunit_ and docutils_ eggs.
 
-
 If one of these packages were previously installed without using
 EasyInstall_, you should try with a ``--delete-conflicting`` option, see
 easy_install_ documentation.
+
+
+
+Latest snapshot version
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the latest development snapshot url available on FunkLoad_ site then::
+
+  easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
+
 
 
 Development version
@@ -84,17 +93,24 @@ If you want to try the latest unstable sources from svn ::
     sudo python setup.py install
 
 
+
 Test it
 -------
 
+Install the funkload examples::
+
+  fl-install-demo
+
 Go to the demo/xmlrpc folder then::
 
-  cd demo/xmlrpc/
+  cd funkload-demo/xmlrpc/
   make test
 
 To test benching and report building just::
 
   make bench
+
+See ``funkload-demo/README.txt`` for others examples.
 
 
 --------------------------
