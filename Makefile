@@ -8,7 +8,7 @@ CSS_FILE := src/data/funkload.css
 RST2HTML := rst2html.py -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
 TARGET := cvs.in.nuxeo.com:~/public_public_html/funkload/
 
-# use a for alpha, b for beta, rc for release candidate
+# use TAG=a for alpha, b for beta, rc for release candidate
 ifdef TAG
 	PKGTAG := egg_info --tag-build=$(TAG) --tag-svn-revision
 else
