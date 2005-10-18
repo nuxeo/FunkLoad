@@ -8,11 +8,11 @@ FunkLoad INSTALL
 
 :version: FunkLoad/1.1.0
 
-:revision: $Id: README.txt 27636 2005-09-27 14:27:34Z bdelbosc $
+:revision: $Id: INSTALL-1.2.0.txt 28355 2005-10-17 14:36:34Z bdelbosc $
 
 :abstract: This document describes how to install the FunkLoad_ tool.
 
-.. sectnum::    :depth: 2
+.. sectnum::    :depth: 1
 
 .. contents:: Table of Contents
 
@@ -30,69 +30,55 @@ Required packages
 
     sudo apt-get install python-dev
 
-* python Richard Jones' webunit_ version 1.3.8::
+* For FunkLoad_ > 1.1.0 you need to use EasyInstall_, download ez_setup.py_,
+  and run it::
 
     cd /tmp
-    wget http://www.mechanicalcat.net/tech/webunit/webunit-1.3.8.tar.gz
-    tar xzvf webunit-1.3.8.tar.gz
-    cd webunit-1.3.8/
-    python setup.py build
-    sudo python setup.py install
+    wget http://peak.telecommunity.com/dist/ez_setup.py
+    sudo python ez_setup.py
 
-  Note that webunit_ is also available using easy_install_::
-
-    sudo easy_install webunit
+  This will download and install the appropriate setuptools egg for your
+  Python version.
 
 
 Optional packages
 -----------------
 
-* to produce html report : python-docutils (0.3.7-2 is fine), on Debian::
-
-   apt-get install python-docutils
-
 * to produce charts : python-gdchart (0.6.1-8 is fine), on Debian::
 
    apt-get install python-gdchart
 
-* to have a proxy recorder install TestMaker, this requires a jre 1.4.2
+* to have a proxy recorder install TestMaker_, this requires a jre 1.4.2
   (seems fine also with 1.5.0)
 
    - Unzip TestMaker 4.3.1 from http://downloads.pushtotest.com/TestMaker.zip
    - you need to export your JAVA_HOME (like /usr/local/java/jre1.5.0_01)
 
+
 Installation
 ------------
 
-See CHANGES.txt_ to know which package to install.
-
-the 1.1.0 package
+Easy installation
 ~~~~~~~~~~~~~~~~~
 
-::
+Install the latest stable package::
 
-    # check the latest package at http://funkload.nuxeo.org/
-
-    cd /tmp
-    wget http://funkload.nuxeo.org/funkload-1.1.0.tar.gz
-    tar xzvf funkload-1.1.0.tar.gz
-    cd funkload-1.1.0/
-    python setup.py build
-    sudo python setup.py install
-
-
-Latest easy_install snapshot
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-::
-
-  sudo easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
+  sudo easy_install funkload
 
 This will install FunkLoad_, webunit_ and docutils_ eggs.
 
 If one of these packages were previously installed without using
 EasyInstall_, you should try with a ``--delete-conflicting`` option, see
 easy_install_ documentation.
+
+
+
+Latest snapshot version
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the latest development snapshot url available on FunkLoad_ site then::
+
+  easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
 
 
 
@@ -111,17 +97,20 @@ If you want to try the latest unstable sources from svn ::
 Test it
 -------
 
-Go to the demo/xmlrpc [*]_ folder then::
+Install the funkload examples::
 
-  cd demo/xmlrpc/
+  fl-install-demo
+
+Go to the demo/xmlrpc folder then::
+
+  cd funkload-demo/xmlrpc/
   make test
 
 To test benching and report building just::
 
   make bench
 
-.. [*] with package installed with easy_install_ you need to run
-       ``fl-install-demo`` to extract the examples.
+See ``funkload-demo/README.txt`` for others examples.
 
 
 --------------------------
@@ -139,6 +128,7 @@ See demo_ folder for other examples.
 .. _README.txt: README.html
 .. _CHANGES.txt: CHANGES.html
 .. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
-.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
+.. _ez_setup.py: http://peak.telecommunity.com/dist/ez_setup.py
 .. _docutils: http://docutils.sourceforge.net/
