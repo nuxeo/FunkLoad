@@ -46,7 +46,7 @@ doc: ${HTML_DOCS}
 
 uninstall:
 	-easy_install -m funkload
-    -rm -rf /usr/lib/python2.3/site-packages/funkload*
+	-rm -rf /usr/lib/python2.3/site-packages/funkload*
 	-rm -rf /usr/local/bin/fl-*
 
 clean:
