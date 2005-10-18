@@ -67,11 +67,6 @@ Install the latest stable package::
 
 This will install FunkLoad_, webunit_ and docutils_ eggs.
 
-If one of these packages were previously installed without using
-EasyInstall_, you should try with a ``--delete-conflicting`` option, see
-easy_install_ documentation.
-
-
 
 Latest snapshot version
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,6 +106,42 @@ To test benching and report building just::
   make bench
 
 See ``funkload-demo/README.txt`` for others examples.
+
+
+
+Problems ?
+----------
+
+* got a ::
+
+    error: invalid Python installation: unable to open /usr/lib/python2.4/config/Makefile (No such file or directory)
+
+  Install python2.4-dev package.
+
+* easy_install complains about conflict, if FunkLoad_, webunit_ or docutils_
+  were previously installed without using EasyInstall_.  You need to try
+  with the ``--delete-conflicting`` option, see easy_install_ documentation.
+
+* If you still have conflict try to remove FunkLoad from your system::
+
+    easy_install -m funkload
+    rm -rf /usr/lib/python2.3/site-packages/funkload*
+    rm -rf /usr/local/funkload/
+    rm /usr/local/bin/fl-*
+    rm /usr/bin/fl-*
+
+  then reinstall
+
+* on xmlrpc make return ::
+
+    ### credentialctl: Stopping credential server.
+    python: can't open file '/usr/lib/python2.4/site-packages/funkload-1.2.0-py2.4.egg/funkload/credentialctl.py': [Errno 20] Not a directory
+
+  Starting with FunkLoad 1.2.0 scripts are installed in /usr/bin, previously
+  they were in /usr/local/bin, you need to remove them::
+
+    sudo rm /usr/local/bin/fl-*
+
 
 
 --------------------------
