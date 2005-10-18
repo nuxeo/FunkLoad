@@ -45,9 +45,9 @@ doc: ${HTML_DOCS}
 	${RST2HTML} $< $@
 
 uninstall:
-        -easy_install -m funkload
-        -rm -rf /usr/lib/python2.3/site-packages/funkload*
-        -rm -rf /usr/local/bin/fl-*
+	-easy_install -m funkload
+    -rm -rf /usr/lib/python2.3/site-packages/funkload*
+	-rm -rf /usr/local/bin/fl-*
 
 clean:
 	find . "(" -name "*~" -or  -name ".#*" -or  -name "#*#" -or -name "*.pyc" ")" -print0 | xargs -0 rm -f
