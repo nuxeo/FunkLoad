@@ -105,7 +105,7 @@ Main FunkLoad features are:
     license='GPL',
     keywords='testing benching load performance functional monitoring',
     packages= ['funkload'],
-    package_dir=find_packages(),
+    package_dir={'funkload': 'funkload'},
     scripts=['scripts/fl-monitor-ctl', 'scripts/fl-credential-ctl',
              'scripts/fl-run-bench', 'scripts/fl-run-test',
              'scripts/fl-build-report',
@@ -135,5 +135,6 @@ Main FunkLoad features are:
                                'demo/cmf/*', 'demo/xmlrpc/*',
                                'demo/*.txt',
                                'tests/*',]},
-    test_suite = "funkload.tests.test_Install.test_suite",
+    # this test suite works only on an installed version :(
+    # test_suite = "funkload.tests.test_Install.test_suite",
     )
