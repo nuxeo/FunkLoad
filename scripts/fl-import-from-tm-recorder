@@ -156,6 +156,10 @@ Then you can use
     __call__ = main
 
 
+def main():
+    """main."""
+    importer = TMImportProgram()
+    importer()
 
-a = TMImportProgram()
-a()
+if __name__ == '__main__':
+    main()
