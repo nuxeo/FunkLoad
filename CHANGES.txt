@@ -34,6 +34,8 @@ New features
 Bug fixes
 ~~~~~~~~~
 
+* fix # 1022_ Monitor: no cpu usage monitoring on linux 2.4.x
+
 * fix # 1017_ Report: request charts is alway the same.
 
 * fix # 1000_ easy_install failed to install funkload.
@@ -131,3 +133,4 @@ See README.txt_ for more information about FunkLoad_.
 .. _1008: http://svn.nuxeo.org/trac/pub/ticket/1008
 .. _1009: http://svn.nuxeo.org/trac/pub/ticket/1009
 .. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
+.. _1022: http://svn.nuxeo.org/trac/pub/ticket/1022
