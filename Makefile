@@ -4,7 +4,7 @@
 .PHONY: build pkg sdist egg install clean rpm doc
 
 HTML_DOCS := README.html INSTALL.html CHANGES.html
-CSS_FILE := src/data/funkload.css
+CSS_FILE := funkload/data/funkload.css
 RST2HTML := rst2html.py -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
 TARGET := cvs.in.nuxeo.com:~/public_public_html/funkload
 

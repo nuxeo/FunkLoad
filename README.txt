@@ -148,7 +148,7 @@ See the demo_ folder contents and a report_ example.
 For package installed with easy_install you need to run ``fl-install-demo``
 to extract the demo examples.
 
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/demo/
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
 .. _report: http://funkload.nuxeo.org/report-example.pdf
 
 Credits

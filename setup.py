@@ -25,7 +25,7 @@ import ez_setup
 ez_setup.use_setuptools()
 from setuptools import setup, find_packages
 #from distutils.core import setup
-from src.version import __version__
+from funkload.version import __version__
 
 setup(
     name="funkload",
@@ -105,7 +105,7 @@ Main FunkLoad features are:
     license='GPL',
     keywords='testing benching load performance functional monitoring',
     packages= ['funkload'],
-    package_dir={'funkload': 'src'},
+    package_dir=find_packages(),
     scripts=['scripts/fl-monitor-ctl', 'scripts/fl-credential-ctl',
              'scripts/fl-run-bench', 'scripts/fl-run-test',
              'scripts/fl-build-report',
@@ -135,5 +135,5 @@ Main FunkLoad features are:
                                'demo/cmf/*', 'demo/xmlrpc/*',
                                'demo/*.txt',
                                'tests/*',]},
-    test_suite = "src.tests.test_Install.test_suite",
+    test_suite = "funkload.tests.test_Install.test_suite",
     )
