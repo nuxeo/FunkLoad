@@ -18,6 +18,17 @@ FunkLoad SVN trunk
 
 :Location: http://svn.nuxeo.org/pub/funkload/trunk/
 
+
+FunkLoad 1.1.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.2.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.2.0/
+
+:Released date: 2005-10-18
+
+
 New features
 ~~~~~~~~~~~~
 
@@ -42,7 +53,8 @@ Bug fixes
 
 * fix # 1009_ Report: remove error scale in graph if there is no errors.
 
-* fix # 1008_ Report: missing legend
+* fix # 1008_ Report: missing legend.
+
 
 FunkLoad 1.1.0
 --------------

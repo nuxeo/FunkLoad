@@ -6,7 +6,7 @@ FunkLoad
 
 :address: bdelbosc _at_ nuxeo.com
 
-:version: FunkLoad/1.1.0
+:version: FunkLoad/1.2.0
 
 :revision: $Id$
 
@@ -105,7 +105,7 @@ Main FunkLoad_ features are:
 
 * Provides a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
 
-* Easy to use, see examples in the demo_ folder.
+* Easy to install and use, see examples in the demo_ folder.
 
 
 Where to find FunkLoad ?
@@ -113,10 +113,9 @@ Where to find FunkLoad ?
 
 Either:
 
-.. * Latest stable package using EasyInstall_::
-..    easy_install funkload
+* Latest stable package using EasyInstall_::
 
-* Check the latest stable package on the `python cheese shop`_
+   sudo easy_install funkload
 
 * EasyInstall_ the latest snapshot ::
 
