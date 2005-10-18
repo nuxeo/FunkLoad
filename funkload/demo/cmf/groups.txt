@@ -1,0 +1,9 @@
+# $Id$
+#
+
+# The Zope admin group
+AdminZope:admin
+
+# CPS Test groups
+FL_Member:fl_member_01,fl_member_02,fl_member_03,fl_member_04,fl_member_05
+FL_Member:fl_member_06,fl_member_07,fl_member_08,fl_member_09,fl_member_10
