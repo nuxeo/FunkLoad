@@ -23,7 +23,7 @@ $Id: setup.py 24768 2005-08-31 14:01:05Z bdelbosc $
 """
 import ez_setup
 ez_setup.use_setuptools()
-from setuptools import setup
+from setuptools import setup, find_packages
 #from distutils.core import setup
 from src.version import __version__
 
@@ -104,7 +104,7 @@ Main FunkLoad features are:
     download_url="http://funkload.nuxeo.org/funkload-%s.tar.gz"%__version__,
     license='GPL',
     keywords='testing benching load performance functional monitoring',
-    packages=['funkload'],
+    packages= ['funkload'],
     package_dir={'funkload': 'src'},
     scripts=['scripts/fl-monitor-ctl', 'scripts/fl-credential-ctl',
              'scripts/fl-run-bench', 'scripts/fl-run-test',
@@ -133,5 +133,7 @@ Main FunkLoad features are:
     package_data={'funkload': ['data/*',
                                'demo/simple/*', 'demo/zope/*',
                                'demo/cmf/*', 'demo/xmlrpc/*',
-                               'demo/*.txt']},
+                               'demo/*.txt',
+                               'tests/*',]},
+    test_suite = "src.tests.test_Install.test_suite",
     )
