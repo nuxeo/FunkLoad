@@ -19,6 +19,9 @@ endif
 build:
 	python setup.py $(PKGTAG) build
 
+test:
+	python setup.py test
+
 pkg: sdist egg
 
 sdist:
@@ -43,5 +46,5 @@ doc: ${HTML_DOCS}
 
 clean:
 	find . "(" -name "*~" -or  -name ".#*" -or  -name "#*#" -or -name "*.pyc" ")" -print0 | xargs -0 rm -f
-	rm -rf ./build ./dist ./MANIFEST
+	rm -rf ./build ./dist ./MANIFEST ./funkload.egg-info
 	rm -f ${HTML_DOCS}
