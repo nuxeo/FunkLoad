@@ -52,7 +52,7 @@ def read_cpu_usage():
     for line in lines:
         #print "l = %s" % line
         l = line.split()
-        if len(l) < 8:
+        if len(l) < 5:
             continue
         if l[0].startswith('cpu'):
             # cpu = sum of usr, nice, sys
