@@ -76,6 +76,7 @@ def test_suite():
     """Return a test suite."""
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestInstall))
+    return suite
 
 if __name__ in ('main', '__main__'):
     unittest.main()
