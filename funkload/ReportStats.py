@@ -99,46 +99,70 @@ class AllResponseStat:
         self.finalized = True
 
 
+
+class SinglePageStat:
+    """Collect stat for a single page."""
+    def __init__(self, step):
+        self.step = step
+        self.count = 0
+        self.date_s = None
+        self.duration = 0.0
+        self.result = 'Successful'
+
+    def addResponse(self, date, result, duration):
+        """Add a response to a page."""
+        self.count += 1
+        if self.date_s is None:
+            self.date_s = int(float(date))
+        self.duration += float(duration)
+        if result != 'Successful':
+            self.result = result
+
+    def __repr__(self):
+        """Representation."""
+        return 'page %s %s %ss' % (self.step,
+                                   self.result, self.duration)
+
 class PageStat(AllResponseStat):
     """Collect stat for asked pages in a cycle."""
     def __init__(self, cycle, cycle_duration, cvus):
         AllResponseStat.__init__(self, cycle, cycle_duration, cvus)
-        self.pages = {}
+        self.threads = {}
 
-    def add(self, date, result, duration, rtype):
+    def add(self, thread, step,  date, result, duration, rtype):
         """Add a new response to stat."""
+        thread = self.threads.setdefault(thread, {'count': 0,
+                                                  'pages': {}})
         if str(rtype) in ('post', 'get', 'xmlrpc'):
             new_page = True
         else:
             new_page = False
+
         if new_page:
+            thread['count'] += 1
             self.count += 1
-        stat = self.pages.setdefault(self.count, {'result': 'Successful',
-                                                  'duration': 0,})
-        if new_page:
-            stat['date_s'] = int(float(date))
-        if str(result) != 'Successful':
-            stat['result'] = result
-        stat['duration'] += float(duration)
-        self.pages[self.count] = stat
-        self.total += float(duration)
+        stat = thread['pages'].setdefault(thread['count'],
+                                          SinglePageStat(step))
+        stat.addResponse(date, result, duration)
         self.finalized = False
 
     def finalize(self):
         """Compute avg times."""
-        for stat in self.pages.values():
-            if str(stat['result']) == 'Successful':
-                if stat.has_key('date_s'):
-                    date_s = stat['date_s']
-                    self.per_second[date_s] = self.per_second.setdefault(
-                        date_s, 0) + 1
-                self.success += 1
-            else:
-                self.error += 1
-                continue
-            duration = float(stat['duration'])
-            self.max = max(self.max, duration)
-            self.min = min(self.min, duration)
+        for thread in self.threads.keys():
+            for page in self.threads[thread]['pages'].values():
+                #print "page ", page
+                if str(page.result) == 'Successful':
+                    if page.date_s:
+                        count = self.per_second.setdefault(page.date_s, 0) + 1
+                        self.per_second[page.date_s] = count
+                    self.success += 1
+                    self.total += page.duration
+                else:
+                    self.error += 1
+                    continue
+                duration = page.duration
+                self.max = max(self.max, duration)
+                self.min = min(self.min, duration)
         AllResponseStat.finalize(self)
         if self.cycle_duration:
             # override rps to srps

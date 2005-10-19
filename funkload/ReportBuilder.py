@@ -123,8 +123,8 @@ class FunkLoadXmlParser:
 
             stat = stats.setdefault(
                 'page', PageStat(cycle, self.cycle_duration, attrs['cvus']))
-            stat.add(attrs['time'], attrs['result'], attrs['duration'],
-                     attrs['type'])
+            stat.add(attrs['thread'], attrs['step'], attrs['time'],
+                     attrs['result'], attrs['duration'], attrs['type'])
             stats['page'] = stat
 
             step = '%s.%s' % (attrs['step'], attrs['number'])
