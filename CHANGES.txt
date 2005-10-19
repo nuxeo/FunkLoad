@@ -19,7 +19,7 @@ FunkLoad SVN trunk
 :Location: http://svn.nuxeo.org/pub/funkload/trunk/
 
 
-FunkLoad 1.1.0
+FunkLoad 1.2.0
 --------------
 
 :Package: http://funkload.nuxeo.org/funkload-1.2.0.tar.gz
