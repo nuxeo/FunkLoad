@@ -29,6 +29,7 @@ sdist:
 
 egg:
 	python setup.py $(PKGTAG) bdist_egg
+	-python2.4 setup.py $(PKGTAG) bdist_egg
 
 
 distrib: doc
