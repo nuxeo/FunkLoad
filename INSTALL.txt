@@ -90,7 +90,7 @@ If you want to try the latest unstable sources from svn ::
 Test it
 -------
 
-Install the funkload examples::
+Install the FunkLoad_ examples::
 
   fl-install-demo
 
@@ -120,7 +120,7 @@ Problems ?
   were previously installed without using EasyInstall_.  You need to try
   with the ``--delete-conflicting`` option, see easy_install_ documentation.
 
-* If you still have conflict try to remove FunkLoad from your system::
+* If you still have conflict try to remove FunkLoad_ from your system::
 
     easy_install -m funkload
     rm -rf /usr/lib/python2.3/site-packages/funkload*
@@ -135,7 +135,7 @@ Problems ?
     ### credentialctl: Stopping credential server.
     python: can't open file '/usr/lib/python2.4/site-packages/funkload-1.2.0-py2.4.egg/funkload/credentialctl.py': [Errno 20] Not a directory
 
-  Starting with FunkLoad 1.2.0 scripts are installed in /usr/bin, previously
+  Starting with FunkLoad_ 1.2.0 scripts are installed in /usr/bin, previously
   they were in /usr/local/bin, you need to remove them::
 
     sudo rm /usr/local/bin/fl-*
@@ -156,7 +156,7 @@ See demo_ folder for other examples.
 .. _TestMaker: http://www.pushtotest.com/
 .. _README.txt: README.html
 .. _CHANGES.txt: CHANGES.html
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/demo/
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
 .. _ez_setup.py: http://peak.telecommunity.com/dist/ez_setup.py

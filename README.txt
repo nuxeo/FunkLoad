@@ -262,7 +262,7 @@ A FunkLoadTestCase class uses a configuration file to setup variable
 configuration, like the base server url to be tested, the test description,
 credential access, logging files and other test specific parameters. The test
 configuration file have the same name of the FunkLoadTestCase with a '.conf'
-extension. See documented examples in the demo/ folder.
+extension. See documented examples in the demo_ folder (``fl-install-demo``).
 
 conf_get
 ~~~~~~~~
