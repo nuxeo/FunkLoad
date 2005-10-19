@@ -1,12 +1,10 @@
-================
-FunkLoad INSTALL
-================
+=================
+FunkLoad_ INSTALL
+=================
 
 :author: Benoit Delbosc
 
 :address: bdelbosc _at_ nuxeo.com
-
-:version: FunkLoad/1.1.0
 
 :revision: $Id: INSTALL-1.2.0.txt 28355 2005-10-17 14:36:34Z bdelbosc $
 
