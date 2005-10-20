@@ -170,7 +170,7 @@ Examples
         """Filter and extract request from tcpwatch files."""
         last_code = None
         filter_ctypes = ('image', 'css', 'javascript')
-        filter_url = ('.png', '.gif', '.css', '.js')
+        filter_url = ('.jpg', '.png', '.gif', '.css', '.js')
         requests = []
         for request_path, response_path in files:
             response = Response(response_path)
