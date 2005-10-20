@@ -18,6 +18,11 @@ FunkLoad SVN trunk
 
 :Location: http://svn.nuxeo.org/pub/funkload/trunk/
 
+New features
+~~~~~~~~~~~~
+
+* Starting new recorder using tcpwatch ``fl-record``.
+
 
 FunkLoad 1.2.0
 --------------
