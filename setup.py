@@ -110,7 +110,8 @@ Main FunkLoad features are:
              'scripts/fl-run-bench', 'scripts/fl-run-test',
              'scripts/fl-build-report',
              'scripts/fl-import-from-tm-recorder',
-             'scripts/fl-install-demo'],
+             'scripts/fl-install-demo',
+             'scripts/fl-record'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
