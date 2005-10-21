@@ -23,6 +23,12 @@ require tcpwatch.py
 Credits goes to Ian Bicking for parsing tcpwatch files.
 
 $Id$
+
+TODO:
+
+* handle fileupload
+* add an option to generate a funkload test and config file -C
+
 """
 import os
 import sys
@@ -30,7 +36,8 @@ from cStringIO import StringIO
 from optparse import OptionParser, TitledHelpFormatter
 from tempfile import mkdtemp
 import rfc822
-import cgi
+from cgi import FieldStorage
+from urlparse import urlsplit
 
 class Request:
     """Store a tcpwatch request."""
@@ -40,7 +47,12 @@ class Request:
         f = open(file_path, 'rb')
         line = f.readline().split(None, 2)
         self.method = line[0]
-        self.url = line[1]
+        url = line[1]
+        scheme, host, path, query, fragment = urlsplit(url)
+        self.host = scheme + '://' + host
+        self.rurl = url[len(self.host):]
+        self.url = url
+        self.path = path
         self.version = line[2].strip()
         self.headers = dict(rfc822.Message(f).items())
         self.body = f.read()
@@ -53,9 +65,9 @@ class Request:
             'CONTENT_LENGTH': self.headers['content-length'],
             'REQUEST_METHOD': 'POST',
             }
-        form = cgi.FieldStorage(fp=StringIO(self.body),
-                                environ=environ,
-                                keep_blank_values=True)
+        form = FieldStorage(fp=StringIO(self.body),
+                            environ=environ,
+                            keep_blank_values=True)
         params = []
         for key in form.keys():
             if not isinstance(form[key], list):
@@ -63,7 +75,7 @@ class Request:
             else:
                 values = form[key]
             for form_value in values:
-                params.append((key, form_value.value))
+                params.append([key, form_value.value])
         return params
 
     def __repr__(self):
@@ -125,10 +137,14 @@ Examples
                           help="Verbose output")
         parser.add_option("-p", "--port", type="string", dest="port",
                           default=self.port, help="The proxy port.")
+        parser.add_option("-i", "--tcp-watch-input", type="string",
+                          dest="tmp_path", default=None,
+                          help="Path to an existing tcpwatch capture.")
         options, args = parser.parse_args(argv)
         if len(args) != 1:
             parser.error("incorrect number of arguments")
         self.verbose = options.verbose
+        self.tmp_path = options.tmp_path
         self.port = options.port
         self.name = args[0]
 
@@ -137,11 +153,12 @@ Examples
         """Start a tcpwatch session."""
         self.tmp_path = mkdtemp('_funkload')
         cmd = 'tcpwatch.py -p %s -s -r %s' % (self.port,
-                                               self.tmp_path)
+                                              self.tmp_path)
         if self.verbose:
             cmd += ' | grep "T http"'
         else:
             cmd += ' > /dev/null'
+        print "Hit Ctrl-C to stop recording."
         os.system(cmd)
 
     def searchFiles(self):
@@ -187,22 +204,39 @@ Examples
             requests.append(request)
         return requests
 
+    def reindent(self, code):
+        """Improve indentation."""
+        indent = code.index('(')*' '
+        code = code.replace('], [', '],\n%s[' % indent)
+        code = code.replace('[[', '[\n%s[' % indent)
+        code = code.replace(', description=', ',\n%sdescription=' % indent)
+        return code
+
     def convertToFunkLoad(self, request):
         """return a funkload python instruction."""
         text = []
-        text.append('self.%s("%s"' % (request.method.lower(), request.url))
+        text.append('self.%s("%%s%s" %% server_url' % (request.method.lower(),
+                                                       request.rurl))
+        description = "%s %s" % (request.method.capitalize(),
+                                 request.path)
         if request.body:
             text.append(', params=%s' % request.extractParam())
-        return ''.join(text) + ')'
+        text.append(', description="%s")' % description)
+        return ''.join(text)
 
     def run(self):
         """run it."""
-        self.startProxy()
+        if self.tmp_path is None:
+            self.startProxy()
         files = self.searchFiles()
         requests = self.extractRequests(files)
-        code = [self.convertToFunkLoad(request) for request in requests]
+        code = [self.convertToFunkLoad(request)
+                for request in requests]
+        if not code:
+            print "Sorry no action recorded."
+            return
         code.insert(0, '')
-        print ('\n' + ' '*8).join(code)
+        print self.reindent('\n       '.join(code))
 
 
 if __name__ == '__main__':
