@@ -23,21 +23,17 @@ require tcpwatch.py
 Credits goes to Ian Bicking for parsing tcpwatch files.
 
 $Id$
-
-TODO:
-
-* handle fileupload
-* add an option to generate a funkload test and config file -C
-
 """
 import os
 import sys
+import re
 from cStringIO import StringIO
 from optparse import OptionParser, TitledHelpFormatter
 from tempfile import mkdtemp
 import rfc822
 from cgi import FieldStorage
 from urlparse import urlsplit
+from utils import truncate, trace
 
 class Request:
     """Store a tcpwatch request."""
@@ -111,23 +107,36 @@ class Response:
 
 class RecorderProgram:
     """A tcpwatch to funkload recorder."""
-    USAGE = """%prog [options] test_name
+    USAGE = """%prog [options]
 
-%prog launch a proxy and record activities, then create a FunkLoad unit test.
+%prog launch a proxy and record activities, then output a FunkLoad
+script or generates a FunkLoad unit test.
+
+Default proxy port is 8090.
 
 Examples
 ========
 
-  %prog myFile.py -p 9090 foo         - run a proxy in port 9090
+  %prog -p 9090             - run a proxy in port 9090, output script
+                              to stdout
+  %prog -o foo_bar          - run a proxy and create a FunkLoad test
+                              case, generates test_FooBar.py and
+                              FooBar.conf file. To test it:
+                              fl-run-test -dV test_FooBar.py
+  %prog -i /tmp/tcpwatch    - convert a tcpwatch capture into a script
 """
     def __init__(self, argv=None):
         if argv is None:
             argv = sys.argv[1:]
         self.verbose = False
-        self.name = None
-        self.tmp_path = None
+        self.tcpwatch_path = None
         self.prefix = 'watch'
         self.port = "8090"
+        self.server_url = None
+        self.class_name = None
+        self.test_name = None
+        self.script_path = None
+        self.configuration_path = None
         self.parseArgs(argv)
 
     def parseArgs(self, argv):
@@ -138,45 +147,53 @@ Examples
         parser.add_option("-p", "--port", type="string", dest="port",
                           default=self.port, help="The proxy port.")
         parser.add_option("-i", "--tcp-watch-input", type="string",
-                          dest="tmp_path", default=None,
+                          dest="tcpwatch_path", default=None,
                           help="Path to an existing tcpwatch capture.")
+        parser.add_option("-o", "--output", type="string",
+                          dest="test_name",
+                          help="Create a FunkLoad script and conf file.")
         options, args = parser.parse_args(argv)
-        if len(args) != 1:
-            parser.error("incorrect number of arguments")
         self.verbose = options.verbose
-        self.tmp_path = options.tmp_path
+        self.tcpwatch_path = options.tcpwatch_path
         self.port = options.port
-        self.name = args[0]
+        test_name = options.test_name
+        if test_name:
+            class_name = ''.join([x.capitalize()
+                                  for x in re.split('_|-', test_name)])
+            self.test_name = test_name
+            self.class_name = class_name
+            self.script_path = './test_%s.py' % class_name
+            self.configuration_path = './%s.conf' % class_name
 
 
     def startProxy(self):
         """Start a tcpwatch session."""
-        self.tmp_path = mkdtemp('_funkload')
+        self.tcpwatch_path = mkdtemp('_funkload')
         cmd = 'tcpwatch.py -p %s -s -r %s' % (self.port,
-                                              self.tmp_path)
+                                              self.tcpwatch_path)
         if self.verbose:
             cmd += ' | grep "T http"'
         else:
             cmd += ' > /dev/null'
-        print "Hit Ctrl-C to stop recording."
+        trace("Hit Ctrl-C to stop recording.\n")
         os.system(cmd)
 
     def searchFiles(self):
         """Search tcpwatch file."""
         items = {}
         prefix = self.prefix
-        for filename in os.listdir(self.tmp_path):
+        for filename in os.listdir(self.tcpwatch_path):
             if not filename.startswith(prefix):
                 continue
             name, ext = os.path.splitext(filename)
             name = name[len(self.prefix):]
             ext = ext[1:]
             if ext == 'errors':
-                print "Error in response %s" % name
+                trace("Error in response %s" % name)
                 continue
             assert ext in ('request', 'response'), "Bad extension: %r" % ext
             items.setdefault(name, {})[ext] = os.path.join(
-                self.tmp_path, filename)
+                self.tcpwatch_path, filename)
         items = items.items()
         items.sort()
         return [(v['request'], v['response'])
@@ -192,6 +209,9 @@ Examples
         for request_path, response_path in files:
             response = Response(response_path)
             request = Request(request_path)
+            if self.server_url is None:
+                self.server_url = request.host
+            host = request.host
             ctype = response.headers.get('content-type', '')
             url = request.url
             if request.method != "POST" and (
@@ -204,40 +224,87 @@ Examples
             requests.append(request)
         return requests
 
-    def reindent(self, code):
+    def reindent(self, code, indent=8):
         """Improve indentation."""
-        indent = code.index('(')*' '
-        code = code.replace('], [', '],\n%s[' % indent)
-        code = code.replace('[[', '[\n%s[' % indent)
-        code = code.replace(', description=', ',\n%sdescription=' % indent)
+        spaces = ' ' * indent
+        code = code.replace('], [', '],\n%s    [' % spaces)
+        code = code.replace('[[', '[\n%s    [' % spaces)
+        code = code.replace(', description=', ',\n%s    description=' % spaces)
+        code = code.replace('self.', '\n%sself.' % spaces)
         return code
 
     def convertToFunkLoad(self, request):
         """return a funkload python instruction."""
         text = []
-        text.append('self.%s("%%s%s" %% server_url' % (request.method.lower(),
-                                                       request.rurl))
+        server_url = self.server_url
+        if request.host != self.server_url:
+            text.append('self.%s("%s"' % (request.method.lower(),
+                                          request.url))
+        else:
+            text.append('self.%s("%%s%s" %% server_url' % (
+                request.method.lower(),  request.rurl))
         description = "%s %s" % (request.method.capitalize(),
-                                 request.path)
+                                 request.path | truncate(42))
         if request.body:
             text.append(', params=%s' % request.extractParam())
         text.append(', description="%s")' % description)
         return ''.join(text)
 
-    def run(self):
-        """run it."""
-        if self.tmp_path is None:
-            self.startProxy()
+    def extractScript(self):
+        """Convert a tcpwatch capture into a FunkLoad script."""
         files = self.searchFiles()
         requests = self.extractRequests(files)
         code = [self.convertToFunkLoad(request)
                 for request in requests]
         if not code:
-            print "Sorry no action recorded."
+            trace("Sorry no action recorded.\n")
             return
         code.insert(0, '')
-        print self.reindent('\n       '.join(code))
+        return self.reindent('\n'.join(code))
 
+    def writeScript(self, script):
+        """Write the FunkLoad test script."""
+        trace('Creating script: %s.\n' % self.script_path)
+        from pkg_resources import resource_string
+        tpl = resource_string('funkload', 'data/ScriptTestCase.tpl')
+        content = tpl % {'script': script,
+                         'test_name': self.test_name,
+                         'class_name': self.class_name}
+        if os.path.exists(self.script_path):
+            trace("Error file %s already exists.\n" % self.script_path)
+            return
+        f = open(self.script_path, 'w')
+        f.write(content)
+        f.close()
+
+    def writeConfiguration(self):
+        """Write the FunkLoad configuration test script."""
+        trace('Creating configuration file: %s.\n' % self.configuration_path)
+        from pkg_resources import resource_string
+        tpl = resource_string('funkload', 'data/ConfigurationTestCase.tpl')
+        content = tpl % {'server_url': self.server_url,
+                         'test_name': self.test_name,
+                         'class_name': self.class_name}
+        if os.path.exists(self.configuration_path):
+            trace("Error file %s already exists.\n" %
+                  self.configuration_path)
+            return
+        f = open(self.configuration_path, 'w')
+        f.write(content)
+        f.close()
+
+    def run(self):
+        """run it."""
+        if self.tcpwatch_path is None:
+            self.startProxy()
+        script = self.extractScript()
+        if not script:
+            return
+        if self.test_name is not None:
+            self.writeScript(script)
+            self.writeConfiguration()
+        else:
+            print script
 
 if __name__ == '__main__':
     RecorderProgram().run()
