@@ -4,9 +4,8 @@
 $Id: $
 """
 import unittest
-from random import random
 from funkload.FunkLoadTestCase import FunkLoadTestCase
-from funkload.utils import xmlrpc_get_credential
+#from funkload.utils import xmlrpc_get_credential
 
 class %(class_name)s(FunkLoadTestCase):
     """XXX
@@ -28,7 +27,7 @@ class %(class_name)s(FunkLoadTestCase):
         # The description should be set in the configuration file
         server_url = self.server_url
         # begin of test ---------------------------------------------
-%(scenario)s
+%(script)s
 
         # end of test -----------------------------------------------
 
