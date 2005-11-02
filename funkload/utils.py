@@ -233,19 +233,31 @@ def green_str(text):
     global _COLOR
     return _COLOR['green'] + text + _COLOR['reset']
 
-
-def get_funkload_data_path():
-    """Return the path of the funkload data."""
-    fl_home = os.getenv('FL_HOME')
-    if fl_home is None:
-        return '/usr/local/funkload'
-    else:
-        return os.path.join(fl_home, 'data')
-
-
 def is_html(text):
     """Simple check that return True if the text is an html page."""
     if '<html' in text[:300].lower():
         return True
     return False
 
+
+# credits goes to Subways and Django folks
+class BaseFilter(object):
+    """Base filter."""
+    def __ror__(self, other):
+        return other  # pass-thru
+
+    def __call__(self, other):
+        return other | self
+
+
+class truncate(BaseFilter):
+    """Middle truncate string up to length."""
+    def __init__(self, length=40, extra='...'):
+        self.length = length
+        self.extra = extra
+
+    def __ror__(self, other):
+        if len(other) > self.length:
+            mid_size = (self.length - 3) / 2
+            other = other[:mid_size] + self.extra + other[-mid_size:]
+        return other
