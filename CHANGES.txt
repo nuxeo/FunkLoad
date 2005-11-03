@@ -21,7 +21,9 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
-* Starting new recorder using tcpwatch ``fl-record``.
+* # 944_: Recorder: replace TestMaker recorder
+  providing a ``fl-record`` command that drive a TCPWatch_ proxy.
+  See INSTALL.txt_ to setup TCPWatch_.
 
 
 FunkLoad 1.2.0
@@ -142,9 +144,11 @@ See README.txt_ for more information about FunkLoad_.
 
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _README.txt: README.html
 .. _INSTALL.txt: INSTALL.html
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
+.. _944: http://svn.nuxeo.org/trac/pub/ticket/944
 .. _948: http://svn.nuxeo.org/trac/pub/ticket/948
 .. _950: http://svn.nuxeo.org/trac/pub/ticket/950
 .. _971: http://svn.nuxeo.org/trac/pub/ticket/971
