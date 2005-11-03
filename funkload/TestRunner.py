@@ -32,6 +32,7 @@ import time
 import unittest
 from optparse import OptionParser, TitledHelpFormatter
 from utils import red_str, green_str
+from version import __version__
 
 # ------------------------------------------------------------
 #
@@ -164,6 +165,9 @@ class TestProgram(unittest.TestProgram):
 A FunkLoad unittest use a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
+The current FunkLoad version is """ + __version__ + """.
+See http://funkload.nuxeo.org/ for more information.
+
 
 Examples
 ========
@@ -222,7 +226,6 @@ Examples
                           help="Verbose output")
         parser.add_option("-d", "--debug", action="store_true",
                           help="Funkload debug output")
-
         parser.add_option("-c", "--color", action="store_true",
                           help="Colored output")
 
