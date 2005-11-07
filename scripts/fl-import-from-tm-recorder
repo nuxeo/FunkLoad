@@ -115,7 +115,7 @@ Then you can use
         """Write the FunkLoad test script."""
         from pkg_resources import resource_string
         tpl = resource_string('funkload', 'data/ScriptTestCase.tpl')
-        content = tpl % {'scenario': self.scenario,
+        content = tpl % {'script': self.scenario,
                          'test_name': self.test_name,
                          'class_name': self.class_name}
         if os.path.exists(self.script_path):
