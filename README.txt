@@ -230,7 +230,46 @@ clearBasicAuth
 
   clearBasicAuth()
 
-Remove basic auth credential set by setBasicAuth
+Remove basic auth credential set by setBasicAuth.
+
+
+setUserAgent
+~~~~~~~~~~~~
+::
+
+  setUserAgent(agent)
+
+New in 1.3.0. version.
+
+Set a ``User-Agent`` http header for the next requests, the default browser
+behaviour is to use the agent defined in the configuration file under
+``[main] user_agent`` or to use the default ``FunkLoad/version``
+string. Using this method enable to change the user agent during a test
+case.
+
+
+addHeader
+~~~~~~~~~
+::
+
+  addHeader(key, value)
+
+
+New in 1.3.0. version.
+
+Add an http header for the next requests.
+
+
+clearHeaders
+~~~~~~~~~~~~
+::
+
+  clearHeaders()
+
+New in 1.3.0. version.
+
+Remove all headers previously added by `addHeader`_ or `setUserAgent`_.
+
 
 XML RPC API
 -----------

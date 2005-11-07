@@ -114,10 +114,10 @@ class FunkLoadTestCase(unittest.TestCase):
 
         # init webunit browser (passing a fake methodName)
         self._browser = WebTestCase(methodName='log')
-        self._browser.user_agent =  self.conf_get('main', 'user_agent',
-                                                  'FunkLoad/%s' % get_version(),
-                                                  quiet=True)
         self.clearContext()
+        self.setUserAgent(self.conf_get('main', 'user_agent',
+                                        'FunkLoad/%s' % get_version(),
+                                        quiet=True))
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
 
@@ -126,6 +126,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self._browser.clearContext()
         self._browser.css = {}                   # css cache
         self._browser.history = []
+        self._browser.extra_headers = []
         self.step_success = True
         self.test_status = 'Successful'
         self.steps = 0
@@ -136,6 +137,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_links = self.total_redirects = 0
         self.total_xmlrpc = 0
         self.clearBasicAuth()
+        self.clearHeaders()
         #self.logd('# FunkLoadTestCase.clearContext done')
 
 
@@ -422,11 +424,45 @@ class FunkLoadTestCase(unittest.TestCase):
         self._browser.setBasicAuth(login, password)
         self._authinfo = '%s:%s@' % (login, password)
 
-
     def clearBasicAuth(self):
         """Remove basic authentication."""
         self._browser.clearBasicAuth()
         self._authinfo = None
+
+
+    def addHeader(self, key, value):
+        """Add an http header."""
+        self._browser.extra_headers.append((key, value))
+
+    def setHeader(self, key, value):
+        """Add or override an http header.
+
+        If value is None, the key is removed."""
+        headers = self._browser.extra_headers
+        for i, (k, v) in enumerate(headers):
+            if k == key:
+                if value is not None:
+                    headers[i] = (key, value)
+                else:
+                    del headers[i]
+                break
+        else:
+            if value is not None:
+                headers.append((key, value))
+
+    def delHeader(self, key):
+        """Remove an http header key."""
+        self.setHeader(key, None)
+
+    def clearHeaders(self):
+        """Remove all http headers set by addHeader or setUserAgent."""
+        self._browser.extra_headers = []
+
+    def setUserAgent(self, agent):
+        """Set User-Agent http header for the next requests.
+
+        If agent is None, the user agent header is removed."""
+        self.setHeader('User-Agent', agent)
 
     #------------------------------------------------------------
     # logging

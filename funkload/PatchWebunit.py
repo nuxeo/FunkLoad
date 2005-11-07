@@ -190,8 +190,9 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     h.putheader('Host', host_header)
 
     # FL Patch -------------------------
-    if self.user_agent:
-        h.putheader('User-Agent', self.user_agent)
+    for key, value in self.extra_headers:
+        h.putheader(key, value)
+
     # FL Patch end ---------------------
 
     # Send cookies
