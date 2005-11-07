@@ -71,7 +71,21 @@ class Request:
             else:
                 values = form[key]
             for form_value in values:
-                params.append([key, form_value.value])
+                filename = form_value.filename
+                if filename is None:
+                    params.append([key, form_value.value])
+                else:
+                    # got a file upload
+                    filename = filename or 'empty.txt'
+                    params.append([key, 'Upload("%s")' % filename])
+                    if os.path.exists(filename):
+                        trace('# Warning: %s already exists, keep it.\n' %
+                              filename)
+                    else:
+                        trace('# Saving file upload %s\n' % filename)
+                        f = open(filename, 'w')
+                        f.write(str(form_value.value))
+                        f.close()
         return params
 
     def __repr__(self):
@@ -246,7 +260,9 @@ Examples
         description = "%s %s" % (request.method.capitalize(),
                                  request.path | truncate(42))
         if request.body:
-            text.append(', params=%s' % request.extractParam())
+            params =('params=%s' % request.extractParam())
+            params = re.sub("'Upload\(([^\)]*)\)'", "Upload(\\1)", params)
+            text.append(', ' + params)
         text.append(', description="%s")' % description)
         return ''.join(text)
 
