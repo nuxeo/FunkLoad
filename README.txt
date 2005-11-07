@@ -6,7 +6,7 @@ FunkLoad
 
 :address: bdelbosc _at_ nuxeo.com
 
-:version: FunkLoad/1.2.0
+:version: FunkLoad/1.3.0
 
 :revision: $Id$
 
@@ -99,7 +99,7 @@ Main FunkLoad_ features are:
 
 * Easy test customization using a configuration file or command line options.
 
-* Easy test creation using TestMaker_ / maxq_ recorder, so you can use your web
+* Easy test creation using TCPWatch_ as proxy recorder, so you can use your web
   browser and produce a FunkLoad_ test automatically.
 
 * Provides web assertion helpers.
@@ -1043,6 +1043,103 @@ Options
 
 
 
+Test Recorder
+=============
+
+
+Recording a new FunkLoad test
+-----------------------------
+
+Starting with FunkLoad_ 1.3.0 you can use ``fl-record`` to record your
+navigator activity, this requires the TCPWatch_ python proxy see INSTALL.txt_
+for information on how to install TCPWatch_.
+
+1. Start the recorder::
+
+    fl-record -o basic_navigation
+
+
+  This will output something like this::
+
+    Hit Ctrl-C to stop recording.
+    HTTP proxy listening on :8090
+    Recording to directory /tmp/tmpaYDky9_funkload.
+
+
+2. Setup your browser proxy and play your scenario
+
+  * in Firefox: Edit > Preferencies > General; Connection Settings set
+    `localhost:8090` as your HTTP proxy
+
+  * Play your scenario using your navigator
+
+  * Hit Ctrl-C to stop recording::
+
+      ^C
+      # Saving uploaded file: foo.png
+      # Saving uploaded file: bar.pdf
+      Creating script: ./test_BasicNavigation.py.
+      Creating configuration file: ./BasicNavigation.conf.
+
+
+3. Replay you scenario::
+
+     fl-run-test -dV test_BasicNavigation.py
+
+  You should see all the steps on your navigator.
+
+4. Implement the dynamic part and assertion
+
+  * Add assertion using FunkLoad_ helpers
+  * Code the dynamic part like getting new url of a created document
+  * Use a credential server if you want to make bench with different users
+
+
+Note that ``fl-record`` works fine with multi-part encoded form, file upload
+but will failed to record https session.
+
+
+The fl-record command
+---------------------
+
+Usage
+~~~~~
+::
+
+  fl-record [options]
+
+  fl-record launch a proxy and record activities, then output a FunkLoad
+  script or generates a FunkLoad unit test.
+
+  Default proxy port is 8090.
+
+Examples
+~~~~~~~~
+::
+
+  fl-record -p 9090           - run a proxy on port 9090, output script
+                                to stdout
+  fl-record -o foo_bar        - run a proxy and create a FunkLoad test
+                                case, generates test_FooBar.py and
+                                FooBar.conf file. To test it:
+                                fl-run-test -dV test_FooBar.py
+  fl-record -i /tmp/tcpwatch  - convert a tcpwatch capture into a script
+
+
+Options
+~~~~~~~
+::
+
+  --help, -h              show this help message and exit
+  --verbose, -v           Verbose output
+  --port=PORT, -pPORT     The proxy port.
+  --tcp-watch-input=TCPWATCH_PATH, -iTCPWATCH_PATH
+                          Path to an existing tcpwatch capture.
+  --output=TEST_NAME, -oTEST_NAME
+                          Create a FunkLoad script and conf file.
+
+
+
 Credential server
 =================
 
@@ -1107,49 +1204,6 @@ Note that you can monitor multiple hosts and that the monitor is linux
 specific.
 
 
-Recording a new FunkLoad test
-=============================
-
-TestMaker_ java framework include a maxq_ proxy recorder, see INSTALL.txt_ for
-information on how to install TestMaker.
-
-1. Record using TestMaker_
-
-  * Launch testmaker UI
-  * Go to 'Tools/New Agent' then 'Record from a Web-Browser'
-    set a whatever name and click to 'Start Recording"
-  * Configure your Web Browser to use the TestMaker_ proxy `localhost:8090`
-  * Play your scenario
-  * Click on `End Recording`
-  * Save the tm script into the proper location and set a file_name like
-    `scenario_name.tm`
-  * Close TestMaker_
-
-2. Converting the TestMaker_ script into a FunkLoad_ script::
-
-     fl-import-from-tm-recorder scenario_name.tm
-
-   This will produce a test_ScenarioName.py and ScenarioName.conf
-
-3. Testing
-
-   Test is ready to be launch::
-
-     fl-run-test test_ScenarioName.py
-
-   To check if the scenario is well executed you can invoke firefox to view
-   each step result and add debug information::
-
-     fl-run-test -V -d test_ScenarioName.py
-
-   You need to have a firefox already running on the same host.
-
-4. Implement the dynamic part and assertion
-
-  * Use the configuration file for settings like server_url
-  * Use a credential server if you want to make bench with different users
-  * Add assertion using FunkLoad_ helpers
-
 
 Bugs
 ====
@@ -1159,6 +1213,7 @@ Bugs
 
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _TestMaker: http://www.pushtotest.com/
+.. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _pyUnit: http://pyunit.sourceforge.net/
 .. _INSTALL.txt: INSTALL.html
