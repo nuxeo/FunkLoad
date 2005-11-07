@@ -18,12 +18,27 @@ FunkLoad SVN trunk
 
 :Location: http://svn.nuxeo.org/pub/funkload/trunk/
 
+:Snapshots: http://funkload.nuxeo.org/snapshots/
+
+
 New features
 ~~~~~~~~~~~~
 
-* # 944_: Recorder: replace TestMaker recorder
+* # 944_: Recorder: replace TestMaker recorder.
+
   providing a ``fl-record`` command that drive a TCPWatch_ proxy.
   See INSTALL.txt_ to setup TCPWatch_.
+
+* # 1041_: Browser: implement an addHeader method.
+
+  FunkLoadTestCase provides new methods ``setUserAgent``, ``addHeader`` and
+  ``clearHeaders``.
+
+Bug fixes
+~~~~~~~~~
+
+* fix # 935_: Browser: doesn't handle Referer header.
+
 
 
 FunkLoad 1.2.0
@@ -147,6 +162,7 @@ See README.txt_ for more information about FunkLoad_.
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _README.txt: README.html
 .. _INSTALL.txt: INSTALL.html
+.. _935: http://svn.nuxeo.org/trac/pub/ticket/935
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
 .. _944: http://svn.nuxeo.org/trac/pub/ticket/944
 .. _948: http://svn.nuxeo.org/trac/pub/ticket/948
@@ -158,3 +174,4 @@ See README.txt_ for more information about FunkLoad_.
 .. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
 .. _1022: http://svn.nuxeo.org/trac/pub/ticket/1022
 .. _1027: http://svn.nuxeo.org/trac/pub/ticket/1027
+.. _1041: http://svn.nuxeo.org/trac/pub/ticket/1041

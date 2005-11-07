@@ -267,14 +267,10 @@ class CPSTestCase(ZopeTestCase):
         return doc_url, doc_id
 
     def cpsChangeUiLanguage(self, lang):
-        """Change the ui language."""
-        # Webunit don't handle referer header
-        # this get redirect to cpsportlet_change_language that return a 204
+        """Change the ui language and return the referer page."""
         self.get("%s/cpsportlet_change_language" % self.server_url,
                  params=[['lang', lang]],
-                 description="Change UI language to %s" % lang,
-                 ok_codes=[200,302,204])
-        # but the language selector coockie is set
+                 description="Change UI language to %s" % lang)
 
 
     # ------------------------------------------------------------

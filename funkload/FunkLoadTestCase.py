@@ -225,6 +225,9 @@ class FunkLoadTestCase(unittest.TestCase):
             self.total_redirects += 1
         elif rtype == 'link':
             self.total_links += 1
+        if rtype in ('post', 'get', 'redirect'):
+            # this is a valid referer for the next request
+            self.setHeader('Referer', url)
         self._browser.history.append((rtype, url))
         self.logd(' Done in %.3fs' % t_delta)
         self.log_response(response, rtype, description, t_start, t_stop)
@@ -455,7 +458,9 @@ class FunkLoadTestCase(unittest.TestCase):
         self.setHeader(key, None)
 
     def clearHeaders(self):
-        """Remove all http headers set by addHeader or setUserAgent."""
+        """Remove all http headers set by addHeader or setUserAgent.
+
+        Note that the Referer is also removed."""
         self._browser.extra_headers = []
 
     def setUserAgent(self, agent):

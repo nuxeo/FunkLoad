@@ -71,6 +71,7 @@ Main FunkLoad_ features are:
 
   - basic authentication support
   - cookies support
+  - referrer support
   - fetching css, javascript and images
   - emulating a browser cache
   - file upload and multipart/form-data submission
@@ -268,7 +269,8 @@ clearHeaders
 
 New in 1.3.0. version.
 
-Remove all headers previously added by `addHeader`_ or `setUserAgent`_.
+Remove all headers previously added by `addHeader`_ or `setUserAgent`_,
+and remove the referer as well.
 
 
 XML RPC API
