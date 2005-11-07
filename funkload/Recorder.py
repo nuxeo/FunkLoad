@@ -79,10 +79,10 @@ class Request:
                     filename = filename or 'empty.txt'
                     params.append([key, 'Upload("%s")' % filename])
                     if os.path.exists(filename):
-                        trace('# Warning: %s already exists, keep it.\n' %
-                              filename)
+                        trace('# Warning: uploaded file: %s already exists, '
+                              'keep it.\n' % filename)
                     else:
-                        trace('# Saving file upload %s\n' % filename)
+                        trace('# Saving uploaded file: %s\n' % filename)
                         f = open(filename, 'w')
                         f.write(str(form_value.value))
                         f.close()
@@ -131,7 +131,7 @@ Default proxy port is 8090.
 Examples
 ========
 
-  %prog -p 9090             - run a proxy in port 9090, output script
+  %prog -p 9090             - run a proxy on port 9090, output script
                               to stdout
   %prog -o foo_bar          - run a proxy and create a FunkLoad test
                               case, generates test_FooBar.py and
