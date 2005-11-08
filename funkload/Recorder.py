@@ -33,7 +33,7 @@ from tempfile import mkdtemp
 import rfc822
 from cgi import FieldStorage
 from urlparse import urlsplit
-from utils import truncate, trace
+from utils import truncate, trace, get_version
 
 class Request:
     """Store a tcpwatch request."""
@@ -123,10 +123,14 @@ class RecorderProgram:
     """A tcpwatch to funkload recorder."""
     USAGE = """%prog [options]
 
-%prog launch a proxy and record activities, then output a FunkLoad
+%prog launch a TCPWatch proxy and record activities, then output a FunkLoad
 script or generates a FunkLoad unit test.
+The default proxy port is 8090.
 
-Default proxy port is 8090.
+Note that tcpwatch.py executable must be accessible from your env.
+
+The current FunkLoad version is """ + get_version() + """.
+See http://funkload.nuxeo.org/ for more information.
 
 Examples
 ========
