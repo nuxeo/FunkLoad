@@ -770,39 +770,43 @@ Examples
 --------
 ::
 
-  fl-run-test myFile.py              - run default set of tests
-  fl-run-test myFile.py MyTestSuite  - run suite 'MyTestSuite'
+  fl-run-test myFile.py
+                        Run default set of tests.
+  fl-run-test myFile.py MyTestSuite
+                        Run suite MyTestSuite.
   fl-run-test myFile.py MyTestCase.testSomething
-                                     - run MyTestCase.testSomething
-  fl-run-test myFile.py MyTestCase   - run all 'test*' test methods
-                                       in MyTestCase
-  fl-run-test myFile.py -c -u http://localhost MyTestCase
-                                     - same in color against localhost
-  %prot myfile.py -V                 - run default set of tests and view in
-                                       real time each page fetch with firefox
-  fl-run-test -h                     - more options
+                        Run MyTestCase.testSomething.
+  fl-run-test myFile.py MyTestCase
+                        Run all 'test*' test methods in MyTestCase.
+  fl-run-test myFile.py MyTestCase -u http://localhost
+                        Same against localhost.
+  fl-run-test myfile.py -V
+                        Run default set of tests and view in real time each
+                        page fetch with firefox.
+  fl-run-test -h
+                        More options.
 
 
 Options
 -------
 ::
 
+  --version               show program's version number and exit
   --help, -h              show this help message and exit
-  --quiet, -q             Minimal output
-  --verbose, -v           Verbose output
-  --debug, -d             FunkLoad debug output
-  --color, -c             Colored output
+  --quiet, -q             Minimal output.
+  --verbose, -v           Verbose output.
+  --debug, -d             FunkLoad debug output.
   --url=MAIN_URL, -uMAIN_URL
                           Base URL to bench without ending '/'.
-  --sleep-time-min=TEST_SLEEP_TIME_MIN, -mTEST_SLEEP_TIME_MIN
-                          Minimum sleep time between request.
-  --sleep-time-max=TEST_SLEEP_TIME_MAX, -MTEST_SLEEP_TIME_MAX
+  --sleep-time-min=FTEST_SLEEP_TIME_MIN, -mFTEST_SLEEP_TIME_MIN
+                          Minumum sleep time between request.
+  --sleep-time-max=FTEST_SLEEP_TIME_MAX, -MFTEST_SLEEP_TIME_MAX
                           Maximum sleep time between request.
-  --dump-directory=DUMP_DIR, -DDUMP_DIR
+  --dump-directory=DUMP_DIR
                           Directory to dump html pages.
   --firefox-view, -V      Real time view using firefox, you must have a running
                           instance of firefox in the same host.
-
+  --no-color              Monochrome output.
 
 
 Benching
@@ -934,20 +938,18 @@ Examples
 ::
 
   fl-run-bench myFile.py MyTestCase.testSomething
-                                           - bench MyTestCase.testSomething
-                                             using MyTestCase.conf
-  fl-run-bench -u http://localhost:8080 -c 10:20 -d 30 myFile.py \
-        MyTestCase.testSomething
-                                           - bench MyTestCase.testSomething
-                                             on localhost:8080 with 2 cycles
-                                             of 10 and 20 users during 30s
-  fl-run-bench -h                                 - more options
-
+                        Bench MyTestCase.testSomething using MyTestCase.conf.
+  fl-run-bench -u http://localhost:8080 -c 10:20 -d 30 myFile.py MyTestCase.testSomething
+                        Bench MyTestCase.testSomething on localhost:8080
+                        with 2 cycles of 10 and 20 users during 30s.
+  fl-run-bench -h
+                        More options.
 
 Options
 ~~~~~~~
 ::
 
+  --version               show program's version number and exit
   --help, -h              show this help message and exit
   --url=MAIN_URL, -uMAIN_URL
                           Base URL to bench.
@@ -955,7 +957,7 @@ Options
                           Cycles to bench, this is a list of number of virtual
                           concurrent users, to run a bench with 3 cycles with 5,
                           10 and 20 users use: -c 2:10:20
-  --duration=BENCH_DURATION, -dBENCH_DURATION
+  --duration=BENCH_DURATION, -DBENCH_DURATION
                           Duration of a cycle in seconds.
   --sleep-time-min=BENCH_SLEEP_TIME_MIN, -mBENCH_SLEEP_TIME_MIN
                           Minimum sleep time between request.
@@ -963,8 +965,7 @@ Options
                           Maximum sleep time between request.
   --startup-delay=BENCH_STARTUP_DELAY, -sBENCH_STARTUP_DELAY
                           Startup delay between thread.
-  --color, -C             Colored output
-
+  --no-color              Monochrome output.
 
 
 Tips
@@ -1016,21 +1017,22 @@ Examples
 --------
 ::
 
-  fl-build-report funkload.xml                    - ReST rendering into stdout
-  fl-build-report --html -o /tmp funkload.xml     - Build an HTML report in /tmp
-  fl-build-report -h                              - more options
-
+  fl-build-report funkload.xml
+                        ReST rendering into stdout.
+  fl-build-report --html -o /tmp funkload.xml
+                        Build an HTML report in /tmp.
+  fl-build-report -h
+                        More options.
 
 Options
 -------
 ::
 
-  --help, -h              show this help message and exit
-  --html, -H              Produce an html report.
-  --output-directory=OUTPUT_DIR, -oOUTPUT_DIR
-                          Directory to store reports.
-
-
+    --version               show program's version number and exit
+    --help, -h              show this help message and exit
+    --html, -H              Produce an html report.
+    --output-directory=OUTPUT_DIR, -oOUTPUT_DIR
+                            Directory to store reports.
 
 
  Note that you can preview the report for cycles that have been done while
@@ -1102,38 +1104,38 @@ Usage
 ~~~~~
 ::
 
-  fl-record [options]
+    fl-record [options] [test_name]
 
-  fl-record launch a proxy and record activities, then output a FunkLoad
-  script or generates a FunkLoad unit test.
+  fl-record launch a TCPWatch_ proxy and record activities, then output
+  a FunkLoad script or generates a FunkLoad unit test if test_name is specified.
+  The default proxy port is 8090.
 
-  Default proxy port is 8090.
+  Note that tcpwatch.py executable must be accessible from your env.
+
 
 Examples
 ~~~~~~~~
 ::
 
-  fl-record -p 9090           - run a proxy on port 9090, output script
-                                to stdout
-  fl-record -o foo_bar        - run a proxy and create a FunkLoad test
-                                case, generates test_FooBar.py and
-                                FooBar.conf file. To test it:
-                                fl-run-test -dV test_FooBar.py
-  fl-record -i /tmp/tcpwatch  - convert a tcpwatch capture into a script
-
+  fl-record foo_bar
+                        Run a proxy and create a FunkLoad test case,
+                        generates test_FooBar.py and FooBar.conf file.
+                        To test it:  fl-run-test -dV test_FooBar.py
+  fl-record -p 9090
+                        Run a proxy on port 9090, output script to stdout.
+  fl-record -i /tmp/tcpwatch
+                        Convert a tcpwatch capture into a script.
 
 Options
 ~~~~~~~
 ::
 
+  --version               show program's version number and exit
   --help, -h              show this help message and exit
   --verbose, -v           Verbose output
   --port=PORT, -pPORT     The proxy port.
   --tcp-watch-input=TCPWATCH_PATH, -iTCPWATCH_PATH
                           Path to an existing tcpwatch capture.
-  --output=TEST_NAME, -oTEST_NAME
-                          Create a FunkLoad script and conf file.
-
 
 
 Credential server
@@ -1143,21 +1145,24 @@ If you are writing a bench that requires to be logged with different users
 FunkLoad_ provides an xmlrpc credential server to serve login/pwd between the
 different threads.
 
-It requires 2 files (like unix /etc/passwd and /etc/group) the passwd file
+It requires 2 files (like unix /etc/passwd and /etc/group) the password file
 have the following format::
 
   login1:pwd1
   ...
 
-the group file format is::
+The group file format is::
 
   group1:user1, user2
   group2:user2
+  # you can split group declaration
+  group1:user3
   ...
 
-Start the credential server::
+Setup a configuration file like in the demo_/cmf folder, then start the
+credential server::
 
-  fl-credential-ctl CONFIGURATION_FILE start
+  fl-credential-ctl credential.conf start
 
 More options::
 
