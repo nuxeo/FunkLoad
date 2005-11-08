@@ -25,6 +25,8 @@ class Simple(FunkLoadTestCase):
         for i in range(nb_time):
             self.logd('Try %i' % i)
             for page in pages:
+                self.setUserAgent('toto')
+                self.addHeader('foo', 'bar')
                 self.get(server_url + page, description='Get %s' % page)
 
         # end of test -----------------------------------------------

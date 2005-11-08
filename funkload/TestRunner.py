@@ -164,7 +164,6 @@ class TestProgram(unittest.TestProgram):
 A FunkLoad unittest use a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
-The current FunkLoad version is """ + get_version() + """.
 See http://funkload.nuxeo.org/ for more information.
 
 
@@ -218,7 +217,8 @@ Examples
 
     def parseArgs(self, argv):
         """Parse programs args."""
-        parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter())
+        parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
+                              version="FunkLoad %s" % get_version())
         parser.add_option("-q", "--quiet", action="store_true",
                           help="Minimal output")
         parser.add_option("-v", "--verbose", action="store_true",

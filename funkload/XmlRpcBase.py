@@ -28,7 +28,8 @@ from xmlrpclib import ServerProxy
 import logging
 from optparse import OptionParser, TitledHelpFormatter
 
-from utils import create_daemon, get_default_logger, close_logger, trace
+from utils import create_daemon, get_default_logger, close_logger
+from utils import trace, get_version
 
 
 def is_server_running(host, port):
@@ -144,7 +145,8 @@ Start %prog XML/RPC daemon.
 
     def parseArgs(self, argv):
         """Parse programs args."""
-        parser = OptionParser(self.usage, formatter=TitledHelpFormatter())
+        parser = OptionParser(self.usage, formatter=TitledHelpFormatter(),
+                              version="FunkLoad %s" % get_version())
         parser.add_option("-v", "--verbose", action="store_true",
                           help="Verbose output")
         parser.add_option("-d", "--debug", action="store_true",
@@ -228,7 +230,8 @@ Execute action on the XML/RPC server.
 
     def parseArgs(self, argv):
         """Parse programs args."""
-        parser = OptionParser(self.usage, formatter=TitledHelpFormatter())
+        parser = OptionParser(self.usage, formatter=TitledHelpFormatter(),
+                              version="FunkLoad %s" % get_version())
         parser.add_option("-q", "--quiet", action="store_true",
                           help="Verbose output")
         options, args = parser.parse_args(argv)

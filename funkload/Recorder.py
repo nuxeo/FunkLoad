@@ -129,7 +129,6 @@ The default proxy port is 8090.
 
 Note that tcpwatch.py executable must be accessible from your env.
 
-The current FunkLoad version is """ + get_version() + """.
 See http://funkload.nuxeo.org/ for more information.
 
 Examples
@@ -159,7 +158,8 @@ Examples
 
     def parseArgs(self, argv):
         """Parse programs args."""
-        parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter())
+        parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
+                              version="FunkLoad %s" % get_version())
         parser.add_option("-v", "--verbose", action="store_true",
                           help="Verbose output")
         parser.add_option("-p", "--port", type="string", dest="port",

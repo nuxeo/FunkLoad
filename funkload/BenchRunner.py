@@ -20,7 +20,6 @@
 
 $Id: BenchRunner.py 24746 2005-08-31 09:59:27Z bdelbosc $
 """
-from utils import get_version
 
 USAGE = """%prog [options] file class.method
 
@@ -29,7 +28,6 @@ USAGE = """%prog [options] file class.method
 A FunkLoad unittest use a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
-The current FunkLoad version is """ + get_version() + """.
 See http://funkload.nuxeo.org/ for more information.
 
 
@@ -61,6 +59,8 @@ from optparse import OptionParser, TitledHelpFormatter
 from utils import mmn_encode, set_recording_flag, recording
 from utils import set_running_flag, running
 from utils import thread_sleep, trace, red_str, green_str
+from utils import get_version
+
 
 
 
@@ -453,7 +453,8 @@ def main():
     cur_path = os.path.abspath(os.path.curdir)
     sys.path.insert(0, cur_path)
 
-    parser = OptionParser(USAGE, formatter=TitledHelpFormatter())
+    parser = OptionParser(USAGE, formatter=TitledHelpFormatter(),
+                          version="FunkLoad %s" % get_version())
     parser.add_option("-u", "--url", type="string", dest="main_url",
                       help="Base URL to bench.")
     parser.add_option("-c", "--cycles", type="string", dest="bench_cycles",
