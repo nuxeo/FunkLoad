@@ -41,7 +41,7 @@ install:
 	python setup.py $(PKGTAG) install
 
 register:
-    python setup.py register sdist bdist_egg upload --sign
+	python setup.py register sdist bdist_egg upload --sign
 	-python2.4 setup.py register bdist_egg upload --sign
 
 doc: ${HTML_DOCS}
