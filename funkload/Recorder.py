@@ -42,6 +42,9 @@ class Request:
         self.file_path = file_path
         f = open(file_path, 'rb')
         line = f.readline().split(None, 2)
+        if not line:
+            trace('# Warning: empty first line on %s\n' % self.file_path)
+            line = f.readline().split(None, 2)
         self.method = line[0]
         url = line[1]
         scheme, host, path, query, fragment = urlsplit(url)
@@ -65,7 +68,14 @@ class Request:
                             environ=environ,
                             keep_blank_values=True)
         params = []
-        for key in form.keys():
+        try:
+            keys = form.keys()
+        except TypeError:
+            trace('# Warning: skipping invalid http post param in file: %s '
+                  'may be an xmlrpc call ?\n' % self.file_path)
+            return params
+
+        for key in keys:
             if not isinstance(form[key], list):
                 values = [form[key]]
             else:
@@ -170,8 +180,8 @@ Examples
                           help="Path to an existing tcpwatch capture.")
 
         options, args = parser.parse_args(argv)
-        if len(args) == 2:
-            test_name = args[2]
+        if len(args) == 1:
+            test_name = args[0]
         else:
             test_name = None
 
@@ -260,7 +270,7 @@ Examples
             text.append('self.%s("%s"' % (request.method.lower(),
                                           request.url))
         else:
-            text.append('self.%s("%%s%s" %% server_url' % (
+            text.append('self.%s(server_url + "%s"' % (
                 request.method.lower(),  request.rurl))
         description = "%s %s" % (request.method.capitalize(),
                                  request.path | truncate(42))
