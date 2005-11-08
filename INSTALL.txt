@@ -149,8 +149,9 @@ Problems ?
 
     sudo rm /usr/local/bin/fl-*
 
-* No chart on your report? you need to have python-gdchart available, I am
-  looking for hints on how to install gdchart on non Debian system.
+* No charts on your report. You need to have gdchart python module check
+  ``import gdchart``. I am looking for hints on how to install gdchart on
+  non Debian system.
 
 
 --------------------------
