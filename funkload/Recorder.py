@@ -232,7 +232,6 @@ Examples
             request = Request(request_path)
             if self.server_url is None:
                 self.server_url = request.host
-            host = request.host
             ctype = response.headers.get('content-type', '')
             url = request.url
             if request.method != "POST" and (
@@ -257,7 +256,6 @@ Examples
     def convertToFunkLoad(self, request):
         """return a funkload python instruction."""
         text = []
-        server_url = self.server_url
         if request.host != self.server_url:
             text.append('self.%s("%s"' % (request.method.lower(),
                                           request.url))
@@ -267,7 +265,7 @@ Examples
         description = "%s %s" % (request.method.capitalize(),
                                  request.path | truncate(42))
         if request.body:
-            params =('params=%s' % request.extractParam())
+            params = ('params=%s' % request.extractParam())
             params = re.sub("'Upload\(([^\)]*)\)'", "Upload(\\1)", params)
             text.append(', ' + params)
         text.append(', description="%s")' % description)
