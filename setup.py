@@ -53,6 +53,8 @@ main use cases are:
 
 Main FunkLoad features are:
 
+* FunkLoad is free software distributed under the `GNU GPL`.
+
 * Functional test are pure Python scripts using the pyUnit framework like
   normal unit test. Python enable complex scenarios to handle real world
   applications.
@@ -62,6 +64,7 @@ Main FunkLoad features are:
 
   - basic authentication support
   - cookies support
+  - referrer support
   - fetching css, javascript and images
   - emulating a browser cache
   - file upload and multipart/form-data submission
@@ -80,23 +83,23 @@ Main FunkLoad features are:
 * Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
   containing:
 
-  - bench configuration
+  - the bench configuration
   - tests, pages, requests stats and charts.
-  - 5 slowest requests
+  - the 5 slowest requests.
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
-  - http error summary list
+  - an http error summary list
 
 * Easy test customization using a configuration file or command line options.
 
-* Easy test creation using TestMaker / maxq recorder, so you can use your web
+* Easy test creation using TCPWatch as proxy recorder, so you can use your web
   browser and produce a FunkLoad test automatically.
 
 * Provides web assertion helpers.
 
 * Provides a funkload.CPSTestCase to ease Zope and Nuxeo CPS testing.
 
-* Easy to use, see examples in the demo folder.
+* Easy to install (EasyInstall) and use, see examples in the demo folder.
 """,
     author="Benoit Delbosc",
     author_email="bdelbosc@nuxeo.com",
