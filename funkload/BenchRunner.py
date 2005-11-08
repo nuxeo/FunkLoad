@@ -187,6 +187,7 @@ class BenchRunner:
         self.class_name = class_name
         self.method_name = method_name
         self.options = options
+        self.color = not options.no_color
         # create a unittest to get the configuration file
         test = load_unittest(self.module_name, class_name,
                              mmn_encode(method_name, 0, 0, 0), options)
@@ -247,8 +248,7 @@ class BenchRunner:
             t_stop = time.time()
             trace("* End of cycle, %.2fs elapsed.\n" % (t_stop - t_start))
             success, failures, errors = get_cycle_results()
-            status, code = get_status(success, failures, errors,
-                                      self.options.color)
+            status, code = get_status(success, failures, errors, self.color)
             trace("* Cycle result: **%s**, "
                   "%i success, %i failure, %i errors.\n\n" % (
                 status, success, failures, errors))
