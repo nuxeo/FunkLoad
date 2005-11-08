@@ -13,6 +13,7 @@ FunkLoad_ CHANGES
 .. contents:: Table of Contents
 
 
+
 FunkLoad SVN trunk
 ------------------
 
@@ -21,12 +22,21 @@ FunkLoad SVN trunk
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
 
+FunkLoad 1.3.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.3.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.3.0/
+
+:Released date: 2005-11-08
+
 New features
 ~~~~~~~~~~~~
 
 * # 944_: Recorder: replace TestMaker recorder.
 
-  providing a ``fl-record`` command that drive a TCPWatch_ proxy.
+  Providing a ``fl-record`` command that drive a TCPWatch_ proxy.
   See INSTALL.txt_ to setup TCPWatch_.
 
 * # 1041_: Browser: implement an addHeader method.
@@ -192,3 +202,4 @@ See README.txt_ for more information about FunkLoad_.
 .. _1022: http://svn.nuxeo.org/trac/pub/ticket/1022
 .. _1027: http://svn.nuxeo.org/trac/pub/ticket/1027
 .. _1041: http://svn.nuxeo.org/trac/pub/ticket/1041
+.. _1088: http://svn.nuxeo.org/trac/pub/ticket/1088
