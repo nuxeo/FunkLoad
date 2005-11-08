@@ -1053,7 +1053,7 @@ for information on how to install TCPWatch_.
 
 1. Start the recorder::
 
-    fl-record -o basic_navigation
+    fl-record basic_navigation
 
 
   This will output something like this::
