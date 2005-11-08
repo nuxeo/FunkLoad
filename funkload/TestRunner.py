@@ -31,8 +31,7 @@ import types
 import time
 import unittest
 from optparse import OptionParser, TitledHelpFormatter
-from utils import red_str, green_str
-from version import __version__
+from utils import red_str, green_str, get_version
 
 # ------------------------------------------------------------
 #
@@ -165,7 +164,7 @@ class TestProgram(unittest.TestProgram):
 A FunkLoad unittest use a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
-The current FunkLoad version is """ + __version__ + """.
+The current FunkLoad version is """ + get_version() + """.
 See http://funkload.nuxeo.org/ for more information.
 
 

@@ -20,7 +20,7 @@
 
 $Id: BenchRunner.py 24746 2005-08-31 09:59:27Z bdelbosc $
 """
-from version import __version__
+from utils import get_version
 
 USAGE = """%prog [options] file class.method
 
@@ -29,7 +29,7 @@ USAGE = """%prog [options] file class.method
 A FunkLoad unittest use a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
-The current FunkLoad version is """ + __version__ + """.
+The current FunkLoad version is """ + get_version() + """.
 See http://funkload.nuxeo.org/ for more information.
 
 
