@@ -44,7 +44,7 @@ New features
   FunkLoadTestCase provides new methods ``setUserAgent``, ``addHeader`` and
   ``clearHeaders``.
 
-* # 1088: TestRunner / BenchRunner: use compatible command line option
+* # 1088_: TestRunner / BenchRunner: use compatible command line option
 
     - All ``fl-*`` executables have a ``--version`` option to display the
       FunkLoad_ version.
