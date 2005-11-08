@@ -62,6 +62,8 @@ main use cases are:
 
 Main FunkLoad_ features are:
 
+* FunkLoad_ is free software distributed under the `GNU GPL`_.
+
 * Functional test are pure Python scripts using the pyUnit_ framework like
   normal unit test. Python enable complex scenarios to handle real world
   applications.
@@ -90,12 +92,12 @@ Main FunkLoad_ features are:
 * Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
   containing:
 
-  - bench configuration
+  - the bench configuration
   - tests, pages, requests stats and charts.
-  - 5 slowest requests
+  - the 5 slowest requests.
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
-  - http error summary list
+  - an http error summary list
 
 * Easy test customization using a configuration file or command line options.
 
@@ -106,7 +108,7 @@ Main FunkLoad_ features are:
 
 * Provides a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
 
-* Easy to install and use, see examples in the demo_ folder.
+* Easy to install (EasyInstall_) and use, see examples in the demo_ folder.
 
 
 Where to find FunkLoad ?
@@ -130,9 +132,6 @@ Either:
 See CHANGES.txt_ file for information about distribution contents.
 
 
-.. _`python cheese shop`: http://www.python.org/pypi/funkload/
-.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
-
 
 Installation
 ------------
@@ -147,9 +146,6 @@ See the demo_ folder contents and a report_ example.
 
 For package installed with easy_install you need to run ``fl-install-demo``
 to extract the demo examples.
-
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
-.. _report: http://funkload.nuxeo.org/report-example.pdf
 
 Credits
 -------
@@ -254,7 +250,6 @@ addHeader
 ::
 
   addHeader(key, value)
-
 
 New in 1.3.0. version.
 
@@ -1090,12 +1085,13 @@ for information on how to install TCPWatch_.
 
 4. Implement the dynamic part and assertion
 
-  * Add assertion using FunkLoad_ helpers
   * Code the dynamic part like getting new url of a created document
-  * Use a credential server if you want to make bench with different users
+  * Add assertion using FunkLoad_ helpers
+  * Use a credential server if you want to make a bench with different users
+    or simply don't want to hard code your login/password.
 
 
-Note that ``fl-record`` works fine with multi-part encoded form, file upload
+Note that ``fl-record`` works fine with multi-part encoded form and file upload
 but will failed to record https session.
 
 
@@ -1177,19 +1173,16 @@ If you want to monitor a linux server health during the bench, you have to
 run a monitor xmlrpc server on the target server, this require to install
 the FunkLoad_ package.
 
-On the server side init the FunkLoad_ env as above and ::
+On the server side you need to install the FunkLoad_ tool then launch the
+server using a configuration file (example in the demo_/simple folder.)::
 
-  # edit monitor.conf if needed and run
-  fl-monitor-ctl $FLOAD_HOME/lib/monitor.conf start
-
-  # check if it is fine
-  fl-monitor-ctl $FLOAD_HOME/lib/monitor.conf test
+  fl-monitor-ctl monitor.conf start
 
   # more info
   fl-monitor-ctl --help
 
 
-Then on your bench host edit your test configuration file and this section::
+On the bench host side setup your test configuration like this::
 
   [monitor]
   hosts = server.to.test.com
@@ -1202,7 +1195,6 @@ Then run the bench, the report will include server stats.
 
 Note that you can monitor multiple hosts and that the monitor is linux
 specific.
-
 
 
 Bugs
@@ -1223,3 +1215,9 @@ Bugs
 .. _Cmf: http://www.zope.org/Products/CMF/
 .. _Nuxeo: http://www.nuxeo.com/
 .. _CPS: http://www.cps-project.org/
+.. _`python cheese shop`: http://www.python.org/pypi/funkload/
+.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
+.. _report: http://funkload.nuxeo.org/report-example.pdf
+.. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
+
