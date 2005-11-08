@@ -21,6 +21,11 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
+Bug fixes
+~~~~~~~~~
+
+* fix # 1115_: Recorder: impossible to generate test
+
 
 FunkLoad 1.3.0
 --------------
@@ -203,3 +208,4 @@ See README.txt_ for more information about FunkLoad_.
 .. _1027: http://svn.nuxeo.org/trac/pub/ticket/1027
 .. _1041: http://svn.nuxeo.org/trac/pub/ticket/1041
 .. _1088: http://svn.nuxeo.org/trac/pub/ticket/1088
+.. _1115: http://svn.nuxeo.org/trac/pub/ticket/1115
