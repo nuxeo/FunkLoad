@@ -34,6 +34,23 @@ New features
   FunkLoadTestCase provides new methods ``setUserAgent``, ``addHeader`` and
   ``clearHeaders``.
 
+* # 1088: TestRunner / BenchRunner: use compatible command line option
+
+    - All ``fl-*`` executables have a ``--version`` option to display the
+      FunkLoad_ version.
+
+    - All `fl-run-*` are now in color mode by default. Use ``--no-color``
+      options for monochrome output.
+      You need to remove the ``-c`` option for ``fl-run-test`` and ``-C``
+      for ``fl-run-bench`` in your scripts.
+
+    - Changing ``fl-run-bench`` short option ``-d`` into ``-D`` for duration,
+      keeping ``-d`` for debug mode.
+
+    - Removing ``fl-run-test`` short option ``-D`` to not conflict with new
+      ``-D`` option of ``fl-run-bench``, you now have to use the long format
+      ``--dump-directory``.
+
 Bug fixes
 ~~~~~~~~~
 
