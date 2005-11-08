@@ -6,7 +6,7 @@ FunkLoad_ INSTALL
 
 :address: bdelbosc _at_ nuxeo.com
 
-:revision: $Id: INSTALL-1.2.0.txt 28355 2005-10-17 14:36:34Z bdelbosc $
+:revision: $Id$
 
 :abstract: This document describes how to install the FunkLoad_ tool.
 
@@ -54,12 +54,6 @@ Optional packages
     cd tcpwatch
     python setup.py build
     sudo python setup.py install
-
-* On version <= 1.2.0 to have a proxy recorder install TestMaker_, this
-  requires a jre 1.4.2 (seems fine also with 1.5.0)
-
-   - Unzip TestMaker 4.3.1 from http://downloads.pushtotest.com/TestMaker.zip
-   - you need to export your JAVA_HOME (like /usr/local/java/jre1.5.0_01)
 
 
 Installation
@@ -165,7 +159,6 @@ See demo_ folder for other examples.
 
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
-.. _TestMaker: http://www.pushtotest.com/
 .. _README.txt: README.html
 .. _CHANGES.txt: CHANGES.html
 .. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
