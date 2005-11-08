@@ -21,7 +21,7 @@ test: credential_test
 
 credential_test:
 	$(CREDCTL) restart
-	fl-run-test test_Credential.py -cv $(FLOPS)
+	fl-run-test test_Credential.py -v $(FLOPS)
 	$(CREDCTL) stop
 
 # benching
@@ -30,7 +30,7 @@ bench: credential_bench
 credential_bench:
 	@$(CREDCTL) restart
 	@$(MONCTL) restart
-	-fl-run-bench -C -c 1:20:40:60:80:100 -d 10 test_Credential.py Credential.test_credential $(FLOPS)
+	-fl-run-bench -C -c 1:20:40:60:80:100 -D 10 test_Credential.py Credential.test_credential $(FLOPS)
 	-fl-build-report credential-bench.xml --html
 	@$(MONCTL) stop
 	@$(CREDCTL) stop

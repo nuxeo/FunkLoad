@@ -17,9 +17,9 @@ zope cache, pack the zodb and restart the zope server.
 
 To run the test::
 
-  fl-run-test -cv test_Zope.py
+  fl-run-test -v test_Zope.py
 
 You can view the debug information::
 
-  fl-run-test -cd test_Zope.py
+  fl-run-test -d test_Zope.py
 

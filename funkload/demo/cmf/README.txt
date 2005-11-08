@@ -23,15 +23,15 @@ If your zope admin is not called ``admin`` add your credential to the
 To run the test::
 
   fl-credential-ctl credential.conf start
-  fl-run-test -cv test_Cmf.py
+  fl-run-test -v test_Cmf.py
 
 You can view the debug information::
 
-  fl-run-test -cd test_Zope.py
+  fl-run-test -d test_Zope.py
 
 If something goes wrong try to view the html output::
 
-  fl-run-test -cdV test_Zope.py
+  fl-run-test -dV test_Zope.py
 
 
 Note that all errors are logged in the xml output file ``cmf-test.xml``.

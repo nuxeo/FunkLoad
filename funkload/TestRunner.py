@@ -164,23 +164,26 @@ class TestProgram(unittest.TestProgram):
 A FunkLoad unittest use a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
-See http://funkload.nuxeo.org/ for more information.
+See http://funkload.nuxeo.org/ for more information. 
 
 
 Examples
 ========
-
-  %prog myFile.py                    - run default set of tests
-  %prog myFile.py MyTestSuite        - run suite 'MyTestSuite'
+  %prog myFile.py
+                        Run default set of tests.
+  %prog myFile.py MyTestSuite
+                        Run suite MyTestSuite.
   %prog myFile.py MyTestCase.testSomething
-                                     - run MyTestCase.testSomething
-  %prog myFile.py MyTestCase         - run all 'test*' test methods
-                                       in MyTestCase
-  %prog myFile.py -c -u http://localhost MyTestCase
-                                     - same in color against localhost
-  %prog myfile.py -V                 - run default set of tests and view in
-                                       real time each page fetch with firefox
-  %prog -h                           - more options
+                        Run MyTestCase.testSomething.
+  %prog myFile.py MyTestCase
+                        Run all 'test*' test methods in MyTestCase.
+  %prog myFile.py MyTestCase -u http://localhost
+                        Same against localhost.
+  %prog myfile.py -V
+                        Run default set of tests and view in real time each
+                        page fetch with firefox.
+  %prog -h
+                        More options.
 """
     def __init__(self, module=None, defaultTest=None,
                  argv=None, testRunner=None,
@@ -190,7 +193,7 @@ Examples
         self.module = module
         self.testNames = None
         self.verbosity = 1
-        self.color = False
+        self.color = True
         self.defaultTest = defaultTest
         self.testLoader = testLoader
         self.progName = os.path.basename(argv[0])
@@ -220,14 +223,11 @@ Examples
         parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
                               version="FunkLoad %s" % get_version())
         parser.add_option("-q", "--quiet", action="store_true",
-                          help="Minimal output")
+                          help="Minimal output.")
         parser.add_option("-v", "--verbose", action="store_true",
-                          help="Verbose output")
+                          help="Verbose output.")
         parser.add_option("-d", "--debug", action="store_true",
-                          help="Funkload debug output")
-        parser.add_option("-c", "--color", action="store_true",
-                          help="Colored output")
-
+                          help="FunkLoad debug output.")
         parser.add_option("-u", "--url", type="string", dest="main_url",
                           help="Base URL to bench without ending '/'.")
         parser.add_option("-m", "--sleep-time-min", type="string",
@@ -236,13 +236,15 @@ Examples
         parser.add_option("-M", "--sleep-time-max", type="string",
                           dest="ftest_sleep_time_max",
                           help="Maximum sleep time between request.")
-        parser.add_option("-D", "--dump-directory", type="string",
+        parser.add_option("", "--dump-directory", type="string",
                           dest="dump_dir",
                           help="Directory to dump html pages.")
         parser.add_option("-V", "--firefox-view", action="store_true",
                           help="Real time view using firefox, "
                           "you must have a running instance of firefox "
                           "in the same host.")
+        parser.add_option("", "--no-color", action="store_true",
+                          help="Monochrome output.")
 
         options, args = parser.parse_args()
         if self.module is None:
@@ -261,8 +263,7 @@ Examples
             options.ftest_log_to = 'console file'
         else:
             options.ftest_log_to = 'file'
-        if options.color:
-            self.color = True
+        self.color = not options.no_color
 
         # set testloader options
         self.testLoader.options = options

@@ -26,13 +26,16 @@ USAGE = """%prog [options] xmlfile
 
 %prog analyze a FunkLoad bench xml result file and output a report.
 
+See http://funkload.nuxeo.org/ for more information.
 
 Examples
 ========
-
-  %prog funkload.xml                    - ReST rendering into stdout
-  %prog --html -o /tmp funkload.xml     - Build an HTML report in /tmp
-  %prog -h                              - more options
+  %prog funkload.xml
+                        ReST rendering into stdout.
+  %prog --html -o /tmp funkload.xml
+                        Build an HTML report in /tmp.
+  %prog -h
+                        More options.
 """
 import os
 import xml.parsers.expat
@@ -41,7 +44,7 @@ from optparse import OptionParser, TitledHelpFormatter
 from ReportStats import AllResponseStat, PageStat, ResponseStat, TestStat
 from ReportStats import MonitorStat, ErrorStat
 from ReportRenderer import RenderRst, RenderHtml
-from utils import trace
+from utils import trace, get_version
 
 
 # ------------------------------------------------------------
@@ -171,7 +174,8 @@ class FunkLoadXmlParser:
 # main
 #
 def main():
-    parser = OptionParser(USAGE, formatter=TitledHelpFormatter())
+    parser = OptionParser(USAGE, formatter=TitledHelpFormatter(),
+                          version="FunkLoad %s" % get_version())
     parser.add_option("-H", "--html", action="store_true", default=False,
                       dest="html", help="Produce an html report.")
     cur_path = os.path.abspath(os.path.curdir)

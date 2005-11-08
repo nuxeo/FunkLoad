@@ -121,10 +121,11 @@ class Response:
 
 class RecorderProgram:
     """A tcpwatch to funkload recorder."""
-    USAGE = """%prog [options]
+    USAGE = """%prog [options] [test_name]
 
-%prog launch a TCPWatch proxy and record activities, then output a FunkLoad
-script or generates a FunkLoad unit test.
+%prog launch a TCPWatch proxy and record activities, then output
+a FunkLoad script or generates a FunkLoad unit test if test_name is specified.
+
 The default proxy port is 8090.
 
 Note that tcpwatch.py executable must be accessible from your env.
@@ -133,14 +134,14 @@ See http://funkload.nuxeo.org/ for more information.
 
 Examples
 ========
-
-  %prog -p 9090             - run a proxy on port 9090, output script
-                              to stdout
-  %prog -o foo_bar          - run a proxy and create a FunkLoad test
-                              case, generates test_FooBar.py and
-                              FooBar.conf file. To test it:
-                              fl-run-test -dV test_FooBar.py
-  %prog -i /tmp/tcpwatch    - convert a tcpwatch capture into a script
+  %prog foo_bar
+                        Run a proxy and create a FunkLoad test case,
+                        generates test_FooBar.py and FooBar.conf file.
+                        To test it:  fl-run-test -dV test_FooBar.py
+  %prog -p 9090
+                        Run a proxy on port 9090, output script to stdout.
+  %prog -i /tmp/tcpwatch
+                        Convert a tcpwatch capture into a script.
 """
     def __init__(self, argv=None):
         if argv is None:
@@ -167,14 +168,16 @@ Examples
         parser.add_option("-i", "--tcp-watch-input", type="string",
                           dest="tcpwatch_path", default=None,
                           help="Path to an existing tcpwatch capture.")
-        parser.add_option("-o", "--output", type="string",
-                          dest="test_name",
-                          help="Create a FunkLoad script and conf file.")
+
         options, args = parser.parse_args(argv)
+        if len(args) == 2:
+            test_name = args[2]
+        else:
+            test_name = None
+
         self.verbose = options.verbose
         self.tcpwatch_path = options.tcpwatch_path
         self.port = options.port
-        test_name = options.test_name
         if test_name:
             class_name = ''.join([x.capitalize()
                                   for x in re.split('_|-', test_name)])

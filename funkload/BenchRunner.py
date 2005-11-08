@@ -30,19 +30,16 @@ configuration is overriden by the command line options.
 
 See http://funkload.nuxeo.org/ for more information.
 
-
 Examples
 ========
-
   %prog myFile.py MyTestCase.testSomething
-                                           - bench MyTestCase.testSomething
-                                             using MyTestCase.conf
+                        Bench MyTestCase.testSomething using MyTestCase.conf.
   %prog -u http://localhost:8080 -c 10:20 -d 30 myFile.py \\
-        MyTestCase.testSomething
-                                           - bench MyTestCase.testSomething
-                                             on localhost:8080 with 2 cycles
-                                             of 10 and 20 users during 30s
-  %prog -h                                 - more options
+      MyTestCase.testSomething
+                        Bench MyTestCase.testSomething on localhost:8080
+                        with 2 cycles of 10 and 20 users during 30s.
+  %prog -h
+                        More options.
 """
 import os
 import sys
@@ -134,7 +131,7 @@ class LoopTestRunner(threading.Thread):
                                   args=())
         self.test = load_unittest(test_module, test_class, meta_method_name,
                                   options)
-        self.color = options.color
+        self.color = not options.no_color
         self.sleep_time = sleep_time
         self.debug = debug
         # this makes threads endings if main stop with a KeyboardInterupt
@@ -462,7 +459,7 @@ def main():
                       "virtual concurrent users, "
                       "to run a bench with 3 cycles with 5, 10 and 20 "
                       "users use: -c 2:10:20")
-    parser.add_option("-d", "--duration", type="string", dest="bench_duration",
+    parser.add_option("-D", "--duration", type="string", dest="bench_duration",
                       help="Duration of a cycle in seconds.")
     parser.add_option("-m", "--sleep-time-min", type="string",
                       dest="bench_sleep_time_min",
@@ -473,8 +470,8 @@ def main():
     parser.add_option("-s", "--startup-delay", type="string",
                       dest="bench_startup_delay",
                       help="Startup delay between thread.")
-    parser.add_option("-C", "--color", action="store_true",
-                      help="Colored output")
+    parser.add_option("", "--no-color", action="store_true",
+                      help="Monochrome output.")
 
     options, args = parser.parse_args()
     if len(args) != 2:

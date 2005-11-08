@@ -15,4 +15,4 @@ You can find 4 examples of FunkLoad usage here:
   An test case that requires a credential server.
 
 * xmlrpc/
-  An example on how to test/bench an XML RPC server. Makefile example.
+  An example on how to test/bench an XML RPC server with a Makefile example.
