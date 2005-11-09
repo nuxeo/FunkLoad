@@ -64,7 +64,7 @@ Easy installation
 
 Install the latest stable package::
 
-  sudo easy_install funkload
+  sudo easy_install -U funkload
 
 This will install FunkLoad_, webunit_ and docutils_ eggs.
 

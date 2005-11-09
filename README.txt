@@ -118,7 +118,7 @@ Either:
 
 * Latest stable package using EasyInstall_::
 
-   sudo easy_install funkload
+   sudo easy_install -U funkload
 
 * EasyInstall_ the latest snapshot ::
 
