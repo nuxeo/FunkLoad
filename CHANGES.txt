@@ -21,6 +21,17 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
+
+
+FunkLoad 1.3.1
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.3.1.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.3.1/
+
+:Released date: 2005-11-10
+
 Bug fixes
 ~~~~~~~~~
 
