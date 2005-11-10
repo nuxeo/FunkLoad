@@ -39,7 +39,7 @@ from webunit.webunittest import WebTestCase, HTTPError
 
 import PatchWebunit
 from utils import get_default_logger, mmn_is_bench, mmn_decode
-from utils import recording, thread_sleep, is_html, get_version
+from utils import recording, thread_sleep, is_html, get_version, trace
 from xmlrpclib import ServerProxy
 
 _marker = []
@@ -75,6 +75,16 @@ class FunkLoadTestCase(unittest.TestCase):
             # viewing requires dumping contents
             self.dumping = True
             self.options.dump_dir = mkdtemp('_funkload')
+        self._loop_mode = getattr(options, 'loop_steps', False)
+        if self._loop_mode:
+            if options.loop_steps.count(':'):
+                steps = options.loop_steps.split(':')
+                self._loop_steps = range(int(steps[0]), int(steps[1]))
+            else:
+                self._loop_steps = [int(options.loop_steps)]
+            self._loop_number = options.loop_number
+            self._loop_recording = False
+            self._loop_records = []
 
     def _funkload_init(self):
         """Initialize a funkload test case using a configuration file."""
@@ -243,6 +253,15 @@ class FunkLoadTestCase(unittest.TestCase):
                sleep=True):
         """Simulate a browser."""
         self._response = None
+        # Loop mode
+        if self._loop_mode:
+            if self.steps == self._loop_steps[0]:
+                self._loop_recording = True
+                self.logi('Loop mode start recording')
+            if self._loop_recording:
+                self._loop_records.append((url_in, params_in, description,
+                                           ok_codes, method, follow_redirect,
+                                           load_auto_links, False))
         # ok codes
         if ok_codes is None:
             ok_codes = self.ok_codes
@@ -312,6 +331,27 @@ class FunkLoadTestCase(unittest.TestCase):
         if sleep:
             self.sleep()
         self._response = response
+
+        # Loop mode
+        if self._loop_mode and self.steps == self._loop_steps[-1]:
+            self._loop_recording = False
+            self.logi('Loop mode end recording.')
+            t_start = self.total_time
+            count = 0
+            for i in range(self._loop_number):
+                self.logi('Loop mode replay %i' % i)
+                for record in self._loop_records:
+                    count += 1
+                    self.steps += 1
+                    self.browse(*record)
+            dt = self.total_time - t_start
+            text = ('End of loop: %d pages rendered in %.3fs, '
+                    'avg of %.3fs per page, '
+                    '%.3f SPPS without concurrency.' % (count, dt, dt/count,
+                                                        count/dt))
+            self.logi(text)
+            trace(text + '\n')
+
         return response
 
 

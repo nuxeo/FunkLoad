@@ -84,6 +84,7 @@ Main FunkLoad_ features are:
   - set the target server url
   - display the fetched page in real time in your browser
   - debug mode
+  - check performance of a single page (or set of pages) inside a test
   - green/red color mode
 
 * Turn a functional test into a load test: just by invoking the bench runner
@@ -758,6 +759,10 @@ and a 'python MyFile.py'.
 To ease testing FunkLoad_ come with an advanced test runner to override
 the static configuration file.
 
+The ``loop-on-pages`` option enable to check response time of some specific
+pages inside a test without changing the script, which make easy to tune a
+page in a complex context. Use the ``debug`` option to find the page numbers.
+
 
 Usage
 -----
@@ -783,6 +788,11 @@ Examples
   fl-run-test myfile.py -V
                         Run default set of tests and view in real time each
                         page fetch with firefox.
+  fl-run-test  myfile.py MyTestCase.testSomething -l 3 -n 100
+                        Run MyTestCase.testSomething, reload one hundred
+                        time the page 3 without concurrency and as fast as
+                        possible. Output response time stats. You can loop
+                        on many pages using slice -l 2:4.
   fl-run-test -h
                         More options.
 

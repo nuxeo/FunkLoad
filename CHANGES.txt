@@ -21,6 +21,22 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
+New features
+~~~~~~~~~~~~
+
+* New ``loop-on-pages`` option for ``fl-run-test``.
+
+  This option enable to check response time of some specific pages inside a
+  test without changing the script, which make easy to tune a page in a
+  complex context. Use the ``debug`` option to find the page numbers. For
+  example::
+
+    fl-run-test  myfile.py MyTestCase.testSomething -l 3 -n 100
+
+  Run MyTestCase.testSomething, reload one hundred time the page 3 without
+  concurrency and as fast as possible. Output response time stats. You can
+  loop on many pages using slice -l 2:4.
+
 
 
 FunkLoad 1.3.1

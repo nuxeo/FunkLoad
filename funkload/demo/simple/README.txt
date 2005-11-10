@@ -29,6 +29,11 @@ your responsablity as it can result a DOS in bench mode.
 
      fl-run-test -V test_Simple.py
 
+   check performance of a single page::
+
+     fl-run-test -l 4 -n 100 test_Simple.py
+
+
 3/ Bench it
 
    Start a monitord server to log server activities::
@@ -53,3 +58,5 @@ your responsablity as it can result a DOS in bench mode.
 4/ Build the report::
 
    fl-build-report --html simple-bench.xml
+
+

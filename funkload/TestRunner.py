@@ -164,7 +164,7 @@ class TestProgram(unittest.TestProgram):
 A FunkLoad unittest use a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
-See http://funkload.nuxeo.org/ for more information. 
+See http://funkload.nuxeo.org/ for more information.
 
 
 Examples
@@ -182,6 +182,11 @@ Examples
   %prog myfile.py -V
                         Run default set of tests and view in real time each
                         page fetch with firefox.
+  %prog myfile.py MyTestCase.testSomething -l 3:5 -n 100
+                        Run MyTestCase.testSomething, reload one hundred
+                        time the page 3 without concurrency and as fast as
+                        possible. Output response time stats. You can loop
+                        on many pages using slice -l 2:4.
   %prog -h
                         More options.
 """
@@ -245,6 +250,14 @@ Examples
                           "in the same host.")
         parser.add_option("", "--no-color", action="store_true",
                           help="Monochrome output.")
+        parser.add_option("-l", "--loop-on-pages", type="string",
+                          dest="loop_steps",
+                          help="Loop as fast as possible without concurrency "
+                          "on pages, expect a page number or a slice like 3:5."
+                          " Output some statistics.")
+        parser.add_option("-n", "--loop-number", type="int",
+                          dest="loop_number", default=10,
+                          help="Number of loop")
 
         options, args = parser.parse_args()
         if self.module is None:
