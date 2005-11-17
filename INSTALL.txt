@@ -46,6 +46,25 @@ Optional packages
 
     apt-get install python-gdchart
 
+  On Fedora FC4 (tested with python 2.3.5)::
+
+    cd /tmp
+    wget http://ftp.debian.org/debian/pool/main/p/python-gdchart/python-gdchart_0.6.1.orig.tar.gz
+    tar xzvf python-gdchart_0.6.1.orig.tar.gz
+    cd python-gdchart-0.6.1.orig/
+    wget http://funkload.nuxeo.org/patch_gdc_py.diff
+    wget http://funkload.nuxeo.org/patch_gdc_pie.diff
+    patch -p0 < patch_gdc_py.diff
+    patch -p0 < patch_gdc_pie.diff
+    # change in Makefile
+    # PY_INCLUDE = -I/usr/local/include/python2.0
+    # to your corresponding path
+    make
+    # as a 'root' copy produced gdchart.so into your python's site-packages
+    # directory
+
+
+
 * Starting with version 1.3.0 the recorder use TCPWatch_::
 
     cd /tmp
