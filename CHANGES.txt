@@ -37,7 +37,10 @@ New features
   concurrency and as fast as possible. Output response time stats. You can
   loop on many pages using slice -l 2:4.
 
+Bug fixes
+~~~~~~~~~
 
+* updating ez_setup to fix broken sourceforge docutils download
 
 FunkLoad 1.3.1
 --------------
