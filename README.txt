@@ -125,8 +125,10 @@ Either:
 
    sudo easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
 
-* Bleeding edge svn sources::
+* Bleeding edge `svn sources`_::
 
+   easy_install -eb . funkload==dev
+   # or
    svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
 
 
@@ -1235,4 +1237,4 @@ Bugs
 .. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
 .. _report: http://funkload.nuxeo.org/report-example.pdf
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
-
+.. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev
