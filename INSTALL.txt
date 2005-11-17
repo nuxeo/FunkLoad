@@ -133,6 +133,17 @@ Problems ?
 
   then reinstall
 
+* easy_install ends with::
+
+    error: Unexpected HTML page found at
+    http://prdownloads.sourceforge.net...
+
+  Source Forge has changed their donwload page you need to update your
+  setuptools::
+
+     sudo easy_install -U setuptools
+
+
 * When testing ``make test`` return ::
 
     ### credentialctl: Stopping credential server.
