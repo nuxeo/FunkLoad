@@ -71,6 +71,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self._funkload_init()
         self.dumping = getattr(options, 'dump_dir', False) and True
         self.viewing = getattr(options, 'firefox_view', False)
+        self.accept_invalid_links = getattr(options, 'accept_invalid_links',
+                                            False)
         if self.viewing and not self.dumping:
             # viewing requires dumping contents
             self.dumping = True
@@ -318,14 +320,17 @@ class FunkLoadTestCase(unittest.TestCase):
                 # pageImages is patched to log_response on all links
                 self._browser.pageImages(url, page, self)
             except HTTPError, error:
-                t_stop = time.time()
-                t_delta = t_stop - t_start
-                self.step_success = False
-                self.test_status = 'Failure'
-                self.logd('  Failed in %.2fs' % t_delta)
-                self.log_response(error.response, 'link', None,
-                                  t_start, t_stop, log_body=True)
-                raise self.failureException, str(error)
+                if self.accept_invalid_links:
+                    self.logd('  ' + str(error))
+                else:
+                    t_stop = time.time()
+                    t_delta = t_stop - t_start
+                    self.step_success = False
+                    self.test_status = 'Failure'
+                    self.logd('  Failed in %.2fs' % t_delta)
+                    self.log_response(error.response, 'link', None,
+                                      t_start, t_stop, log_body=True)
+                    raise self.failureException, str(error)
             t_stop = time.time()
             self.logd('  Done in %.3fs' % (t_stop - t_start))
         if sleep:
@@ -704,7 +709,7 @@ class FunkLoadTestCase(unittest.TestCase):
         if response is not None:
             a_links = response.getDOM().getByName('a')
             if a_links:
-                ret = [x.href for x in a_links]
+                ret = [getattr(x, 'href', '') for x in a_links]
             if pattern is not None:
                 pat = re.compile(pattern)
                 ret = [href for href in ret if pat.search(href) is not None]

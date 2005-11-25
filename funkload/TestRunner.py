@@ -258,6 +258,10 @@ Examples
         parser.add_option("-n", "--loop-number", type="int",
                           dest="loop_number", default=10,
                           help="Number of loop")
+        parser.add_option("", "--accept-invalid-links", action="store_true",
+                          help="Do not fail if css/image links are "
+                          "not reachable.")
+
 
         options, args = parser.parse_args()
         if self.module is None:
