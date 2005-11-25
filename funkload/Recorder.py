@@ -220,7 +220,7 @@ Examples
             name = name[len(self.prefix):]
             ext = ext[1:]
             if ext == 'errors':
-                trace("Error in response %s" % name)
+                trace("Error in response %s\n" % name)
                 continue
             assert ext in ('request', 'response'), "Bad extension: %r" % ext
             items.setdefault(name, {})[ext] = os.path.join(
