@@ -180,6 +180,7 @@ appropriate cookies, follow redirection, register new cookies, load css and
 javascript that are not already cached.
 This method returns a webunit_ HTTPResponse.
 
+
 Parameters:
 
 - *url* the url without parameters
@@ -819,6 +820,15 @@ Options
   --firefox-view, -V      Real time view using firefox, you must have a running
                           instance of firefox in the same host.
   --no-color              Monochrome output.
+  --loop-on-pages=LOOP_STEPS, -lLOOP_STEPS
+                          Loop as fast as possible without concurrency on pages
+                          expect a page number or a slice like 3:5. Output some
+                          statistics.
+  --loop-number=LOOP_NUMBER, -nLOOP_NUMBER
+                          Number of loop.
+  --accept-invalid-links  Do not fail if css/image links are not reachable.
+  --simple-fetch          Don't load additional links like css or images when
+                          fetching an html page.
 
 
 Benching
@@ -978,6 +988,9 @@ Options
   --startup-delay=BENCH_STARTUP_DELAY, -sBENCH_STARTUP_DELAY
                           Startup delay between thread.
   --no-color              Monochrome output.
+  --accept-invalid-links  Do not fail if css/image links are not reachable.
+  --simple-fetch          Don't load additional links like css or images when
+                          fetching an html page.
 
 
 Tips

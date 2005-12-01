@@ -37,9 +37,14 @@ New features
   concurrency and as fast as possible. Output response time stats. You can
   loop on many pages using slice -l 2:4.
 
-* New ``accept-invalid-links`` options for ``fl-run-test`` and ``fl-run-bench``
+* New ``accept-invalid-links`` option for ``fl-run-test`` and ``fl-run-bench``
 
   Don't fail if css/image links are not reachable.
+
+* New ``simple-fetch`` option for ``fl-run-test`` and ``fl-run-bench``
+
+  Don't load additional links like css or images when fetching an html page.
+
 
 Bug fixes
 ~~~~~~~~~
