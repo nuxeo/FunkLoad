@@ -472,7 +472,9 @@ def main():
                       help="Startup delay between thread.")
     parser.add_option("", "--no-color", action="store_true",
                       help="Monochrome output.")
-
+    parser.add_option("", "--accept-invalid-links", action="store_true",
+                      help="Do not fail if css/image links are "
+                      "not reachable.")
     options, args = parser.parse_args()
     if len(args) != 2:
         parser.error("incorrect number of arguments")
