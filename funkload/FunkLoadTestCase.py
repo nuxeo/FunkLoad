@@ -69,14 +69,16 @@ class FunkLoadTestCase(unittest.TestCase):
         self._response = None
         self.options = options
         self._funkload_init()
-        self.dumping = getattr(options, 'dump_dir', False) and True
-        self.viewing = getattr(options, 'firefox_view', False)
-        self.accept_invalid_links = getattr(options, 'accept_invalid_links',
-                                            False)
-        if self.viewing and not self.dumping:
+        self._dump_dir = getattr(options, 'dump_dir', None)
+        self._dumping =  self._dump_dir and True or False
+        self._viewing = getattr(options, 'firefox_view', False)
+        self._accept_invalid_links = getattr(options, 'accept_invalid_links',
+                                             False)
+        self._simple_fetch = getattr(options, 'simple_fetch', False)
+        if self._viewing and not self._dumping:
             # viewing requires dumping contents
-            self.dumping = True
-            self.options.dump_dir = mkdtemp('_funkload')
+            self._dumping = True
+            self._dump_dir = mkdtemp('_funkload')
         self._loop_mode = getattr(options, 'loop_steps', False)
         if self._loop_mode:
             if options.loop_steps.count(':'):
@@ -160,7 +162,7 @@ class FunkLoadTestCase(unittest.TestCase):
     def conf_get(self, section, key, default=_marker, quiet=False):
         """Return an entry from the options or configuration file."""
         # check for a command line options
-        opt_key = '%s_%s' %(section, key)
+        opt_key = '%s_%s' % (section, key)
         opt_val = getattr(self.options, opt_key, None)
         if opt_val:
             #print('[%s] %s = %s from options.' % (section, key, opt_val))
@@ -218,7 +220,7 @@ class FunkLoadTestCase(unittest.TestCase):
             if etype is HTTPError:
                 self.log_response(value.response, rtype, description,
                                   t_start, t_stop, log_body=True)
-                if self.dumping:
+                if self._dumping:
                     self.dump_content(value.response)
                 raise self.failureException, str(value.response)
             else:
@@ -243,7 +245,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self._browser.history.append((rtype, url))
         self.logd(' Done in %.3fs' % t_delta)
         self.log_response(response, rtype, description, t_start, t_stop)
-        if self.dumping:
+        if self._dumping:
             self.dump_content(response)
         return response
 
@@ -253,7 +255,7 @@ class FunkLoadTestCase(unittest.TestCase):
                method='post',
                follow_redirect=True, load_auto_links=True,
                sleep=True):
-        """Simulate a browser."""
+        """Simulate a browser handle redirects, load/cache css and images."""
         self._response = None
         # Loop mode
         if self._loop_mode:
@@ -312,7 +314,7 @@ class FunkLoadTestCase(unittest.TestCase):
 
         # Load auto links (css and images)
         response.is_html = is_html(response.body)
-        if load_auto_links and response.is_html:
+        if load_auto_links and response.is_html and not self._simple_fetch:
             self.logd(' Load css and images...')
             page = response.body
             t_start = time.time()
@@ -320,7 +322,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 # pageImages is patched to log_response on all links
                 self._browser.pageImages(url, page, self)
             except HTTPError, error:
-                if self.accept_invalid_links:
+                if self._accept_invalid_links:
                     self.logd('  ' + str(error))
                 else:
                     t_stop = time.time()
@@ -441,8 +443,7 @@ class FunkLoadTestCase(unittest.TestCase):
         time_start = time.time()
         while(True):
             try:
-                response = self._browser.fetch(url, None,
-                                               ok_codes=[200,301,302])
+                self._browser.fetch(url, None, ok_codes=[200,301,302])
             except SocketError:
                 if time.time() - time_start > time_out:
                     self.fail('Time out service %s not available after %ss' %
@@ -665,7 +666,7 @@ class FunkLoadTestCase(unittest.TestCase):
         """Dump the html content in a file.
 
         Use firefox to render the content if we are in rt viewing mode."""
-        dump_dir = getattr(self.options, 'dump_dir', None)
+        dump_dir = self._dump_dir
         if dump_dir is None:
             return
         if getattr(response, 'code', 301) in [301, 302]:
@@ -679,9 +680,12 @@ class FunkLoadTestCase(unittest.TestCase):
         f = open(file_path, 'w')
         f.write(response.body)
         f.close()
-        if self.viewing:
+        if self._viewing:
             cmd = 'firefox -remote  "openfile(file://%s,new-tab)"' % file_path
             ret = os.system(cmd)
+            if ret != 0:
+                self.logi('Failed to remote control firefox: %s' % cmd)
+                self._viewing = False
 
     #
     # Assertion helper

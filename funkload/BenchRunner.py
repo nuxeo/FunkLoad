@@ -475,6 +475,9 @@ def main():
     parser.add_option("", "--accept-invalid-links", action="store_true",
                       help="Do not fail if css/image links are "
                       "not reachable.")
+    parser.add_option("", "--simple-fetch", action="store_true",
+                      help="Don't load additional links like css "
+                      "or images when fetching an html page.")
     options, args = parser.parse_args()
     if len(args) != 2:
         parser.error("incorrect number of arguments")
