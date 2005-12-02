@@ -148,6 +148,8 @@ class PageStat(AllResponseStat):
 
     def finalize(self):
         """Compute avg times."""
+        if self.finalized:
+            return
         for thread in self.threads.keys():
             for page in self.threads[thread]['pages'].values():
                 #print "page ", page
@@ -167,7 +169,7 @@ class PageStat(AllResponseStat):
         if self.cycle_duration:
             # override rps to srps
             self.rps = self.success / float(self.cycle_duration)
-
+        self.finalized = True
 
 class ResponseStat:
     """Collect stat a specific response in a cycle."""

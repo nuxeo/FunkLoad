@@ -269,9 +269,9 @@ class RenderRst:
 
     def renderTestContent(self, test):
         """Render global information about test content."""
-        self.append(rst_title("Test content", 2))
+        self.append(rst_title("Bench content", 2))
         config = self.config
-        self.append('The test ``%s.%s`` contents: ' % (config['class'],
+        self.append('The test ``%s.%s`` contains: ' % (config['class'],
                                                        config['method']))
         self.append('')
         self.append("* %s page(s)" % test.pages)
@@ -280,6 +280,37 @@ class RenderRst:
         self.append("* %s image(s)" % test.images)
         self.append("* %s XML RPC call(s)" % test.xmlrpc)
         self.append('')
+
+        self.append('The bench contains:')
+        total_tests = 0
+        total_tests_error = 0
+        total_pages = 0
+        total_pages_error = 0
+        total_responses = 0
+        total_responses_error = 0
+        stats = self.stats
+        for cycle in self.cycles:
+            if stats[cycle].has_key('test'):
+                total_tests += stats[cycle]['test'].count
+                total_tests_error += stats[cycle]['test'].error
+            if stats[cycle].has_key('page'):
+                stat = stats[cycle]['page']
+                stat.finalize()
+                total_pages += stat.count
+                total_pages_error += stat.error
+            if stats[cycle].has_key('response'):
+                total_responses += stats[cycle]['response'].count
+                total_responses_error += stats[cycle]['response'].error
+        self.append('')
+        self.append("* %s tests" % total_tests + (
+            total_tests_error and ", %s error(s)" % total_tests_error or ''))
+        self.append("* %s pages" % total_pages + (
+            total_pages_error and ", %s error(s)" % total_pages_error or ''))
+        self.append("* %s requests" % total_responses + (
+            total_responses_error and ", %s error(s)" %
+            total_responses_error or ''))
+        self.append('')
+
 
     def renderCyclesStat(self, key, title, description=''):
         """Render a type of stats for all cycles."""
