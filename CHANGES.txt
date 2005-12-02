@@ -24,27 +24,27 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
-* New ``loop-on-pages`` option for ``fl-run-test``.
+* New ``--loop-on-pages`` option for ``fl-run-test``.
 
   This option enable to check response time of some specific pages inside a
   test without changing the script, which make easy to tune a page in a
   complex context. Use the ``debug`` option to find the page numbers. For
   example::
 
-    fl-run-test  myfile.py MyTestCase.testSomething -l 3 -n 100
+    fl-run-test myfile.py MyTestCase.testSomething -l 3 -n 100
 
   Run MyTestCase.testSomething, reload one hundred time the page 3 without
   concurrency and as fast as possible. Output response time stats. You can
   loop on many pages using slice -l 2:4.
 
-* New ``accept-invalid-links`` option for ``fl-run-test`` and ``fl-run-bench``
+* New ``--accept-invalid-links`` option for ``fl-run-test`` and
+  ``fl-run-bench``
 
   Don't fail if css/image links are not reachable.
 
-* New ``simple-fetch`` option for ``fl-run-test`` and ``fl-run-bench``
+* # 939_: Browser: Provide an option to disable image and links load
 
-  Don't load additional links like css or images when fetching an html page.
-
+  New ``--simple-fetch`` option for ``fl-run-test`` and ``fl-run-bench``.
 
 Bug fixes
 ~~~~~~~~~
@@ -234,6 +234,7 @@ See README.txt_ for more information about FunkLoad_.
 .. _README.txt: README.html
 .. _INSTALL.txt: INSTALL.html
 .. _935: http://svn.nuxeo.org/trac/pub/ticket/935
+.. _939: http://svn.nuxeo.org/trac/pub/ticket/939
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
 .. _944: http://svn.nuxeo.org/trac/pub/ticket/944
 .. _948: http://svn.nuxeo.org/trac/pub/ticket/948

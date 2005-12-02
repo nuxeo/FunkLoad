@@ -102,11 +102,17 @@ Development version
 
 If you want to try the latest unstable sources from svn ::
 
+    easy_install -eb /tmp funkload==dev
+
+or::
+
     svn co http://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
+
+then::
+
     cd /tmp/funkload/
     python setup.py build
     sudo python setup.py install
-
 
 
 Test it
