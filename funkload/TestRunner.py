@@ -241,14 +241,14 @@ Examples
         parser.add_option("-M", "--sleep-time-max", type="string",
                           dest="ftest_sleep_time_max",
                           help="Maximum sleep time between request.")
-        parser.add_option("", "--dump-directory", type="string",
+        parser.add_option("--dump-directory", type="string",
                           dest="dump_dir",
                           help="Directory to dump html pages.")
         parser.add_option("-V", "--firefox-view", action="store_true",
                           help="Real time view using firefox, "
                           "you must have a running instance of firefox "
                           "in the same host.")
-        parser.add_option("", "--no-color", action="store_true",
+        parser.add_option("--no-color", action="store_true",
                           help="Monochrome output.")
         parser.add_option("-l", "--loop-on-pages", type="string",
                           dest="loop_steps",
@@ -258,13 +258,14 @@ Examples
         parser.add_option("-n", "--loop-number", type="int",
                           dest="loop_number", default=10,
                           help="Number of loop.")
-        parser.add_option("", "--accept-invalid-links", action="store_true",
+        parser.add_option("--accept-invalid-links", action="store_true",
                           help="Do not fail if css/image links are "
                           "not reachable.")
-        parser.add_option("", "--simple-fetch", action="store_true",
+        parser.add_option("--simple-fetch", action="store_true",
                           help="Don't load additional links like css "
                           "or images when fetching an html page.")
-
+        parser.add_option("--stop-on-fail", action="store_true",
+                          help="Stop tests on first failure or error.")
 
         options, args = parser.parse_args()
         if self.module is None:

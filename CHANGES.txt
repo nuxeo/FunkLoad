@@ -46,6 +46,11 @@ New features
 
   New ``--simple-fetch`` option for ``fl-run-test`` and ``fl-run-bench``.
 
+* # 937_: TestRunner: Add an immediate fail option
+
+  New ``--stop-on-fail`` option for ``fl-run-test`` that stops tests on
+  first failure or error.
+
 Bug fixes
 ~~~~~~~~~
 

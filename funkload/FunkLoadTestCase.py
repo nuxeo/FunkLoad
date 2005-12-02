@@ -75,6 +75,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self._accept_invalid_links = getattr(options, 'accept_invalid_links',
                                              False)
         self._simple_fetch = getattr(options, 'simple_fetch', False)
+        self._stop_on_fail = getattr(options, 'stop_on_fail', False)
         if self._viewing and not self._dumping:
             # viewing requires dumping contents
             self._dumping = True
@@ -753,6 +754,7 @@ class FunkLoadTestCase(unittest.TestCase):
         result.startTest(self)
         testMethod = getattr(self, self._TestCase__testMethodName)
         try:
+            ok = False
             try:
                 self.logd('Starting -----------------------------------\n\t%s'
                           % self.conf_get(self.meta_method_name, 'description',
@@ -765,11 +767,9 @@ class FunkLoadTestCase(unittest.TestCase):
                 self.test_status = 'Error'
                 self.log_result(t_start, time.time())
                 return
-
-            ok = 0
             try:
                 testMethod()
-                ok = 1
+                ok = True
             except self.failureException:
                 result.addFailure(self, self._TestCase__exc_info())
                 self.test_status = 'Failure'
@@ -778,7 +778,6 @@ class FunkLoadTestCase(unittest.TestCase):
             except:
                 result.addError(self, self._TestCase__exc_info())
                 self.test_status = 'Error'
-
             try:
                 self.tearDown()
             except KeyboardInterrupt:
@@ -786,12 +785,13 @@ class FunkLoadTestCase(unittest.TestCase):
             except:
                 result.addError(self, self._TestCase__exc_info())
                 self.test_status = 'Error'
-                ok = 0
+                ok = False
             if ok:
                 result.addSuccess(self)
-
         finally:
             self.log_result(t_start, time.time())
+            if not ok and self._stop_on_fail:
+                result.stop()
             result.stopTest(self)
 
 
