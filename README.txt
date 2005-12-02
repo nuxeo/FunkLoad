@@ -829,6 +829,7 @@ Options
   --accept-invalid-links  Do not fail if css/image links are not reachable.
   --simple-fetch          Don't load additional links like css or images when
                           fetching an html page.
+  --stop-on-fail          Stop tests on first failure or error.
 
 
 Benching

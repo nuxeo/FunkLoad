@@ -239,6 +239,7 @@ See README.txt_ for more information about FunkLoad_.
 .. _README.txt: README.html
 .. _INSTALL.txt: INSTALL.html
 .. _935: http://svn.nuxeo.org/trac/pub/ticket/935
+.. _937: http://svn.nuxeo.org/trac/pub/ticket/937
 .. _939: http://svn.nuxeo.org/trac/pub/ticket/939
 .. _941: http://svn.nuxeo.org/trac/pub/ticket/941
 .. _944: http://svn.nuxeo.org/trac/pub/ticket/944
