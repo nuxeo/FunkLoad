@@ -51,6 +51,11 @@ New features
   New ``--stop-on-fail`` option for ``fl-run-test`` that stops tests on
   first failure or error.
 
+* # 933_: Report: Add global info
+
+  Adding total number of tests, pages and requests during the bench.
+
+
 Bug fixes
 ~~~~~~~~~
 
@@ -238,6 +243,7 @@ See README.txt_ for more information about FunkLoad_.
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _README.txt: README.html
 .. _INSTALL.txt: INSTALL.html
+.. _933: http://svn.nuxeo.org/trac/pub/ticket/933
 .. _935: http://svn.nuxeo.org/trac/pub/ticket/935
 .. _937: http://svn.nuxeo.org/trac/pub/ticket/937
 .. _939: http://svn.nuxeo.org/trac/pub/ticket/939
