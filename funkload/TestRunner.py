@@ -295,6 +295,7 @@ Examples
         # else we have to load all module test
 
     def runTests(self):
+        """Launch the tests."""
         if self.testRunner is None:
             if self.color:
                 self.testRunner = ColoredTextTestRunner(
