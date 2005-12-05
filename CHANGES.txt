@@ -55,11 +55,19 @@ New features
 
   Adding total number of tests, pages and requests during the bench.
 
+* ``CPSTestCase.listDocumentHref`` is renamed into ``cpsListDocumentHref``
+
+* ``FunkLoadTestCase.xmlrpc_call`` is renamed into ``xmlrpc``
+  (``xmlrpc_call`` is still working)
+
+* Some code cleaning.
+
 
 Bug fixes
 ~~~~~~~~~
 
 * updating ez_setup to fix broken sourceforge docutils download
+
 
 FunkLoad 1.3.1
 --------------

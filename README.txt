@@ -277,11 +277,11 @@ XML RPC API
 
 You can test or bench xmlrpc services using the following API.
 
-xmlrpc_call
-~~~~~~~~~~~
+xmlrpc
+~~~~~~
 ::
 
-  xmlrpc_call(url, method_name, params=None, description=None)
+  xmlrpc(url, method_name, params=None, description=None)
 
 Call the ``method_name`` at ``url`` using xmlrpclib. You can use the
 setBasicAuth_ method before to handle the http basic authentication. Note
@@ -1003,7 +1003,7 @@ Here are few remarks/advices to obtain workable metrics.
   are not hit by FunkLoad_ before your server's limit is reached.
   Check this by launching a bench from another host.
 
-* Always use description in post/get/xmlrpc_call, this improves the
+* Always use description in post/get/xmlrpc, this improves the
   readability of the report.
 
 * A good benching test should not be too long so you can bench faster using
