@@ -135,7 +135,6 @@ class FunkLoadTestCase(unittest.TestCase):
                                         quiet=True))
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
-
     def clearContext(self):
         """Resset the testcase."""
         self._browser.clearContext()
@@ -158,49 +157,6 @@ class FunkLoadTestCase(unittest.TestCase):
 
 
     #------------------------------------------------------------
-    # configuration file utils
-    #
-    def conf_get(self, section, key, default=_marker, quiet=False):
-        """Return an entry from the options or configuration file."""
-        # check for a command line options
-        opt_key = '%s_%s' % (section, key)
-        opt_val = getattr(self.options, opt_key, None)
-        if opt_val:
-            #print('[%s] %s = %s from options.' % (section, key, opt_val))
-            return opt_val
-        # check for the configuration file if opt val is None
-        # or nul
-        try:
-            val = self._config.get(section, key)
-        except (NoSectionError, NoOptionError):
-            if not quiet:
-                self.logi('[%s] %s not found' % (section, key))
-            if default is _marker:
-                raise
-            val = default
-        #print('[%s] %s = %s from config.' % (section, key, val))
-        return val
-
-    def conf_getInt(self, section, key, default=_marker, quiet=False):
-        """Return an integer from the configuration file."""
-        return int(self.conf_get(section, key, default, quiet))
-
-    def conf_getFloat(self, section, key, default=_marker, quiet=False):
-        """Return a float from the configuration file."""
-        return float(self.conf_get(section, key, default, quiet))
-
-    def conf_getList(self, section, key, default=_marker, quiet=False):
-        """Return a list from the configuration file."""
-        value = self.conf_get(section, key, default, quiet)
-        if value is default:
-            return value
-        if value.count(':'):
-            return value.split(':')
-        return [value]
-
-
-
-    #------------------------------------------------------------
     # browser simulation
     #
     def _connect(self, url, params, ok_codes, rtype, description):
@@ -209,7 +165,7 @@ class FunkLoadTestCase(unittest.TestCase):
         try:
             response = self._browser.fetch(url, params, ok_codes=ok_codes)
         except:
-            etype, value, tb = sys.exc_info()
+            etype, value, tback = sys.exc_info()
             t_stop = time.time()
             t_delta = t_stop - t_start
             self.total_time += t_delta
@@ -247,7 +203,6 @@ class FunkLoadTestCase(unittest.TestCase):
         if self._dumping:
             self._dump_content(response)
         return response
-
 
     def _browse(self, url_in, params_in=None,
                 description=None, ok_codes=None,
@@ -350,16 +305,16 @@ class FunkLoadTestCase(unittest.TestCase):
                     count += 1
                     self.steps += 1
                     self._browse(*record)
-            dt = self.total_time - t_start
+            t_delta = self.total_time - t_start
             text = ('End of loop: %d pages rendered in %.3fs, '
                     'avg of %.3fs per page, '
-                    '%.3f SPPS without concurrency.' % (count, dt, dt/count,
-                                                        count/dt))
+                    '%.3f SPPS without concurrency.' % (count, t_delta,
+                                                        t_delta/count,
+                                                        count/t_delta))
             self.logi(text)
             trace(text + '\n')
 
         return response
-
 
     def post(self, url, params=None, description=None, ok_codes=None):
         """POST method on url with params."""
@@ -369,7 +324,6 @@ class FunkLoadTestCase(unittest.TestCase):
                                 method="post")
         return response
 
-
     def get(self, url, params=None, description=None, ok_codes=None):
         """GET method on url adding params."""
         self.steps += 1
@@ -377,7 +331,6 @@ class FunkLoadTestCase(unittest.TestCase):
         response = self._browse(url, params, description, ok_codes,
                                 method="get")
         return response
-
 
     def exists(self, url, params=None, description="Checking existence"):
         """Try a GET on URL return True if the page exists or False."""
@@ -388,7 +341,6 @@ class FunkLoadTestCase(unittest.TestCase):
             return False
         self.logd('Page %s exists.' % url)
         return True
-
 
     def xmlrpc(self, url_in, method_name, params=None, description=None):
         """Call an xml rpc method_name on url with params."""
@@ -411,7 +363,7 @@ class FunkLoadTestCase(unittest.TestCase):
             else:
                 response = method()
         except:
-            etype, value, tb = sys.exc_info()
+            etype, value, tback = sys.exc_info()
             t_stop = time.time()
             t_delta = t_stop - t_start
             self.total_time += t_delta
@@ -443,7 +395,7 @@ class FunkLoadTestCase(unittest.TestCase):
         time_start = time.time()
         while(True):
             try:
-                self._browser.fetch(url, None, ok_codes=[200,301,302])
+                self._browser.fetch(url, None, ok_codes=[200, 301, 302])
             except SocketError:
                 if time.time() - time_start > time_out:
                     self.fail('Time out service %s not available after %ss' %
@@ -451,22 +403,6 @@ class FunkLoadTestCase(unittest.TestCase):
             else:
                 return
             time.sleep(sleep_time)
-
-
-    def sleep(self):
-        """Sleeps a random amount of time.
-
-        Between the predefined sleep_time_min and sleep_time_max values.
-        """
-        s_min = self.sleep_time_min
-        s_max = self.sleep_time_max
-        if s_max != s_min:
-            s_val = s_min + abs(s_max - s_min) * random()
-        else:
-            s_val = s_min
-        # we should always sleep something
-        thread_sleep(s_val)
-
 
     def setBasicAuth(self, login, password):
         """Set http basic authentication."""
@@ -477,7 +413,6 @@ class FunkLoadTestCase(unittest.TestCase):
         """Remove basic authentication."""
         self._browser.clearBasicAuth()
         self._authinfo = None
-
 
     def addHeader(self, key, value):
         """Add an http header."""
@@ -514,6 +449,120 @@ class FunkLoadTestCase(unittest.TestCase):
 
         If agent is None, the user agent header is removed."""
         self.setHeader('User-Agent', agent)
+
+    def sleep(self):
+        """Sleeps a random amount of time.
+
+        Between the predefined sleep_time_min and sleep_time_max values.
+        """
+        s_min = self.sleep_time_min
+        s_max = self.sleep_time_max
+        if s_max != s_min:
+            s_val = s_min + abs(s_max - s_min) * random()
+        else:
+            s_val = s_min
+        # we should always sleep something
+        thread_sleep(s_val)
+
+
+
+    #------------------------------------------------------------
+    # Assertion helpers
+    #
+    def getLastUrl(self):
+        """Return the last accessed url taking into account redirection."""
+        response = self._response
+        if response is not None:
+            return response.url
+        return ''
+
+    def getBody(self):
+        """Return the last response content."""
+        response = self._response
+        if response is not None:
+            return response.body
+        return ''
+
+    def listHref(self, pattern=None):
+        """Return a list of href anchor url present in the last html response.
+
+        Filtering href using the pattern regex if present."""
+        response = self._response
+        ret = []
+        if response is not None:
+            a_links = response.getDOM().getByName('a')
+            if a_links:
+                ret = [getattr(x, 'href', '') for x in a_links]
+            if pattern is not None:
+                pat = re.compile(pattern)
+                ret = [href for href in ret if pat.search(href) is not None]
+        return ret
+
+    def getLastBaseUrl(self):
+        """Return the base href url."""
+        response = self._response
+        if response is not None:
+            base = response.getDOM().getByName('base')
+            if base:
+                return base[0].href
+        return ''
+
+
+    #------------------------------------------------------------
+    # configuration file utils
+    #
+    def conf_get(self, section, key, default=_marker, quiet=False):
+        """Return an entry from the options or configuration file."""
+        # check for a command line options
+        opt_key = '%s_%s' % (section, key)
+        opt_val = getattr(self.options, opt_key, None)
+        if opt_val:
+            #print('[%s] %s = %s from options.' % (section, key, opt_val))
+            return opt_val
+        # check for the configuration file if opt val is None
+        # or nul
+        try:
+            val = self._config.get(section, key)
+        except (NoSectionError, NoOptionError):
+            if not quiet:
+                self.logi('[%s] %s not found' % (section, key))
+            if default is _marker:
+                raise
+            val = default
+        #print('[%s] %s = %s from config.' % (section, key, val))
+        return val
+
+    def conf_getInt(self, section, key, default=_marker, quiet=False):
+        """Return an integer from the configuration file."""
+        return int(self.conf_get(section, key, default, quiet))
+
+    def conf_getFloat(self, section, key, default=_marker, quiet=False):
+        """Return a float from the configuration file."""
+        return float(self.conf_get(section, key, default, quiet))
+
+    def conf_getList(self, section, key, default=_marker, quiet=False):
+        """Return a list from the configuration file."""
+        value = self.conf_get(section, key, default, quiet)
+        if value is default:
+            return value
+        if value.count(':'):
+            return value.split(':')
+        return [value]
+
+
+
+    #------------------------------------------------------------
+    # Extend unittest.TestCase to provide bench cycle hook
+    #
+    def setUpCycle(self):
+        """Called on bench mode before a cycle start."""
+        pass
+
+    def tearDownCycle(self):
+        """Called after a cycle in bench mode."""
+        pass
+
+
 
     #------------------------------------------------------------
     # logging
@@ -633,7 +682,6 @@ class FunkLoadTestCase(unittest.TestCase):
         message = '''<response cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s" step="%(step).3i" number="%(number).3i" type="%(type)s" result="%(result)s" url=%(url)s code="%(code)s" description=%(description)s time="%(time_start)s" duration="%(duration)s" />"''' % info
         self._logr(message)
 
-
     def _log_result(self, time_start, time_stop):
         """Log the test result."""
         info = {}
@@ -661,7 +709,6 @@ class FunkLoadTestCase(unittest.TestCase):
         text = '''<testResult cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s"  time="%(time_start)s" result="%(result)s" steps="%(steps)s" duration="%(duration)s" connection_duration="%(connection_duration)s" requests="%(requests)s" pages="%(pages)s" xmlrpc="%(xmlrpc)s" redirects="%(redirects)s" images="%(images)s" links="%(links)s" %(traceback)s/>''' % info
         self._logr(text)
 
-
     def _dump_content(self, response):
         """Dump the html content in a file.
 
@@ -686,58 +733,6 @@ class FunkLoadTestCase(unittest.TestCase):
             if ret != 0:
                 self.logi('Failed to remote control firefox: %s' % cmd)
                 self._viewing = False
-
-    #------------------------------------------------------------
-    # Assertion helper
-    #
-    def getLastUrl(self):
-        """Return the last accessed url taking into account redirection."""
-        response = self._response
-        if response is not None:
-            return response.url
-        return ''
-
-    def getBody(self):
-        """Return the last response content."""
-        response = self._response
-        if response is not None:
-            return response.body
-        return ''
-
-    def listHref(self, pattern=None):
-        """Return a list of href anchor url present in the last html response.
-
-        Filtering href using the pattern regex if present."""
-        response = self._response
-        ret = []
-        if response is not None:
-            a_links = response.getDOM().getByName('a')
-            if a_links:
-                ret = [getattr(x, 'href', '') for x in a_links]
-            if pattern is not None:
-                pat = re.compile(pattern)
-                ret = [href for href in ret if pat.search(href) is not None]
-        return ret
-
-    def getLastBaseUrl(self):
-        """Return the base href url."""
-        response = self._response
-        if response is not None:
-            base = response.getDOM().getByName('base')
-            if base:
-                return base[0].href
-        return ''
-
-    #------------------------------------------------------------
-    # Extend unittest.TestCase
-    #
-    def setUpCycle(self):
-        """Called on bench mode before a cycle start."""
-        pass
-
-    def tearDownCycle(self):
-        """Called after a cycle in bench mode."""
-        pass
 
 
     #------------------------------------------------------------
