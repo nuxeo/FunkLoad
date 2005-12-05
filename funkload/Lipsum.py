@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""A very simple Lorem ipsum generator.
+"""A simple Lorem ipsum generator.
 
 $Id: Lipsum.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
@@ -85,7 +85,7 @@ class Lipsum:
         return random.choice(self.vocab)
 
     def getUniqWord(self, length_min=None, length_max=None):
-        """Generate a kind of uniq id"""
+        """Generate a kind of uniq identifier."""
         length_min = length_min or 5
         length_max = length_max or 9
         length = random.randrange(length_min, length_max)
@@ -119,7 +119,7 @@ class Lipsum:
         return sentence
 
     def getParagraph(self, length=4):
-        """Return a paragraph"""
+        """Return a paragraph."""
         return ' '.join([self.getSentence() for i in range(length)])
 
     def getMessage(self, length=7):

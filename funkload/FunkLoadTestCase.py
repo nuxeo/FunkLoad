@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""FunkLoad Test Case using Richard Jones' webunit.
+"""FunkLoad test case using Richard Jones' webunit.
 
 $Id: FunkLoadTestCase.py 24757 2005-08-31 12:22:19Z bdelbosc $
 """
@@ -55,8 +55,8 @@ class FunkLoadTestCase(unittest.TestCase):
     def __init__(self, methodName='runTest', options=None):
         """Initialise the test case.
 
-        Extract the testname from the methodName if
-        method is encoded like 'methodName:testName'."""
+        Note that methodName is encoded in bench mode to provide additional
+        information like thread_id, concurrent virtual users.."""
         if mmn_is_bench(methodName):
             self.in_bench_mode = True
         else:
@@ -183,15 +183,15 @@ class FunkLoadTestCase(unittest.TestCase):
 
 
     def conf_getInt(self, section, key, default=_marker, quiet=False):
-        """Return an integer from th econfiguration file."""
+        """Return an integer from the configuration file."""
         return int(self.conf_get(section, key, default, quiet))
 
     def conf_getFloat(self, section, key, default=_marker, quiet=False):
-        """Return a float from th econfiguration file."""
+        """Return a float from the configuration file."""
         return float(self.conf_get(section, key, default, quiet))
 
     def conf_getList(self, section, key, default=_marker, quiet=False):
-        """Return a list from th econfiguration file."""
+        """Return a list from the configuration file."""
         value = self.conf_get(section, key, default, quiet)
         if value is default:
             return value

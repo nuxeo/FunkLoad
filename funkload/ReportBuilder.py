@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""Create an html report with charts from a funkload xml log and a config file.
+"""Create an ReST or HTML report with charts from a FunkLoad bench xml result.
 
 Producing html and png chart require python-docutils and python-gdchart
 
@@ -174,6 +174,7 @@ class FunkLoadXmlParser:
 # main
 #
 def main():
+    """ReportBuilder main."""
     parser = OptionParser(USAGE, formatter=TitledHelpFormatter(),
                           version="FunkLoad %s" % get_version())
     parser.add_option("-H", "--html", action="store_true", default=False,

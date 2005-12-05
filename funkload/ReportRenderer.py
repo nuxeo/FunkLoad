@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""Classes that collect and render statistics submitted by the result parser.
+"""Classes that render statistics.
 
 $Id: ReportRenderer.py 24736 2005-08-31 08:59:54Z bdelbosc $
 """

@@ -237,12 +237,12 @@ class BenchRunner:
             trace('-' * (len(text) - 1) + "\n\n")
             monitor_key = '%s:%s:%s' % (self.method_name, cycle, cvus)
             self.test.setUpCycle()
-            self.startMonitor(monitor_key)
+            self.startMonitors(monitor_key)
             self.startThreads(cycle, cvus)
             self.logging()
             #self.dumpThreads()
             self.stopThreads()
-            self.stopMonitor(monitor_key)
+            self.stopMonitors(monitor_key)
             cycle += 1
             self.test.tearDownCycle()
             t_stop = time.time()
@@ -347,7 +347,7 @@ class BenchRunner:
             trace(stack + '\n')
 
 
-    def startMonitor(self, monitor_key):
+    def startMonitors(self, monitor_key):
         """Start monitoring on hosts list."""
         if not self.monitor_hosts:
             return
@@ -365,7 +365,7 @@ class BenchRunner:
         self.monitor_hosts = monitor_hosts
 
 
-    def stopMonitor(self, monitor_key):
+    def stopMonitors(self, monitor_key):
         """Stop monitoring and save xml result."""
         if not self.monitor_hosts:
             return

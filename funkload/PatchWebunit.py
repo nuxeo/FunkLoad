@@ -15,11 +15,12 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""Patching Richard Jones' webunit, to :
+"""Patching Richard Jones' webunit for FunkLoad.
 
- * cache css
- * store a browser history
- * log response
+* Add cache for links (css, js)
+* store a browser history
+* add headers
+* log response
 
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
@@ -38,6 +39,7 @@ from webunit.webunittest import HTTPResponse, HTTPError, VERBOSE
 from utils import thread_sleep
 
 class FKLIMGSucker(IMGSucker):
+    """Image and links loader, patched to log response stats."""
     def __init__(self, url, session, ftestcase=None):
         IMGSucker.__init__(self, url, session)
         self.ftestcase = ftestcase

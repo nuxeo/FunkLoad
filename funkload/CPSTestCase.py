@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""CPS Layer for funkload test.
+"""FunkLoad test case for Nuxeo CPS.
 
 $Id: CPSTestCase.py 24728 2005-08-31 08:13:54Z bdelbosc $
 """

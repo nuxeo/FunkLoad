@@ -15,9 +15,10 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""Simple FunkLoad Test Recorder.
+"""TCPWatch FunkLoad Test Recorder.
 
-require tcpwatch.py
+Requires tcpwatch.py available at:
+
 * http://hathawaymix.org/Software/TCPWatch/tcpwatch-1.3.tar.gz
 
 Credits goes to Ian Bicking for parsing tcpwatch files.

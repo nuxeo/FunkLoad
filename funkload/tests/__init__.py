@@ -1,0 +1,4 @@
+"""FunkLoad test package
+
+$Id$
+"""
