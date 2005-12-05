@@ -315,7 +315,7 @@ class CPSTestCase(ZopeTestCase):
                 url = url[len(server_url):]
         return url
 
-    def listDocumentHref(self, pattern=None):
+    def cpsListDocumentHref(self, pattern=None):
         """Return a clean list of document href that matches pattern.
 
         Try to remove server_url and other cps trailings,
