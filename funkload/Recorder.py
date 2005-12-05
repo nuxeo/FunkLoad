@@ -290,7 +290,7 @@ Examples
                 for request in requests]
         if not code:
             trace("Sorry no action recorded.\n")
-            return
+            return ''
         code.insert(0, '')
         return self.reindent('\n'.join(code))
 
