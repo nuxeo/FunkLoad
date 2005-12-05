@@ -272,6 +272,7 @@ class FunkLoadTestCase(unittest.TestCase):
             self.logd(' Load css and images...')
             page = response.body
             t_start = time.time()
+            c_start = self.total_time
             try:
                 # pageImages is patched to call _log_response on all links
                 self._browser.pageImages(url, page, self)
@@ -283,12 +284,13 @@ class FunkLoadTestCase(unittest.TestCase):
                     t_delta = t_stop - t_start
                     self.step_success = False
                     self.test_status = 'Failure'
-                    self.logd('  Failed in %.2fs' % t_delta)
+                    self.logd('  Failed in ~ %.2fs' % t_delta)
+                    # XXX The duration logged for this response is wrong
                     self._log_response(error.response, 'link', None,
                                        t_start, t_stop, log_body=True)
                     raise self.failureException, str(error)
-            t_stop = time.time()
-            self.logd('  Done in %.3fs' % (t_stop - t_start))
+            c_stop = self.total_time
+            self.logd('  Done in %.3fs' % (c_stop - c_start))
         if sleep:
             self.sleep()
         self._response = response
