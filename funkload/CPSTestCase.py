@@ -298,7 +298,7 @@ class CPSTestCase(ZopeTestCase):
         params = [["SearchableText", doc_id]]
         self.post("%s/search_form" % self.server_url, params,
                   description="Searching doc_id %s" % doc_id)
-        ret = self.listDocumentHref(pattern='%s$' % doc_id)
+        ret = self.cpsListDocumentHref(pattern='%s$' % doc_id)
         self.logd('found %i link ends with %s' % (len(ret), doc_id))
         return ret
 
