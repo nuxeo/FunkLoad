@@ -63,8 +63,8 @@ class TestInstall(unittest.TestCase):
         os.chdir(os.path.join(tmp_path, 'funkload-demo', 'xmlrpc'))
         self.system("fl-credential-ctl cred.conf restart")
         self.system("fl-monitor-ctl monitor.conf restart")
-        self.system("fl-run-test -cv test_Credential.py")
-        self.system("fl-run-bench -C -c 1:10:20 -d 4 "
+        self.system("fl-run-test -v test_Credential.py")
+        self.system("fl-run-bench -c 1:10:20 -D 4 "
                     "test_Credential.py Credential.test_credential")
         self.system("fl-monitor-ctl monitor.conf stop")
         self.system("fl-credential-ctl cred.conf stop")
