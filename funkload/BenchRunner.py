@@ -139,7 +139,7 @@ class LoopTestRunner(threading.Thread):
 
 
     def run(self):
-        """Run a test in loop during."""
+        """Run a test in loop."""
         while (running()):
             test_result = unittest.TestResult()
             self.test.clearContext()
@@ -384,7 +384,7 @@ class BenchRunner:
 
     def logr(self, message):
         """Log to the test result file."""
-        self.test.logr(message, force=True)
+        self.test._logr(message, force=True)
 
     def logr_open(self):
         """Start logging tag."""
@@ -407,11 +407,11 @@ class BenchRunner:
                   'log_xml': self.result_path,}
         for (host, port, desc) in self.monitor_hosts:
             config[host] = desc
-        self.test.open_result_log(**config)
+        self.test._open_result_log(**config)
 
     def logr_close(self):
         """Stop logging tag."""
-        self.test.close_result_log()
+        self.test._close_result_log()
 
     def __repr__(self):
         """Display bench information."""

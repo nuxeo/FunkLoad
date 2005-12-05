@@ -58,8 +58,9 @@ class FKLIMGSucker(IMGSucker):
                     self.session.history.append(('image', url))
                     self.ftestcase.total_time += (t_stop - t_start)
                     self.ftestcase.total_images += 1
-                    self.ftestcase.log_response(self.session.images[url],
-                                                'image', None, t_start, t_stop)
+                    self.ftestcase._log_response(self.session.images[url],
+                                                 'image', None, t_start,
+                                                 t_stop)
                     thread_sleep()      # give a chance to other threads
             else:
                 newattributes.append((name, value))
@@ -80,8 +81,8 @@ class FKLIMGSucker(IMGSucker):
                     self.session.history.append(('link', url))
                     self.ftestcase.total_time += (t_stop - t_start)
                     self.ftestcase.total_links += 1
-                    self.ftestcase.log_response(self.session.css[url],
-                                                'link', None, t_start, t_stop)
+                    self.ftestcase._log_response(self.session.css[url],
+                                                 'link', None, t_start, t_stop)
                     thread_sleep()      # give a chance to other threads
             else:
                 newattributes.append((name, value))

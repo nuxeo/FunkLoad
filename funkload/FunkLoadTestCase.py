@@ -48,7 +48,7 @@ _marker = []
 # Classes
 #
 class FunkLoadTestCase(unittest.TestCase):
-    """Conducts a functional test of a Web-enabled HTTP application."""
+    """Unit test with browser and configuration capabilties."""
     # ------------------------------------------------------------
     # Initialisation
     #
@@ -56,7 +56,7 @@ class FunkLoadTestCase(unittest.TestCase):
         """Initialise the test case.
 
         Note that methodName is encoded in bench mode to provide additional
-        information like thread_id, concurrent virtual users.."""
+        information like thread_id, concurrent virtual users..."""
         if mmn_is_bench(methodName):
             self.in_bench_mode = True
         else:
@@ -139,7 +139,7 @@ class FunkLoadTestCase(unittest.TestCase):
     def clearContext(self):
         """Resset the testcase."""
         self._browser.clearContext()
-        self._browser.css = {}                   # css cache
+        self._browser.css = {}
         self._browser.history = []
         self._browser.extra_headers = []
         self.step_success = True
@@ -181,7 +181,6 @@ class FunkLoadTestCase(unittest.TestCase):
         #print('[%s] %s = %s from config.' % (section, key, val))
         return val
 
-
     def conf_getInt(self, section, key, default=_marker, quiet=False):
         """Return an integer from the configuration file."""
         return int(self.conf_get(section, key, default, quiet))
@@ -204,8 +203,7 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # browser simulation
     #
-
-    def connect(self, url, params, ok_codes, rtype, description):
+    def _connect(self, url, params, ok_codes, rtype, description):
         """Handle fetching, logging, errors and history."""
         t_start = time.time()
         try:
@@ -219,14 +217,14 @@ class FunkLoadTestCase(unittest.TestCase):
             self.test_status = 'Failure'
             self.logd(' Failed in %.3fs' % t_delta)
             if etype is HTTPError:
-                self.log_response(value.response, rtype, description,
-                                  t_start, t_stop, log_body=True)
+                self._log_response(value.response, rtype, description,
+                                   t_start, t_stop, log_body=True)
                 if self._dumping:
-                    self.dump_content(value.response)
+                    self._dump_content(value.response)
                 raise self.failureException, str(value.response)
             else:
-                self.log_response_error(url, rtype, description, t_start,
-                                        t_stop)
+                self._log_response_error(url, rtype, description, t_start,
+                                         t_stop)
                 if etype is SocketError:
                     raise SocketError("Can't load %s." % url)
                 raise
@@ -245,17 +243,17 @@ class FunkLoadTestCase(unittest.TestCase):
             self.setHeader('Referer', url)
         self._browser.history.append((rtype, url))
         self.logd(' Done in %.3fs' % t_delta)
-        self.log_response(response, rtype, description, t_start, t_stop)
+        self._log_response(response, rtype, description, t_start, t_stop)
         if self._dumping:
-            self.dump_content(response)
+            self._dump_content(response)
         return response
 
 
-    def browse(self, url_in, params_in=None,
-               description=None, ok_codes=None,
-               method='post',
-               follow_redirect=True, load_auto_links=True,
-               sleep=True):
+    def _browse(self, url_in, params_in=None,
+                description=None, ok_codes=None,
+                method='post',
+                follow_redirect=True, load_auto_links=True,
+                sleep=True):
         """Simulate a browser handle redirects, load/cache css and images."""
         self._response = None
         # Loop mode
@@ -297,7 +295,7 @@ class FunkLoadTestCase(unittest.TestCase):
                                                           self.steps,
                                                           description or ''))
         # Fetching
-        response = self.connect(url, params, ok_codes, method, description)
+        response = self._connect(url, params, ok_codes, method, description)
 
         # Check redirection
         if follow_redirect and response.code in (301, 302):
@@ -308,7 +306,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 newurl = response.headers['Location']
                 url = urljoin(url_in, newurl)
                 self.logd(' Load redirect link: %s' % url)
-                response = self.connect(url, None, ok_codes, 'redirect', None)
+                response = self._connect(url, None, ok_codes, 'redirect', None)
                 max_redirect_count -= 1
             if not max_redirect_count:
                 self.logd(' WARNING Too many redirects give up.')
@@ -320,7 +318,7 @@ class FunkLoadTestCase(unittest.TestCase):
             page = response.body
             t_start = time.time()
             try:
-                # pageImages is patched to log_response on all links
+                # pageImages is patched to call _log_response on all links
                 self._browser.pageImages(url, page, self)
             except HTTPError, error:
                 if self._accept_invalid_links:
@@ -331,8 +329,8 @@ class FunkLoadTestCase(unittest.TestCase):
                     self.step_success = False
                     self.test_status = 'Failure'
                     self.logd('  Failed in %.2fs' % t_delta)
-                    self.log_response(error.response, 'link', None,
-                                      t_start, t_stop, log_body=True)
+                    self._log_response(error.response, 'link', None,
+                                       t_start, t_stop, log_body=True)
                     raise self.failureException, str(error)
             t_stop = time.time()
             self.logd('  Done in %.3fs' % (t_stop - t_start))
@@ -351,7 +349,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 for record in self._loop_records:
                     count += 1
                     self.steps += 1
-                    self.browse(*record)
+                    self._browse(*record)
             dt = self.total_time - t_start
             text = ('End of loop: %d pages rendered in %.3fs, '
                     'avg of %.3fs per page, '
@@ -367,8 +365,8 @@ class FunkLoadTestCase(unittest.TestCase):
         """POST method on url with params."""
         self.steps += 1
         self.page_responses = 0
-        response = self.browse(url, params, description, ok_codes,
-                               method="post")
+        response = self._browse(url, params, description, ok_codes,
+                                method="post")
         return response
 
 
@@ -376,8 +374,8 @@ class FunkLoadTestCase(unittest.TestCase):
         """GET method on url adding params."""
         self.steps += 1
         self.page_responses = 0
-        response = self.browse(url, params, description, ok_codes,
-                               method="get")
+        response = self._browse(url, params, description, ok_codes,
+                                method="get")
         return response
 
 
@@ -392,7 +390,7 @@ class FunkLoadTestCase(unittest.TestCase):
         return True
 
 
-    def xmlrpc_call(self, url_in, method_name, params=None, description=None):
+    def xmlrpc(self, url_in, method_name, params=None, description=None):
         """Call an xml rpc method_name on url with params."""
         self.steps += 1
         self.page_responses = 0
@@ -420,8 +418,8 @@ class FunkLoadTestCase(unittest.TestCase):
             self.step_success = False
             self.test_status = 'Error'
             self.logd(' Failed in %.3fs' % t_delta)
-            self.log_xmlrpc_response(url, method_name, description, response,
-                                     t_start, t_stop, -1)
+            self._log_xmlrpc_response(url, method_name, description, response,
+                                      t_start, t_stop, -1)
             if etype is SocketError:
                 raise SocketError("Can't access %s." % url)
             raise
@@ -430,11 +428,12 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_time += t_delta
         self.total_xmlrpc += 1
         self.logd(' Done in %.3fs' % t_delta)
-        self.log_xmlrpc_response(url, method_name, description, response,
-                                 t_start, t_stop, 200)
+        self._log_xmlrpc_response(url, method_name, description, response,
+                                  t_start, t_stop, 200)
         self.sleep()
         return response
-
+    # backward compatibility < 1.4.0
+    xmlrpc_call = xmlrpc
 
     def waitUntilAvailable(self, url, time_out=20, sleep_time=2):
         """Wait until url is available.
@@ -530,26 +529,26 @@ class FunkLoadTestCase(unittest.TestCase):
         else:
             print self.meta_method_name+': '+message
 
-    def logr(self, message, force=False):
+    def _logr(self, message, force=False):
         """Log a result."""
         if force or not self.in_bench_mode or recording():
             self.logger_result.info(message)
 
-    def open_result_log(self, **kw):
+    def _open_result_log(self, **kw):
         """Open the result log."""
         xml = ['<funkload version="%s" time="%s">' % (
             get_version(), datetime.now().isoformat())]
         for key, value in kw.items():
             xml.append('<config key="%s" value=%s />' % (
                 key, quoteattr(str(value))))
-        self.logr('\n'.join(xml), force=True)
+        self._logr('\n'.join(xml), force=True)
 
-    def close_result_log(self):
+    def _close_result_log(self):
         """Close the result log."""
-        self.logr('</funkload>', force=True)
+        self._logr('</funkload>', force=True)
 
-    def log_response_error(self, url, rtype, description, time_start,
-                           time_stop):
+    def _log_response_error(self, url, rtype, description, time_start,
+                            time_stop):
         """Log a response that raise an unexpected exception."""
         self.total_responses += 1
         self.page_responses += 1
@@ -571,10 +570,10 @@ class FunkLoadTestCase(unittest.TestCase):
         info['traceback'] = quoteattr(' '.join(
             traceback.format_exception(*sys.exc_info())))
         message = '''<response cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s" step="%(step).3i" number="%(number).3i" type="%(type)s" result="%(result)s" url=%(url)s code="%(code)s" description=%(description)s time="%(time_start)s" duration="%(duration)s" traceback=%(traceback)s />''' % info
-        self.logr(message)
+        self._logr(message)
 
-    def log_response(self, response, rtype, description, time_start, time_stop,
-                     log_body=False):
+    def _log_response(self, response, rtype, description, time_start,
+                      time_stop, log_body=False):
         """Log a response."""
         self.total_responses += 1
         self.page_responses += 1
@@ -609,10 +608,10 @@ class FunkLoadTestCase(unittest.TestCase):
                 headers,
                 '  <body><![CDATA[\n%s\n]]>\n  </body>' % response.body,
                 '</response>'])
-        self.logr(message)
+        self._logr(message)
 
-    def log_xmlrpc_response(self, url, method, description, response,
-                            time_start, time_stop, code):
+    def _log_xmlrpc_response(self, url, method, description, response,
+                             time_start, time_stop, code):
         """Log a response."""
         self.total_responses += 1
         self.page_responses += 1
@@ -632,10 +631,10 @@ class FunkLoadTestCase(unittest.TestCase):
         info['duration'] = time_stop - time_start
         info['result'] = self.step_success and 'Successful' or 'Failure'
         message = '''<response cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s" step="%(step).3i" number="%(number).3i" type="%(type)s" result="%(result)s" url=%(url)s code="%(code)s" description=%(description)s time="%(time_start)s" duration="%(duration)s" />"''' % info
-        self.logr(message)
+        self._logr(message)
 
 
-    def log_result(self, time_start, time_stop):
+    def _log_result(self, time_start, time_stop):
         """Log the test result."""
         info = {}
         info['cycle'] = self.cycle
@@ -660,10 +659,10 @@ class FunkLoadTestCase(unittest.TestCase):
         else:
             info['traceback'] = ''
         text = '''<testResult cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s"  time="%(time_start)s" result="%(result)s" steps="%(steps)s" duration="%(duration)s" connection_duration="%(connection_duration)s" requests="%(requests)s" pages="%(pages)s" xmlrpc="%(xmlrpc)s" redirects="%(redirects)s" images="%(images)s" links="%(links)s" %(traceback)s/>''' % info
-        self.logr(text)
+        self._logr(text)
 
 
-    def dump_content(self, response):
+    def _dump_content(self, response):
         """Dump the html content in a file.
 
         Use firefox to render the content if we are in rt viewing mode."""
@@ -688,7 +687,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 self.logi('Failed to remote control firefox: %s' % cmd)
                 self._viewing = False
 
-    #
+    #------------------------------------------------------------
     # Assertion helper
     #
     def getLastUrl(self):
@@ -729,8 +728,8 @@ class FunkLoadTestCase(unittest.TestCase):
                 return base[0].href
         return ''
 
-    #
-    # extend unittest.TestCase
+    #------------------------------------------------------------
+    # Extend unittest.TestCase
     #
     def setUpCycle(self):
         """Called on bench mode before a cycle start."""
@@ -741,13 +740,13 @@ class FunkLoadTestCase(unittest.TestCase):
         pass
 
 
-    #
-    # overriding unittest.TestCase
+    #------------------------------------------------------------
+    # Overriding unittest.TestCase
     #
     def __call__(self, result=None):
         """Run the test method.
 
-        Override to trace test result."""
+        Override to log test result."""
         t_start = time.time()
         if result is None:
             result = self.defaultTestResult()
@@ -765,7 +764,7 @@ class FunkLoadTestCase(unittest.TestCase):
             except:
                 result.addError(self, self._TestCase__exc_info())
                 self.test_status = 'Error'
-                self.log_result(t_start, time.time())
+                self._log_result(t_start, time.time())
                 return
             try:
                 testMethod()
@@ -789,7 +788,7 @@ class FunkLoadTestCase(unittest.TestCase):
             if ok:
                 result.addSuccess(self)
         finally:
-            self.log_result(t_start, time.time())
+            self._log_result(t_start, time.time())
             if not ok and self._stop_on_fail:
                 result.stop()
             result.stopTest(self)

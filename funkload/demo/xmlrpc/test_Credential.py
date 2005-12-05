@@ -17,28 +17,28 @@ class Credential(FunkLoadTestCase):
 
     def test_credential(self):
         server_url = self.server_url
-        ret = self.xmlrpc_call(server_url, 'getStatus',
-                               description="Check getStatus")
+        ret = self.xmlrpc(server_url, 'getStatus',
+                          description="Check getStatus")
         self.assert_('running' in ret, 'Server is down %s' % ret)
         self.logd('ret %s' % ret)
 
-        ret = self.xmlrpc_call(server_url, 'getCredential',
-                               description="Get a credential from a file")
+        ret = self.xmlrpc(server_url, 'getCredential',
+                          description="Get a credential from a file")
         self.logd('ret %s' % ret)
         self.assertEquals(len(ret), 2, 'Invalid return %s' % ret)
 
-        ret = self.xmlrpc_call(server_url, 'listGroups',
-                               description="list groups from the group file")
+        ret = self.xmlrpc(server_url, 'listGroups',
+                          description="list groups from the group file")
         self.logd('ret %s' % ret)
         a_group = ret[0]
 
-        ret = self.xmlrpc_call(server_url, 'listCredentials',
-                               description="list all credential of the file")
+        ret = self.xmlrpc(server_url, 'listCredentials',
+                          description="list all credential of the file")
         self.logd('ret %s' % ret)
 
-        ret = self.xmlrpc_call(server_url, 'listCredentials', (a_group,),
-                               description="list credentials of group " +
-                               a_group)
+        ret = self.xmlrpc(server_url, 'listCredentials', (a_group,),
+                          description="list credentials of group " +
+                          a_group)
         self.logd('ret %s' % ret)
 
 
