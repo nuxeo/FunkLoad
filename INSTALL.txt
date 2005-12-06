@@ -131,7 +131,7 @@ To test benching and report building just::
 
   make bench
 
-See ``funkload-demo/README.txt`` for others examples.
+See ``funkload-demo/README`` for others examples.
 
 
 
@@ -186,17 +186,17 @@ Problems ?
 
 --------------------------
 
-See README.txt_ for more information about FunkLoad_.
+See README_ for more information about FunkLoad_.
 
-See CHANGES.txt_ for information on FunkLoad_ packages.
+See CHANGES_ for information on FunkLoad_ packages.
 
 See demo_ folder for other examples.
 
 
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
-.. _README.txt: README.html
-.. _CHANGES.txt: CHANGES.html
+.. _README: README.html
+.. _CHANGES: CHANGES.html
 .. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
