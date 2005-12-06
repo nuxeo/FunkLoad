@@ -23,6 +23,7 @@ import os
 import sys
 import time
 import re
+from warnings import warn
 from socket import error as SocketError
 from types import ListType
 from datetime import datetime
@@ -386,8 +387,12 @@ class FunkLoadTestCase(unittest.TestCase):
                                   t_start, t_stop, 200)
         self.sleep()
         return response
-    # backward compatibility < 1.4.0
-    xmlrpc_call = xmlrpc
+
+    def xmlrpc_call(self, url_in, method_name, params=None, description=None):
+        """BBB of xmlrpc, this method will be removed for 1.6.0."""
+        warn('Since 1.4.0 the method "xmlrpc_call" is renamed into "xmlrpc".',
+             DeprecationWarning, stacklevel=2)
+        return self.xmlrpc(url_in, method_name, params, description)
 
     def waitUntilAvailable(self, url, time_out=20, sleep_time=2):
         """Wait until url is available.
