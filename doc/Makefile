@@ -22,5 +22,5 @@ distrib: doc
 
 
 clean:
-	-rm -rf ./api/ $(HTML_DOCS)
+	-rm -rf ./api/* $(HTML_DOCS)
 	-@find . "(" -name "*~" -or  -name ".#*" -or  -name "#*#" -or -name "*.pyc" ")" -print0 | xargs -0 rm -f
