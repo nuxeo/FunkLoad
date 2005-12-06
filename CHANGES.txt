@@ -60,7 +60,7 @@ New features
 * ``FunkLoadTestCase.xmlrpc_call`` is renamed into ``xmlrpc``
   (``xmlrpc_call`` is still working)
 
-* Some code cleaning.
+* Some code cleaning, cheesecake_ index 460/560 ~82%.
 
 * New epydoc_ API_ documentation.
 
@@ -255,6 +255,7 @@ See README_ for more information about FunkLoad_.
 .. _INSTALL: INSTALL.html
 .. _API: api/index.html
 .. _epydoc: http://epydoc.sourceforge.net/
+.. _cheesecake: http://tracos.org/cheesecake/
 .. _933: http://svn.nuxeo.org/trac/pub/ticket/933
 .. _935: http://svn.nuxeo.org/trac/pub/ticket/935
 .. _937: http://svn.nuxeo.org/trac/pub/ticket/937
