@@ -1,11 +1,8 @@
 # FunkLoad Makefile
 # $Id: $
 #
-.PHONY: build pkg sdist egg install clean rpm doc
+.PHONY: build pkg sdist egg install clean rpm
 
-HTML_DOCS := README.html INSTALL.html CHANGES.html
-CSS_FILE := funkload/data/funkload.css
-RST2HTML := rst2html.py -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
 TARGET := cvs.in.nuxeo.com:~/public_public_html/funkload
 
 # use TAG=a for alpha, b for beta, rc for release candidate
@@ -32,10 +29,9 @@ egg:
 	-python2.4 setup.py $(PKGTAG) bdist_egg
 
 
-distrib: doc
+distrib:
 	-scp dist/funkload-*.tar.gz $(TARGET)/snapshots
 	-scp dist/funkload-*.egg $(TARGET)/snapshots
-	scp ${HTML_DOCS} $(TARGET)/
 
 install:
 	python setup.py $(PKGTAG) install
@@ -44,10 +40,6 @@ register:
 	python setup.py register sdist bdist_egg upload --sign
 	-python2.4 setup.py register bdist_egg upload --sign
 
-doc: ${HTML_DOCS}
-
-%.html: %.txt  $(CSS_FILE)
-	${RST2HTML} $< $@
 
 uninstall:
 	-easy_install -m funkload
@@ -59,4 +51,3 @@ uninstall:
 clean:
 	find . "(" -name "*~" -or  -name ".#*" -or  -name "#*#" -or -name "*.pyc" ")" -print0 | xargs -0 rm -f
 	rm -rf ./build ./dist ./MANIFEST ./funkload.egg-info
-	rm -f ${HTML_DOCS}
