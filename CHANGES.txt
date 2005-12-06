@@ -62,6 +62,8 @@ New features
 
 * Some code cleaning.
 
+* New epydoc_ API_ documentation.
+
 
 Bug fixes
 ~~~~~~~~~
@@ -99,7 +101,7 @@ New features
 * # 944_: Recorder: replace TestMaker recorder.
 
   Providing a ``fl-record`` command that drive a TCPWatch_ proxy.
-  See INSTALL.txt_ to setup TCPWatch_.
+  See INSTALL_ to setup TCPWatch_.
 
 * # 1041_: Browser: implement an addHeader method.
 
@@ -240,17 +242,19 @@ FunkLoad 1.0.0
 
 ---------------------------------------------
 
-See the INSTALL.txt_ file for requirement and installation.
+See the INSTALL_ file for requirement and installation.
 
-See README.txt_ for more information about FunkLoad_.
+See README_ for more information about FunkLoad_.
 
 
 
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
-.. _README.txt: README.html
-.. _INSTALL.txt: INSTALL.html
+.. _README: README.html
+.. _INSTALL: INSTALL.html
+.. _API: api/index.html
+.. _epydoc: http://epydoc.sourceforge.net/
 .. _933: http://svn.nuxeo.org/trac/pub/ticket/933
 .. _935: http://svn.nuxeo.org/trac/pub/ticket/935
 .. _937: http://svn.nuxeo.org/trac/pub/ticket/937

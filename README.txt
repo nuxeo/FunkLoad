@@ -1,6 +1,6 @@
-========
-FunkLoad
-========
+=========
+FunkLoad_
+=========
 
 :author: Benoit Delbosc
 
@@ -25,8 +25,6 @@ FunkLoad
 
 :abstract: This document describes the usage of the FunkLoad_ tool. This tool
     enables to do functional and load testing of web application.
-
-
 
 
 
@@ -132,14 +130,13 @@ Either:
    svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
 
 
-See CHANGES.txt_ file for information about distribution contents.
-
+See CHANGES_ file for information about distribution contents.
 
 
 Installation
 ------------
 
-See the INSTALL.txt_ file for requirement and installation.
+See the INSTALL_ file for requirement and installation.
 
 
 Examples
@@ -149,6 +146,18 @@ See the demo_ folder contents and a report_ example.
 
 For package installed with easy_install you need to run ``fl-install-demo``
 to extract the demo examples.
+
+
+Documentation
+-------------
+
+This page is the main FunkLoad_ documentation, there are also:
+
+* CHANGES_ for information about distribution contents.
+* INSTALL_ for requirement and installation.
+* API_ documentation generated with epydoc_.
+* SLIDES_ introducing FunkLoad_.
+
 
 Credits
 -------
@@ -165,6 +174,7 @@ capabilities, configuration file helpers and assertions helpers. FunkLoad_
 provides also some tools to generate random inputs and communicate with
 credential servers.
 
+Here is an overview of the api, you can find more on
 
 Browser API
 -----------
@@ -561,8 +571,8 @@ xmlrpc_list_credentials
 List all login/password served by the credential server.
 
 
-Other TestCases
-===============
+Other Test Cases
+================
 
 The ZopeTestCase
 ----------------
@@ -1074,7 +1084,7 @@ Recording a new FunkLoad test
 -----------------------------
 
 Starting with FunkLoad_ 1.3.0 you can use ``fl-record`` to record your
-navigator activity, this requires the TCPWatch_ python proxy see INSTALL.txt_
+navigator activity, this requires the TCPWatch_ python proxy see INSTALL_
 for information on how to install TCPWatch_.
 
 1. Start the recorder::
@@ -1228,10 +1238,11 @@ Note that you can monitor multiple hosts and that the monitor is linux
 specific.
 
 
-Bugs
-====
+Todo and bugs
+=============
 
 * See the trac tickets: http://svn.nuxeo.org/trac/pub/report/12
+
 
 
 .. _FunkLoad: http://funkload.nuxeo.org/
@@ -1239,9 +1250,11 @@ Bugs
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _pyUnit: http://pyunit.sourceforge.net/
-.. _INSTALL.txt: INSTALL.html
-.. _CHANGES.txt: CHANGES.html
-.. _maxq: http://maxq.tigris.org/
+.. _INSTALL: INSTALL.html
+.. _CHANGES: CHANGES.html
+.. _API: api/index.html
+.. _Slides: http://blogs.nuxeo.com/sections/blogs/fermigier/2005_11_17_slides-introducing
+.. _epydoc: http://epydoc.sourceforge.net/
 .. _Zope: http://www.zope.org/
 .. _Cmf: http://www.zope.org/Products/CMF/
 .. _Nuxeo: http://www.nuxeo.com/
