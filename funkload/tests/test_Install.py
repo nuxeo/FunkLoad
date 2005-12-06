@@ -16,7 +16,7 @@
 # 02111-1307, USA.
 #
 #
-"""Check FunkLoad installation
+"""Check FunkLoad installation.
 
 $Id$
 """

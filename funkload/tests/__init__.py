@@ -1,4 +1,4 @@
-"""FunkLoad test package
+"""FunkLoad test package.
 
 $Id$
 """

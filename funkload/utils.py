@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""FunkLoad common utils
+"""FunkLoad common utils.
 
 $Id: utils.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
