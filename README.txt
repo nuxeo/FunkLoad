@@ -776,6 +776,7 @@ The ``loop-on-pages`` option enable to check response time of some specific
 pages inside a test without changing the script, which make easy to tune a
 page in a complex context. Use the ``debug`` option to find the page numbers.
 
+Note that ``fl-run-test`` can be used to launch normal unittest.TestCase.
 
 Usage
 -----
@@ -806,6 +807,10 @@ Examples
                         time the page 3 without concurrency and as fast as
                         possible. Output response time stats. You can loop
                         on many pages using slice -l 2:4.
+  fl-run-test myFile.py -e [Ss]ome
+                        Run all tests that match the regex [Ss]ome.
+  fl-run-test myFile.py --list
+                        List all the test names.
   fl-run-test -h
                         More options.
 
@@ -840,6 +845,8 @@ Options
   --simple-fetch          Don't load additional links like css or images when
                           fetching an html page.
   --stop-on-fail          Stop tests on first failure or error.
+  --regex=REGEX, -eREGEX  The test names must match the regex.
+  --list                  Just list the test names.
 
 
 Benching
