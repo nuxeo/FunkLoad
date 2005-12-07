@@ -30,8 +30,10 @@ import sys
 import types
 import time
 import unittest
+import re
 from optparse import OptionParser, TitledHelpFormatter
 from utils import red_str, green_str, get_version
+from funkload.FunkLoadTestCase import FunkLoadTestCase
 
 # ------------------------------------------------------------
 #
@@ -40,6 +42,9 @@ class TestLoader(unittest.TestLoader):
     """Override to add options when instanciating test case."""
     def loadTestsFromTestCase(self, testCaseClass):
         """Return a suite of all tests cases contained in testCaseClass"""
+        if not issubclass(testCaseClass, FunkLoadTestCase):
+            return unittest.TestLoader.loadTestsFromTestCase(self,
+                                                             testCaseClass)
         options = getattr(self, 'options', None)
         return self.suiteClass([testCaseClass(name, options) for name in
                                 self.getTestCaseNames(testCaseClass)])
@@ -78,7 +83,10 @@ class TestLoader(unittest.TestLoader):
             return self.loadTestsFromTestCase(obj)
         elif type(obj) == types.UnboundMethodType:
             # pass funkload options
-            return obj.im_class(obj.__name__, self.options)
+            if issubclass(obj.im_class, FunkLoadTestCase):
+                return obj.im_class(obj.__name__, self.options)
+            else:
+                return obj.im_class(obj.__name__)
         elif callable(obj):
             test = obj()
             if not isinstance(test, unittest.TestCase) and \
@@ -154,6 +162,32 @@ class ColoredTextTestRunner(unittest.TextTestRunner):
             self.stream.writeln(green_str("OK"))
         return result
 
+def filter_testcases(suite, cpattern):
+    """Filter a suite with test names that match the compiled regex pattern."""
+    new = unittest.TestSuite()
+    for test in suite._tests:
+        if isinstance(test, unittest.TestCase):
+            name = test.id() # Full test name: package.module.class.method
+            name = name[1 + name.rfind('.'):] # extract method name
+            if cpattern.search(name):
+                new.addTest(test)
+        else:
+            filtered = filter_testcases(test, cpattern)
+            if filtered:
+                new.addTest(filtered)
+    return new
+
+
+def display_testcases(suite):
+    """Display test cases of the suite."""
+    for test in suite._tests:
+        if isinstance(test, unittest.TestCase):
+            name = test.id()
+            name = name[1 + name.find('.'):]
+            print name
+        else:
+            filtered = display_testcases(test)
+
 
 class TestProgram(unittest.TestProgram):
     """Override to add a python module and more options."""
@@ -187,6 +221,10 @@ Examples
                         time the page 3 without concurrency and as fast as
                         possible. Output response time stats. You can loop
                         on many pages using slice -l 2:4.
+  %prog myFile.py -e [Ss]ome
+                        Run all tests that match the regex [Ss]ome.
+  %prog myFile.py --list
+                        List all the test names.
   %prog -h
                         More options.
 """
@@ -213,15 +251,22 @@ Examples
         else:
             self.module = module
         self.loadTests()
-        self.runTests()
+        if self.list_tests:
+            display_testcases(self.test)
+        else:
+            self.runTests()
 
     def loadTests(self):
         """Load tests from modules or names."""
-        if self.testNames is None:
+        names = self.testNames
+        if names is None:
             self.test = self.testLoader.loadTestsFromModule(self.module)
         else:
             self.test = self.testLoader.loadTestsFromNames(self.testNames,
                                                            self.module)
+        if self.test_name_pattern is not None:
+            cpattern = re.compile(self.test_name_pattern)
+            self.test = filter_testcases(self.test, cpattern)
 
     def parseArgs(self, argv):
         """Parse programs args."""
@@ -266,6 +311,10 @@ Examples
                           "or images when fetching an html page.")
         parser.add_option("--stop-on-fail", action="store_true",
                           help="Stop tests on first failure or error.")
+        parser.add_option("-e", "--regex", type="string", default=None,
+                          help="The test names must match the regex.")
+        parser.add_option("--list", action="store_true",
+                          help="Just list the test names.")
 
         options, args = parser.parse_args()
         if self.module is None:
@@ -285,6 +334,8 @@ Examples
         else:
             options.ftest_log_to = 'file'
         self.color = not options.no_color
+        self.test_name_pattern = options.regex
+        self.list_tests = options.list
 
         # set testloader options
         self.testLoader.options = options
