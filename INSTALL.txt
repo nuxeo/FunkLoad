@@ -144,9 +144,24 @@ Problems ?
 
   Install python2.4-dev package.
 
-* easy_install complains about conflict, if FunkLoad_, webunit_ or docutils_
-  were previously installed without using EasyInstall_.  You need to try
-  with the ``--delete-conflicting`` option, see easy_install_ documentation.
+* easy_install complains about conflict::
+
+    ...
+    /usr/lib/site-python/docutils
+
+    Note: you can attempt this installation again with EasyInstall, and use
+    either the --delete-conflicting (-D) option or the
+    --ignore-conflicts-at-my-risk option, to either delete the above files
+    and directories, or to ignore the conflicts, respectively.  Note that if
+    you ignore the conflicts, the installed package(s) may not work.
+    -------------------------------------------------------------------------
+    error: Installation aborted due to conflicts
+
+
+  If FunkLoad_, webunit_ or docutils_ were previously installed without
+  using EasyInstall_.  You need to reinstall the package that raise the
+  conflict with the ``--delete-conflicting`` option, see easy_install_
+  documentation.
 
 * If you still have conflict try to remove FunkLoad_ from your system::
 
