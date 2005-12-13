@@ -137,7 +137,6 @@ class PageStat(AllResponseStat):
             new_page = True
         else:
             new_page = False
-
         if new_page:
             thread['count'] += 1
             self.count += 1
