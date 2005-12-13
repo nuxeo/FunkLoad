@@ -141,6 +141,9 @@ class PageStat(AllResponseStat):
         if new_page:
             thread['count'] += 1
             self.count += 1
+        if not thread['count']:
+            # don't take into account request that belongs to a staging up page
+            return
         stat = thread['pages'].setdefault(thread['count'],
                                           SinglePageStat(step))
         stat.addResponse(date, result, duration)
@@ -152,7 +155,6 @@ class PageStat(AllResponseStat):
             return
         for thread in self.threads.keys():
             for page in self.threads[thread]['pages'].values():
-                #print "page ", page
                 if str(page.result) == 'Successful':
                     if page.date_s:
                         count = self.per_second.setdefault(page.date_s, 0) + 1
