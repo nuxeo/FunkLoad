@@ -27,7 +27,7 @@ FunkLoad SVN trunk
 Bug fixes
 ~~~~~~~~~
 
-* # 1201_: Erroneous page stats
+* fix # 1201_: Erroneous page stats
 
 * fix # 934_: REPORT: Charts should display origin
 
