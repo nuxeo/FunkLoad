@@ -640,7 +640,8 @@ class RenderHtml(RenderRst):
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='STPS', ytitle2="Errors",
                        ylabel_density=50,
-                       ytitle2_color=color_error, ylabel2_color=color_error)
+                       ytitle2_color=color_error, ylabel2_color=color_error,
+                       requested_ymin=0.0)
         gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
                       self.getChartSize(cvus),
                       image_path,
@@ -684,7 +685,8 @@ class RenderHtml(RenderRst):
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
                        GDC_HLC_CONNECTING,
-                       ytitle2_color=color_error, ylabel2_color=color_error)
+                       ytitle2_color=color_error, ylabel2_color=color_error,
+                       requested_ymin=0.0)
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
@@ -697,7 +699,8 @@ class RenderHtml(RenderRst):
                        title='Successful Pages Per Second', xtitle='CUs',
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='SPPS', ytitle2="Errors",
-                       ylabel_density=50)
+                       ylabel_density=50,
+                       requested_ymin=0.0)
         gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
                       self.getChartSize(cvus),
                       image2_path,
@@ -742,7 +745,8 @@ class RenderHtml(RenderRst):
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
                        GDC_HLC_CONNECTING,
-                       ytitle2_color=color_error, ylabel2_color=color_error)
+                       ytitle2_color=color_error, ylabel2_color=color_error,
+                       requested_ymin=0.0)
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
@@ -757,7 +761,8 @@ class RenderHtml(RenderRst):
                        ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
                        ytitle='RPS', ytitle2="Errors",
                        ylabel_density=50,
-                       ytitle2_color=color_error, ylabel2_color=color_error)
+                       ytitle2_color=color_error, ylabel2_color=color_error,
+                       requested_ymin=0.0)
         gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
                       self.getChartSize(cvus),
                       image2_path,
@@ -809,7 +814,8 @@ class RenderHtml(RenderRst):
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
                        GDC_HLC_CONNECTING,
-                       ytitle2_color=color_error, ylabel2_color=color_error)
+                       ytitle2_color=color_error, ylabel2_color=color_error,
+                       requested_ymin=0.0)
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
@@ -901,7 +907,7 @@ class RenderHtml(RenderRst):
                        ylabel_fmt='%.2f',
                        ytitle='loadavg',
                        ylabel_density=50,
-                       )
+                       requested_ymin=0.0)
         gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
                       image_path,
                       times, cpu_usage, load_avg_1, load_avg_5, load_avg_15)
@@ -911,7 +917,7 @@ class RenderHtml(RenderRst):
         gdchart.option(format=gdchart.GDC_PNG,
                        title=title,
                        ylabel_fmt='%.0f kB',
-                       ytitle='memory used kB',)
+                       ytitle='memory used kB')
         gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
                       image_path,
                       times, mem_used, swap_used)
@@ -921,7 +927,7 @@ class RenderHtml(RenderRst):
         gdchart.option(format=gdchart.GDC_PNG,
                        title=title,
                        ylabel_fmt='%.0f kB/s',
-                       ytitle='network',)
+                       ytitle='network')
         gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
                       image_path,
                       times, net_in, net_out)
