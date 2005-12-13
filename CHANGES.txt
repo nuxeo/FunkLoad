@@ -29,6 +29,8 @@ Bug fixes
 
 * # 1201_: Erroneous page stats
 
+* fix # 934_: REPORT: Charts should display origin
+
 
 FunkLoad 1.4.0
 --------------
@@ -286,6 +288,7 @@ See README_ for more information about FunkLoad_.
 .. _epydoc: http://epydoc.sourceforge.net/
 .. _cheesecake: http://tracos.org/cheesecake/
 .. _933: http://svn.nuxeo.org/trac/pub/ticket/933
+.. _934: http://svn.nuxeo.org/trac/pub/ticket/934
 .. _935: http://svn.nuxeo.org/trac/pub/ticket/935
 .. _936: http://svn.nuxeo.org/trac/pub/ticket/936
 .. _937: http://svn.nuxeo.org/trac/pub/ticket/937
