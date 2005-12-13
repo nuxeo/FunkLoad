@@ -21,6 +21,13 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
+:Target: 1.4.1
+
+
+Bug fixes
+~~~~~~~~~
+
+* # 1201_: Erroneous page stats
 
 
 FunkLoad 1.4.0
@@ -298,3 +305,4 @@ See README_ for more information about FunkLoad_.
 .. _1088: http://svn.nuxeo.org/trac/pub/ticket/1088
 .. _1115: http://svn.nuxeo.org/trac/pub/ticket/1115
 .. _1183: http://svn.nuxeo.org/trac/pub/ticket/1183
+.. _1201: http://svn.nuxeo.org/trac/pub/ticket/1201
