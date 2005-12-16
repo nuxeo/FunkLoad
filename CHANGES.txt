@@ -1,4 +1,4 @@
-=================
+================
 FunkLoad_ CHANGES
 =================
 
@@ -21,7 +21,18 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: 1.4.1
+:Target: 1.5.0
+
+
+
+FunkLoad 1.4.1
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.4.1.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.4.1/
+
+:Released date: 2005-12-16
 
 
 Bug fixes
