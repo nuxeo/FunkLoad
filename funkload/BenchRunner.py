@@ -98,7 +98,7 @@ def get_status(success, failures, errors, color=False):
             status = red_str(status)
         code = 1
     else:
-        status = 'SUCCESSFULL'
+        status = 'SUCCESSFUL'
         if color:
             status = green_str(status)
         code = 0
@@ -300,7 +300,7 @@ class BenchRunner:
         """Log activity during duration."""
         duration = self.duration
         end_time = time.time() + duration
-        trace("* Logging for %ds (untill %s): " % (
+        trace("* Logging for %ds (until %s): " % (
             duration, datetime.fromtimestamp(end_time).isoformat()))
         set_recording_flag(True)
         while time.time() < end_time:
