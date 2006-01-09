@@ -46,6 +46,9 @@ Optional packages
 
     apt-get install python-gdchart
 
+  On non Debian systems you can build the gdchart following the
+  `Francois Meehan`_'s page.
+
   On Fedora FC4 (tested with python 2.3.5)::
 
     cd /tmp
@@ -195,8 +198,8 @@ Problems ?
     sudo rm /usr/local/bin/fl-*
 
 * No charts on your report. You need to have gdchart python module check
-  ``import gdchart``. I am looking for hints on how to install gdchart on
-  non Debian system.
+  ``import gdchart``. See the `Optional packages`_ for help on how to
+  install gdchart.
 
 
 --------------------------
@@ -218,3 +221,4 @@ See demo_ folder for other examples.
 .. _ez_setup.py: http://peak.telecommunity.com/dist/ez_setup.py
 .. _docutils: http://docutils.sourceforge.net/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
+.. _`Francois Meehan`: http://moinmoin.wikiwikiweb.de/FrancoisMeehan
