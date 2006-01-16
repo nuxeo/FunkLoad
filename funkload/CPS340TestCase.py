@@ -75,19 +75,21 @@ class CPSTestCase(ZopeTestCase):
         if zope_url is None or site_id is None:
             zope_url, site_id = self.cpsGuessZopeUrl()
         self.setBasicAuth(admin_id, admin_pwd)
-        params = {"id": site_id,
-                  "title": title or "CPS Portal",
-                  "description": description or "A funkload cps test site",
-                  "manager_id": manager_id,
-                  "manager_password": manager_password,
-                  "manager_password_confirmation": manager_password,
-                  "manager_email": manager_mail,
-                  "manager_sn": "CPS",
-                  "manager_givenName": "Manager",
-                  "langs_list:list": langs or self._default_langs,
-                  "interface": interface,
-                  "submit": "Create"}
-        self.post("%s/manage_addProduct/CPSDefault/manage_addCPSDefaultSite" %
+        params = {
+            'site_id': site_id,
+            'title': title or "FunkLoad CPS Portal",
+            'manager_id': manager_id,
+            'password': manager_password,
+            'password_confirm': manager_password,
+            'manager_email': manager_mail,
+            'manager_firstname': 'Manager',
+            'manager_lastname': 'CPS Manager',
+            'extension_ids:list': 'CPSSubscriptions:default',
+            'description': description or "A funkload cps test site",
+            'languages:list': langs or self._default_langs,
+            'submit': 'Add',
+            'profile_id': 'CPSDefault:default'}
+        self.post("%s/manage_addProduct/CPSDefault/addConfiguredCPSSite" %
                   zope_url, params, description="Create a CPS Site")
         self.clearBasicAuth()
 
@@ -139,7 +141,7 @@ class CPSTestCase(ZopeTestCase):
                   ["widget__roles:tokens:default", ""],
                   ["widget__roles:list", "Member"],
                   ["widget__groups:tokens:default", ""],
-                  ["widget__homeless", "0"],
+                  ["widget__homeless:boolean", "False"],
                   ["cpsdirectory_entry_create_form:method", "Create"]]
         for group in groups:
             params.append(["widget__groups:list", group])
@@ -201,9 +203,9 @@ class CPSTestCase(ZopeTestCase):
                   ["widget__Description",
                    description],
                   ["widget__LanguageSelectorCreation", lang],
-                  ["widget__hidden_folder", "0"],
+                  ["widget__hidden_folder:boolean", False],
                   ["cpsdocument_create_button", "Create"]]
-        self.post("%s/cpsdocument_create_form" % parent_url,
+        self.post("%s/cpsdocument_create" % parent_url,
                   params, "Create a %s" % type)
         return self.cpsCleanUrl(self.getLastBaseUrl())
 
@@ -222,7 +224,7 @@ class CPSTestCase(ZopeTestCase):
                   ["widget__content", self._lipsum.getMessage()],
                   ["widget__content_rformat", "text"],
                   ["cpsdocument_create_button", "Create"]]
-        self.post("%s/cpsdocument_create_form" % parent_url, params,
+        self.post("%s/cpsdocument_create" % parent_url, params,
                   description="Creating a document")
         self.assert_(self.getLastUrl().find('psm_content_created')!=-1,
                      'Failed to create [%s] in %s/.' % (title, parent_url))
@@ -257,7 +259,7 @@ class CPSTestCase(ZopeTestCase):
                   ["widget__publication_date_hour", time.strftime('%H')],
                   ["widget__publication_date_minute", time.strftime('%M')],
                   ["cpsdocument_create_button", "Create"]]
-        self.post("%s/cpsdocument_create_form" % parent_url, params,
+        self.post("%s/cpsdocument_create" % parent_url, params,
                   description="Creating a news item")
         last_url = self.getLastUrl()
         self.assert_('psm_content_created' in last_url,
