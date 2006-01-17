@@ -18,7 +18,7 @@ FunkLoad_ INSTALL
 OS support
 ----------
 
-Some part are OS specific:
+Some parts are OS specific:
 
 * the monitor server works only on Linux
 * the credential server is a unix daemon but can run on windows if launched
