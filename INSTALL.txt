@@ -15,11 +15,24 @@ FunkLoad_ INSTALL
 .. contents:: Table of Contents
 
 
+OS support
+----------
+
+Some part are OS specific:
+
+* the monitor server works only on Linux
+* the credential server is a unix daemon but can run on windows if launched
+  in debug mode (-d)
+
+Under windows there is a trick to install docutils (see below), you may
+also rename the scripts with a ``.py`` extension.
+
+
 Required packages
 -----------------
 
 * libexpat1
-* works fine with python 2.3.5, looks like ok with python 2.4
+* works fine with python 2.3.5 and python 2.4
 * python distutils, on a Debian system::
 
     sudo apt-get install python-dev
@@ -28,8 +41,7 @@ Required packages
 
     sudo apt-get install python-xml
 
-* For FunkLoad_ > 1.1.0 you need to use EasyInstall_, download ez_setup.py_,
-  and run it::
+* EasyInstall_, download ez_setup.py_, and run it::
 
     cd /tmp
     wget http://peak.telecommunity.com/dist/ez_setup.py
@@ -67,8 +79,10 @@ Optional packages
     # directory
 
 
+   No idea under windows.
 
-* Starting with version 1.3.0 the recorder use TCPWatch_::
+
+* The recorder use TCPWatch_ which is not yet available using easy_install::
 
     cd /tmp
     wget http://hathawaymix.org/Software/TCPWatch/tcpwatch-1.3.tar.gz
@@ -200,6 +214,13 @@ Problems ?
 * No charts on your report. You need to have gdchart python module check
   ``import gdchart``. See the `Optional packages`_ for help on how to
   install gdchart.
+
+
+* Under windows easy_install can not fetch docutils
+
+  - download the latest docutils tar gz (0.4) from docutils.sourceforge.net
+  - make sure that C:\python24 and C:\python24\Script are in your PATH
+  - easy_install c:\path\to\docutils-0.4.tar.gz
 
 
 --------------------------
