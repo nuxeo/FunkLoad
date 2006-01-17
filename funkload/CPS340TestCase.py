@@ -28,6 +28,7 @@ class CPSTestCase(ZopeTestCase):
     """Common CPS tasks.
 
     setUp must set a server_url attribute."""
+    cps_test_case_version = (3, 4, 0)
     server_url = None
     _lipsum = Lipsum()
     _all_langs = ['en', 'fr', 'de', 'it', 'es', 'pt_BR',
