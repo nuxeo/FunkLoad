@@ -24,6 +24,11 @@ FunkLoad SVN trunk
 :Target: 1.5.0
 
 
+New features
+~~~~~~~~~~~~
+
+* CPSTestCase is up to date for 3.4.0, use CPS338TestCase for a CPS 3.3.8
+
 
 FunkLoad 1.4.1
 --------------
