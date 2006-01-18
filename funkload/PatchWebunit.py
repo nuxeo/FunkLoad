@@ -21,6 +21,8 @@
 * store a browser history
 * add headers
 * log response
+* remove webunit log
+* fix HTTPResponse __repr__
 
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
@@ -90,19 +92,20 @@ class FKLIMGSucker(IMGSucker):
         self.unknown_starttag('link', newattributes)
 
 # remove webunit logging
-def log(self, message, content):
+def WTC_log(self, message, content):
     """Remove webunit logging."""
     pass
-WebTestCase.log = log
+WebTestCase.log = WTC_log
 
-def pageImages(self, url, page, testcase=None):
+# use fl img sucker
+def WTC_pageImages(self, url, page, testcase=None):
     '''Given the HTML page that was loaded from url, grab all the images.
     '''
     sucker = FKLIMGSucker(url, self, testcase)
     sucker.feed(page)
     sucker.close()
 
-WebTestCase.pageImages = pageImages
+WebTestCase.pageImages = WTC_pageImages
 
 
 # WebFetcher fetch
@@ -155,26 +158,26 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     if protocol == 'http':
         h = httplib.HTTP(server, int(port))
         if int(port) == 80:
-           host_header = server
+            host_header = server
         else:
-           host_header = '%s:%s'%(server, port)
+            host_header = '%s:%s' % (server, port)
     elif protocol == 'https':
         #if httpslib is None:
             #raise ValueError, "Can't fetch HTTPS: M2Crypto not installed"
         h = httplib.HTTPS(server, int(port))
         if int(port) == 443:
-           host_header = server
+            host_header = server
         else:
-           host_header = '%s:%s'%(server, port)
+            host_header = '%s:%s' % (server, port)
     else:
         raise ValueError, protocol
 
     params = None
     if postdata:
-        for field,value in postdata.items():
+        for field, value in postdata.items():
             if type(value) == type({}):
                 postdata[field] = []
-                for k,selected in value.items():
+                for k, selected in value.items():
                     if selected: postdata[field].append(k)
 
         # Do a post with the data file
@@ -273,7 +276,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         data = response.body
         for content in self.error_content:
             if data.find(content) != -1:
-                msg = "Matched error: %s"%content
+                msg = "Matched error: %s" % content
                 if hasattr(self, 'results') and self.results:
                     self.writeError(url, msg)
                 self.log('Matched error'+`(url, content)`, data)
@@ -288,3 +291,13 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     return response
 
 WebFetcher.fetch = WF_fetch
+
+
+def HR___repr__(self):
+    """fix HTTPResponse rendering."""
+    return """<response url="%s://%s:%s/%s" code="%s" message="%s" />""" % (
+        self.protocol, self.server, self.port, self.url, self.code,
+        self.message)
+
+HTTPResponse.__repr__ = HR___repr__
+
