@@ -29,6 +29,9 @@ New features
 
 * CPSTestCase is up to date for 3.4.0, use CPS338TestCase for a CPS 3.3.8
 
+* Improve firefox view in real time by using approriate file extention for
+  the content type
+
 
 FunkLoad 1.4.1
 --------------
