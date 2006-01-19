@@ -729,8 +729,15 @@ class FunkLoadTestCase(unittest.TestCase):
             return
         if not os.access(dump_dir, os.W_OK):
             os.mkdir(dump_dir, 0775)
+        content_type = response.headers.get('content-type')
+        if content_type == 'text/xml':
+            ext = '.xml'
+        else:
+            ext = os.path.splitext(response.url)[1]
+            if not ext.startswith('.') or len(ext) > 4:
+                ext = '.html'
         file_path = os.path.abspath(
-            os.path.join(dump_dir, '%3.3i.html' % self.steps))
+            os.path.join(dump_dir, '%3.3i%s' % (self.steps, ext)))
         f = open(file_path, 'w')
         f.write(response.body)
         f.close()
