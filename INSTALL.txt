@@ -176,7 +176,7 @@ Problems ?
 
 
   If FunkLoad_, webunit_ or docutils_ were previously installed without
-  using EasyInstall_.  You need to reinstall the package that raise the
+  using EasyInstall_.  You need to reinstall the package that raises the
   conflict with the ``--delete-conflicting`` option, see easy_install_
   documentation.
 
@@ -200,6 +200,21 @@ Problems ?
 
      sudo easy_install -U setuptools
 
+* Failed to install docutils 0.4 with easy_install 0.6a9 getting a::
+
+    ...
+    Best match: docutils 0.4
+    Downloading http://prdownloads.sourceforge.net/docutils/docutils-0.4.tar.gz?download
+    Requesting redirect to (randomly selected) 'mesh' mirror
+    error: No META HTTP-EQUIV="refresh" found in Sourceforge page at http://prdownloads.sourceforge.net/docutils/docutils-0.4.tar.gz?use_mirror=mesh
+
+ It looks like sourceforge change their download page again :(
+
+ - download manually the docutils tar gz from
+   http://prdownloads.sourceforge.net/docutils/docutils-0.4.tar.gz?download
+ - then ``sudo easy_install /path/to/docutils-0.4.tar.gz``
+
+
 
 * When testing ``make test`` return ::
 
@@ -211,16 +226,11 @@ Problems ?
 
     sudo rm /usr/local/bin/fl-*
 
+
 * No charts on your report. You need to have gdchart python module check
   ``import gdchart``. See the `Optional packages`_ for help on how to
   install gdchart.
 
-
-* Under windows easy_install can not fetch docutils
-
-  - download the latest docutils tar gz (0.4) from docutils.sourceforge.net
-  - make sure that C:\python24 and C:\python24\Script are in your PATH
-  - easy_install c:\path\to\docutils-0.4.tar.gz
 
 
 --------------------------
