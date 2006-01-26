@@ -27,7 +27,7 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
-* # 1300_: TestCase: support of doctest
+* # 1284_: TestCase: support of doctest
 
   There is a new FunkLoadDocTest class that ease usage of FunkLoad from
   doctest so you can simply do::
@@ -381,4 +381,4 @@ See README_ for more information about FunkLoad_.
 .. _1183: http://svn.nuxeo.org/trac/pub/ticket/1183
 .. _1201: http://svn.nuxeo.org/trac/pub/ticket/1201
 .. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
-.. _1300: http://svn.nuxeo.org/trac/pub/ticket/1300
+.. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
