@@ -17,7 +17,7 @@ build:
 	python setup.py $(PKGTAG) build
 
 test:
-	python setup.py test
+	cd funkload/tests && fl-run-test -v test_Install.py
 
 pkg: sdist egg
 
@@ -25,7 +25,7 @@ sdist:
 	python setup.py $(PKGTAG) sdist
 
 egg:
-	python setup.py $(PKGTAG) bdist_egg
+	-python2.3 setup.py $(PKGTAG) bdist_egg
 	-python2.4 setup.py $(PKGTAG) bdist_egg
 
 
@@ -37,7 +37,7 @@ install:
 	python setup.py $(PKGTAG) install
 
 register:
-	python setup.py register sdist bdist_egg upload --sign
+	-python2.3 setup.py register sdist bdist_egg upload --sign
 	-python2.4 setup.py register bdist_egg upload --sign
 
 
