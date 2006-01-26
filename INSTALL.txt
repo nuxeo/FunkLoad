@@ -61,6 +61,9 @@ Optional packages
 
     apt-get install python-gdchart
 
+  This package is only available for python2.3, but copying the ``gdchart.so``
+  to the ``python2.4/site-pacakges`` seems to work.
+
   On non Debian systems you can build the gdchart following the
   `Francois Meehan`_'s page.
 
