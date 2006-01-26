@@ -31,9 +31,44 @@ import types
 import time
 import unittest
 import re
+from StringIO import StringIO
 from optparse import OptionParser, TitledHelpFormatter
 from utils import red_str, green_str, get_version
+from doctest import DocTestSuite, DocFileSuite, DocTestCase, DocTestRunner
+from doctest import REPORTING_FLAGS, _unittest_reportflags
 from funkload.FunkLoadTestCase import FunkLoadTestCase
+
+DTC_verbose = False
+
+# patch for verbose doctest string
+def DTC_runTest(self):
+    global DTC_verbose
+    test = self._dt_test
+    old = sys.stdout
+    new = StringIO()
+    optionflags = self._dt_optionflags
+
+    if not (optionflags & REPORTING_FLAGS):
+        # The option flags don't include any reporting flags,
+        # so add the default reporting flags
+        optionflags |= _unittest_reportflags
+
+    runner = DocTestRunner(optionflags=optionflags,
+                           checker=self._dt_checker, verbose=DTC_verbose)
+    try:
+        runner.DIVIDER = "-"*70
+        failures, tries = runner.run(
+            test, out=new.write, clear_globs=False)
+    finally:
+        sys.stdout = old
+
+    if failures:
+        raise self.failureException(self.format_failure(new.getvalue()))
+    elif DTC_verbose:
+        print new.getvalue()
+
+DocTestCase.runTest = DTC_runTest
+
 
 # ------------------------------------------------------------
 #
@@ -48,6 +83,24 @@ class TestLoader(unittest.TestLoader):
         options = getattr(self, 'options', None)
         return self.suiteClass([testCaseClass(name, options) for name in
                                 self.getTestCaseNames(testCaseClass)])
+
+    def loadTestsFromModule(self, module):
+        """Return a suite of all tests cases contained in the given module"""
+        tests = []
+        try:
+            doctests = DocTestSuite(module)
+        except ValueError:
+            doctests = None
+        for name in dir(module):
+            obj = getattr(module, name)
+            if (isinstance(obj, (type, types.ClassType)) and
+                issubclass(obj, unittest.TestCase)):
+                tests.append(self.loadTestsFromTestCase(obj))
+        suite = self.suiteClass(tests)
+        if doctests is not None:
+            suite.addTest(doctests)
+        return suite
+
 
     def loadTestsFromName(self, name, module=None):
         """Return a suite of all tests cases given a string specifier.
@@ -96,6 +149,7 @@ class TestLoader(unittest.TestLoader):
             return test
         else:
             raise ValueError, "don't know how to make test from: %s" % obj
+
 
 
 class _ColoredTextTestResult(unittest._TextTestResult):
@@ -162,7 +216,7 @@ class ColoredTextTestRunner(unittest.TextTestRunner):
             self.stream.writeln(green_str("OK"))
         return result
 
-def filter_testcases(suite, cpattern):
+def filter_testcases(suite, cpattern, negative_pattern=False):
     """Filter a suite with test names that match the compiled regex pattern."""
     new = unittest.TestSuite()
     for test in suite._tests:
@@ -170,6 +224,9 @@ def filter_testcases(suite, cpattern):
             name = test.id() # Full test name: package.module.class.method
             name = name[1 + name.rfind('.'):] # extract method name
             if cpattern.search(name):
+                if not negative_pattern:
+                    new.addTest(test)
+            elif negative_pattern:
                 new.addTest(test)
         else:
             filtered = filter_testcases(test, cpattern)
@@ -204,15 +261,19 @@ See http://funkload.nuxeo.org/ for more information.
 Examples
 ========
   %prog myFile.py
-                        Run default set of tests.
-  %prog myFile.py MyTestSuite
-                        Run suite MyTestSuite.
+                        Run all tests including doctest.
+  %prog myFile.py test_suite
+                        Run suite named test_suite.
   %prog myFile.py MyTestCase.testSomething
-                        Run MyTestCase.testSomething.
+                        Run a single test MyTestCase.testSomething.
   %prog myFile.py MyTestCase
-                        Run all 'test*' test methods in MyTestCase.
+                        Run all 'test*' test methods and doctest in MyTestCase.
   %prog myFile.py MyTestCase -u http://localhost
                         Same against localhost.
+  %prog myDocTest.txt
+                        Run doctest from plain text file.
+  %prog myDocTest.txt -d
+                        Run doctest with debug output.
   %prog myfile.py -V
                         Run default set of tests and view in real time each
                         page fetch with firefox.
@@ -223,6 +284,8 @@ Examples
                         on many pages using slice -l 2:4.
   %prog myFile.py -e [Ss]ome
                         Run all tests that match the regex [Ss]ome.
+  %prog myFile.py -e '!xmlrpc$'
+                        Run all tests that does not ends with xmlrpc.
   %prog myFile.py --list
                         List all the test names.
   %prog -h
@@ -242,12 +305,18 @@ Examples
         self.progName = os.path.basename(argv[0])
         self.parseArgs(argv)
         self.testRunner = testRunner
+        self.checkAsDocFile = False
 
         module = self.module
         if type(module)  == type(''):
-            self.module = __import__(module)
-            for part in module.split('.')[1:]:
-                self.module = getattr(self.module, part)
+            try:
+                self.module = __import__(module)
+            except ImportError:
+                # may be a doc file case
+                self.checkAsDocFile = True
+            else:
+                for part in module.split('.')[1:]:
+                    self.module = getattr(self.module, part)
         else:
             self.module = module
         self.loadTests()
@@ -257,19 +326,28 @@ Examples
             self.runTests()
 
     def loadTests(self):
-        """Load tests from modules or names."""
-        names = self.testNames
-        if names is None:
-            self.test = self.testLoader.loadTestsFromModule(self.module)
+        """Load unit and doc tests from modules or names."""
+        if self.checkAsDocFile:
+            self.test = DocFileSuite(os.path.abspath(self.module),
+                                     module_relative=False)
         else:
-            self.test = self.testLoader.loadTestsFromNames(self.testNames,
+            if self.testNames is None:
+                self.test = self.testLoader.loadTestsFromModule(self.module)
+            else:
+                self.test = self.testLoader.loadTestsFromNames(self.testNames,
                                                            self.module)
         if self.test_name_pattern is not None:
-            cpattern = re.compile(self.test_name_pattern)
-            self.test = filter_testcases(self.test, cpattern)
+            test_name_pattern = self.test_name_pattern
+            negative_pattern = False
+            if test_name_pattern.startswith('!'):
+                test_name_pattern = test_name_pattern[1:]
+                negative_pattern = True
+            cpattern = re.compile(test_name_pattern)
+            self.test = filter_testcases(self.test, cpattern, negative_pattern)
 
     def parseArgs(self, argv):
         """Parse programs args."""
+        global DTC_verbose
         parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
                               version="FunkLoad %s" % get_version())
         parser.add_option("-q", "--quiet", action="store_true",
@@ -278,6 +356,8 @@ Examples
                           help="Verbose output.")
         parser.add_option("-d", "--debug", action="store_true",
                           help="FunkLoad debug output.")
+        parser.add_option("--debug-level", type="int",
+                          help="Debug level 2 is more verbose.")
         parser.add_option("-u", "--url", type="string", dest="main_url",
                           help="Base URL to bench without ending '/'.")
         parser.add_option("-m", "--sleep-time-min", type="string",
@@ -321,7 +401,10 @@ Examples
             if len(args) == 0:
                 parser.error("incorrect number of arguments")
             # remove the .py
-            self.module =  os.path.basename(os.path.splitext(args[0])[0])
+            module = args[0]
+            if module.endswith('.py'):
+                module =  os.path.basename(os.path.splitext(args[0])[0])
+            self.module = module
         else:
             args.insert(0, self.module)
 
@@ -329,10 +412,15 @@ Examples
             self.verbosity = 2
         if options.quiet:
             self.verbosity = 0
-        if options.debug:
+            DTC_verbose = False
+        if options.debug or options.debug_level:
+            options.ftest_debug_level = 1
             options.ftest_log_to = 'console file'
+            DTC_verbose = True
         else:
             options.ftest_log_to = 'file'
+        if options.debug_level:
+            options.ftest_debug_level = int(options.debug_level)
         self.color = not options.no_color
         self.test_name_pattern = options.regex
         self.list_tests = options.list
