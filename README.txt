@@ -6,7 +6,7 @@ FunkLoad_
 
 :address: bdelbosc _at_ nuxeo.com
 
-:version: FunkLoad/1.4.1
+:version: FunkLoad/1.5.0
 
 :revision: $Id$
 
@@ -84,6 +84,9 @@ Main FunkLoad_ features are:
   - debug mode
   - check performance of a single page (or set of pages) inside a test
   - green/red color mode
+  - select or exclude tests cases using a regex
+  - can launch normal unit test
+  - can launch doctest from a plain text file or embedded in python docstring
 
 * Turn a functional test into a load test: just by invoking the bench runner
   you can identify scalability and performance problems.
@@ -187,7 +190,17 @@ get
 
 This emulates a browser http GET link. It will fetch the url, submits
 appropriate cookies, follow redirection, register new cookies, load css and
-javascript that are not already cached.
+javascript.
+
+It also simulates a browser cache by not reloading a css, a javascript or an
+image twice.
+
+Note that this is an emulation with some limitation:
+
+* It is single threaded (it loads images one after the other)
+* It does not interpret javascript
+* See trac_ tickets that starts with `Browser:` for other limitations
+
 This method returns a webunit_ HTTPResponse.
 
 
@@ -398,10 +411,10 @@ The response returned by a get or post are webunit_ HTTPResponse object
 
 ::
 
-  repsonse = self.get(url)
+  response = self.get(url)
   print "http response code %s" % response.code
   print "http header location %s" % response.headers['location']
-
+  self.assert_('HTML' in response.body)
 
 ::
 
@@ -570,6 +583,20 @@ xmlrpc_list_credentials
 
 List all login/password served by the credential server.
 
+FunkLoadDocTest
+===============
+
+Since FunkLoad_ 1.5 you can use funkload easily from a doctest::
+
+    >>> from funkload.FunkLoadDocTest import FunkLoadDocTest
+    >>> fl = FunkLoadDocTest()
+    >>> response = fl.get('http://localhost/')
+    >>> 'HTML' in response.body
+    True
+    >>> response
+    <response url="http://127.0.0.1:80//" code="200" message="OK" />
+
+FunkLoadDocTest_ expose the same API than FunkLoadTestCase_
 
 Other Test Cases
 ================
@@ -627,7 +654,10 @@ Add an External method an run it.
 CPSTestCase
 -----------
 
-This class extends the ZopeTestCase providing common Nuxeo_ CPS_ tasks.
+This class extends the ZopeTestCase providing common Nuxeo_ CPS_ tasks. You
+need to import the CPSTestCase that works with your CPS_ for example
+CPS338TestCAse or CPS340TestCase.
+
 
 cpsCreateSite
 ~~~~~~~~~~~~~
@@ -776,7 +806,10 @@ The ``loop-on-pages`` option enable to check response time of some specific
 pages inside a test without changing the script, which make easy to tune a
 page in a complex context. Use the ``debug`` option to find the page numbers.
 
-Note that ``fl-run-test`` can be used to launch normal unittest.TestCase.
+Note that ``fl-run-test`` can be used to launch normal unittest.TestCase and
+even doctest in a plain text file or embedded in a python docstring. The
+``--debug`` option makes doctests verbose.
+
 
 Usage
 -----
@@ -790,15 +823,19 @@ Examples
 ::
 
   fl-run-test myFile.py
-                        Run default set of tests.
-  fl-run-test myFile.py MyTestSuite
-                        Run suite MyTestSuite.
+                        Run all tests including doctests.
+  fl-run-test myFile.py test_suite
+                        Run suite named test_suite.
   fl-run-test myFile.py MyTestCase.testSomething
-                        Run MyTestCase.testSomething.
+                        Run a single test MyTestCase.testSomething.
   fl-run-test myFile.py MyTestCase
                         Run all 'test*' test methods in MyTestCase.
   fl-run-test myFile.py MyTestCase -u http://localhost
                         Same against localhost.
+  fl-run-test myDocTest.txt
+                        Run doctest from plain text file.
+  fl-run-test myDocTest.txt -d
+                        Run doctest with debug output.
   fl-run-test myfile.py -V
                         Run default set of tests and view in real time each
                         page fetch with firefox.
@@ -809,6 +846,8 @@ Examples
                         on many pages using slice -l 2:4.
   fl-run-test myFile.py -e [Ss]ome
                         Run all tests that match the regex [Ss]ome.
+  fl-run-test myFile.py -e '!foo$'
+                        Run all tests that does not ends with foo.
   fl-run-test myFile.py --list
                         List all the test names.
   fl-run-test -h
@@ -824,6 +863,8 @@ Options
   --quiet, -q             Minimal output.
   --verbose, -v           Verbose output.
   --debug, -d             FunkLoad debug output.
+  --debug-level=DEBUG_LEVEL
+                          Debug level 2 is more verbose.
   --url=MAIN_URL, -uMAIN_URL
                           Base URL to bench without ending '/'.
   --sleep-time-min=FTEST_SLEEP_TIME_MIN, -mFTEST_SLEEP_TIME_MIN
@@ -847,6 +888,8 @@ Options
   --stop-on-fail          Stop tests on first failure or error.
   --regex=REGEX, -eREGEX  The test names must match the regex.
   --list                  Just list the test names.
+
+
 
 
 Benching
@@ -1256,6 +1299,8 @@ component in the 'Ticket properties'.
 
 
 
+
+
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _TestMaker: http://www.pushtotest.com/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
@@ -1276,3 +1321,4 @@ component in the 'Ticket properties'.
 .. _report: http://funkload.nuxeo.org/report-example.pdf
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
 .. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev
+.. _trac: http://svn.nuxeo.org/trac/pub/report/12
