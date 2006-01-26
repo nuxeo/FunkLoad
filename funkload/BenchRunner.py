@@ -34,7 +34,7 @@ Examples
 ========
   %prog myFile.py MyTestCase.testSomething
                         Bench MyTestCase.testSomething using MyTestCase.conf.
-  %prog -u http://localhost:8080 -c 10:20 -d 30 myFile.py \\
+  %prog -u http://localhost:8080 -c 10:20 -D 30 myFile.py \\
       MyTestCase.testSomething
                         Bench MyTestCase.testSomething on localhost:8080
                         with 2 cycles of 10 and 20 users during 30s.
