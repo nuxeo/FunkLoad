@@ -106,6 +106,9 @@ class FunkLoadTestCase(unittest.TestCase):
         config.read(config_path)
         self._config = config
         self._config_path = config_path
+        self.default_user_agent = self.conf_get('main', 'user_agent',
+                                                'FunkLoad/%s' % get_version(),
+                                                quiet=True)
         if self.in_bench_mode:
             section = 'bench'
         else:
@@ -132,9 +135,7 @@ class FunkLoadTestCase(unittest.TestCase):
         # init webunit browser (passing a fake methodName)
         self._browser = WebTestCase(methodName='log')
         self.clearContext()
-        self.setUserAgent(self.conf_get('main', 'user_agent',
-                                        'FunkLoad/%s' % get_version(),
-                                        quiet=True))
+        
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
     def clearContext(self):
@@ -154,6 +155,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_xmlrpc = 0
         self.clearBasicAuth()
         self.clearHeaders()
+        self.setUserAgent(self.default_user_agent)
+
         self.logdd('FunkLoadTestCase.clearContext done')
 
 
