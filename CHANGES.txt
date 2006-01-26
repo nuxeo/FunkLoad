@@ -84,6 +84,12 @@ New features
 * CPSTestCase is up to date for 3.4.0, use CPS338TestCase for a CPS 3.3.8.
 
 
+Bug fixes
+~~~~~~~~~
+
+* fix # 1278_: BenchRunner: UserAgent from config file is not set
+
+
 
 FunkLoad 1.4.1
 --------------
@@ -380,5 +386,6 @@ See README_ for more information about FunkLoad_.
 .. _1115: http://svn.nuxeo.org/trac/pub/ticket/1115
 .. _1183: http://svn.nuxeo.org/trac/pub/ticket/1183
 .. _1201: http://svn.nuxeo.org/trac/pub/ticket/1201
+.. _1278: http://svn.nuxeo.org/trac/pub/ticket/1278
 .. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
 .. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
