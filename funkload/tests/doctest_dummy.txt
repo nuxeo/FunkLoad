@@ -1,0 +1,18 @@
+=============
+Dummy DocTest
+=============
+
+This is a dummy doc test to check fl-run-test doctest support:
+
+>>> 1 + 1
+2
+
+
+Check FunkLoad doctest:
+
+>>> from funkload.FunkLoadDocTest import FunkLoadDocTest
+>>> fl = FunkLoadDocTest()
+>>> fl.get('http://localhost/')
+<response url="http://127.0.0.1:80//" code="200" message="OK" />
+
+See http://funkload.nuxeo.org/ for more information about FunkLoad
