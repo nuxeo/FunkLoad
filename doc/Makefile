@@ -2,14 +2,16 @@
 # $Id: $
 # to build api documentation you need python docutils and epydoc
 #
-.PHONY: doc epydoc clean distrib
+.PHONY: all epydoc clean distrib
 
 TARGET := cvs.in.nuxeo.com:~/public_public_html/funkload
 HTML_DOCS := README.html INSTALL.html CHANGES.html
 CSS_FILE := ../funkload/data/funkload.css
 RST2HTML := rst2html.py -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
 
-doc: ${HTML_DOCS} epydoc
+all: doc epydoc
+
+doc: ${HTML_DOCS}
 
 %.html: ../%.txt  $(CSS_FILE)
 	${RST2HTML} $< $@
