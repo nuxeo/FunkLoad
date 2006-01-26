@@ -39,7 +39,7 @@ class TestInstall(unittest.TestCase):
                       (cmd, ret[0], expected_code, ret[1]))
         return ret[1]
 
-    def test_01_checkRequires(self):
+    def test_01_requires(self):
         try:
             import webunit
         except ImportError:
