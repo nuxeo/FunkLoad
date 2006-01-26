@@ -27,10 +27,62 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
-* CPSTestCase is up to date for 3.4.0, use CPS338TestCase for a CPS 3.3.8
+* # 1300_: TestCase: support of doctest
+
+  There is a new FunkLoadDocTest class that ease usage of FunkLoad from
+  doctest so you can simply do::
+
+    >>> from funkload.FunkLoadDocTest import FunkLoadDocTest
+    >>> fl = FunkLoadDocTest()
+    >>> response = fl.get('http://localhost/')
+    >>> 'HTML' in response.body
+    True
+    >>> response
+    <response url="http://127.0.0.1:80//" code="200" message="OK" />
+
+
+  The test runner ``fl-run-test`` is now able launch doctest from a plain text
+  file or embedded in python docstring::
+
+     $ fl-run-test -v doctest_dummy.txt
+     Doctest: doctest_dummy.txt          Ok
+     -----------------------------------------------------
+     Ran 1 test in 0.077s
+     OK
+
+  And the ``--debug`` option makes doctests verbose::
+
+     $ fl-run-test -d doctest_dummy.txt
+     ...
+     Trying:
+         fl = FunkLoadDocTest()
+     Expecting nothing
+     ok
+     Trying:
+         fl.get('http://localhost/')
+     Expecting:
+         <response url="http://127.0.0.1:80//" code="200" message="OK" />
+     ok
+     Ok
+     ----------------------------------------------------------------------
+     Ran 1 test in 0.051s
+     OK
+
+* Test runner can use a negative regex to select tests. For example if you
+  want to launch all tests that does not ends with 'foo' ::
+
+    fl-run-test myFile.py -e '!foo$'
+
+* # 1282_: TestRunner: more verbosity
+
+  The new ``fl-run-test`` option ``--debug-level=2`` will produce debug
+  output on each link (images or css) fetched.
 
 * Improve firefox view in real time by using approriate file extention for
-  the content type
+  the content type.
+
+* CPSTestCase is up to date for 3.4.0, use CPS338TestCase for a CPS 3.3.8.
+
 
 
 FunkLoad 1.4.1
@@ -328,3 +380,5 @@ See README_ for more information about FunkLoad_.
 .. _1115: http://svn.nuxeo.org/trac/pub/ticket/1115
 .. _1183: http://svn.nuxeo.org/trac/pub/ticket/1183
 .. _1201: http://svn.nuxeo.org/trac/pub/ticket/1201
+.. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
+.. _1300: http://svn.nuxeo.org/trac/pub/ticket/1300
