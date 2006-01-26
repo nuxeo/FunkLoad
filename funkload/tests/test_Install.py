@@ -16,15 +16,28 @@
 # 02111-1307, USA.
 #
 #
-"""Check FunkLoad installation.
+"""Check an installed FunkLoad.
 
 $Id$
 """
 import os
 import unittest
+import commands
 
 class TestInstall(unittest.TestCase):
     """Check installation."""
+
+    def setUp(self):
+        self.test_file = 'test_dummy.py'
+        self.doctest_file = 'doctest_dummy.txt'
+
+    def system(self, cmd, expected_code=0):
+        """Execute a cmd and exit on fail return cmd output."""
+        ret = commands.getstatusoutput(cmd)
+        if ret[0] != expected_code:
+            self.fail("exec [%s] return code %s != %s output:\n%s" %
+                      (cmd, ret[0], expected_code, ret[1]))
+        return ret[1]
 
     def test_01_checkImport(self):
         try:
@@ -46,17 +59,101 @@ class TestInstall(unittest.TestCase):
             print ("WARNING: missing gdchart module, "
                    "no charts available in the HTML report.")
 
+    def test_testloader(self):
+        # check testrunner loader
+        test_file = self.test_file
+        # listing test
+        output = self.system("fl-run-test %s --list" % test_file)
+        self.assert_('test_dummy1_1' in output)
+        self.assert_('test_dummy2_1' in output)
+        self.assert_('test_dummy3_1' in output)
+        self.assert_('Dummy.double' in output, 'missing doctest')
 
-    def system(self, cmd):
-        """Execute a shell cmd and exit on fail."""
-        ret = os.system(cmd)
-        if ret != 0:
-            self.fail("exec [%s] return code %s" % (cmd, ret))
+        # list a test suite
+        output = self.system("fl-run-test %s test_suite --list" % test_file)
+        self.assert_('test_dummy1_1' in output)
+        self.assert_('test_dummy2_1' in output)
+        self.assert_('test_dummy3_1' not in output)
+        self.assert_('Dummy.double' not in output,
+                     'doctest is not part of the suite')
+
+        # list all test in a test case class
+        output = self.system("fl-run-test %s TestDummy1 --list" % test_file)
+        self.assert_('test_dummy1_1' in output)
+        self.assert_('test_dummy2_1' not in output)
+        self.assert_('Dummy.double' not in output,
+                     'doctest is not part of the testcase')
+
+        # pure doctest
+        doctest_file = self.doctest_file
+        output = self.system("fl-run-test %s --list" % doctest_file)
+        self.assert_(doctest_file.replace('.', '_') in output,
+                     'no %s in output %s' % (doctest_file, output))
+        self.assert_('test_dummy1_1' not in output)
+
+        # match regex
+        output = self.system("fl-run-test %s --list -e dummy1_1" % test_file)
+        self.assert_('test_dummy1_1' in output)
+        self.assert_('test_dummy2_1' not in output)
+
+        output = self.system("fl-run-test %s TestDummy1 --list -e dummy1_1" %
+                             test_file)
+        self.assert_('test_dummy1_1' in output)
+        self.assert_('test_dummy2_1' not in output)
+
+        output = self.system("fl-run-test %s --list -e dummy._1" % test_file)
+        self.assert_('test_dummy1_1' in output)
+        self.assert_('test_dummy2_1' in output)
+        self.assert_('test_dummy2_2' not in output)
+
+        output = self.system("fl-run-test %s --list -e 2$" % test_file)
+        self.assert_('test_dummy1_2' in output)
+        self.assert_('test_dummy1_1' not in output)
+
+        output = self.system("fl-run-test %s --list -e double" % test_file)
+        self.assert_('Dummy.double' in output)
+        self.assert_('test_dummy1_1' not in output)
+
+        output = self.system("fl-run-test %s --list -e double" % test_file)
+        self.assert_('Dummy.double' in output)
+        self.assert_('test_dummy1_1' not in output)
+
+        output = self.system("fl-run-test %s --list -e '!double'" % test_file)
+        self.assert_('double' not in output)
+        self.assert_('test_dummy1_1' in output)
+        self.assert_('test_dummy2_2' in output)
+
+
+
+
+    def test_testrunner(self):
+        # try to launch a test
+        test_file = self.test_file
+        output = self.system('fl-run-test %s TestDummy1 -v' % test_file)
+        self.assert_('Ran 0 tests' not in output,
+                     'not expected output:"""%s"""' % output)
+
+        output = self.system('fl-run-test %s TestDummy2 -v' % test_file)
+        self.assert_('Ran 0 tests' not in output,
+                     'not expected output:"""%s"""' % output)
+        # doctest
+        output = self.system('fl-run-test %s -e double -v' % test_file)
+        self.assert_('Ran 0 tests' not in output,
+                     'not expected output:"""%s"""' % output)
+
+        # failing test
+        output = self.system('fl-run-test %s TestDummy3 -v' % test_file,
+                             expected_code=256)
+        self.assert_('Ran 0 tests' not in output,
+                     'not expected output:"""%s"""' % output)
+        self.assert_('FAILED' in output)
+        self.assert_('ERROR' in output)
+
 
     def test_xmlrpc(self):
+        # extract demo example and run the xmlrpc test
         from tempfile import mkdtemp
         pwd = os.getcwd()
-        print ""
         tmp_path = mkdtemp('funkload')
         os.chdir(tmp_path)
         self.system('fl-install-demo')
@@ -70,6 +167,7 @@ class TestInstall(unittest.TestCase):
         self.system("fl-credential-ctl cred.conf stop")
         self.system("fl-build-report credential-bench.xml --html")
         os.chdir(pwd)
+
 
 
 def test_suite():
