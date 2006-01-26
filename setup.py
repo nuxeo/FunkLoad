@@ -76,6 +76,9 @@ Main FunkLoad features are:
   - display the fetched page in real time in your browser
   - debug mode
   - green/red color mode
+  - select test case using a regex
+  - can launch normal unit test
+  - can launch doctest from a plain text file or embedded in python docstring
 
 * Turn a functional test into a load test: just by invoking the bench runner
   you can identify scalability and performance problems.
