@@ -807,8 +807,8 @@ pages inside a test without changing the script, which make easy to tune a
 page in a complex context. Use the ``debug`` option to find the page numbers.
 
 Note that ``fl-run-test`` can be used to launch normal unittest.TestCase and
-even doctest in a plain text file or embedded in a python docstring. The
-``--debug`` option makes doctests verbose.
+(if you use python2.4) doctest in a plain text file or embedded in a python
+docstring. The ``--debug`` option makes doctests verbose.
 
 
 Usage
@@ -823,7 +823,7 @@ Examples
 ::
 
   fl-run-test myFile.py
-                        Run all tests including doctests.
+                        Run all tests (including doctest with python2.4).
   fl-run-test myFile.py test_suite
                         Run suite named test_suite.
   fl-run-test myFile.py MyTestCase.testSomething
@@ -833,9 +833,9 @@ Examples
   fl-run-test myFile.py MyTestCase -u http://localhost
                         Same against localhost.
   fl-run-test myDocTest.txt
-                        Run doctest from plain text file.
+                        Run doctest from plain text file (requires python2.4).
   fl-run-test myDocTest.txt -d
-                        Run doctest with debug output.
+                        Run doctest with debug output (requires python2.4).
   fl-run-test myfile.py -V
                         Run default set of tests and view in real time each
                         page fetch with firefox.

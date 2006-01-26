@@ -22,6 +22,7 @@ Similar to unittest.TestProgram but:
 * you can pass the python module to load
 * able to override funkload configuration file using command line options
 * cool color output
+* support doctest with python2.4
 
 $Id: TestRunner.py 24758 2005-08-31 12:33:00Z bdelbosc $
 """
@@ -47,9 +48,7 @@ try:
 except ImportError:
     g_has_doctest = False
 else:
-    # Patching doctestcase to enable verbose mode
     def DTC_runTest(self):
-        global g_doctest_verbose
         test = self._dt_test
         old = sys.stdout
         new = StringIO()
@@ -58,9 +57,12 @@ else:
             # The option flags don't include any reporting flags,
             # so add the default reporting flags
             optionflags |= _unittest_reportflags
+        # Patching doctestcase to enable verbose mode
+        global g_doctest_verbose
         runner = DocTestRunner(optionflags=optionflags,
                                checker=self._dt_checker,
                                verbose=g_doctest_verbose)
+        # End of patch
         try:
             runner.DIVIDER = "-"*70
             failures, tries = runner.run(
@@ -73,7 +75,6 @@ else:
             print new.getvalue()
 
     DocTestCase.runTest = DTC_runTest
-
 
 
 
@@ -271,7 +272,7 @@ See http://funkload.nuxeo.org/ for more information.
 Examples
 ========
   %prog myFile.py
-                        Run all tests including doctest.
+                        Run all tests (including doctest with python2.4).
   %prog myFile.py test_suite
                         Run suite named test_suite.
   %prog myFile.py MyTestCase.testSomething
@@ -281,9 +282,9 @@ Examples
   %prog myFile.py MyTestCase -u http://localhost
                         Same against localhost.
   %prog myDocTest.txt
-                        Run doctest from plain text file.
+                        Run doctest from plain text file (requires python2.4).
   %prog myDocTest.txt -d
-                        Run doctest with debug output.
+                        Run doctest with debug output (requires python2.4).
   %prog myfile.py -V
                         Run default set of tests and view in real time each
                         page fetch with firefox.
