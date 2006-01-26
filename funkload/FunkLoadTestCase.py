@@ -69,6 +69,7 @@ class FunkLoadTestCase(unittest.TestCase):
         unittest.TestCase.__init__(self, methodName=self.test_name)
         self._response = None
         self.options = options
+        self.debug_level = getattr(options, 'debug_level', 0)
         self._funkload_init()
         self._dump_dir = getattr(options, 'dump_dir', None)
         self._dumping =  self._dump_dir and True or False
@@ -153,7 +154,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_xmlrpc = 0
         self.clearBasicAuth()
         self.clearHeaders()
-        #self.logd('# FunkLoadTestCase.clearContext done')
+        self.logdd('FunkLoadTestCase.clearContext done')
 
 
 
@@ -577,6 +578,11 @@ class FunkLoadTestCase(unittest.TestCase):
     def logd(self, message):
         """Debug log."""
         self.logger.debug(self.meta_method_name +': ' +message)
+
+    def logdd(self, message):
+        """Verbose Debug log."""
+        if self.debug_level >= 2:
+            self.logger.debug(self.meta_method_name +': ' +message)
 
     def logi(self, message):
         """Info log."""

@@ -54,9 +54,12 @@ class FKLIMGSucker(IMGSucker):
                 # TODO: figure the re-write path
                 # newattributes.append((name, path))
                 if not self.session.images.has_key(url):
+                    self.ftestcase.logdd('    img: %s ...' % url)
                     t_start = time.time()
                     self.session.images[url] = self.session.fetch(url)
                     t_stop = time.time()
+                    self.ftestcase.logdd('     Done in %.3fs' %
+                                         (t_stop - t_start))
                     self.session.history.append(('image', url))
                     self.ftestcase.total_time += (t_stop - t_start)
                     self.ftestcase.total_images += 1
@@ -77,9 +80,12 @@ class FKLIMGSucker(IMGSucker):
                 # TODO: figure the re-write path
                 # newattributes.append((name, path))
                 if not self.session.css.has_key(url):
+                    self.ftestcase.logdd('    link: %s ...' % url)
                     t_start = time.time()
                     self.session.css[url] = self.session.fetch(url)
                     t_stop = time.time()
+                    self.ftestcase.logdd('     Done in %.3fs' %
+                                         (t_stop - t_start))
                     self.session.history.append(('link', url))
                     self.ftestcase.total_time += (t_stop - t_start)
                     self.ftestcase.total_links += 1
