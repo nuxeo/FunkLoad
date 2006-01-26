@@ -34,40 +34,47 @@ import re
 from StringIO import StringIO
 from optparse import OptionParser, TitledHelpFormatter
 from utils import red_str, green_str, get_version
-from doctest import DocTestSuite, DocFileSuite, DocTestCase, DocTestRunner
-from doctest import REPORTING_FLAGS, _unittest_reportflags
 from funkload.FunkLoadTestCase import FunkLoadTestCase
 
-DTC_verbose = False
+# ------------------------------------------------------------
+# doctest patch to command verbose mode only available with python2.4
+#
+g_doctest_verbose = False
+try:
+    from doctest import DocTestSuite, DocFileSuite, DocTestCase, DocTestRunner
+    from doctest import REPORTING_FLAGS, _unittest_reportflags
+    g_has_doctest = True
+except ImportError:
+    g_has_doctest = False
+else:
+    # Patching doctestcase to enable verbose mode
+    def DTC_runTest(self):
+        global g_doctest_verbose
+        test = self._dt_test
+        old = sys.stdout
+        new = StringIO()
+        optionflags = self._dt_optionflags
+        if not (optionflags & REPORTING_FLAGS):
+            # The option flags don't include any reporting flags,
+            # so add the default reporting flags
+            optionflags |= _unittest_reportflags
+        runner = DocTestRunner(optionflags=optionflags,
+                               checker=self._dt_checker,
+                               verbose=g_doctest_verbose)
+        try:
+            runner.DIVIDER = "-"*70
+            failures, tries = runner.run(
+                test, out=new.write, clear_globs=False)
+        finally:
+            sys.stdout = old
+        if failures:
+            raise self.failureException(self.format_failure(new.getvalue()))
+        elif g_doctest_verbose:
+            print new.getvalue()
 
-# patch for verbose doctest string
-def DTC_runTest(self):
-    global DTC_verbose
-    test = self._dt_test
-    old = sys.stdout
-    new = StringIO()
-    optionflags = self._dt_optionflags
+    DocTestCase.runTest = DTC_runTest
 
-    if not (optionflags & REPORTING_FLAGS):
-        # The option flags don't include any reporting flags,
-        # so add the default reporting flags
-        optionflags |= _unittest_reportflags
 
-    runner = DocTestRunner(optionflags=optionflags,
-                           checker=self._dt_checker, verbose=DTC_verbose)
-    try:
-        runner.DIVIDER = "-"*70
-        failures, tries = runner.run(
-            test, out=new.write, clear_globs=False)
-    finally:
-        sys.stdout = old
-
-    if failures:
-        raise self.failureException(self.format_failure(new.getvalue()))
-    elif DTC_verbose:
-        print new.getvalue()
-
-DocTestCase.runTest = DTC_runTest
 
 
 # ------------------------------------------------------------
@@ -86,11 +93,14 @@ class TestLoader(unittest.TestLoader):
 
     def loadTestsFromModule(self, module):
         """Return a suite of all tests cases contained in the given module"""
+        global g_has_doctest
         tests = []
-        try:
-            doctests = DocTestSuite(module)
-        except ValueError:
-            doctests = None
+        doctests = None
+        if g_has_doctest:
+            try:
+                doctests = DocTestSuite(module)
+            except ValueError:
+                pass
         for name in dir(module):
             obj = getattr(module, name)
             if (isinstance(obj, (type, types.ClassType)) and
@@ -229,7 +239,7 @@ def filter_testcases(suite, cpattern, negative_pattern=False):
             elif negative_pattern:
                 new.addTest(test)
         else:
-            filtered = filter_testcases(test, cpattern)
+            filtered = filter_testcases(test, cpattern, negative_pattern)
             if filtered:
                 new.addTest(filtered)
     return new
@@ -243,7 +253,7 @@ def display_testcases(suite):
             name = name[1 + name.find('.'):]
             print name
         else:
-            filtered = display_testcases(test)
+            display_testcases(test)
 
 
 class TestProgram(unittest.TestProgram):
@@ -312,8 +322,12 @@ Examples
             try:
                 self.module = __import__(module)
             except ImportError:
-                # may be a doc file case
-                self.checkAsDocFile = True
+                global g_has_doctest
+                if g_has_doctest:
+                    # may be a doc file case
+                    self.checkAsDocFile = True
+                else:
+                    raise
             else:
                 for part in module.split('.')[1:]:
                     self.module = getattr(self.module, part)
@@ -347,7 +361,7 @@ Examples
 
     def parseArgs(self, argv):
         """Parse programs args."""
-        global DTC_verbose
+        global g_doctest_verbose
         parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
                               version="FunkLoad %s" % get_version())
         parser.add_option("-q", "--quiet", action="store_true",
@@ -412,11 +426,11 @@ Examples
             self.verbosity = 2
         if options.quiet:
             self.verbosity = 0
-            DTC_verbose = False
+            g_doctest_verbose = False
         if options.debug or options.debug_level:
             options.ftest_debug_level = 1
             options.ftest_log_to = 'console file'
-            DTC_verbose = True
+            g_doctest_verbose = True
         else:
             options.ftest_log_to = 'file'
         if options.debug_level:
