@@ -30,7 +30,7 @@ New features
 * # 1284_: TestCase: support of doctest
 
   There is a new FunkLoadDocTest class that ease usage of FunkLoad from
-  doctest so you can simply do::
+  doctest::
 
     >>> from funkload.FunkLoadDocTest import FunkLoadDocTest
     >>> fl = FunkLoadDocTest()
