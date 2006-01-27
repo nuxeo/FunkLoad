@@ -44,6 +44,7 @@ register:
 uninstall:
 	-easy_install -m funkload
 	-rm -rf /usr/lib/python2.3/site-packages/funkload*
+	-rm -rf /usr/lib/python2.4/site-packages/funkload*
 	-rm -rf /usr/local/funkload/
 	-rm -f /usr/local/bin/fl-*
 	-rm -f /usr/bin/fl-*
