@@ -21,7 +21,18 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: 1.5.0
+:Target: ?
+
+
+
+FunkLoad 1.5.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.5.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.5.0/
+
+:Released date: 2006-01-31
 
 
 New features
@@ -41,8 +52,8 @@ New features
     <response url="http://127.0.0.1:80//" code="200" message="OK" />
 
 
-  The test runner ``fl-run-test`` is now able launch doctest from a plain text
-  file or embedded in python docstring::
+  If you use python2.4, the test runner ``fl-run-test`` is able launch
+  doctest from a plain text file or embedded in python docstring::
 
      $ fl-run-test -v doctest_dummy.txt
      Doctest: doctest_dummy.txt          Ok
@@ -389,3 +400,6 @@ See README_ for more information about FunkLoad_.
 .. _1278: http://svn.nuxeo.org/trac/pub/ticket/1278
 .. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
 .. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
+
+.. Local Variables:
+.. mode: rst
