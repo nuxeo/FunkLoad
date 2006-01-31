@@ -259,3 +259,6 @@ See demo_ folder for other examples.
 .. _docutils: http://docutils.sourceforge.net/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _`Francois Meehan`: http://moinmoin.wikiwikiweb.de/FrancoisMeehan
+
+.. Local Variables:
+.. mode: rst

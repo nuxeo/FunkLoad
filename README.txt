@@ -10,7 +10,7 @@ FunkLoad_
 
 :revision: $Id$
 
-:Copyright: (C) Copyright 2005 Nuxeo SARL (http://nuxeo.com).
+:Copyright: (C) Copyright 2005 Nuxeo SAS (http://nuxeo.com).
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
     version 2 as published by the Free Software Foundation.
@@ -25,7 +25,6 @@ FunkLoad_
 
 :abstract: This document describes the usage of the FunkLoad_ tool. This tool
     enables to do functional and load testing of web application.
-
 
 
 .. sectnum::    :depth: 2
@@ -1300,7 +1299,6 @@ component in the 'Ticket properties'.
 
 
 
-
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _TestMaker: http://www.pushtotest.com/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
@@ -1322,3 +1320,6 @@ component in the 'Ticket properties'.
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
 .. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev
 .. _trac: http://svn.nuxeo.org/trac/pub/report/12
+
+.. Local Variables:
+.. mode: rst

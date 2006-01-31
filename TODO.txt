@@ -3,3 +3,6 @@ FunkLoad Todo
 =============
 
 See the trac tickets: http://svn.nuxeo.org/trac/pub/report/12
+
+.. Local Variables:
+.. mode: rst
