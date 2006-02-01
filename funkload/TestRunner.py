@@ -370,7 +370,7 @@ Examples
         parser.add_option("-v", "--verbose", action="store_true",
                           help="Verbose output.")
         parser.add_option("-d", "--debug", action="store_true",
-                          help="FunkLoad debug output.")
+                          help="FunkLoad and doctest debug output.")
         parser.add_option("--debug-level", type="int",
                           help="Debug level 2 is more verbose.")
         parser.add_option("-u", "--url", type="string", dest="main_url",
