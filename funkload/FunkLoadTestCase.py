@@ -377,8 +377,8 @@ class FunkLoadTestCase(unittest.TestCase):
             self.step_success = False
             self.test_status = 'Error'
             self.logd(' Failed in %.3fs' % t_delta)
-            self._log_xmlrpc_response(url, method_name, description, response,
-                                      t_start, t_stop, -1)
+            self._log_xmlrpc_response(url_in, method_name, description,
+                                      response, t_start, t_stop, -1)
             if etype is SocketError:
                 raise SocketError("Can't access %s." % url)
             raise
@@ -387,7 +387,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_time += t_delta
         self.total_xmlrpc += 1
         self.logd(' Done in %.3fs' % t_delta)
-        self._log_xmlrpc_response(url, method_name, description, response,
+        self._log_xmlrpc_response(url_in, method_name, description, response,
                                   t_start, t_stop, 200)
         self.sleep()
         return response
@@ -551,13 +551,16 @@ class FunkLoadTestCase(unittest.TestCase):
         """Return a float from the configuration file."""
         return float(self.conf_get(section, key, default, quiet))
 
-    def conf_getList(self, section, key, default=_marker, quiet=False):
+    def conf_getList(self, section, key, default=_marker, quiet=False,
+                     separator=None):
         """Return a list from the configuration file."""
         value = self.conf_get(section, key, default, quiet)
         if value is default:
             return value
-        if value.count(':'):
-            return value.split(':')
+        if separator is None:
+            separator = ':'
+        if value.count(separator):
+            return value.split(separator)
         return [value]
 
 
