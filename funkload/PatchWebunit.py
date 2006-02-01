@@ -301,7 +301,7 @@ WebFetcher.fetch = WF_fetch
 
 def HR___repr__(self):
     """fix HTTPResponse rendering."""
-    return """<response url="%s://%s:%s/%s" code="%s" message="%s" />""" % (
+    return """<response url="%s://%s:%s%s" code="%s" message="%s" />""" % (
         self.protocol, self.server, self.port, self.url, self.code,
         self.message)
 
