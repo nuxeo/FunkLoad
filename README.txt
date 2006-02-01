@@ -84,8 +84,8 @@ Main FunkLoad_ features are:
   - check performance of a single page (or set of pages) inside a test
   - green/red color mode
   - select or exclude tests cases using a regex
-  - can launch normal unit test
-  - can launch doctest from a plain text file or embedded in python docstring
+  - support normal pyUnit_ test
+  - support doctest_ from a plain text file or embedded in python docstring
 
 * Turn a functional test into a load test: just by invoking the bench runner
   you can identify scalability and performance problems.
@@ -590,7 +590,7 @@ List all login/password served by the credential server.
 FunkLoadDocTest
 ===============
 
-Since FunkLoad_ 1.5 you can use funkload easily from a doctest::
+Since FunkLoad_ 1.5 you can use funkload easily from a doctest_::
 
     >>> from funkload.FunkLoadDocTest import FunkLoadDocTest
     >>> fl = FunkLoadDocTest()
@@ -1325,6 +1325,7 @@ component in the 'Ticket properties'.
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
 .. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev
 .. _trac: http://svn.nuxeo.org/trac/pub/report/12
+.. _doctest: http://docs.python.org/lib/module-doctest.html
 
 .. Local Variables:
 .. mode: rst
