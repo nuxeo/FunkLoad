@@ -24,6 +24,18 @@ FunkLoad SVN trunk
 :Target: ?
 
 
+New features
+~~~~~~~~~~~~
+
+* FunkLoadTestCase.conf_getList accept a separator parameter
+
+Bug fixes
+~~~~~~~~~
+
+* fix: response string representation url contains double `/`
+
+* fix: xmlrpc url contains basic auth credential in the report
+
 
 FunkLoad 1.5.0
 --------------
