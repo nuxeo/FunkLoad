@@ -317,47 +317,6 @@ Parameters:
 - *description* is used on the bench report to describe the action
 
 
-Configuration file API
-----------------------
-
-A FunkLoadTestCase class uses a configuration file to setup variable
-configuration, like the base server url to be tested, the test description,
-credential access, logging files and other test specific parameters. The test
-configuration file have the same name of the FunkLoadTestCase with a '.conf'
-extension. See documented examples in the demo_ folder (``fl-install-demo``).
-
-conf_get
-~~~~~~~~
-::
-
-  conf_get(section, key, default=_marker)
-
-Return an entry from the configuration file. Note that the entry may be
-overriden by a command line option.
-
-Parameters:
-
-- *section* the section in the configuration file.
-- *key* the key.
-- *default* a default value.
-
-
-conf_getInt
-~~~~~~~~~~~
-
-Return an integer.
-
-conf_getFloat
-~~~~~~~~~~~~~
-
-Return a float.
-
-conf_getList
-~~~~~~~~~~~~
-
-Return a list, the default separators is a colon ':'.
-
-
 Assertion helpers API
 ---------------------
 
@@ -421,6 +380,52 @@ The response returned by a get or post are webunit_ HTTPResponse object
 
 getDOM return a SimpleDOM interface of the fetched html page, see the
 webunit_ SimpleDOM api instructions for details.
+
+
+
+Configuration file API
+----------------------
+
+A FunkLoadTestCase class uses a configuration file to setup variable
+configuration, like the base server url to be tested, the test description,
+credential access, logging files and other test specific parameters. The test
+configuration file have the same name of the FunkLoadTestCase with a '.conf'
+extension. See documented examples in the demo_ folder (``fl-install-demo``).
+
+conf_get
+~~~~~~~~
+::
+
+  conf_get(section, key, default=_marker)
+
+Return an entry from the configuration file. Note that the entry may be
+overriden by a command line option.
+
+Parameters:
+
+- *section* the section in the configuration file.
+- *key* the key.
+- *default* a default value.
+
+
+conf_getInt
+~~~~~~~~~~~
+
+Return an integer.
+
+conf_getFloat
+~~~~~~~~~~~~~
+
+Return a float.
+
+conf_getList
+~~~~~~~~~~~~
+
+Additional parameter:
+
+- *separator* the default separator is a colon ':'.
+
+Return a list
 
 
 Logging
@@ -806,7 +811,7 @@ pages inside a test without changing the script, which make easy to tune a
 page in a complex context. Use the ``debug`` option to find the page numbers.
 
 Note that ``fl-run-test`` can be used to launch normal unittest.TestCase and
-(if you use python2.4) doctest in a plain text file or embedded in a python
+(if you use python2.4) doctest_ in a plain text file or embedded in a python
 docstring. The ``--debug`` option makes doctests verbose.
 
 
@@ -861,7 +866,7 @@ Options
   --help, -h              show this help message and exit
   --quiet, -q             Minimal output.
   --verbose, -v           Verbose output.
-  --debug, -d             FunkLoad debug output.
+  --debug, -d             FunkLoad and doctest debug output.
   --debug-level=DEBUG_LEVEL
                           Debug level 2 is more verbose.
   --url=MAIN_URL, -uMAIN_URL
