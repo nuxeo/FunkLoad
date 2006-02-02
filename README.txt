@@ -598,9 +598,9 @@ Since FunkLoad_ 1.5 you can use funkload easily from a doctest_::
     >>> 'HTML' in response.body
     True
     >>> response
-    <response url="http://127.0.0.1:80//" code="200" message="OK" />
+    <response url="http://127.0.0.1:80/" code="200" message="OK" />
 
-FunkLoadDocTest_ expose the same API than `The FunkLoadTestCase`_.
+FunkLoadDocTest_ exposes the same API than `The FunkLoadTestCase`_.
 
 Other Test Cases
 ================
