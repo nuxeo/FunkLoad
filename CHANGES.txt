@@ -36,6 +36,9 @@ Bug fixes
 
 * fix: xmlrpc url contains basic auth credential in the report
 
+* fix: # 1300_: easy_install failed to install docutils from sourceforge,
+  upgrading ez_install 0.6a10
+
 
 FunkLoad 1.5.0
 --------------
@@ -412,6 +415,7 @@ See README_ for more information about FunkLoad_.
 .. _1278: http://svn.nuxeo.org/trac/pub/ticket/1278
 .. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
 .. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
+.. _1300: http://svn.nuxeo.org/trac/pub/ticket/1300
 
 .. Local Variables:
 .. mode: rst
