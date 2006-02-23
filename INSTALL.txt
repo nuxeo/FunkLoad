@@ -59,7 +59,7 @@ Optional packages
 
 * To produce charts : python-gdchart (0.6.1-8 is fine), on Debian::
 
-    apt-get install python-gdchart
+    sudo apt-get install python-gdchart
 
   If the package is only available for python2.3 you may try to copy the
   ``gdchart.so`` to the ``python2.4/site-pacakges``.
