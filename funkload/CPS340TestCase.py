@@ -34,6 +34,9 @@ class CPSTestCase(ZopeTestCase):
     _all_langs = ['en', 'fr', 'de', 'it', 'es', 'pt_BR',
                   'nl', 'mg', 'ro', 'eu']
     _default_langs = _all_langs[:4]
+    _default_extensions = ['CPSForum:default',
+                           'CPSSkins:cps3',
+                           'CPSSubscriptions:default']
     _cps_login = None
 
     # ------------------------------------------------------------
@@ -68,7 +71,8 @@ class CPSTestCase(ZopeTestCase):
                       description=None,
                       interface="portlets",
                       zope_url=None,
-                      site_id=None):
+                      site_id=None,
+                      extensions=None):
         """Create a CPS Site.
 
         if zope_url or site_id is not provided guess them from the server_url.
@@ -85,7 +89,7 @@ class CPSTestCase(ZopeTestCase):
             'manager_email': manager_mail,
             'manager_firstname': 'Manager',
             'manager_lastname': 'CPS Manager',
-            'extension_ids:list': 'CPSSubscriptions:default',
+            'extension_ids:list': extensions or self._default_extensions,
             'description': description or "A funkload cps test site",
             'languages:list': langs or self._default_langs,
             'submit': 'Add',
