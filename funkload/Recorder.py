@@ -87,16 +87,17 @@ class Request:
                     params.append([key, form_value.value])
                 else:
                     # got a file upload
-                    filename = filename or 'empty.txt'
+                    filename = filename or ''
                     params.append([key, 'Upload("%s")' % filename])
-                    if os.path.exists(filename):
-                        trace('# Warning: uploaded file: %s already exists, '
-                              'keep it.\n' % filename)
-                    else:
-                        trace('# Saving uploaded file: %s\n' % filename)
-                        f = open(filename, 'w')
-                        f.write(str(form_value.value))
-                        f.close()
+                    if filename:
+                        if os.path.exists(filename):
+                            trace('# Warning: uploaded file: %s already'
+                                  ' exists, keep it.\n' % filename)
+                        else:
+                            trace('# Saving uploaded file: %s\n' % filename)
+                            f = open(filename, 'w')
+                            f.write(str(form_value.value))
+                            f.close()
         return params
 
     def __repr__(self):
@@ -196,7 +197,6 @@ Examples
             self.class_name = class_name
             self.script_path = './test_%s.py' % class_name
             self.configuration_path = './%s.conf' % class_name
-
 
     def startProxy(self):
         """Start a tcpwatch session."""
