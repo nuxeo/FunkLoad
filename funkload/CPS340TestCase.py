@@ -23,6 +23,7 @@ import time
 import random
 from Lipsum import Lipsum
 from ZopeTestCase import ZopeTestCase
+from webunit.utility import Upload
 
 class CPSTestCase(ZopeTestCase):
     """Common CPS tasks.
@@ -55,7 +56,8 @@ class CPSTestCase(ZopeTestCase):
         self.post("%s/logged_in" % self.server_url, params,
                   description="Log in user [%s] %s" % (login, comment or ''))
         # assume we are logged in if we have a logout link...
-        self.assert_('%s/logout' % self.server_url in self.listHref(),
+        self.assert_([link for link in self.listHref()
+                      if link.endswith('logout')],
                      'invalid credential: [%s:%s].' % (login, password))
         self._cps_login = login
 
@@ -237,26 +239,26 @@ class CPSTestCase(ZopeTestCase):
         doc_id = doc_url.split('/')[-1]
         return doc_url, doc_id
 
-    def cpsCreateNewsItem(self, parent_url):
+    def cpsCreateNewsItem(self, parent_url, photo_path=None):
         """Create a random news.
 
         return a tuple: (doc_url, doc_id)."""
         language = self.cpsGetRandomLanguage()
         title = self._lipsum.getSubject(uniq=True,
                                         prefix='test %s' % language)
-        params = [["type_name", "News Item"],
+        params = [["cpsformuid", self._lipsum.getUniqWord()],
+                  ["type_name", "News Item"],
                   ["widget__Title", title],
                   ["widget__Description", self._lipsum.getSubject(10)],
-                  ["widget__LanguageSelectorCreation", language],
-                  ["widget__photo_title", "none"],
-                  ["widget__photo_filename", ""],
-                  ["widget__photo_choice", "keep"],
-                  ["widget__photo", ""],
-                  ["widget__photo_resize", "img_auto_size"],
-                  ["widget__photo_rposition", "left"],
-                  ["widget__photo_subtitle", ""],
+                  ['widget__photo_filename', ''],
+                  ['widget__photo_choice', photo_path and 'change' or 'keep'],
+                  ['widget__photo', Upload(photo_path or '')],
+                  ['widget__photo_resize', 'img_auto_size'],
+                  ['widget__photo_rposition', 'left'],
+                  ['widget__photo_subtitle', ''],
                   ["widget__content", self._lipsum.getMessage()],
                   ["widget__content_rformat", "text"],
+                  ['widget__content_fileupload', Upload('')],
                   ["widget__Subject:tokens:default", ""],
                   ["widget__Subject:list", "Business"],
                   # %m/%m prevent invalid date depending on ui locale
