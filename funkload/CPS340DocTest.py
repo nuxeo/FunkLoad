@@ -24,7 +24,7 @@ from CPS340TestCase import CPSTestCase
 from FunkLoadDocTest import FunkLoadDocTest
 
 
-class CPSDocTest(FunkLoadDocTest, CPSTestCase):
+class CPSDocTest(CPSTestCase, FunkLoadDocTest):
     """Class to use to doctest a CPS portal
 
     >>> from CPS340DocTest import CPSDocTest
@@ -35,8 +35,8 @@ class CPSDocTest(FunkLoadDocTest, CPSTestCase):
     True
     """
 
-    def __init__(self):
-        FunkLoadDocTest.__init__(self)
+    def __init__(self, debug=False, debug_level=1):
+        FunkLoadDocTest.__init__(self, debug=debug, debug_level=debug_level)
         CPSTestCase.__init__(self)
 
 def _test():
