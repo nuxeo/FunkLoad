@@ -253,8 +253,8 @@ class CPSTestCase(ZopeTestCase):
                   ["widget__content_rformat", "text"],
                   ["widget__Subject:tokens:default", ""],
                   ["widget__Subject:list", "Business"],
-                  # %m/%m prevent invalid date depending on ui locale
-                  ["widget__publication_date_date", time.strftime('%m/%m/%Y')],
+                  # prevent invalid date depending on ui locale
+                  ["widget__publication_date_date", time.strftime('01/01/%Y')],
                   ["widget__publication_date_hour", time.strftime('%H')],
                   ["widget__publication_date_minute", time.strftime('%M')],
                   ["cpsdocument_create_button", "Create"]]
