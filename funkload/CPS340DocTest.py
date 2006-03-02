@@ -24,20 +24,27 @@ from CPS340TestCase import CPSTestCase
 from FunkLoadDocTest import FunkLoadDocTest
 
 
-class CPSDocTest(CPSTestCase, FunkLoadDocTest):
+class CPSDocTest(FunkLoadDocTest, CPSTestCase):
     """Class to use to doctest a CPS portal
 
     >>> from CPS340DocTest import CPSDocTest
-    >>> fl = CPSDocTest()
+    >>> cps_url = 'http://localhost:8080/cps'
+    >>> fl = CPSDocTest(cps_url)
     >>> fl.cps_test_case_version
     (3, 4, 0)
-    >>> fl.server_url is None
+    >>> fl.server_url == cps_url
     True
-    """
 
-    def __init__(self, debug=False, debug_level=1):
+    Then you can use the CPS340TestCase API like fl.cpsLogin('manager', 'pwd').
+    """
+    def __init__(self, server_url, debug=False, debug_level=1):
+        """init CPSDocTest
+
+        server_url is the CPS server url."""
         FunkLoadDocTest.__init__(self, debug=debug, debug_level=debug_level)
-        CPSTestCase.__init__(self)
+        # FunkLoadDocTest handles the init of FunkLoadTestCase which is the
+        # same as CPSTestCase
+        self.server_url = server_url
 
 def _test():
     import doctest, CPS340DocTest
@@ -45,4 +52,3 @@ def _test():
 
 if __name__ == "__main__":
     _test()
-
