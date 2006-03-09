@@ -156,6 +156,29 @@ def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
     return logger
 
 
+def get_logger(name, log_path=None, log_console=True, level=logging.DEBUG):
+    """Get a logger new impl."""
+    logger = logging.getLogger(name)
+    if logger.handlers:
+        # already setup
+        return logger
+    if log_console:
+        hdlr = logging.StreamHandler()
+        hdlr.setLevel(level)
+        logger.addHandler(hdlr)
+    if log_path:
+        if os.access(log_path, os.F_OK):
+            os.rename(log_path, log_path + '.bak-' + str(int(time.time())))
+        formatter = logging.Formatter(
+            '%(asctime)s %(levelname)s %(message)s')
+        hdlr = logging.FileHandler(log_path)
+        hdlr.setLevel(level)
+        hdlr.setFormatter(formatter)
+        logger.addHandler(hdlr)
+    logger.setLevel(level)
+    return logger
+
+
 def close_logger(name):
     """Close the logger."""
     logger = logging.getLogger(name)
