@@ -159,8 +159,8 @@ class Browser:
         self.logi("          --------")
         for request in stats.keys():
             values = stats[request]
-            self.logi('request: ', request)
-            self.logi('count: ', len(values))
+            self.logi('request: %s' % request)
+            self.logi('count: %s' % len(values))
             s = self._stat(stats[request])
             for i, j in zip(x, s):
                 self.logi("%s %.6fs" % (i, j))
