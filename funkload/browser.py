@@ -147,9 +147,10 @@ class Browser:
         for i in xrange(count):
             responses = self.browse(url, params, method)
             for response in responses:
-                if not i:
-                    url_order.append(response.url)
-                stats.setdefault(response.url, []).append(
+                url = response.url
+                if url not in url_order:
+                    url_order.append(url)
+                stats.setdefault(url, []).append(
                     (response.total_time,
                      response.connect_time,
                      response.transfer_time))
