@@ -20,6 +20,7 @@
 $Id$
 """
 import sys
+import traceback
 from socket import error as SocketError
 import time
 from webunit.webunittest import WebFetcher, HTTPError
@@ -36,15 +37,15 @@ class HTTPWebunitResponse(HTTPBaseResponse):
             code = response.code
             if code:
                 self.code = code
-            header = str(response.headers)
-            if header:
-                self.header = header
-                self.headers = self.getheaders()
+            headers = str(response.headers)
+            if headers:
+                self.headers = headers
+                self.headers_dict = self.parseHeaders(headers)
             self.body = response.body
             if self.body:
                 self.size_download += len(self.body)
             self.effective_url =  response.url
-            self.content_type = self.getheader('Content-Type')
+            self.content_type = self.getHeader('Content-Type')
 
     def __str__(self):
         return ('<httpwebunitresponse url="%s"'
@@ -90,11 +91,13 @@ class WebunitFetcher(BaseFetcher):
         """Setup extra_headers set by set/add/clearHeader."""
         self.webunit.extra_headers = self.extra_headers
 
-    def fetch(self, url_in, method='get', params_in=None):
-        """Webunit post impl.
+    def fetch(self, url_in, params_in=None, method=None):
+        """Webunit fetch impl.
 
-        return an HTTPWebunitResponse or an HTTPWebunitError."""
+        return an HTTPWebunitResponse."""
         webunit = self.webunit
+        if method is None:
+            method = params_in and 'post' or 'get'
         if method == 'post':
             url = url_in
             is_multipart, params = self.preparePostParams(params_in, False)
@@ -123,7 +126,8 @@ class WebunitFetcher(BaseFetcher):
                     self.loge(" webunit SocketError: Can't load %s." % url)
                 else:
                     error = 'unknown'
-                    self.loge(' unknow error: %s' % value)
+                    self.loge(''.join(traceback.format_exception(
+                        etype, value, tback)))
         t_stop = time.time()
         t_delta = t_stop - t_start
         return HTTPWebunitResponse(url, method, params,

@@ -121,17 +121,19 @@ class CurlFetcher(BaseFetcher):
                         for (key, value) in self.extra_headers]
         curl.setopt(curl.HTTPHEADER, headers_list)
 
-    def fetch(self, url_in, method='get', params_in=None):
+    def fetch(self, url_in, params_in=None,  method=None):
         """Curl post impl.
 
-        return an HTTPCurlResponse or an HTTPCurlError."""
+        return an HTTPCurlResponse."""
         body = StringIO()
-        header = StringIO()
+        headers = StringIO()
         curl = self.curl
         curl.setopt(curl.WRITEFUNCTION, body.write)
-        curl.setopt(curl.HEADERFUNCTION, header.write)
+        curl.setopt(curl.HEADERFUNCTION, headers.write)
         self.setExtraHeaders()
 
+        if method is None:
+            method = params_in and 'post' or 'get'
         if method == 'post':
             url = url_in
             curl.setopt(curl.URL, url)
@@ -157,8 +159,13 @@ class CurlFetcher(BaseFetcher):
         except pycurl.error, v:
             error = v
             self.loge('pycurl error: ' + str(error))
+        except:
+            error = 'unknown'
+            self.loge(''.join(traceback.format_exception(*sys.exc_info())))
+
         return HTTPCurlResponse(url, method, params,
-                                header=header.getvalue(), body=body.getvalue(),
+                                headers=headers.getvalue(),
+                                body=body.getvalue(),
                                 error=error, curl=curl)
 
     def prepareUploadParam(self, value):

@@ -31,7 +31,7 @@ class TestHTTPBaseResponse(unittest.TestCase):
 
     def test_header(self):
         location = "http://127.0.0.1/blah?foo=bar"
-        header = """HTTP/1.1 302 Moved Temporarily
+        headers = """HTTP/1.1 302 Moved Temporarily
 Server: Zope/(Zope 2.9.1-, python 2.1.2, linux) ZServer/1.1 FOO/3.4
 Date: Wed, 08 Mar 2002 11:15:53 GMT
 Bobo-Exception-Line: 114
@@ -42,13 +42,13 @@ Location: %s
 Content-Type: text/html; charset=iso-8859-15
 """ % location
 
-        resp = HTTPBaseResponse('http://localhost', 'get', None, header=header)
-        self.assertEquals(resp.getheader('Location'), location)
+        resp = HTTPBaseResponse('http://localhost', 'get', None,
+                                headers=headers)
+        self.assertEquals(resp.getHeader('Location'), location)
         # case insensitive
-        self.assertEquals(resp.getheader('location'), location)
-        self.assert_(resp.getheader('Server'), resp.getheaders())
-        self.assert_(resp.getheader('Content-Type'), resp.getheaders())
-
+        self.assertEquals(resp.getHeader('location'), location)
+        self.assert_(resp.getHeader('Server'), resp.headers_dict)
+        self.assert_(resp.getHeader('Content-Type'), resp.headers_dict)
 
 
 class TestBaseFetcher(unittest.TestCase):

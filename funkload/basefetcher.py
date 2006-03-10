@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""Browser using pyCurl.
+"""Base class for Response and Fetcher.
 
 $Id$
 """
@@ -28,9 +28,7 @@ from utils import get_logger
 # Classes
 #
 class Upload:
-    """Simple class that lets us identify file uploads in POST data mappings.
-
-    """
+    """Simple class that identify file uploads in POST data mappings."""
     def __init__(self, filename):
         self.filename = filename
 
@@ -39,7 +37,10 @@ class Upload:
 
 
 class HTTPBaseResponse:
-    """Base http response that knows how to split header."""
+    """Base class for http response.
+
+    Collects response information and provides a simple header parser.
+    """
     splitheader = re.compile('^([^:\n]*): (.*)$', re.M)
 
     def __init__(self, url, method, params, **kw):
@@ -48,35 +49,37 @@ class HTTPBaseResponse:
         self.params = params
         self.size_download = 0
         self.code = kw.get('code', '-1')
-        self.header = kw.get('header')
+        self.headers = kw.get('headers')
         self.body = kw.get('body')
         self.error = str(kw.get('error'))
         self.traceback = kw.get('traceback')
         self.content_type = kw.get('content_type')
-        if self.header:
-            self.headers = self.getheaders()
+        if self.headers:
+            self.headers_dict = self.parseHeaders(self.headers)
         else:
-            self.headers = {}
+            self.headers_dict = {}
 
     def __str__(self):
         return ('<httpbaseresponse url="%s"'
                 ' params="%s"'
-                ' header="%s"'
-                ' error="%s" />' % (self.url, self.params, self.header,
+                ' headers="%s"'
+                ' error="%s" />' % (self.url, self.params, self.headers,
                                     self.error))
 
-    def getheaders(self):
-        """Return a dict of headers value."""
-        headers = self.splitheader.findall(self.header)
-        return dict([(key.strip(), value.strip()) for (key, value) in headers])
+    def parseHeaders(self, headers):
+        """Return a dict of headers key, value."""
+        match = self.splitheader.findall(headers)
+        return dict([(name.strip().lower(), value.strip())
+                     for (name, value) in match])
 
-    def getheader(self, name, default=None):
+    def getHeader(self, name, default=None):
         """Return the header value for the name."""
-        return self.headers.get(name, default)
+        return self.headers_dict.get(name.lower(), default)
+
 
 
 class BaseFetcher:
-    """An html fetcher."""
+    """A base class for a fetcher."""
 
     def __init__(self, **kw):
         logger = get_logger(name='funkload.browser')
@@ -87,53 +90,55 @@ class BaseFetcher:
         self.loge = logger.error
         self.extra_headers = []
 
+    def fetch(self, url_in, params_in=None, method=None):
+        """Fetch a page using http method (get or post).
+
+        The default method is get or post if there are params.
+
+        The fetcher must hanldle cookies.
+
+        return an HTTPBaseResponse or derived.
+        """
+        raise NotImplemented()
+
     def reset(self):
         """Reset the fetcher session."""
+        raise NotImplemented()
 
-    def fetch(self, url_in, method='get', params_in=None):
-        """Fetch a page.
+    def addHeader(self, name, value):
+        """Add an extra http header."""
+        self.extra_headers.append((name, value))
 
-        Handles save and send cookies.
-
-        return an HTTPBaseResponse or a HTTPBaseError.
-        """
-
-    def addHeader(self, key, value):
-        """Add an http header."""
-        self.extra_headers.append((key, value))
-
-    def setHeader(self, key, value):
+    def setHeader(self, name, value):
         """Add or override an http header.
 
-        If value is None, the key is removed."""
+        If value is None, the name is removed."""
         headers = self.extra_headers
         for i, (k, v) in enumerate(headers):
-            if k == key:
+            if k == name:
                 if value is not None:
-                    headers[i] = (key, value)
+                    headers[i] = (name, value)
                 else:
                     del headers[i]
                 break
         else:
             if value is not None:
-                headers.append((key, value))
+                headers.append((name, value))
 
-    def delHeader(self, key):
-        """Remove an http header key."""
-        self.setHeader(key, None)
+    def delHeader(self, name):
+        """Remove an http header name."""
+        self.setHeader(name, None)
 
     def clearHeaders(self):
-        """Remove all http headers set by addHeader or setUserAgent.
-
-        Note that the Referer is also removed."""
+        """Remove all extra http headers."""
         self.extra_headers = []
 
     def setReferer(self, referer):
-        """Set a referer."""
+        """Set a referer using extra headers."""
         self.setHeader('Referer', referer)
 
     def setUserAgent(self, user_agent):
-        """Set user agent."""
+        """Set user agent using extra headers."""
         self.setHeader('User-Agent', user_agent)
 
     def prepareGetParams(self, params_in, encode=True):
@@ -156,9 +161,11 @@ class BaseFetcher:
         return params
 
     def preparePostParams(self, params_in, encode=True):
-        """Convert post params.
+        """Convert params for a post.
 
-        Return a tuple (is_multipart, params)."""
+        Return a tuple (is_multipart, params).
+
+        is_multipart is True if params contains a file upload."""
         is_multipart = False
         if not params_in:
             return params_in
@@ -179,5 +186,5 @@ class BaseFetcher:
         return (is_multipart, params)
 
     def prepareUploadParam(self, value):
-        """Convert an upload file can be overriden."""
+        """Hook to prepare file upload convertion."""
         return value

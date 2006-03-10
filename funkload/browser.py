@@ -55,7 +55,7 @@ class Browser:
         self.fetch_resources = True     # extract html resources
         self.setUserAgent('FunkLoad/%s' % get_version())
 
-    def browse(self, url_in, method, params_in, fetch_resources=None):
+    def browse(self, url_in, params_in, method=None, fetch_resources=None):
         """Handle redirect and fetch HTML ressources.
 
         return a list of HTTPResponses"""
@@ -63,11 +63,12 @@ class Browser:
         request_history = self.request_history
         if fetch_resources is None:
             fetch_resources = self.fetch_resources
+        if method is None:
+            method = params_in and 'post' or 'get'
 
         # 1. fetch the requested page
         self.logd('%s: %s' % (method, url_in | truncate(70)))
-        response = self.fetch(url_in, method, params_in)
-
+        response = self.fetch(url_in, params_in, method)
         responses.append(response)
         request_history.append((method, url_in, params_in))
         self.setReferer(url_in, False)
@@ -77,10 +78,10 @@ class Browser:
         # 2. handles redirection
         redirect_count = self.max_redirs
         while response.code in (301, 302):
-            url = response.getheader('Location')
+            url = response.getHeader('Location')
             url = urljoin(url_in, url)
             self.logd(' redirect: %s' % url | truncate(70))
-            response = self.fetch(url, method, params_in)
+            response = self.fetch(url, params_in, method)
             self.logd('  return code %s done in %.6fs.' % (
                 response.code, response.total_time))
             responses.append(response)
@@ -105,7 +106,7 @@ class Browser:
                      if ('get', link, None) not in self.request_history]
             for link in links:
                 self.logd(' fetch resource:  %s' % link | truncate(70))
-                response = self.fetch(link, 'get')
+                response = self.fetch(link, method='get')
                 responses.append(response)
                 request_history.append((method, link, params_in))
                 self.logd('  return code %s done in %.6fs.' % (
@@ -115,13 +116,13 @@ class Browser:
 
     def post(self, url_in, params_in=None):
         """Simulate a browser post."""
-        responses = self.browse(url_in, 'post', params_in)
+        responses = self.browse(url_in, params_in, method='post')
         self.page_history.append(('post', url_in, params_in))
         return responses
 
     def get(self, url_in, params_in=None):
-        """Simulate a Do a get like a browser."""
-        responses = self.browse(url_in, 'get', params_in=None)
+        """Simulate a browser get."""
+        responses = self.browse(url_in, params_in=None, method='get')
         self.page_history.append(('get', url_in, params_in))
         return responses
 
