@@ -54,6 +54,9 @@ class HTTPBaseResponse:
         self.error = str(kw.get('error'))
         self.traceback = kw.get('traceback')
         self.content_type = kw.get('content_type')
+        self.connect_time = -1
+        self.transfer_time = -1
+        self.total_time = -1
         if self.headers:
             self.headers_dict = self.parseHeaders(self.headers)
         else:

@@ -34,8 +34,8 @@ class HTTPCurlResponse(HTTPBaseResponse):
             self.code = code
         self.effective_url = curl.getinfo(curl.EFFECTIVE_URL)
         self.connect_time = curl.getinfo(curl.CONNECT_TIME)
-        self.transfert_time = curl.getinfo(curl.TOTAL_TIME)
-        self.total_time = self.connect_time + self.transfert_time
+        self.transfer_time = curl.getinfo(curl.TOTAL_TIME)
+        self.total_time = self.connect_time + self.transfer_time
         self.size_upload = curl.getinfo(curl.SIZE_UPLOAD)
         self.size_download = curl.getinfo(curl.SIZE_DOWNLOAD)
         self.content_type = curl.getinfo(curl.CONTENT_TYPE)
