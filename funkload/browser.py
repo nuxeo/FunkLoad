@@ -131,42 +131,48 @@ class Browser:
         if force or self.auto_referer:
             self.fetcher.setReferer(url)
 
-    def _stat(self, times):
-        """Returns the median, average, standard deviation,
-           min and max of a sequence."""
-        tot = sum(times)
-        avg = tot/len(times)
-        sdsq = sum([(i-avg)**2 for i in times])
-        s = list(times)
-        s.sort()
-        return (s[len(s)//2], avg, (sdsq/(len(times)-1 or 1))**.5,
-                min(times), max(times))
-
     def perf(self, url, params=None, method=None, count=10):
         """Loop on a request output stats."""
         stats = {}
-        if method == 'post':
-            meth = self.post
-        else:
-            meth = self.get
         for i in xrange(count):
-            responses = meth(url, params)
+            responses = self.browse(url, params, method)
             for response in responses:
-                stats.setdefault(response.url, []).append(response.total_time)
+                stats.setdefault(response.url, []).append(
+                    (response.total_time,
+                     response.connect_time,
+                     response.transfer_time))
+        self._renderStat(stats)
 
+    def _computeStat(self, times):
+        """Returns the (average, standard deviation,
+            min, median, percentil 90, 95, 98, max,
+            per second) of a list of times."""
+        total = sum(times)
+        avg = total / len(times)
+        pers = avg and 1/avg or 0
+        count = len(times)
+        stddev = (sum([(i - avg)**2 for i in times]) / (count - 1 or 1)) ** .5
+        sort = list(times)
+        sort.sort()
+        return (avg, stddev,
+                sort[0], sort[count//2],
+                sort[int(count * .90)], sort[int(count * .95)],
+                sort[int(count * .98)], sort[-1], pers)
+
+    def _renderStat(self, stats):
+        """Render perf stats."""
         # render stats
-        x = ('average: ', 'median:  ', 'std dev: ', 'minimum: ', 'maximum: ')
-        self.logi("           total")
-        self.logi("          --------")
+        thead = ('average:', 'std dev:', 'minimum:', 'median:',
+                 '90%:', '95%:', '98%:', 'maximum:', 'per second:')
         for request in stats.keys():
             values = stats[request]
-            self.logi('request: %s' % request)
-            self.logi('count: %s' % len(values))
-            s = self._stat(stats[request])
-            for i, j in zip(x, s):
-                self.logi("%s %.6fs" % (i, j))
-            self.logi('req/s:    %.2f RPS' % (1/s[0]))
-            self.logi('')
+            self.logi("Stat for %d requests of: %s" % (len(values), request))
+            self.logi("                 total      connect    transfert")
+            self.logi("----------- ----------- ------------ ------------")
+            times = zip(*[self._computeStat(x) for x in zip(*values)])
+            for title, line in zip(thead, times):
+                self.logi("%11s" % title + "%12.6f %12.6f %12.6f" % line)
+            self.logi("----------- ----------- ------------ ------------\n")
 
 
 class BrowserProgram:
