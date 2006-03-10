@@ -187,8 +187,20 @@ See http://funkload.nuxeo.org/ for more information.
 
 Examples
 ========
-  %prog http://localhost/
-
+  %prog http://localhost/ -d
+                        Display requests used to browse http://localhost/
+  %prog http://localhost/ -d -S
+                        Do not fetch html resources.
+  %prog http://localhost/ -d --webunit
+                        Use the WebUnit fetcher (default is pyCurl).
+  %prog http://localhost/ -D
+                        Dump responses.
+  %prog http://localhost/ -t
+                        Verbose trace for request.
+  %prog http://localhost/ -u login:pwd -d
+                        Use http basic auth.
+  %prog http://localhost/ -n 100
+                        Perform 100 requests and output detail statistics.
 """
 
     def __init__(self, argv=None):
