@@ -47,16 +47,24 @@ class HTTPBaseResponse:
         self.url = url.strip()
         self.method = method
         self.params = params
+        # init default
+        self.type = 'unknown'
         self.size_download = 0
-        self.code = kw.get('code', '-1')
-        self.headers = kw.get('headers')
-        self.body = kw.get('body')
-        self.error = str(kw.get('error'))
-        self.traceback = kw.get('traceback')
-        self.content_type = kw.get('content_type')
+        self.code = -1
+        self.headers = None
+        self.body = None
+        self.error = None
+        self.traceback = None
+        self.content_type = None
         self.connect_time = -1
         self.transfer_time = -1
         self.total_time = -1
+        self.start = 0
+        self.description = ''
+        # user extra kw
+        for key, value in kw.items():
+            setattr(self, key, value)
+        self.setType(self.code, self.type)
         if self.headers:
             self.headers_dict = self.parseHeaders(self.headers)
         else:
@@ -64,9 +72,11 @@ class HTTPBaseResponse:
 
     def __str__(self):
         return ('<httpbaseresponse url="%s"'
+                ' type="%s"'
                 ' params="%s"'
                 ' headers="%s"'
-                ' error="%s" />' % (self.url, self.params, self.headers,
+                ' error="%s" />' % (self.url, self.type,
+                                    self.params, self.headers,
                                     self.error))
 
     def parseHeaders(self, headers):
@@ -79,7 +89,14 @@ class HTTPBaseResponse:
         """Return the header value for the name."""
         return self.headers_dict.get(name.lower(), default)
 
-
+    def setType(self, code, default=None):
+        """Set the type depending on the code."""
+        if code == -1:
+            self.type = "error"
+        elif code in (301, 302):
+            self.type = "redirect"
+        elif default:
+            self.type = default
 
 class BaseFetcher:
     """A base class for a fetcher."""
@@ -93,7 +110,7 @@ class BaseFetcher:
         self.loge = logger.error
         self.extra_headers = []
 
-    def fetch(self, url_in, params_in=None, method=None):
+    def fetch(self, url_in, params_in=None, method=None, **kw):
         """Fetch a page using http method (get or post).
 
         The default method is get or post if there are params.
@@ -101,6 +118,8 @@ class BaseFetcher:
         The fetcher must hanldle cookies.
 
         return an HTTPBaseResponse or derived.
+
+        extra kw are set as response attribute.
         """
         raise NotImplemented()
 

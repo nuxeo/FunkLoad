@@ -20,7 +20,9 @@
 $Id$
 """
 from cStringIO import StringIO
+import time
 import pycurl
+import traceback
 from basefetcher import HTTPBaseResponse, BaseFetcher
 
 
@@ -32,6 +34,7 @@ class HTTPCurlResponse(HTTPBaseResponse):
         code = curl.getinfo(curl.RESPONSE_CODE)
         if code:
             self.code = code
+            self.setType(code, kw.get('type'))
         self.effective_url = curl.getinfo(curl.EFFECTIVE_URL)
         self.connect_time = curl.getinfo(curl.CONNECT_TIME)
         self.transfer_time = curl.getinfo(curl.TOTAL_TIME)
@@ -43,14 +46,16 @@ class HTTPCurlResponse(HTTPBaseResponse):
 
     def __str__(self):
         return ('<httpcurlresponse url="%s"'
+                ' type="%s"'
                 ' code="%s"'
                 ' content_type="%s"'
                 ' size_download="%d"'
                 ' connect_time="%.6fs"'
                 ' total_time="%.6fs"'
                 ' error="%s" />' % (
-            self.url, self.code, self.content_type, self.size_download,
-            self.connect_time, self.total_time, self.error))
+            self.url, self.type, self.code, self.content_type,
+            self.size_download, self.connect_time, self.total_time,
+            self.error))
 
 
 class CurlFetcher(BaseFetcher):
@@ -111,8 +116,8 @@ class CurlFetcher(BaseFetcher):
     def clearBasicAuth(self):
         """Remove basic authentication."""
         curl = self.curl
-        curl.setopt(curl.USERPWD, 0)
-        curl.setopt(curl.HTTPAUTH, 0)
+        curl.setopt(curl.USERPWD, '')
+        #curl.setopt(curl.HTTPAUTH, )
 
     def setExtraHeaders(self):
         """Setup extra_headers set by set/add/clearHeader."""
@@ -121,7 +126,7 @@ class CurlFetcher(BaseFetcher):
                         for (key, value) in self.extra_headers]
         curl.setopt(curl.HTTPHEADER, headers_list)
 
-    def fetch(self, url_in, params_in=None,  method=None):
+    def fetch(self, url_in, params_in=None,  method=None, **kw):
         """Curl post impl.
 
         return an HTTPCurlResponse."""
@@ -154,6 +159,7 @@ class CurlFetcher(BaseFetcher):
             curl.setopt(curl.HTTPGET, True)
 
         error = None
+        start = time.time()
         try:
             curl.perform()
         except pycurl.error, v:
@@ -166,7 +172,8 @@ class CurlFetcher(BaseFetcher):
         return HTTPCurlResponse(url, method, params,
                                 headers=headers.getvalue(),
                                 body=body.getvalue(),
-                                error=error, curl=curl)
+                                error=error, curl=curl,
+                                start=start, **kw)
 
     def prepareUploadParam(self, value):
         """Convert params return params url encoded if not multipart."""

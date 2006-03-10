@@ -37,6 +37,7 @@ class HTTPWebunitResponse(HTTPBaseResponse):
             code = response.code
             if code:
                 self.code = code
+                self.setType(code, kw.get('type'))
             headers = str(response.headers)
             if headers:
                 self.headers = headers
@@ -49,13 +50,14 @@ class HTTPWebunitResponse(HTTPBaseResponse):
 
     def __str__(self):
         return ('<httpwebunitresponse url="%s"'
+                ' type="%s"'
                 ' code="%s"'
                 ' content_type="%s"'
                 ' size_download="%d"'
                 ' total_time="%.6fs"'
                 ' error="%s" />' % (
-            self.url, self.code, self.content_type, self.size_download,
-            self.total_time, self.error))
+            self.url, self.type, self.code, self.content_type,
+            self.size_download, self.total_time, self.error))
 
 
 class WebunitFetcher(BaseFetcher):
@@ -91,7 +93,7 @@ class WebunitFetcher(BaseFetcher):
         """Setup extra_headers set by set/add/clearHeader."""
         self.webunit.extra_headers = self.extra_headers
 
-    def fetch(self, url_in, params_in=None, method=None):
+    def fetch(self, url_in, params_in=None, method=None, **kw):
         """Webunit fetch impl.
 
         return an HTTPWebunitResponse."""
@@ -132,6 +134,7 @@ class WebunitFetcher(BaseFetcher):
         t_delta = t_stop - t_start
         return HTTPWebunitResponse(url, method, params,
                                    response=response, error=error,
-                                   total_time=t_delta)
+                                   total_time=t_delta,
+                                   start=t_start, **kw)
 
 
