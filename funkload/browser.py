@@ -44,7 +44,9 @@ class Browser:
         self.fetcher = fetcher_cls()
         self.fetch = self.fetcher.fetch
 
+        self.reset = self.fetcher.reset
         self.setHeader = self.fetcher.setHeader
+        self.clearHeaders = self.fetcher.clearHeaders
         self.setUserAgent = self.fetcher.setUserAgent
         self.setBasicAuth = self.fetcher.setBasicAuth
         self.clearBasicAuth = self.fetcher.clearBasicAuth
@@ -58,7 +60,7 @@ class Browser:
         self.setUserAgent('FunkLoad/%s' % get_version())
 
     def browse(self, url_in, params_in, method=None, fetch_resources=None,
-               use_resource_cache=None):
+               use_resource_cache=None, **kw):
         """Handle redirect and fetch HTML ressources.
 
         return a list of HTTPResponses"""
@@ -73,30 +75,31 @@ class Browser:
 
         # 1. fetch the requested page
         self.logd('%s: %s' % (method, url_in | truncate(70)))
-        response = self.fetch(url_in, params_in, method)
+        response = self.fetch(url_in, params_in, method, type='page', **kw)
         responses.append(response)
         request_history.append((method, url_in, params_in))
         self.setReferer(url_in, False)
         self.logd(' return code %s done in %.6fs.' % (
             response.code, response.total_time))
+        yield response
 
         # 2. handles redirection
         redirect_count = self.max_redirs
-        while response.code in (301, 302):
-            url = response.getHeader('Location')
-            url = urljoin(url_in, url)
-            self.logd(' redirect: %s' % url | truncate(70))
-            response = self.fetch(url, params_in, method)
-            self.logd('  return code %s done in %.6fs.' % (
-                response.code, response.total_time))
-            responses.append(response)
-            request_history.append((method, url, params_in))
-            self.setReferer(url, False)
-            redirect_count -= 1
+        while response.type == 'redirect':
             if not redirect_count:
                 self.logw('Too many redirects (%s) give up after: %s.' % (
                     self.max_redirs, url))
                 break
+            url = response.getHeader('Location')
+            url = urljoin(url_in, url)
+            self.logd(' redirect: %s' % url | truncate(70))
+            response = self.fetch(url, params_in, method, type="page", **kw)
+            self.logd('  return code %s done in %.6fs.' % (
+                response.code, response.total_time))
+            request_history.append((method, url, params_in))
+            self.setReferer(url, False)
+            redirect_count -= 1
+            yield response
 
         # 3. extract html resources
         if (fetch_resources and
@@ -112,25 +115,25 @@ class Browser:
                          if ('get', link, None) not in self.request_history]
             for link in links:
                 self.logd(' fetch resource:  %s' % link | truncate(70))
-                response = self.fetch(link, method='get')
+                response = self.fetch(link, method='get', type="resource")
                 responses.append(response)
                 request_history.append((method, link, params_in))
                 self.logd('  return code %s done in %.6fs.' % (
                     response.code, response.total_time))
+                yield response
 
-        return responses
 
     def post(self, url_in, params_in=None):
         """Simulate a browser post."""
-        responses = self.browse(url_in, params_in, method='post')
+        for response in self.browse(url_in, params_in, method='post'):
+            yield response
         self.page_history.append(('post', url_in, params_in))
-        return responses
 
     def get(self, url_in, params_in=None):
         """Simulate a browser get."""
-        responses = self.browse(url_in, params_in=None, method='get')
+        for response in self.browse(url_in, params_in=None, method='get'):
+            yield response
         self.page_history.append(('get', url_in, params_in))
-        return responses
 
     def setReferer(self, url, force=True):
         """Set the referer."""
@@ -145,8 +148,7 @@ class Browser:
         requests = 0
         url_order = []
         for i in xrange(count):
-            responses = self.browse(url, params, method)
-            for response in responses:
+            for response in self.browse(url, params, method):
                 url = response.url
                 if url not in url_order:
                     url_order.append(url)
@@ -269,9 +271,9 @@ Examples
                 browser.perf(url, count=int(options.perf))
             else:
                 if use_http_post:
-                    responses = browser.post(url)
+                    responses = list(browser.post(url))
                 else:
-                    responses = browser.get(url)
+                    responses = list(browser.get(url))
             if options.dump_responses:
                 self.dumpResponses(responses)
 
