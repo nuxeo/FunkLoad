@@ -20,6 +20,7 @@
 $Id$
 """
 import sys
+import time
 import logging
 from urlparse import urljoin
 from optparse import OptionParser, TitledHelpFormatter
@@ -53,9 +54,11 @@ class Browser:
         self.auto_referer = True        # set referer automaticly
         self.max_redirs = 10            # number of redirects to follow
         self.fetch_resources = True     # extract html resources
+        self.use_resource_cache = True  # simulate a cache for resources
         self.setUserAgent('FunkLoad/%s' % get_version())
 
-    def browse(self, url_in, params_in, method=None, fetch_resources=None):
+    def browse(self, url_in, params_in, method=None, fetch_resources=None,
+               use_resource_cache=None):
         """Handle redirect and fetch HTML ressources.
 
         return a list of HTTPResponses"""
@@ -63,6 +66,8 @@ class Browser:
         request_history = self.request_history
         if fetch_resources is None:
             fetch_resources = self.fetch_resources
+        if use_resource_cache is None:
+            use_resource_cache = self.use_resource_cache
         if method is None:
             method = params_in and 'post' or 'get'
 
@@ -101,9 +106,10 @@ class Browser:
             parser.close()
             links = parser.links
 
-            # 4. simulate an optimal cache
-            links = [link for link in links
-                     if ('get', link, None) not in self.request_history]
+            if use_resource_cache:
+                # 4. simulate an optimal cache
+                links = [link for link in links
+                         if ('get', link, None) not in self.request_history]
             for link in links:
                 self.logd(' fetch resource:  %s' % link | truncate(70))
                 response = self.fetch(link, method='get')
@@ -134,14 +140,23 @@ class Browser:
     def perf(self, url, params=None, method=None, count=10):
         """Loop on a request output stats."""
         stats = {}
+        start = time.time()
+        volume = 0
+        requests = 0
+        url_order = []
         for i in xrange(count):
             responses = self.browse(url, params, method)
             for response in responses:
+                if not i:
+                    url_order.append(response.url)
                 stats.setdefault(response.url, []).append(
                     (response.total_time,
                      response.connect_time,
                      response.transfer_time))
-        self._renderStat(stats)
+                volume += response.size_download
+                requests += 1
+        stop = time.time()
+        self._renderStat(stats, requests, stop-start, volume, url_order)
 
     def _computeStat(self, times):
         """Returns the (average, standard deviation,
@@ -159,12 +174,17 @@ class Browser:
                 sort[int(count * .90)], sort[int(count * .95)],
                 sort[int(count * .98)], sort[-1], pers)
 
-    def _renderStat(self, stats):
+    def _renderStat(self, stats, requests, elapsed, volume, url_order):
         """Render perf stats."""
-        # render stats
+        self.logi("Performing %d requests, during %.3fs, download: %.2fKb" % (
+            requests, elapsed, volume/1024))
+        self.logi("  Effective requests per second: %.3f RPS" % (
+            requests/elapsed))
+        self.logi("                 Transfert rate: %.3f Kb/s\n" % (
+            volume/elapsed/1024))
         thead = ('average:', 'std dev:', 'minimum:', 'median:',
                  '90%:', '95%:', '98%:', 'maximum:', 'per second:')
-        for request in stats.keys():
+        for request in url_order:
             values = stats[request]
             self.logi("Stat for %d requests of: %s" % (len(values), request))
             self.logi("                 total      connect    transfert")
@@ -230,6 +250,8 @@ Examples
             browser.setBasicAuth(cred[0], cred[-1])
         if options.no_auto_referer:
             browser.auto_referer = False
+        if options.no_cache:
+            browser.use_resource_cache = False
         self.browser = browser
         self.urls = args[1:]
 
@@ -279,6 +301,8 @@ Examples
         parser.add_option("-A", "--user-agent", type="string",
                           dest="user_agent",
                           help="User-Agent to send to server.")
+        parser.add_option("", "--no-cache", action="store_true",
+                          help="Don't cache resources already fetched.")
         parser.add_option("-u", "--user", type="string",
                           dest="user_password",
                           help="<user[:password]> "
