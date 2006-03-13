@@ -19,9 +19,11 @@
 
 $Id$
 """
+import os
 import sys
 import time
 import logging
+from tempfile import mkdtemp
 from urlparse import urljoin
 from optparse import OptionParser, TitledHelpFormatter
 from curlfetcher import CurlFetcher
@@ -44,19 +46,28 @@ class Browser:
         self.fetcher = fetcher_cls()
         self.fetch = self.fetcher.fetch
 
-        self.reset = self.fetcher.reset
         self.setHeader = self.fetcher.setHeader
         self.clearHeaders = self.fetcher.clearHeaders
         self.setUserAgent = self.fetcher.setUserAgent
         self.setBasicAuth = self.fetcher.setBasicAuth
         self.clearBasicAuth = self.fetcher.clearBasicAuth
 
-        self.page_history = []
+        self.page_count = 0             # count during a session
+        self.request_count = 0
+        self.page_history = []          # history for a session
         self.request_history = []
         self.auto_referer = True        # set referer automaticly
         self.max_redirs = 10            # number of redirects to follow
         self.fetch_resources = True     # extract html resources
         self.use_resource_cache = True  # simulate a cache for resources
+        self.setUserAgent('FunkLoad/%s' % get_version())
+
+    def reset(self):
+        """Reset the browser session."""
+        self.fetcher.reset()
+        self.page_count = 0
+        self.page_history = []
+        self.request_history = []
         self.setUserAgent('FunkLoad/%s' % get_version())
 
     def browse(self, url_in, params_in, method=None, fetch_resources=None,
@@ -71,11 +82,17 @@ class Browser:
             use_resource_cache = self.use_resource_cache
         if method is None:
             method = params_in and 'post' or 'get'
+        history_append = request_history.append
+        request_count = 0
+        page_count = self.page_count
 
         # 1. fetch the requested page
         self.logd('%s: %s' % (method, url_in | truncate(70)))
-        response = self.fetch(url_in, params_in, method, type='page', **kw)
-        request_history.append((method, url_in, params_in))
+        response = self.fetch(url_in, params_in, method, type='page',
+                              page=page_count, request=request_count,
+                              **kw)
+        request_count += 1
+        history_append((method, url_in, params_in))
         self.setReferer(url_in, False)
         self.logd(' return code %s done in %.6fs.' % (
             response.code, response.total_time))
@@ -91,12 +108,15 @@ class Browser:
             url = response.getHeader('Location')
             url = urljoin(url_in, url)
             self.logd(' redirect: %s' % url | truncate(70))
-            response = self.fetch(url, params_in, method, type="page", **kw)
-            self.logd('  return code %s done in %.6fs.' % (
-                response.code, response.total_time))
-            request_history.append((method, url, params_in))
+            response = self.fetch(url, params_in, method, type="page",
+                                  page=page_count, request=request_count,
+                                  **kw)
+            request_count += 1
+            history_append((method, url, params_in))
             self.setReferer(url, False)
             redirect_count -= 1
+            self.logd('  return code %s done in %.6fs.' % (
+                response.code, response.total_time))
             yield response
 
         # 3. extract html resources
@@ -113,12 +133,14 @@ class Browser:
                          if ('get', link, None) not in self.request_history]
             for link in links:
                 self.logd(' fetch resource:  %s' % link | truncate(70))
-                response = self.fetch(link, method='get', type="resource")
-                request_history.append((method, link, params_in))
+                response = self.fetch(link, method='get', type="resource",
+                                      page=page_count, request=request_count)
+                request_count += 1
+                history_append((method, link, params_in))
                 self.logd('  return code %s done in %.6fs.' % (
                     response.code, response.total_time))
                 yield response
-
+        self.page_count += 1
 
     def post(self, url_in, params_in=None):
         """Simulate a browser post."""
@@ -232,6 +254,8 @@ Examples
         else:
             logger = get_logger('funkload.browser', level=logging.INFO)
         self.logi = logger.info
+        self.logd = logger.debug
+        self.logw = logger.warning
         if options.webunit:
             # webunit fetcher
             browser = Browser(WebunitFetcher)
@@ -252,6 +276,10 @@ Examples
             browser.auto_referer = False
         if options.no_cache:
             browser.use_resource_cache = False
+        if options.dump_responses or options.firefox_view:
+            if not options.dump_dir:
+                options.dump_dir = mkdtemp('_funkload')
+                self.logi('Dumping responses into %s' % options.dump_dir)
         self.browser = browser
         self.urls = args[1:]
 
@@ -268,11 +296,12 @@ Examples
                 browser.perf(url, count=int(options.perf))
             else:
                 if use_http_post:
-                    responses = list(browser.post(url))
+                    meth = browser.post
                 else:
-                    responses = list(browser.get(url))
-            if options.dump_responses:
-                self.dumpResponses(responses)
+                    meth = browser.get
+                for response in meth(url):
+                    if options.dump_dir:
+                        self.dumpResponse(response)
 
     def parseArgs(self, argv):
         """Parse programs args."""
@@ -309,6 +338,13 @@ Examples
                           "Set server basic auth user and password.")
         parser.add_option("-n", "--perf", type="int",
                           help="Number of requests to perform, return stats.")
+        parser.add_option("--dump-directory", type="string",
+                          dest="dump_dir",
+                          help="Directory to dump html pages.")
+        parser.add_option("-V", "--firefox-view", action="store_true",
+                          help="Real time view using firefox, "
+                          "you must have a running instance of firefox "
+                          "in the same host.")
         options, args = parser.parse_args(argv)
         if len(args) == 0:
             parser.error("incorrect number of arguments")
@@ -317,9 +353,56 @@ Examples
 
     def dumpResponses(self, responses):
         """Dump responses."""
-        self.logi('Dump responses:')
         for response in responses:
-            self.logi(response)
+            self.dumpResponse(response)
+
+    def dumpResponse(self, response):
+        """Dump the html content in a file.
+
+        Use firefox to render the content if we are in rt viewing mode."""
+        options = self.options
+        dump_dir = options.dump_dir
+        if not os.access(dump_dir, os.W_OK):
+            os.mkdir(dump_dir, 0775)
+        if response.headers:
+            file_path = os.path.abspath(
+                os.path.join(dump_dir, 'response-%3.3i-%2.2i.head' % (
+                response.page, response.request)))
+            f = open(file_path, 'w')
+            f.write(response.headers)
+            f.close()
+        if not response.body or response.code in (301, 302):
+            self.logd('  dump header into: %s' % file_path)
+            return
+
+        content_type = response.content_type
+        if content_type.count('text/xml'):
+            ext = '.xml'
+        elif content_type.count('css'):
+            ext = '.css'
+        elif content_type.count('javascript'):
+            ext = '.js'
+        elif content_type.count('html'):
+            ext = '.html'
+        else:
+            ext = os.path.splitext(response.url)[1]
+            if not ext.startswith('.') or len(ext) > 4:
+                ext = '.html'
+        file_path = os.path.abspath(
+            os.path.join(dump_dir, 'response-%3.3i-%2.2i%s' % (
+            response.page, response.request, ext)))
+        self.logd('  dump into: %s' % file_path)
+        f = open(file_path, 'w')
+        f.write(response.body)
+        f.close()
+        if response.type ==  'page' and options.firefox_view:
+            self.logd('  firefox view ...')
+            cmd = 'firefox -remote  "openfile(file://%s,new-tab)"' % file_path
+            ret = os.system(cmd)
+            if ret != 0:
+                self.logw('Failed to remote control firefox: %s' % cmd)
+                options.firefox_view = False
+
 
     def dumpHistory(self):
         """Dump history."""
@@ -332,6 +415,7 @@ Examples
         self.logi('Request history:')
         for request in self.browser.request_history:
             self.logi(request)
+
 
 
 def main():
