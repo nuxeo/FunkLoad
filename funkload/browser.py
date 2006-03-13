@@ -63,8 +63,7 @@ class Browser:
                use_resource_cache=None, **kw):
         """Handle redirect and fetch HTML ressources.
 
-        return a list of HTTPResponses"""
-        responses = []
+        return an iter list of HTTP<Fetcher>Responses"""
         request_history = self.request_history
         if fetch_resources is None:
             fetch_resources = self.fetch_resources
@@ -76,7 +75,6 @@ class Browser:
         # 1. fetch the requested page
         self.logd('%s: %s' % (method, url_in | truncate(70)))
         response = self.fetch(url_in, params_in, method, type='page', **kw)
-        responses.append(response)
         request_history.append((method, url_in, params_in))
         self.setReferer(url_in, False)
         self.logd(' return code %s done in %.6fs.' % (
@@ -87,8 +85,8 @@ class Browser:
         redirect_count = self.max_redirs
         while response.type == 'redirect':
             if not redirect_count:
-                self.logw('Too many redirects (%s) give up after: %s.' % (
-                    self.max_redirs, url))
+                self.logw('Too many redirects (%s) on %s, give up.' % (
+                    self.max_redirs, url_in))
                 break
             url = response.getHeader('Location')
             url = urljoin(url_in, url)
@@ -116,7 +114,6 @@ class Browser:
             for link in links:
                 self.logd(' fetch resource:  %s' % link | truncate(70))
                 response = self.fetch(link, method='get', type="resource")
-                responses.append(response)
                 request_history.append((method, link, params_in))
                 self.logd('  return code %s done in %.6fs.' % (
                     response.code, response.total_time))
@@ -140,15 +137,15 @@ class Browser:
         if force or self.auto_referer:
             self.fetcher.setReferer(url)
 
-    def perf(self, url, params=None, method=None, count=10):
+    def perf(self, url_in, params=None, method=None, count=10):
         """Loop on a request output stats."""
         stats = {}
-        start = time.time()
         volume = 0
         requests = 0
         url_order = []
+        start = time.time()
         for i in xrange(count):
-            for response in self.browse(url, params, method):
+            for response in self.browse(url_in, params, method):
                 url = response.url
                 if url not in url_order:
                     url_order.append(url)
