@@ -61,6 +61,8 @@ class HTTPBaseResponse:
         self.total_time = -1
         self.start = 0
         self.description = ''
+        self.page = 0
+        self.request = 0
         # user extra kw
         for key, value in kw.items():
             setattr(self, key, value)
@@ -73,9 +75,12 @@ class HTTPBaseResponse:
     def __str__(self):
         return ('<httpbaseresponse url="%s"'
                 ' type="%s"'
+                ' page="%s"'
+                ' request="%s"'
                 ' params="%s"'
                 ' headers="%s"'
-                ' error="%s" />' % (self.url, self.type,
+                ' error="%s" />' % (self.url, self.type, self.page,
+                                    self.request,
                                     self.params, self.headers,
                                     self.error))
 

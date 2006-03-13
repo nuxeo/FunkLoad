@@ -51,13 +51,15 @@ class HTTPWebunitResponse(HTTPBaseResponse):
     def __str__(self):
         return ('<httpwebunitresponse url="%s"'
                 ' type="%s"'
+                ' page="%s" request="%s"'
                 ' code="%s"'
                 ' content_type="%s"'
                 ' size_download="%d"'
                 ' total_time="%.6fs"'
                 ' error="%s" />' % (
-            self.url, self.type, self.code, self.content_type,
-            self.size_download, self.total_time, self.error))
+            self.url, self.type, self.page, self.request, self.code,
+            self.content_type, self.size_download, self.total_time,
+            self.error))
 
 
 class WebunitFetcher(BaseFetcher):
