@@ -29,7 +29,7 @@ from optparse import OptionParser, TitledHelpFormatter
 from curlfetcher import CurlFetcher
 from webunitfetcher import WebunitFetcher
 from htmlresourceparser import HTMLResourceParser
-from utils import get_logger, get_version, truncate
+from utils import get_logger, get_version, truncate, guess_file_extension
 
 class Browser:
     """Simulate a browser using a fetcher.
@@ -38,7 +38,7 @@ class Browser:
     Simulates a cache for resources."""
 
     def __init__(self, fetcher_cls):
-        logger = get_logger('funkload.browser')
+        logger = get_logger()
         self.logd = logger.debug
         self.logi = logger.info
         self.logw = logger.warning
@@ -250,9 +250,9 @@ Examples
             argv = sys.argv
         options, args = self.parseArgs(argv)
         if options.trace or options.debug:
-            logger = get_logger('funkload.browser', level=logging.DEBUG)
+            logger = get_logger(level=logging.DEBUG)
         else:
-            logger = get_logger('funkload.browser', level=logging.INFO)
+            logger = get_logger(level=logging.INFO)
         self.logi = logger.info
         self.logd = logger.debug
         self.logw = logger.warning
@@ -374,20 +374,7 @@ Examples
         if not response.body or response.code in (301, 302):
             self.logd('  dump header into: %s' % file_path)
             return
-
-        content_type = response.content_type
-        if content_type.count('text/xml'):
-            ext = '.xml'
-        elif content_type.count('css'):
-            ext = '.css'
-        elif content_type.count('javascript'):
-            ext = '.js'
-        elif content_type.count('html'):
-            ext = '.html'
-        else:
-            ext = os.path.splitext(response.url)[1]
-            if not ext.startswith('.') or len(ext) > 4:
-                ext = '.html'
+        ext = guess_file_extension(response.url, response.content_type)
         file_path = os.path.abspath(
             os.path.join(dump_dir, 'response-%3.3i-%2.2i%s' % (
             response.page, response.request, ext)))
