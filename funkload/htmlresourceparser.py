@@ -27,6 +27,13 @@ from htmllib import HTMLParser
 class HTMLResourceParser(HTMLParser):
     """Extract img, link, script and base_url ref from an HTML page."""
 
+    def add_links(self, link):
+        """Add new links."""
+        url = urljoin(self.base, link)
+        links = self.links
+        if url not in links:
+            links.append(url)
+
     def __init__(self, url):
         HTMLParser.__init__(self, NullFormatter())
         self.base = url
@@ -42,13 +49,13 @@ class HTMLResourceParser(HTMLParser):
         """Handles img tag."""
         for name, value in attributes:
             if name == 'src':
-                self.links.append(urljoin(self.base, value))
+                self.add_links(value)
 
     def do_link(self, attributes):
         """Handles link tag."""
         for name, value in attributes:
             if name == 'href':
-                self.links.append(urljoin(self.base, value))
+                self.add_links(value)
 
     def do_script(self, attributes):
         """Handles script tag."""

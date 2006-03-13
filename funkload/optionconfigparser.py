@@ -20,6 +20,7 @@
 $Id$
 """
 import os
+import logging
 from ConfigParser import ConfigParser, NoSectionError, NoOptionError
 from utils import get_logger
 
@@ -41,7 +42,7 @@ class OptionConfigParser:
         config.read(config_path)
         self._config = config
         self._options = options
-        logger = get_logger('')
+        logger = get_logger(name="config", level=logging.INFO)
         self.logd = logger.debug
         self.logi = logger.info
 

@@ -107,7 +107,7 @@ class BaseFetcher:
     """A base class for a fetcher."""
 
     def __init__(self, **kw):
-        logger = get_logger(name='funkload.browser')
+        logger = get_logger()
         self.logger = logger
         self.logd = logger.debug
         self.logi = logger.info
