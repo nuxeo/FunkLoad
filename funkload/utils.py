@@ -133,7 +133,7 @@ def mmn_decode(meta_method_name):
 #
 def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
                        name='FunkLoad'):
-    """Get a logger."""
+    """Get a logger deprecated."""
     logger = logging.getLogger(name)
     if logger.handlers:
         # already setup
@@ -156,26 +156,36 @@ def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
     return logger
 
 
-def get_logger(name, log_path=None, log_console=True, level=logging.DEBUG):
-    """Get a logger new impl."""
+def get_logger(name=None, log_path=None, log_console=True, level=None,
+               format='%(asctime)s %(levelname)s %(message)s', propagate=True):
+    """Get a logger add handlers if needed."""
+    if name is None:
+        name = ""                       # default logger
+    print "ask '%s' path:%s level:%s" % (name, log_path, level)
     logger = logging.getLogger(name)
+    add_stream_hdlr = True
+    add_file_hdlr = True
     if logger.handlers:
-        # already setup
-        return logger
-    if log_console:
+        for hdlr in logger.handlers:
+            if isinstance(hdlr, logging.StreamHandler):
+                add_stream_hdlr = False
+            elif isinstance(hdlr, logging.FileHandler):
+                add_file_hdlr = False
+    if log_console and add_stream_hdlr:
         hdlr = logging.StreamHandler()
-        hdlr.setLevel(level)
         logger.addHandler(hdlr)
-    if log_path:
+    if log_path and add_file_hdlr:
         if os.access(log_path, os.F_OK):
             os.rename(log_path, log_path + '.bak-' + str(int(time.time())))
-        formatter = logging.Formatter(
-            '%(asctime)s %(levelname)s %(message)s')
         hdlr = logging.FileHandler(log_path)
-        hdlr.setLevel(level)
-        hdlr.setFormatter(formatter)
+        if format:
+            formatter = logging.Formatter(format)
+            hdlr.setFormatter(formatter)
         logger.addHandler(hdlr)
-    logger.setLevel(level)
+    if level is not None:
+        logger.setLevel(level)
+    if not propagate:
+        logger.propagate = False
     return logger
 
 
@@ -235,6 +245,29 @@ def xmlrpc_list_credentials(host, port, group=None):
 # ------------------------------------------------------------
 # misc
 #
+def guess_file_extension(url, content_type):
+    """Guess a file extension for an url/content_type."""
+    ext = os.path.splitext(url)[1]
+    if not ext.startswith('.') or len(ext) > 4:
+        ext = None
+    if content_type.count('html'):
+        ext = '.html'
+    elif content_type.count('css'):
+        ext = '.css'
+    elif content_type.count('javascript'):
+        ext = '.js'
+    elif content_type.count('text/xml'):
+        ext = '.xml'
+    elif ext is None:
+        if content_type.count('/gif'):
+            ext = '.gif'
+        elif content_type.count('/png'):
+            ext = '.png'
+        else:
+            ext = '.html'
+    return ext
+
+
 def get_version():
     """Retrun the FunkLoad package version."""
     from pkg_resources import get_distribution
