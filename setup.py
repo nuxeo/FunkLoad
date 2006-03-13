@@ -117,7 +117,7 @@ Main FunkLoad features are:
              'scripts/fl-build-report',
              'scripts/fl-import-from-tm-recorder',
              'scripts/fl-install-demo',
-             'scripts/fl-record'],
+             'scripts/fl-record', 'scripts/fl-browse'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
