@@ -161,7 +161,7 @@ def get_logger(name=None, log_path=None, log_console=True, level=None,
     """Get a logger add handlers if needed."""
     if name is None:
         name = ""                       # default logger
-    print "ask '%s' path:%s level:%s" % (name, log_path, level)
+    #print "ask '%s' path:%s level:%s" % (name, log_path, level)
     logger = logging.getLogger(name)
     add_stream_hdlr = True
     add_file_hdlr = True
