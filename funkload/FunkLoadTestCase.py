@@ -30,17 +30,13 @@ from datetime import datetime
 import unittest
 import traceback
 from random import random
-from urllib import urlencode
 from tempfile import mkdtemp
 from xml.sax.saxutils import quoteattr
-from urlparse import urljoin
-from ConfigParser import ConfigParser, NoSectionError, NoOptionError
-
-from webunit.webunittest import WebTestCase, HTTPError
-
-import PatchWebunit
-from utils import get_default_logger, mmn_is_bench, mmn_decode
-from utils import recording, thread_sleep, is_html, get_version, trace
+from utils import get_logger, mmn_is_bench, mmn_decode
+from utils import recording, thread_sleep, is_html, get_version
+from optionconfigparser import OptionConfigParser
+from browser import Browser
+from curlfetcher import CurlFetcher
 from xmlrpclib import ServerProxy
 
 _marker = []
@@ -67,6 +63,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self.meta_method_name = methodName
         self.suite_name = self.__class__.__name__
         unittest.TestCase.__init__(self, methodName=self.test_name)
+
+
         self._response = None
         self.options = options
         self.debug_level = getattr(options, 'debug_level', 0)
@@ -100,11 +98,12 @@ class FunkLoadTestCase(unittest.TestCase):
         config_path = os.path.join(config_directory,
                                    self.__class__.__name__ + '.conf')
         config_path = os.path.abspath(config_path)
-        if not os.path.exists(config_path):
-            config_path = "Missing: "+ config_path
-        config = ConfigParser()
-        config.read(config_path)
+        config = OptionConfigParser(config_path)
         self._config = config
+        self.conf_get = self._config.get
+        self.conf_getInt = self._config.getInt
+        self.conf_getFloat = self._config.getFloat
+        self.conf_getList = self._config.getList
         self._config_path = config_path
         self.default_user_agent = self.conf_get('main', 'user_agent',
                                                 'FunkLoad/%s' % get_version(),
@@ -124,26 +123,20 @@ class FunkLoadTestCase(unittest.TestCase):
             self.conf_get(section, 'result_path', 'funkload.xml'))
 
         # init loggers
-        self.logger = get_default_logger(self.log_to, self.log_path)
-        self.logger_result = get_default_logger(log_to="xml",
-                                                log_path=self.result_path,
-                                                name="FunkLoadResult")
-        #self.logd('_funkload_init config [%s], log_to [%s],'
-        #          ' log_path [%s], result [%s].' % (
-        #    self._config_path, self.log_to, self.log_path, self.result_path))
-
-        # init webunit browser (passing a fake methodName)
-        self._browser = WebTestCase(methodName='log')
+        self.logger = get_logger(log_path=self.log_path,
+                                 log_console=self.log_to.count('console'))
+        self.logger_result = get_logger(name="funkload.result",
+                                        log_console=False,
+                                        log_path=self.result_path,
+                                        format=None, propagate=False)
+        self._browser = Browser(CurlFetcher)
         self.clearContext()
-        
+
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
     def clearContext(self):
         """Resset the testcase."""
-        self._browser.clearContext()
-        self._browser.css = {}
-        self._browser.history = []
-        self._browser.extra_headers = []
+        self._browser.reset()
         self.step_success = True
         self.test_status = 'Successful'
         self.steps = 0
@@ -164,179 +157,58 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # browser simulation
     #
-    def _connect(self, url, params, ok_codes, rtype, description):
-        """Handle fetching, logging, errors and history."""
-        t_start = time.time()
-        try:
-            response = self._browser.fetch(url, params, ok_codes=ok_codes)
-        except:
-            etype, value, tback = sys.exc_info()
-            t_stop = time.time()
-            t_delta = t_stop - t_start
-            self.total_time += t_delta
-            self.step_success = False
-            self.test_status = 'Failure'
-            self.logd(' Failed in %.3fs' % t_delta)
-            if etype is HTTPError:
-                self._log_response(value.response, rtype, description,
-                                   t_start, t_stop, log_body=True)
-                if self._dumping:
-                    self._dump_content(value.response)
-                raise self.failureException, str(value.response)
-            else:
-                self._log_response_error(url, rtype, description, t_start,
-                                         t_stop)
-                if etype is SocketError:
-                    raise SocketError("Can't load %s." % url)
-                raise
-        t_stop = time.time()
-        # Log response
-        t_delta = t_stop - t_start
-        self.total_time += t_delta
-        if rtype in ('post', 'get'):
-            self.total_pages += 1
-        elif rtype == 'redirect':
-            self.total_redirects += 1
-        elif rtype == 'link':
-            self.total_links += 1
-        if rtype in ('post', 'get', 'redirect'):
-            # this is a valid referer for the next request
-            self.setHeader('Referer', url)
-        self._browser.history.append((rtype, url))
-        self.logd(' Done in %.3fs' % t_delta)
-        self._log_response(response, rtype, description, t_start, t_stop)
-        if self._dumping:
-            self._dump_content(response)
-        return response
-
-    def _browse(self, url_in, params_in=None,
-                description=None, ok_codes=None,
-                method='post',
-                follow_redirect=True, load_auto_links=True,
-                sleep=True):
-        """Simulate a browser handle redirects, load/cache css and images."""
+    def _browse(self, url_in, params_in, method=None, fetch_resources=None,
+               use_resource_cache=None, description=None, ok_codes=None,
+               sleep=True):
+        """Simulate a browser log responses."""
         self._response = None
-        # Loop mode
-        if self._loop_mode:
-            if self.steps == self._loop_steps[0]:
-                self._loop_recording = True
-                self.logi('Loop mode start recording')
-            if self._loop_recording:
-                self._loop_records.append((url_in, params_in, description,
-                                           ok_codes, method, follow_redirect,
-                                           load_auto_links, False))
-        # ok codes
         if ok_codes is None:
             ok_codes = self.ok_codes
-        if type(params_in) is ListType:
-            # convert list into a dict
-            params = {}
-            for key, value in params_in:
-                params[key] = params.setdefault(key, [])
-                params[key].append(value)
-            for key, value in params.items():
-                if len(value) == 1:
-                    params[key] = value[0]
-        else:
-            params = params_in
-
-        if method == 'get' and params:
-            url = url_in + '?' + urlencode(params)
-            params = None
-        else:
-            url = url_in
-
-        if method == 'get':
-            self.logd('GET: %s\n\tPage %i: %s ...' % (url, self.steps,
-                                                      description or ''))
-        else:
-            url = url_in
-            self.logd('POST: %s %s\n\tPage %i: %s ...' % (url, str(params),
-                                                          self.steps,
-                                                          description or ''))
-        # Fetching
-        response = self._connect(url, params, ok_codes, method, description)
-
-        # Check redirection
-        if follow_redirect and response.code in (301, 302):
-            max_redirect_count = 10
-            thread_sleep()              # give a chance to other threads
-            while response.code in (301, 302) and max_redirect_count:
-                # Figure the location - which may be relative
-                newurl = response.headers['Location']
-                url = urljoin(url_in, newurl)
-                self.logd(' Load redirect link: %s' % url)
-                response = self._connect(url, None, ok_codes, 'redirect', None)
-                max_redirect_count -= 1
-            if not max_redirect_count:
-                self.logd(' WARNING Too many redirects give up.')
-
-        # Load auto links (css and images)
-        response.is_html = is_html(response.body)
-        if load_auto_links and response.is_html and not self._simple_fetch:
-            self.logd(' Load css and images...')
-            page = response.body
-            t_start = time.time()
-            c_start = self.total_time
-            try:
-                # pageImages is patched to call _log_response on all links
-                self._browser.pageImages(url, page, self)
-            except HTTPError, error:
-                if self._accept_invalid_links:
-                    self.logd('  ' + str(error))
+        for response in self._browser.browse(
+            url_in, params_in, method, fetch_resources, use_resource_cache,
+            description=description):
+            self.total_time += response.total_time
+            code = response.code
+            if code in ok_codes:
+                self.step_success = True
+                self._log_response(response)
+            else:
+                self.step_success = False
+                self.test_status = 'Failure'
+                self._log_response(response)
+                if code == -1:
+                    raise str(response.error)
                 else:
-                    t_stop = time.time()
-                    t_delta = t_stop - t_start
-                    self.step_success = False
-                    self.test_status = 'Failure'
-                    self.logd('  Failed in ~ %.2fs' % t_delta)
-                    # XXX The duration logged for this response is wrong
-                    self._log_response(error.response, 'link', None,
-                                       t_start, t_stop, log_body=True)
-                    raise self.failureException, str(error)
-            c_stop = self.total_time
-            self.logd('  Done in %.3fs' % (c_stop - c_start))
+                    self.fail('invalide return code %s, extpected %s' % (
+                        code, ok_codes))
+            rtype = response.type
+            if rtype == 'page':
+                self._response = response
+                self.total_pages += 1
+            elif rtype == 'redirect':
+                self.total_redirects += 1
+            elif rtype == 'resource':
+                self.total_links += 1
+        if self._dumping:
+            self._dump_content(self._response)
         if sleep:
             self.sleep()
-        self._response = response
-
-        # Loop mode
-        if self._loop_mode and self.steps == self._loop_steps[-1]:
-            self._loop_recording = False
-            self.logi('Loop mode end recording.')
-            t_start = self.total_time
-            count = 0
-            for i in range(self._loop_number):
-                self.logi('Loop mode replay %i' % i)
-                for record in self._loop_records:
-                    count += 1
-                    self.steps += 1
-                    self._browse(*record)
-            t_delta = self.total_time - t_start
-            text = ('End of loop: %d pages rendered in %.3fs, '
-                    'avg of %.3fs per page, '
-                    '%.3f SPPS without concurrency.' % (count, t_delta,
-                                                        t_delta/count,
-                                                        count/t_delta))
-            self.logi(text)
-            trace(text + '\n')
-
-        return response
+        return self._response
 
     def post(self, url, params=None, description=None, ok_codes=None):
         """POST method on url with params."""
         self.steps += 1
         self.page_responses = 0
-        response = self._browse(url, params, description, ok_codes,
-                                method="post")
+        response = self._browse(url, params, description=description,
+                                ok_codes=ok_codes, method="post")
         return response
 
     def get(self, url, params=None, description=None, ok_codes=None):
         """GET method on url adding params."""
         self.steps += 1
         self.page_responses = 0
-        response = self._browse(url, params, description, ok_codes,
-                                method="get")
+        response = self._browse(url, params, description=description,
+                                ok_codes=ok_codes, method="get")
         return response
 
     def exists(self, url, params=None, description="Checking existence"):
@@ -405,9 +277,8 @@ class FunkLoadTestCase(unittest.TestCase):
         time is out."""
         time_start = time.time()
         while(True):
-            try:
-                self._browser.fetch(url, None, ok_codes=[200, 301, 302])
-            except SocketError:
+            response = self._browser.fetch(url, None, ok_codes=[200, 301, 302])
+            if response.code == -1:
                 if time.time() - time_start > time_out:
                     self.fail('Time out service %s not available after %ss' %
                               (url, time_out))
@@ -427,39 +298,29 @@ class FunkLoadTestCase(unittest.TestCase):
 
     def addHeader(self, key, value):
         """Add an http header."""
-        self._browser.extra_headers.append((key, value))
+        self._browser.addHeader(key, value)
 
     def setHeader(self, key, value):
         """Add or override an http header.
 
         If value is None, the key is removed."""
-        headers = self._browser.extra_headers
-        for i, (k, v) in enumerate(headers):
-            if k == key:
-                if value is not None:
-                    headers[i] = (key, value)
-                else:
-                    del headers[i]
-                break
-        else:
-            if value is not None:
-                headers.append((key, value))
+        self._browser.setHeader(key, value)
 
     def delHeader(self, key):
         """Remove an http header key."""
-        self.setHeader(key, None)
+        self._browser.delHeader(key)
 
     def clearHeaders(self):
         """Remove all http headers set by addHeader or setUserAgent.
 
         Note that the Referer is also removed."""
-        self._browser.extra_headers = []
+        self._browser.clearHeaders()
 
     def setUserAgent(self, agent):
         """Set User-Agent http header for the next requests.
 
         If agent is None, the user agent header is removed."""
-        self.setHeader('User-Agent', agent)
+        self._browser.setUserAgent(agent)
 
     def sleep(self):
         """Sleeps a random amount of time.
@@ -500,6 +361,7 @@ class FunkLoadTestCase(unittest.TestCase):
         Filtering href using the pattern regex if present."""
         response = self._response
         ret = []
+        return ret
         if response is not None:
             a_links = response.getDOM().getByName('a')
             if a_links:
@@ -512,57 +374,8 @@ class FunkLoadTestCase(unittest.TestCase):
     def getLastBaseUrl(self):
         """Return the base href url."""
         response = self._response
-        if response is not None:
-            base = response.getDOM().getByName('base')
-            if base:
-                return base[0].href
-        return ''
-
-
-    #------------------------------------------------------------
-    # configuration file utils
-    #
-    def conf_get(self, section, key, default=_marker, quiet=False):
-        """Return an entry from the options or configuration file."""
-        # check for a command line options
-        opt_key = '%s_%s' % (section, key)
-        opt_val = getattr(self.options, opt_key, None)
-        if opt_val:
-            #print('[%s] %s = %s from options.' % (section, key, opt_val))
-            return opt_val
-        # check for the configuration file if opt val is None
-        # or nul
-        try:
-            val = self._config.get(section, key)
-        except (NoSectionError, NoOptionError):
-            if not quiet:
-                self.logi('[%s] %s not found' % (section, key))
-            if default is _marker:
-                raise
-            val = default
-        #print('[%s] %s = %s from config.' % (section, key, val))
-        return val
-
-    def conf_getInt(self, section, key, default=_marker, quiet=False):
-        """Return an integer from the configuration file."""
-        return int(self.conf_get(section, key, default, quiet))
-
-    def conf_getFloat(self, section, key, default=_marker, quiet=False):
-        """Return a float from the configuration file."""
-        return float(self.conf_get(section, key, default, quiet))
-
-    def conf_getList(self, section, key, default=_marker, quiet=False,
-                     separator=None):
-        """Return a list from the configuration file."""
-        value = self.conf_get(section, key, default, quiet)
-        if value is default:
-            return value
-        if separator is None:
-            separator = ':'
-        if value.count(separator):
-            return value.split(separator)
-        return [value]
-
+        # XXX
+        return self._response.url
 
 
     #------------------------------------------------------------
@@ -615,33 +428,7 @@ class FunkLoadTestCase(unittest.TestCase):
         """Close the result log."""
         self._logr('</funkload>', force=True)
 
-    def _log_response_error(self, url, rtype, description, time_start,
-                            time_stop):
-        """Log a response that raise an unexpected exception."""
-        self.total_responses += 1
-        self.page_responses += 1
-        info = {}
-        info['cycle'] = self.cycle
-        info['cvus'] = self.cvus
-        info['thread_id'] = self.thread_id
-        info['suite_name'] = self.suite_name
-        info['test_name'] = self.test_name
-        info['step'] = self.steps
-        info['number'] = self.page_responses
-        info['type'] = rtype
-        info['url'] = quoteattr(url)
-        info['code'] = -1
-        info['description'] = description and quoteattr(description) or '""'
-        info['time_start'] = time_start
-        info['duration'] = time_stop - time_start
-        info['result'] = 'Error'
-        info['traceback'] = quoteattr(' '.join(
-            traceback.format_exception(*sys.exc_info())))
-        message = '''<response cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s" step="%(step).3i" number="%(number).3i" type="%(type)s" result="%(result)s" url=%(url)s code="%(code)s" description=%(description)s time="%(time_start)s" duration="%(duration)s" traceback=%(traceback)s />''' % info
-        self._logr(message)
-
-    def _log_response(self, response, rtype, description, time_start,
-                      time_stop, log_body=False):
+    def _log_response(self, response):
         """Log a response."""
         self.total_responses += 1
         self.page_responses += 1
@@ -653,29 +440,34 @@ class FunkLoadTestCase(unittest.TestCase):
         info['test_name'] = self.test_name
         info['step'] = self.steps
         info['number'] = self.page_responses
-        info['type'] = rtype
+        info['type'] = response.type
         info['url'] = quoteattr(response.url)
         info['code'] = response.code
+        description = response.description
         info['description'] = description and quoteattr(description) or '""'
-        info['time_start'] = time_start
-        info['duration'] = time_stop - time_start
+        info['time_start'] = response.start
+        info['duration'] = response.total_time
         info['result'] = self.step_success and 'Successful' or 'Failure'
         response_start = '''<response cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s" step="%(step).3i" number="%(number).3i" type="%(type)s" result="%(result)s" url=%(url)s code="%(code)s" description=%(description)s time="%(time_start)s" duration="%(duration)s"''' % info
-
-        if not log_body:
+        if self.step_success:
             message = response_start + ' />'
         else:
-            response_start = response_start + '>\n  <headers>'
-            header_xml = []
-            for key, value in response.headers.items():
-                header_xml.append('    <header name="%s" value=%s />' % (
-                    key, quoteattr(value)))
-            headers = '\n'.join(header_xml) + '\n  </headers>'
-            message = '\n'.join([
-                response_start,
-                headers,
-                '  <body><![CDATA[\n%s\n]]>\n  </body>' % response.body,
-                '</response>'])
+            if response.error:
+                response_start = response_start + 'error=%s' % quoteattr(
+                    response.error)
+            # dump header and body
+            if response.headers_dict:
+                response_start = response_start + '>\n  <headers>'
+                header_xml = []
+                for key, value in response.headers_dict.items():
+                    header_xml.append('    <header name="%s" value=%s />' % (
+                        key, quoteattr(value)))
+                headers = '\n'.join(header_xml) + '\n  </headers>'
+                message = '\n'.join([
+                    response_start,
+                    headers,
+                    '  <body><![CDATA[\n%s\n]]>\n  </body>' % response.body,
+                    '</response>'])
         self._logr(message)
 
     def _log_xmlrpc_response(self, url, method, description, response,
