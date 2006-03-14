@@ -19,6 +19,7 @@
 
 $Id$
 """
+import sys
 from cStringIO import StringIO
 import time
 import pycurl
@@ -120,9 +121,10 @@ class CurlFetcher(BaseFetcher):
         curl.setopt(curl.USERPWD, '')
         #curl.setopt(curl.HTTPAUTH, )
 
-    def setExtraHeaders(self):
+    def setExtraHeaders(self, curl=None):
         """Setup extra_headers set by set/add/clearHeader."""
-        curl = self.curl
+        if curl is None:
+            curl = self.curl
         headers_list = ["%s: %s" % (key, value)
                         for (key, value) in self.extra_headers]
         curl.setopt(curl.HTTPHEADER, headers_list)
@@ -175,6 +177,91 @@ class CurlFetcher(BaseFetcher):
                                 body=body.getvalue(),
                                 error=error, curl=curl,
                                 start=start, **kw)
+
+
+    def multiGet(self, urls, concurrency=4, **kw):
+        """Curl multi interface."""
+        queue = urls[:]
+        num_urls = len(urls)
+        num_conn = min(concurrency, num_urls)
+        self.logd('getting %d url, with %d connections' % (num_urls, num_conn))
+        m = pycurl.CurlMulti()
+        m.handles = []
+        for i in range(num_conn):
+            c = pycurl.Curl()
+            c.setopt(pycurl.HTTPGET, True)
+            c.setopt(pycurl.SSL_VERIFYHOST, 0) # no ssl check by default
+            c.setopt(pycurl.SSL_VERIFYPEER, 0)
+            c.setopt(pycurl.FOLLOWLOCATION, 0)
+            c.setopt(pycurl.CONNECTTIMEOUT, 30)
+            c.setopt(pycurl.TIMEOUT, 300)
+            c.setopt(pycurl.NOSIGNAL, 1)
+            self.setExtraHeaders(c)
+            m.handles.append(c)
+
+        freelist = m.handles[:]
+        num_processed = 0
+        while num_processed < num_urls:
+            # If there is an url to process and a free curl object,
+            # add to multi stack
+            while queue and freelist:
+                url = queue.pop(0)
+                c = freelist.pop()
+                # store some info
+                c.url = url
+                c.body = StringIO()
+                c.headers = StringIO()
+                c.start = time.time()
+                # set curl opt
+                c.setopt(pycurl.URL, url)
+                c.setopt(pycurl.WRITEFUNCTION, c.body.write)
+                c.setopt(pycurl.HEADERFUNCTION, c.headers.write)
+                m.add_handle(c)
+            # Run the internal curl state machine for the multi stack
+            while 1:
+                ret, num_handles = m.perform()
+                if ret != pycurl.E_CALL_MULTI_PERFORM:
+                    break
+
+            # Check for curl objects which have terminated,
+            # and add them to the freelist
+            while 1:
+                num_q, ok_list, err_list = m.info_read()
+                for c in ok_list:
+                    m.remove_handle(c)
+                    yield HTTPCurlResponse(c.url, 'get', None,
+                                           headers=c.headers.getvalue(),
+                                           body=c.body.getvalue(),
+                                           error=None, curl=c,
+                                           start=c.start, **kw)
+                    c.body = None
+                    c.header = None
+                    freelist.append(c)
+                for c, errno, errmsg in err_list:
+                    m.remove_handle(c)
+                    yield HTTPCurlResponse(c.url, 'get', None,
+                                           headers=c.headers.getvalue(),
+                                           body=c.body.getvalue(),
+                                           error=str((errno, errmsg)),
+                                           curl=c, start=c.start, **kw)
+                    freelist.append(c)
+                    c.body = None
+                    c.header = None
+
+                num_processed = num_processed + len(ok_list) + len(err_list)
+                if num_q == 0:
+                    break
+            # Currently no more I/O is pending,
+            # could do something in the meantime
+            # (display a progress bar, etc.).
+            # We just call select() to sleep until some more data is available.
+            m.select(1.0)
+
+        # Cleanup
+        for c in m.handles:
+            c.close()
+        m.close()
+
 
     def prepareUploadParam(self, value):
         """Convert params return params url encoded if not multipart."""
