@@ -19,6 +19,16 @@
 
 $Id$
 """
+# We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
+# the libcurl tutorial for more info.
+try:
+    import signal
+    from signal import SIGPIPE, SIG_IGN
+    signal.signal(signal.SIGPIPE, signal.SIG_IGN)
+except ImportError:
+    pass
+
+
 import os
 import sys
 import time
@@ -43,9 +53,10 @@ class Browser:
         self.logi = logger.info
         self.logw = logger.warning
         self.logger = logger
+        self.concurrency = 0
+
         self.fetcher = fetcher_cls()
         self.fetch = self.fetcher.fetch
-
         self.setHeader = self.fetcher.setHeader
         self.clearHeaders = self.fetcher.clearHeaders
         self.setUserAgent = self.fetcher.setUserAgent
@@ -96,6 +107,8 @@ class Browser:
         self.setReferer(url_in, False)
         self.logd(' return code %s done in %.6fs.' % (
             response.code, response.total_time))
+        if response.error:
+            self.logi(' Error: ' + str(response.error))
         yield response
 
         # 2. handles redirection
@@ -131,15 +144,27 @@ class Browser:
                 # 4. simulate an optimal cache
                 links = [link for link in links
                          if ('get', link, None) not in self.request_history]
-            for link in links:
-                self.logd(' fetch resource:  %s' % link | truncate(70))
-                response = self.fetch(link, method='get', type="resource",
-                                      page=page_count, request=request_count)
-                request_count += 1
-                history_append((method, link, params_in))
-                self.logd('  return code %s done in %.6fs.' % (
-                    response.code, response.total_time))
-                yield response
+
+            if self.concurrency > 1:
+                for response in self.fetcher.multiGet(
+                    links, concurrency=self.concurrency, **kw):
+                    request_count += 1
+                    history_append(('get', response.url, None))
+                    self.logd(' multi fetch resources: %s\n'
+                              '  return code %s done in %.6fs.' % (
+                        response.url, response.code, response.total_time))
+                    yield response
+            else:
+                for link in links:
+                    self.logd(' fetch resource:  %s' % link | truncate(70))
+                    response = self.fetch(
+                        link, method='get', type="resource",
+                        page=page_count, request=request_count)
+                    request_count += 1
+                    history_append(('get', link, None))
+                    self.logd('  return code %s done in %.6fs.' % (
+                        response.code, response.total_time))
+                    yield response
         self.page_count += 1
 
     def post(self, url_in, params_in=None):
@@ -262,6 +287,8 @@ Examples
         else:
             # curl fetcher setup
             browser = Browser(CurlFetcher)
+            if options.concurrency:
+                browser.concurrency = options.concurrency
             if options.trace:
                 browser.fetcher.curlVerbose(1)
                 options.debug = True
@@ -345,6 +372,10 @@ Examples
                           help="Real time view using firefox, "
                           "you must have a running instance of firefox "
                           "in the same host.")
+        parser.add_option("-c", "--resource-concurrency", type="int",
+                          dest="concurrency",
+                          help="Fetching html resources asyncronously with "
+                          "concurrency (single threaded).")
         options, args = parser.parse_args(argv)
         if len(args) == 0:
             parser.error("incorrect number of arguments")
