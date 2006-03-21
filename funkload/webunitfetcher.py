@@ -21,11 +21,14 @@ $Id$
 """
 import sys
 import traceback
+import logging
 from socket import error as SocketError
 import time
 from webunit.webunittest import WebFetcher, HTTPError
 from basefetcher import HTTPBaseResponse, BaseFetcher
 import PatchWebunit
+
+log = logging.getLogger('funkload.fetcher')
 
 class HTTPWebunitResponse(HTTPBaseResponse):
     """Collect an http webunit response."""
@@ -123,14 +126,14 @@ class WebunitFetcher(BaseFetcher):
             if etype is HTTPError:
                 error = 'webunit httperror'
                 response = value.response
-                self.loge(' webunit error: %s' % value.response)
+                log.error(' webunit error: %s' % value.response)
             else:
                 if etype is SocketError:
                     error = 'socket error on %s.' % url
-                    self.loge(" webunit SocketError: Can't load %s." % url)
+                    log.error(" webunit SocketError: Can't load %s." % url)
                 else:
                     error = 'unknown'
-                    self.loge(''.join(traceback.format_exception(
+                    log.error(''.join(traceback.format_exception(
                         etype, value, tback)))
         t_stop = time.time()
         t_delta = t_stop - t_start

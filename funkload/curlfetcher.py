@@ -22,10 +22,12 @@ $Id$
 import sys
 from cStringIO import StringIO
 import time
+import logging
 import pycurl
 import traceback
 from basefetcher import HTTPBaseResponse, BaseFetcher
 
+log = logging.getLogger('funkload.fetcher')
 
 class HTTPCurlResponse(HTTPBaseResponse):
     """Collect an http curl response."""
@@ -95,7 +97,7 @@ class CurlFetcher(BaseFetcher):
         else:
             def debug_curl(level, message):
                 """Debug message from curl engine."""
-                self.logd("curl [%d]: %s" % (level, message))
+                log.debug("curl [%d]: %s" % (level, message))
             curl.setopt(pycurl.VERBOSE, level)
             curl.setopt(pycurl.DEBUGFUNCTION, debug_curl)
 
@@ -167,10 +169,10 @@ class CurlFetcher(BaseFetcher):
             curl.perform()
         except pycurl.error, v:
             error = v
-            self.loge('pycurl error: ' + str(error))
+            log.error('pycurl error: ' + str(error))
         except:
             error = 'unknown'
-            self.loge(''.join(traceback.format_exception(*sys.exc_info())))
+            log.error(''.join(traceback.format_exception(*sys.exc_info())))
 
         return HTTPCurlResponse(url, method, params,
                                 headers=headers.getvalue(),
@@ -184,7 +186,7 @@ class CurlFetcher(BaseFetcher):
         queue = urls[:]
         num_urls = len(urls)
         num_conn = min(concurrency, num_urls)
-        self.logd('getting %d url, with %d connections' % (num_urls, num_conn))
+        log.debug('getting %d url, with %d connections' % (num_urls, num_conn))
         m = pycurl.CurlMulti()
         m.handles = []
         for i in range(num_conn):

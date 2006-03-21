@@ -41,6 +41,9 @@ from webunitfetcher import WebunitFetcher
 from htmlresourceparser import HTMLResourceParser
 from utils import get_logger, get_version, truncate, guess_file_extension
 
+
+log = logging.getLogger('funkload.browser')
+
 class Browser:
     """Simulate a browser using a fetcher.
 
@@ -48,11 +51,6 @@ class Browser:
     Simulates a cache for resources."""
 
     def __init__(self, fetcher_cls):
-        logger = get_logger()
-        self.logd = logger.debug
-        self.logi = logger.info
-        self.logw = logger.warning
-        self.logger = logger
         self.concurrency = 0
 
         self.fetcher = fetcher_cls()
@@ -98,29 +96,29 @@ class Browser:
         page_count = self.page_count
 
         # 1. fetch the requested page
-        self.logd('%s: %s' % (method, url_in | truncate(70)))
+        log.debug('%s: %s' % (method, url_in | truncate(70)))
         response = self.fetch(url_in, params_in, method, type='page',
                               page=page_count, request=request_count,
                               **kw)
         request_count += 1
         history_append((method, url_in, params_in))
         self.setReferer(url_in, False)
-        self.logd(' return code %s done in %.6fs.' % (
+        log.debug(' return code %s done in %.6fs.' % (
             response.code, response.total_time))
         if response.error:
-            self.logi(' Error: ' + str(response.error))
+            log.info(' Error: ' + str(response.error))
         yield response
 
         # 2. handles redirection
         redirect_count = self.max_redirs
         while response.type == 'redirect':
             if not redirect_count:
-                self.logw('Too many redirects (%s) on %s, give up.' % (
+                log.warning('Too many redirects (%s) on %s, give up.' % (
                     self.max_redirs, url_in))
                 break
             url = response.getHeader('Location')
             url = urljoin(url_in, url)
-            self.logd(' redirect: %s' % url | truncate(70))
+            log.debug(' redirect: %s' % url | truncate(70))
             response = self.fetch(url, params_in, method, type="page",
                                   page=page_count, request=request_count,
                                   **kw)
@@ -128,7 +126,7 @@ class Browser:
             history_append((method, url, params_in))
             self.setReferer(url, False)
             redirect_count -= 1
-            self.logd('  return code %s done in %.6fs.' % (
+            log.debug('  return code %s done in %.6fs.' % (
                 response.code, response.total_time))
             yield response
 
@@ -150,19 +148,19 @@ class Browser:
                     links, concurrency=self.concurrency, **kw):
                     request_count += 1
                     history_append(('get', response.url, None))
-                    self.logd(' multi fetch resources: %s\n'
+                    log.debug(' multi fetch resources: %s\n'
                               '  return code %s done in %.6fs.' % (
                         response.url, response.code, response.total_time))
                     yield response
             else:
                 for link in links:
-                    self.logd(' fetch resource:  %s' % link | truncate(70))
+                    log.debug(' fetch resource:  %s' % link | truncate(70))
                     response = self.fetch(
                         link, method='get', type="resource",
                         page=page_count, request=request_count)
                     request_count += 1
                     history_append(('get', link, None))
-                    self.logd('  return code %s done in %.6fs.' % (
+                    log.debug('  return code %s done in %.6fs.' % (
                         response.code, response.total_time))
                     yield response
         self.page_count += 1
@@ -223,23 +221,23 @@ class Browser:
 
     def _renderStat(self, stats, requests, elapsed, volume, url_order):
         """Render perf stats."""
-        self.logi("Performing %d requests, during %.3fs, download: %.2fKb" % (
+        log.info("Performing %d requests, during %.3fs, download: %.2fKb" % (
             requests, elapsed, volume/1024))
-        self.logi("  Effective requests per second: %.3f RPS" % (
+        log.info("  Effective requests per second: %.3f RPS" % (
             requests/elapsed))
-        self.logi("                 Transfert rate: %.3f Kb/s\n" % (
+        log.info("                 Transfert rate: %.3f Kb/s\n" % (
             volume/elapsed/1024))
         thead = ('average:', 'std dev:', 'minimum:', 'median:',
                  '90%:', '95%:', '98%:', 'maximum:', 'per second:')
         for request in url_order:
             values = stats[request]
-            self.logi("Stat for %d requests of: %s" % (len(values), request))
-            self.logi("                 total      connect    transfert")
-            self.logi("----------- ----------- ------------ ------------")
+            log.info("Stat for %d requests of: %s" % (len(values), request))
+            log.info("                 total      connect    transfert")
+            log.info("----------- ----------- ------------ ------------")
             times = zip(*[self._computeStat(x) for x in zip(*values)])
             for title, line in zip(thead, times):
-                self.logi("%11s" % title + "%12.6f %12.6f %12.6f" % line)
-            self.logi("----------- ----------- ------------ ------------\n")
+                log.info("%11s" % title + "%12.6f %12.6f %12.6f" % line)
+            log.info("----------- ----------- ------------ ------------\n")
 
 
 class BrowserProgram:
@@ -274,13 +272,7 @@ Examples
         if argv is None:
             argv = sys.argv
         options, args = self.parseArgs(argv)
-        if options.trace or options.debug:
-            logger = get_logger(level=logging.DEBUG)
-        else:
-            logger = get_logger(level=logging.INFO)
-        self.logi = logger.info
-        self.logd = logger.debug
-        self.logw = logger.warning
+        self.setLogger(options)
         if options.webunit:
             # webunit fetcher
             browser = Browser(WebunitFetcher)
@@ -291,7 +283,6 @@ Examples
                 browser.concurrency = options.concurrency
             if options.trace:
                 browser.fetcher.curlVerbose(1)
-                options.debug = True
         self.options = options
         browser.fetch_resources = not options.simple_fetch
         if options.user_agent:
@@ -306,7 +297,7 @@ Examples
         if options.dump_responses or options.firefox_view:
             if not options.dump_dir:
                 options.dump_dir = mkdtemp('_funkload')
-                self.logi('Dumping responses into %s' % options.dump_dir)
+                log.info('Dumping responses into %s' % options.dump_dir)
         self.browser = browser
         self.urls = args[1:]
 
@@ -317,25 +308,41 @@ Examples
         use_http_post = options.post
         if urls is None:
             urls = self.urls
-
         for url in urls:
             if options.perf:
+                log.info('Checking performance for %s: ...' % url)
                 browser.perf(url, count=int(options.perf))
             else:
+                start = time.time()
+                total_time = 0.0
+                log.info('Browse %s: ...' % url)
                 if use_http_post:
                     meth = browser.post
                 else:
                     meth = browser.get
+                request_count = 0
                 for response in meth(url):
+                    request_count += 1
+                    total_time += response.total_time
+                    if response.type == 'page':
+                        log.info(' Page loaded ret code is %s' % response.code)
                     if options.dump_dir:
                         self.dumpResponse(response)
+                stop = time.time()
+                if response.type == 'resource':
+                    log.info(' Resources fetched')
+                log.info('%d requests done in %.3fs effective %.3fs.' % (
+                    request_count, total_time, stop-start))
 
     def parseArgs(self, argv):
         """Parse programs args."""
         parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
                               version="FunkLoad %s" % get_version())
-        parser.add_option("-d", "--debug", action="store_true",
-                          help="Debug mode.")
+        parser.add_option("-d", "--debug", action='store_const',
+                          dest='loglevel', const=logging.DEBUG,
+                          help="Enable debug output.")
+        parser.add_option("-l", "--log", dest="logfile", metavar="FILENAME",
+                          help="Write log messages to FILENAME")
         parser.add_option("-t", "--trace", action="store_true",
                           help="Trace fetcher activity.")
         parser.add_option("-S", "--simple-fetch", action="store_true",
@@ -360,27 +367,48 @@ Examples
         parser.add_option("", "--no-cache", action="store_true",
                           help="Don't cache resources already fetched.")
         parser.add_option("-u", "--user", type="string",
-                          dest="user_password",
-                          help="<user[:password]> "
-                          "Set server basic auth user and password.")
+                          dest="user_password", metavar="USER[:PASSWORD]",
+                          help="Set server basic auth user and password.")
         parser.add_option("-n", "--perf", type="int",
                           help="Number of requests to perform, return stats.")
         parser.add_option("--dump-directory", type="string",
-                          dest="dump_dir",
-                          help="Directory to dump html pages.")
+                          metavar="DIRECTORY", dest="dump_dir",
+                          help="Dump pages and resources to DIRECTORY.")
         parser.add_option("-V", "--firefox-view", action="store_true",
                           help="Real time view using firefox, "
                           "you must have a running instance of firefox "
                           "in the same host.")
         parser.add_option("-c", "--resource-concurrency", type="int",
-                          dest="concurrency",
+                          dest="concurrency", metavar="NUM",
                           help="Fetching html resources asyncronously with "
-                          "concurrency (single threaded).")
+                          "NUM fetchers concurrently (single threaded).")
+        parser.set_defaults(curl=True, loglevel=logging.INFO)
         options, args = parser.parse_args(argv)
         if len(args) == 0:
             parser.error("incorrect number of arguments")
-
+        if options.trace:
+            options.loglevel = logging.DEBUG
         return options, args
+
+    def setLogger(self, options):
+        """Set up the logger."""
+        logger = logging.getLogger('funkload')
+        logger.setLevel(options.loglevel)
+        handler = logging.StreamHandler()
+        if options.logfile:
+            handler.setLevel(logging.WARNING)
+        else:
+            handler.setLevel(options.loglevel)
+        formatter = logging.Formatter('%(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        if options.logfile:
+            handler = logging.FileHandler(options.logfile)
+            handler.setLevel(options.loglevel)
+            formatter = logging.Formatter(
+                '%(asctime)s [%(name)s] %(levelname)s: %(message)s')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def dumpResponses(self, responses):
         """Dump responses."""
@@ -403,36 +431,36 @@ Examples
             f.write(response.headers)
             f.close()
         if not response.body or response.code in (301, 302):
-            self.logd('  dump header into: %s' % file_path)
+            log.debug('  dump header into: %s' % file_path)
             return
         ext = guess_file_extension(response.url, response.content_type)
         file_path = os.path.abspath(
             os.path.join(dump_dir, 'response-%3.3i-%2.2i%s' % (
             response.page, response.request, ext)))
-        self.logd('  dump into: %s' % file_path)
+        log.debug('  dump into: %s' % file_path)
         f = open(file_path, 'w')
         f.write(response.body)
         f.close()
         if response.type ==  'page' and options.firefox_view:
-            self.logd('  firefox view ...')
+            log.debug('  firefox view ...')
             cmd = 'firefox -remote  "openfile(file://%s,new-tab)"' % file_path
             ret = os.system(cmd)
             if ret != 0:
-                self.logw('Failed to remote control firefox: %s' % cmd)
+                log.warning('Failed to remote control firefox: %s' % cmd)
                 options.firefox_view = False
 
 
     def dumpHistory(self):
         """Dump history."""
-        self.logi('Page history:')
+        log.info('Page history:')
         for page in self.browser.page_history:
-            self.logi(page)
+            log.info(page)
 
     def dumpRequestHistory(self):
         """Dump request history."""
-        self.logi('Request history:')
+        log.info('Request history:')
         for request in self.browser.request_history:
-            self.logi(request)
+            log.info(request)
 
 
 

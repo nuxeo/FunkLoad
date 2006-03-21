@@ -22,7 +22,10 @@ $Id$
 import re
 from types import DictType, ListType
 from urllib import urlencode
-from utils import get_logger
+import logging
+
+log = logging.getLogger('funkload.fetcher')
+
 
 # ------------------------------------------------------------
 # Classes
@@ -107,12 +110,6 @@ class BaseFetcher:
     """A base class for a fetcher."""
 
     def __init__(self, **kw):
-        logger = get_logger()
-        self.logger = logger
-        self.logd = logger.debug
-        self.logi = logger.info
-        self.logw = logger.warning
-        self.loge = logger.error
         self.extra_headers = []
 
     def fetch(self, url_in, params_in=None, method=None, **kw):
