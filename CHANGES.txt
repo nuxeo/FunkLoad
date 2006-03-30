@@ -29,6 +29,8 @@ New features
 
 * FunkLoadTestCase.conf_getList accept a separator parameter
 
+* Upgrade to setuptools 0.6a11
+
 Bug fixes
 ~~~~~~~~~
 
