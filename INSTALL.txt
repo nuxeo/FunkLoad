@@ -85,7 +85,9 @@ Optional packages
     # directory
 
 
-   No idea under windows.
+  Should work also for Fedora FC5, it requires libpng-devel and libjpeg-dev.
+
+  No idea under windows.
 
 
 * The recorder use TCPWatch_ which is not yet available using easy_install::
