@@ -37,6 +37,7 @@ from utils import recording, thread_sleep, is_html, get_version
 from optionconfigparser import OptionConfigParser
 from browser import Browser
 from curlfetcher import CurlFetcher
+from webunitfetcher import WebunitFetcher
 from xmlrpclib import ServerProxy
 
 _marker = []
@@ -98,7 +99,7 @@ class FunkLoadTestCase(unittest.TestCase):
         config_path = os.path.join(config_directory,
                                    self.__class__.__name__ + '.conf')
         config_path = os.path.abspath(config_path)
-        config = OptionConfigParser(config_path)
+        config = OptionConfigParser(config_path, self.options)
         self._config = config
         self.conf_get = self._config.get
         self.conf_getInt = self._config.getInt
@@ -123,13 +124,29 @@ class FunkLoadTestCase(unittest.TestCase):
             self.conf_get(section, 'result_path', 'funkload.xml'))
 
         # init loggers
-        self.logger = get_logger(log_path=self.log_path,
+        self.logger = get_logger(name="funkload.log",
+                                 log_path=self.log_path,
                                  log_console=self.log_to.count('console'))
         self.logger_result = get_logger(name="funkload.result",
                                         log_console=False,
                                         log_path=self.result_path,
-                                        format=None, propagate=False)
-        self._browser = Browser(CurlFetcher)
+                                        format=None, propagate=True)
+        # init a browser
+        fetcher_type = self.conf_get('main', 'fetcher', 'curl')
+        if fetcher_type == 'webunit':
+            # webunit fetcher
+            self.fetcher_type = fetcher_type
+            browser = Browser(WebunitFetcher)
+        else:
+            # curl fetcher setup
+            self.fetcher_type = 'curl'
+            browser = Browser(CurlFetcher)
+            if self.conf_getInt('main', 'curl_concurrency', 0, quiet=True):
+                browser.concurrency = options.concurrency
+            if self.conf_getInt('main', 'curl_verbose', 0, quiet=True):
+                browser.fetcher.curlVerbose(1)
+
+        self._browser = browser
         self.clearContext()
 
         #self.logd('# FunkLoadTestCase._funkload_init done')
@@ -568,9 +585,10 @@ class FunkLoadTestCase(unittest.TestCase):
         try:
             ok = False
             try:
-                self.logd('Starting -----------------------------------\n\t%s'
-                          % self.conf_get(self.meta_method_name, 'description',
-                                          ''))
+                if not self.in_bench_mode:
+                    self.logd(
+                        'Starting -----------------------------------\n\t%s' %
+                        self.conf_get(self.method_name, 'description', ''))
                 self.setUp()
             except KeyboardInterrupt:
                 raise

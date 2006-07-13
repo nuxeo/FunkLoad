@@ -39,7 +39,7 @@ from optparse import OptionParser, TitledHelpFormatter
 from curlfetcher import CurlFetcher
 from webunitfetcher import WebunitFetcher
 from htmlresourceparser import HTMLResourceParser
-from utils import get_logger, get_version, truncate, guess_file_extension
+from utils import get_version, truncate, guess_file_extension
 
 
 log = logging.getLogger('funkload.browser')

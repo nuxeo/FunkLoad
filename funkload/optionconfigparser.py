@@ -30,7 +30,6 @@ class OptionConfigParser:
     """A ConfigParser that can be override by options.
 
     options is a OptionParser object.
-    logger is a Logger
 
     Options should be of the format: section_key.
     """
@@ -52,11 +51,11 @@ class OptionConfigParser:
         options = self._options
         if options is not None:
             opt_key = '%s_%s' % (section, key)
-            opt_val = getattr(self._options, opt_key, None)
+            opt_val = getattr(options, opt_key, None)
             if opt_val:
                 self.logd('[%s] %s = %s from options.' %
                            (section, key, opt_val))
-            return opt_val
+                return opt_val
         # check for the configuration file if opt val is None
         # or nul
         try:
@@ -82,8 +81,8 @@ class OptionConfigParser:
                 separator=None):
         """Return a list from options or configuration file."""
         value = self.get(section, key, default, quiet)
-        if value is default:
-            return value
+        if not value or value is default:
+            return default
         if separator is None:
             separator = ':'
         if value.count(separator):

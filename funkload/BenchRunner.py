@@ -206,7 +206,8 @@ class BenchRunner:
         self.sleep_time = test.conf_getFloat('bench', 'sleep_time')
         self.sleep_time_min = test.conf_getFloat('bench', 'sleep_time_min')
         self.sleep_time_max = test.conf_getFloat('bench', 'sleep_time_max')
-
+        self.fetcher_type = test.fetcher_type
+        
         # setup monitoring
         monitor_hosts = []                  # list of (host, port, descr)
         for host in test.conf_get('monitor', 'hosts', '', quiet=True).split():
@@ -426,6 +427,7 @@ class BenchRunner:
         text.append("=============\n")
         text.append("* Current time: %s" % datetime.now().isoformat())
         text.append("* Configuration file: %s" % self.config_path)
+        text.append("* Fetcher: %s" % self.fetcher_type)
         text.append("* Log xml: %s" % self.result_path)
         text.append("* Server: %s" % self.test_url)
         text.append("* Cycles: %s" % self.cycles)
@@ -478,6 +480,10 @@ def main():
     parser.add_option("", "--simple-fetch", action="store_true",
                       help="Don't load additional links like css "
                       "or images when fetching an html page.")
+    parser.add_option("", "--fetcher", type="string", dest="main_fetcher",
+                      help="Choose a fetcher: webunit or curl.")
+    parser.set_defaults(main_fetcher='curl')
+
     options, args = parser.parse_args()
     if len(args) != 2:
         parser.error("incorrect number of arguments")

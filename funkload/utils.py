@@ -156,20 +156,22 @@ def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
     return logger
 
 
-def get_logger(name=None, log_path=None, log_console=True, level=None,
+def get_logger(name=None, log_path=None, log_console=True, level=logging.DEBUG,
                format='%(asctime)s %(levelname)s %(message)s', propagate=True):
     """Get a logger add handlers if needed."""
     if name is None:
         name = ""                       # default logger
-    #print "ask '%s' path:%s level:%s" % (name, log_path, level)
+    # print "ask '%s' path:%s console:%s level:%s" % (
+    #     name, log_path, log_console, level)
     logger = logging.getLogger(name)
     add_stream_hdlr = True
     add_file_hdlr = True
     if logger.handlers:
         for hdlr in logger.handlers:
-            if isinstance(hdlr, logging.StreamHandler):
+            # duno why isinstance(hdlr, logging.StreamHandler) doesn't work ?
+            if hdlr.__class__ is logging.StreamHandler:
                 add_stream_hdlr = False
-            elif isinstance(hdlr, logging.FileHandler):
+            elif hdlr.__class__ is logging.FileHandler:
                 add_file_hdlr = False
     if log_console and add_stream_hdlr:
         hdlr = logging.StreamHandler()
