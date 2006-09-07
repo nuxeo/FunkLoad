@@ -179,6 +179,10 @@ def main():
                           version="FunkLoad %s" % get_version())
     parser.add_option("-H", "--html", action="store_true", default=False,
                       dest="html", help="Produce an html report.")
+    parser.add_option("-P", "--with-percentiles", action="store_true",
+                      default=False, dest="with_percentiles",
+                      help=("Include Percentiles in Tables, use 10%, 50% and"
+                            " 90% instead of min, avg and max in images."))
     cur_path = os.path.abspath(os.path.curdir)
     parser.add_option("-o", "--output-directory", type="string",
                       dest="output_dir",

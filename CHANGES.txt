@@ -27,6 +27,10 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
+* Adding Mirko Friedenhagen ``--with-percentiles`` option to
+  ``fl-build-report`` to include percentiles in statistic tables and use
+  10%, 50% and 90% percentil instead of min, avg and max in charts.
+
 * FunkLoadTestCase.conf_getList accept a separator parameter
 
 * Upgrade to setuptools 0.6a11

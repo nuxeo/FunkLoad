@@ -48,11 +48,11 @@ class BaseRst:
     fmt_int = "%7d"
     fmt_float = "%7.3f"
     fmt_percent = "%6.2f%%"
-    fmt_deco = "======= "
-    header = " Not implemented"
-    nb_cols = 1
+    fmt_deco = "======="
+    headers = []
     indent = 0
     image_names = []
+    with_percentiles = False
 
     def __init__(self, stats):
         self.stats = stats
@@ -76,19 +76,43 @@ class BaseRst:
 
     def render_header(self, with_chart=False):
         """Render rst header."""
-        deco = ' ' + self.fmt_deco * self.nb_cols
+        headers = self.headers[:]
+        if self.with_percentiles:
+            self._attach_percentiles_header(headers)
+        deco = ' ' + " ".join([self.fmt_deco] * len(headers))
+        header = " " + " ".join([ "%7s" % h for h in headers ])
         indent = ' ' * self.indent
         ret = []
         if with_chart:
             ret.append(self.render_images())
         ret.append(indent + deco)
-        ret.append(indent + self.header)
+        ret.append(indent + header)
         ret.append(indent + deco)
         return '\n'.join(ret)
 
+    def _attach_percentiles_header(self, headers):
+        """ Attach percentile headers. """
+        headers.extend(
+            ["P10", "MED", "P90", "P95"])
+
+    def _attach_percentiles(self, ret):
+        """ Attach percentiles, if this is wanted. """
+        percentiles = self.stats.percentiles
+        fmt = self.fmt_float
+        ret.extend([
+            fmt % percentiles.perc10,
+            fmt % percentiles.perc50,
+            fmt % percentiles.perc90,
+            fmt % percentiles.perc95
+        ])
+
     def render_footer(self):
         """Render rst footer."""
-        return ' ' * (self.indent + 1) + self.fmt_deco * self.nb_cols + '\n'
+        headers = self.headers[:]
+        if self.with_percentiles:
+            self._attach_percentiles_header(headers)
+        deco = " ".join([self.fmt_deco] * len(headers))
+        return ' ' * (self.indent + 1) + deco
 
     def render_stat(self):
         """Render rst stat."""
@@ -97,9 +121,8 @@ class BaseRst:
 
 class AllResponseRst(BaseRst):
     """AllResponseStat rendering."""
-    header = "     CUs     RPS  maxRPS   TOTAL SUCCESS   " \
-             "ERROR     MIN     AVG     MAX"
-    nb_cols = 9
+    headers = [ "CUs", "RPS", "maxRPS", "TOTAL", "SUCCESS","ERROR",
+        "MIN", "AVG", "MAX" ]
     image_names = ['requests_rps', 'requests']
 
     def render_stat(self):
@@ -116,21 +139,22 @@ class AllResponseRst(BaseRst):
         ret.append(self.fmt_float % stats.min)
         ret.append(self.fmt_float % stats.avg)
         ret.append(self.fmt_float % stats.max)
+        if self.with_percentiles:
+            self._attach_percentiles(ret)
         ret = ' '.join(ret)
         return ret
 
 
 class PageRst(AllResponseRst):
     """Page rendering."""
-    header = "     CUs    SPPS maxSPPS   TOTAL SUCCESS   " \
-    "ERROR     MIN     AVG     MAX"
+    headers = ["CUs", "SPPS", "maxSPPS", "TOTAL", "SUCCESS",
+              "ERROR", "MIN", "AVG", "MAX"]
     image_names = ['pages_spps', 'pages']
 
 class ResponseRst(BaseRst):
     """Response rendering."""
-    header = "     CUs   TOTAL SUCCESS   ERROR     MIN     AVG     MAX"
+    headers = ["CUs", "TOTAL", "SUCCESS", "ERROR", "MIN", "AVG", "MAX"]
     indent = 4
-    nb_cols = 7
     image_names = ['request_']
 
     def __init__(self, stats):
@@ -151,15 +175,17 @@ class ResponseRst(BaseRst):
         ret.append(self.fmt_float % stats.min)
         ret.append(self.fmt_float % stats.avg)
         ret.append(self.fmt_float % stats.max)
+        if self.with_percentiles:
+            self._attach_percentiles(ret)
         ret = ' '.join(ret)
         return ret
 
 
 class TestRst(BaseRst):
     """Test Rendering."""
-    header = "     CUs    STPS   TOTAL SUCCESS   ERROR     MIN     AVG     MAX"
-    nb_cols = 8
+    headers = ["CUs", "STPS", "TOTAL", "SUCCESS", "ERROR"]
     image_names = ['tests']
+    with_percentiles = False
 
     def render_stat(self):
         """Render rst stat."""
@@ -171,9 +197,6 @@ class TestRst(BaseRst):
         ret.append(self.fmt_int % stats.count)
         ret.append(self.fmt_int % stats.success)
         ret.append(self.fmt_percent % stats.error_percent)
-        ret.append(self.fmt_float % stats.min)
-        ret.append(self.fmt_float % stats.avg)
-        ret.append(self.fmt_float % stats.max)
         ret = ' '.join(ret)
         return ret
 
@@ -194,6 +217,8 @@ class RenderRst:
         cycles = stats.keys()
         cycles.sort()
         self.cycles = cycles
+        if options.with_percentiles:
+            BaseRst.with_percentiles = True
         if options.html:
             self.with_chart = True
         else:
@@ -241,10 +266,12 @@ class RenderRst:
         self.append('')
         date = config['time'][:19].replace('T', ' ')
         self.append(':date: ' + date)
-        description = "Bench result of ``%s.%s``: " % (config['class'],
-                                                       config['method'])
-        description += config['description']
-        self.append(':abstract: ' + description)
+        description = [config['class_description']]
+        description += ["Bench result of ``%s.%s``: " % (config['class'],
+                                                       config['method'])]
+        description += [config['description']]
+        indent = "\n           "
+        self.append(':abstract: ' + indent.join(description))
         self.append('')
         self.append(".. _FunkLoad: http://funkload.nuxeo.org/")
         self.append(".. sectnum::    :depth: 2")
@@ -647,6 +674,23 @@ class RenderHtml(RenderRst):
                       image_path,
                       cvus, stps, errors)
 
+    def appendDelays(self, delay, delay_low, delay_high, stats):
+        """ Show percentiles or min, avg and max in chart. """
+        if self.options.with_percentiles:
+            delay.append(stats.percentiles.perc50)
+            delay_low.append(stats.percentiles.perc10)
+            delay_high.append(stats.percentiles.perc90)
+        else:
+            delay.append(stats.avg)
+            delay_low.append(stats.min)
+            delay_high.append(stats.max)
+   
+    def getYTitle(self):
+        if self.options.with_percentiles:
+            return "Duration (10%, 50% 90%)"
+        else:
+            return "Duration (min, avg, max)"
+
     def createPageChart(self):
         """Create the page chart."""
         image_path = str(os.path.join(self.report_dir, 'pages.png'))
@@ -654,16 +698,14 @@ class RenderHtml(RenderRst):
         stats = self.stats
         errors = []
         delay = []
-        delay_max = []
-        delay_min = []
+        delay_high = []
+        delay_low = []
         spps = []
         cvus = []
         has_error = False
         for cycle in self.cycles:
             page = stats[cycle]['page']
-            delay.append(page.avg)
-            delay_min.append(page.min)
-            delay_max.append(page.max)
+            self.appendDelays(delay, delay_low, delay_high, page)
             spps.append(page.rps)
             error = page.error_percent
             if error:
@@ -681,7 +723,7 @@ class RenderHtml(RenderRst):
                        line_color=self.color_line,
                        title='Page response time', xtitle='CUs',
                        ylabel_fmt='%.2fs', ylabel2_fmt='%.2f %%',
-                       ytitle='Duration', ytitle2="Errors",
+                       ytitle=self.getYTitle(), ytitle2="Errors",
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
                        GDC_HLC_CONNECTING,
@@ -690,7 +732,7 @@ class RenderHtml(RenderRst):
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
-                      cvus, (delay_max, delay_min, delay), errors)
+                      cvus, (delay_high, delay_low, delay), errors)
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_success, self.color_success),
                        vol_color=self.color_error,
@@ -714,16 +756,14 @@ class RenderHtml(RenderRst):
         stats = self.stats
         errors = []
         delay = []
-        delay_max = []
-        delay_min = []
+        delay_high = []
+        delay_low = []
         rps = []
         cvus = []
         has_error = False
         for cycle in self.cycles:
             resp = stats[cycle]['response']
-            delay.append(resp.avg)
-            delay_min.append(resp.min)
-            delay_max.append(resp.max)
+            self.appendDelays(delay, delay_low, delay_high, resp)
             rps.append(resp.rps)
             error = resp.error_percent
             if error:
@@ -741,7 +781,7 @@ class RenderHtml(RenderRst):
                        line_color=self.color_line,
                        title='Request response time', xtitle='CUs',
                        ylabel_fmt='%.2fs', ylabel2_fmt='%.2f %%',
-                       ytitle='Duration', ytitle2="Errors",
+                       ytitle=self.getYTitle(), ytitle2="Errors",
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
                        GDC_HLC_CONNECTING,
@@ -750,7 +790,7 @@ class RenderHtml(RenderRst):
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
-                      cvus, (delay_max, delay_min, delay), errors)
+                      cvus, (delay_high, delay_low, delay), errors)
 
         gdchart.option(format=gdchart.GDC_PNG,
                        set_color=(self.color_success, self.color_success),
@@ -774,8 +814,8 @@ class RenderHtml(RenderRst):
         stats = self.stats
         errors = []
         delay = []
-        delay_max = []
-        delay_min = []
+        delay_high = []
+        delay_low = []
         cvus = []
         number = 0
         has_error = False
@@ -783,14 +823,12 @@ class RenderHtml(RenderRst):
             resp = stats[cycle]['response_step'].get(step)
             if resp is None:
                 delay.append(None)
-                delay_min.append(None)
-                delay_max.append(None)
+                delay_low.append(None)
+                delay_high.append(None)
                 errors.append(None)
                 cvus.append('?')
             else:
-                delay.append(resp.avg)
-                delay_min.append(resp.min)
-                delay_max.append(resp.max)
+                self.appendDelays(delay, delay_low, delay_high, resp)
                 error = resp.error_percent
                 if error:
                     has_error = True
@@ -810,7 +848,7 @@ class RenderHtml(RenderRst):
                        line_color=self.color_line,
                        title=title, xtitle='CUs',
                        ylabel_fmt='%.2fs', ylabel2_fmt='%.2f %%',
-                       ytitle='Duration', ytitle2="Errors",
+                       ytitle=self.getYTitle(), ytitle2="Errors",
                        ylabel_density=50,
                        hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
                        GDC_HLC_CONNECTING,
@@ -819,7 +857,7 @@ class RenderHtml(RenderRst):
         gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
                       self.getChartSize(cvus),
                       image_path,
-                      cvus, (delay_max, delay_min, delay), errors)
+                      cvus, (delay_high, delay_low, delay), errors)
 
     # monitoring charts
     def createMonitorCharts(self):

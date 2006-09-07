@@ -38,6 +38,46 @@ class ErrorStat:
         self.traceback = traceback
 
 
+class Percentiles:
+    """ Calculate Percentiles with the given stepsize. """
+
+    def __init__(self, stepsize=10, name ="UNKNOWN", results=None):
+        self.stepsize = stepsize
+        self.name = name
+        if results is None:
+            self.results = []
+        else:
+            self.results = results
+
+    def addResult(self, newresult):
+        """Add a new result."""
+        self.results.append(newresult)
+
+    def calcPercentiles(self):
+        """Compute percentiles."""
+        results = self.results
+        results.sort()
+        len_results = len(results)
+        for perc in range(0, 100, self.stepsize):
+            index = int(perc / 100.0 * len_results)
+            try:
+                value = results[index]
+            except IndexError:
+                value = -1.0
+            setattr(self, "perc%2d" % perc, float(value))
+
+    def __str__(self):
+        self.calcPercentiles()
+        fmt_string = ["Percentiles: %s" % self.name]
+        for perc in range(0, 100, self.stepsize):
+            name = "perc%2d" % perc
+            fmt_string.append("%s=%s" % (name, getattr(self, name)))
+        return ", ".join(fmt_string)
+
+    def __repr__(self):
+        return "Percentiles(stepsize=%r, name=%r, results=%r)" % (
+            self.stepsize, self.name, self.results)
+
 class AllResponseStat:
     """Collect stat for all response in a cycle."""
     def __init__(self, cycle, cycle_duration, cvus):
@@ -57,6 +97,7 @@ class AllResponseStat:
         self.rps_min = 0
         self.rps_max = 0
         self.finalized = False
+        self.percentiles = Percentiles(stepsize = 5, name = cycle)
 
     def add(self, date, result, duration):
         """Add a new response to stat."""
@@ -72,6 +113,7 @@ class AllResponseStat:
         self.min = min(self.min, float(duration))
         self.total += float(duration)
         self.finalized = False
+        self.percentiles.addResult(duration)
 
     def finalize(self):
         """Compute avg times."""
@@ -96,6 +138,7 @@ class AllResponseStat:
             self.rps = rps
         self.rps_max = rps_max
         self.rps_min = rps_min
+        self.percentiles.calcPercentiles()
         self.finalized = True
 
 
@@ -108,6 +151,7 @@ class SinglePageStat:
         self.date_s = None
         self.duration = 0.0
         self.result = 'Successful'
+        self.percentiles = Percentiles(stepsize=5, name=step)
 
     def addResponse(self, date, result, duration):
         """Add a response to a page."""
@@ -115,6 +159,7 @@ class SinglePageStat:
         if self.date_s is None:
             self.date_s = int(float(date))
         self.duration += float(duration)
+        self.percentiles.addResult(duration)
         if result != 'Successful':
             self.result = result
 
@@ -146,6 +191,7 @@ class PageStat(AllResponseStat):
         stat = thread['pages'].setdefault(thread['count'],
                                           SinglePageStat(step))
         stat.addResponse(date, result, duration)
+        self.percentiles.addResult(duration)
         self.finalized = False
 
     def finalize(self):
@@ -170,6 +216,7 @@ class PageStat(AllResponseStat):
         if self.cycle_duration:
             # override rps to srps
             self.rps = self.success / float(self.cycle_duration)
+        self.percentiles.calcPercentiles()
         self.finalized = True
 
 class ResponseStat:
@@ -190,6 +237,7 @@ class ResponseStat:
         self.description = ''
         self.type = '?'
         self.finalized = False
+        self.percentiles = Percentiles(stepsize=5, name=step)
 
     def add(self, rtype, result, url, duration, description=None):
         """Add a new response to stat."""
@@ -201,6 +249,7 @@ class ResponseStat:
         self.max = max(self.max, float(duration))
         self.min = min(self.min, float(duration))
         self.total += float(duration)
+        self.percentiles.addResult(duration)
         self.url = url
         self.type = rtype
         if description is not None:
@@ -216,8 +265,8 @@ class ResponseStat:
         self.min = min(self.max, self.min)
         if self.error:
             self.error_percent = 100.0 * self.error / float(self.count)
+        self.percentiles.calcPercentiles()
         self.finalized = True
-
 
 class TestStat:
     """Collect test stat for a cycle.
@@ -241,6 +290,7 @@ class TestStat:
         self.xmlrpc = 0
         self.tps = 0
         self.finalized = False
+        self.percentiles = Percentiles(stepsize=5, name=cycle)
 
     def add(self, result, pages, xmlrpc, redirects, images, links,
             duration, traceback=None):
@@ -262,6 +312,7 @@ class TestStat:
         self.redirects = max(self.redirects, int(redirects))
         self.images = max(self.images, int(images))
         self.links = max(self.links, int(links))
+        self.percentiles.addResult(duration)
 
     def finalize(self):
         """Compute avg times."""
@@ -274,4 +325,5 @@ class TestStat:
             self.error_percent = 100.0 * self.error / float(self.count)
         if self.cycle_duration:
             self.tps = self.success / float(self.cycle_duration)
+        self.percentiles.calcPercentiles()
         self.finalized = True
