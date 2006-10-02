@@ -2,4 +2,5 @@
 THANKS
 ======
 
-Mirko Friedenhagen: for reports percentiles features.
+Mirko Friedenhagen: providing reports percentiles features.
+Ivan Kurmanov: webunit mimeEncode patch using CRLF.

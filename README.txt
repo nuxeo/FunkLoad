@@ -1298,9 +1298,7 @@ Todo and bugs
 * See the trac tickets: http://svn.nuxeo.org/trac/pub/report/12
 
 If you want to report a bug or if you think that something is
-missing, you can submit a ticket, take care to select the **funkload**
-component in the 'Ticket properties'.
-
+missing, send me an email.
 
 
 

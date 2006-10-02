@@ -27,6 +27,9 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
+* Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
+  3.6.2, patch provided by Ivan Kurmanov.
+
 * Adding Mirko Friedenhagen ``--with-percentiles`` option to
   ``fl-build-report`` to include percentiles in statistic tables and use
   10%, 50% and 90% percentil instead of min, avg and max in charts.

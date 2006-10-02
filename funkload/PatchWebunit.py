@@ -23,6 +23,7 @@
 * log response
 * remove webunit log
 * fix HTTPResponse __repr__
+* patching webunit mimeEncode to be rfc 1945 3.6.2 compliant using CRLF
 
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
@@ -33,12 +34,44 @@ import urlparse
 import httplib
 import cStringIO
 from webunit import cookie
-from webunit.utility import mimeEncode, boundary
 from webunit.IMGSucker import IMGSucker
 from webunit.webunittest import WebTestCase, WebFetcher
 from webunit.webunittest import HTTPResponse, HTTPError, VERBOSE
 
 from utils import thread_sleep
+
+boundary = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
+sep_boundary = '\r\n--' + boundary
+end_boundary = sep_boundary + '--'
+def mimeEncode(data, sep_boundary=sep_boundary, end_boundary=end_boundary):
+    '''Take the mapping of data and construct the body of a
+    multipart/form-data message with it using the indicated boundaries.
+    '''
+    ret = cStringIO.StringIO()
+    for key, value in data.items():
+        if not key:
+            continue
+        # handle multiple entries for the same name
+        if type(value) != type([]): value = [value]
+        for value in value:
+            ret.write(sep_boundary)
+            # if key starts with a '$' then the entry is a file upload
+            if isinstance(value, Upload):
+                ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
+                ret.write('; filename="%s"\r\n\r\n'%value.filename)
+                if value.filename:
+                    value = open(os.path.join(value.filename), "rb").read()
+                else:
+                    value = ''
+            else:
+                ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
+                ret.write("\r\n\r\n")
+            ret.write(str(value))
+            if value and value[-1] == '\r':
+                ret.write('\r\n')  # write an extra newline
+    ret.write(end_boundary)
+    return ret.getvalue()
+
 
 class FKLIMGSucker(IMGSucker):
     """Image and links loader, patched to log response stats."""
