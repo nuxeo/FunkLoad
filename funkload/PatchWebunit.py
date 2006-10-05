@@ -37,6 +37,7 @@ from webunit import cookie
 from webunit.IMGSucker import IMGSucker
 from webunit.webunittest import WebTestCase, WebFetcher
 from webunit.webunittest import HTTPResponse, HTTPError, VERBOSE
+from webunit.utility import Upload
 
 from utils import thread_sleep
 
