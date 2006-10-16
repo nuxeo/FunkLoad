@@ -41,10 +41,10 @@ from webunit.utility import Upload
 
 from utils import thread_sleep
 
-boundary = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
-sep_boundary = '\r\n--' + boundary
-end_boundary = sep_boundary + '--'
-def mimeEncode(data, sep_boundary=sep_boundary, end_boundary=end_boundary):
+BOUNDARY = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
+SEP_BOUNDARY = '\r\n--' + BOUNDARY
+END_BOUNDARY = SEP_BOUNDARY + '--'
+def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
     '''Take the mapping of data and construct the body of a
     multipart/form-data message with it using the indicated boundaries.
     '''
@@ -53,7 +53,8 @@ def mimeEncode(data, sep_boundary=sep_boundary, end_boundary=end_boundary):
         if not key:
             continue
         # handle multiple entries for the same name
-        if type(value) != type([]): value = [value]
+        if type(value) != type([]):
+            value = [value]
         for value in value:
             ret.write(sep_boundary)
             # if key starts with a '$' then the entry is a file upload
@@ -81,6 +82,7 @@ class FKLIMGSucker(IMGSucker):
         self.ftestcase = ftestcase
 
     def do_img(self, attributes):
+        """Process img tag."""
         newattributes = []
         for name, value in attributes:
             if name == 'src':
@@ -107,6 +109,7 @@ class FKLIMGSucker(IMGSucker):
         self.unknown_starttag('img', newattributes)
 
     def do_link(self, attributes):
+        """Process link tag."""
         newattributes = [('rel', 'stylesheet'), ('type', 'text/css')]
         for name, value in attributes:
             if name == 'href':
@@ -190,13 +193,28 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 url = urlparse.urljoin(t_url, url)
 
     # TODO: allow override of the server and port from the URL!
-    if server is None: server = self.server
-    if port is None: port = self.port
-    if protocol is None: protocol = self.protocol
-    if ok_codes is None: ok_codes = self.expect_codes
+    if server is None:
+        server = self.server
+    if port is None:
+        port = self.port
+    if protocol is None:
+        protocol = self.protocol
+    if ok_codes is None:
+        ok_codes = self.expect_codes
 
     if protocol == 'http':
-        h = httplib.HTTP(server, int(port))
+        webproxy = {}
+        try:
+            proxystring = os.environ["http_proxy"].replace("http://", "")
+            webproxy['host'] = proxystring.split(":")[0]
+            webproxy['port'] = int(proxystring.split(":")[1])
+        except (KeyError, IndexError, ValueError):
+            webproxy = False
+
+        if webproxy:
+            h = httplib.HTTPConnection(webproxy['host'], webproxy['port'])
+        else:
+            h = httplib.HTTP(server, int(port))
         if int(port) == 80:
             host_header = server
         else:
@@ -224,11 +242,14 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         params = mimeEncode(postdata)
         h.putrequest('POST', url)
         h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
-            boundary)
+            BOUNDARY)
         h.putheader('Content-length', str(len(params)))
     else:
-        # Normal GET
-        h.putrequest('GET', url)
+        if webproxy:
+            h.putrequest('GET', "http://%s%s" % (server, url))
+        else:
+            # Normal GET
+            h.putrequest('GET', url)
 
     # Other Full Request headers
     if self.authinfo:
@@ -281,18 +302,29 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         h.send(params)
 
     # handle the reply
-    errcode, errmsg, headers = h.getreply()
+    if webproxy:
+        r = h.getresponse()
+        errcode = r.status
+        errmsg = r.reason
+        headers = r.msg
+        data = r.read()
+        response = HTTPResponse(self.cookies, protocol, server, port, url,
+                                errcode, errmsg, headers, data,
+                                self.error_content)
 
-    # get the body and save it
-    f = h.getfile()
-    g = cStringIO.StringIO()
-    d = f.read()
-    while d:
-        g.write(d)
+    else:
+        # get the body and save it
+        errcode, errmsg, headers = h.getreply()
+        f = h.getfile()
+        g = cStringIO.StringIO()
         d = f.read()
-    response = HTTPResponse(self.cookies, protocol, server, port, url,
-        errcode, errmsg, headers, g.getvalue(), self.error_content)
-    f.close()
+        while d:
+            g.write(d)
+            d = f.read()
+        response = HTTPResponse(self.cookies, protocol, server, port, url,
+                                errcode, errmsg, headers, g.getvalue(),
+                                self.error_content)
+        f.close()
 
     if errcode not in ok_codes:
         if VERBOSE:
