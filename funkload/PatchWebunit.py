@@ -240,13 +240,17 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
 
         # Do a post with the data file
         params = mimeEncode(postdata)
-        h.putrequest('POST', url)
+        if webproxy:
+            h.putrequest('POST', "http://%s%s" % (host_header, url))
+        else:
+            # Normal post
+            h.putrequest('POST', url)
         h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
             BOUNDARY)
         h.putheader('Content-length', str(len(params)))
     else:
         if webproxy:
-            h.putrequest('GET', "http://%s%s" % (server, url))
+            h.putrequest('GET', "http://%s%s" % (host_header, url))
         else:
             # Normal GET
             h.putrequest('GET', url)
