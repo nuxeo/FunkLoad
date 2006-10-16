@@ -75,6 +75,7 @@ Main FunkLoad_ features are:
   - emulating a browser cache
   - file upload and multipart/form-data submission
   - https support
+  - http_proxy support
 
 * Advanced test runner with many command-line options:
 

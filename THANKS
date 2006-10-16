@@ -4,3 +4,4 @@ THANKS
 
 Mirko Friedenhagen: providing reports percentiles features.
 Ivan Kurmanov: webunit mimeEncode patch using CRLF.
+Greg 912: http_proxy support.

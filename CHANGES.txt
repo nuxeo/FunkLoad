@@ -27,6 +27,9 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
+* # 1283_: Patching webunit to support http proxy by checking $http_proxy
+  env. Thanks to Greg.
+
 * Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
   3.6.2, patch provided by Ivan Kurmanov.
 
@@ -36,7 +39,7 @@ New features
 
 * FunkLoadTestCase.conf_getList accept a separator parameter
 
-* Upgrade to setuptools 0.6a11
+* Upgrade to setuptools 0.6c3
 
 Bug fixes
 ~~~~~~~~~
@@ -423,6 +426,7 @@ See README_ for more information about FunkLoad_.
 .. _1201: http://svn.nuxeo.org/trac/pub/ticket/1201
 .. _1278: http://svn.nuxeo.org/trac/pub/ticket/1278
 .. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
+.. _1283: http://svn.nuxeo.org/trac/pub/ticket/1283
 .. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
 .. _1300: http://svn.nuxeo.org/trac/pub/ticket/1300
 
