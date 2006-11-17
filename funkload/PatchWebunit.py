@@ -33,6 +33,8 @@ import time
 import urlparse
 import httplib
 import cStringIO
+from mimetypes import guess_type
+
 from webunit import cookie
 from webunit.IMGSucker import IMGSucker
 from webunit.webunittest import WebTestCase, WebFetcher
@@ -40,6 +42,7 @@ from webunit.webunittest import HTTPResponse, HTTPError, VERBOSE
 from webunit.utility import Upload
 
 from utils import thread_sleep
+
 
 BOUNDARY = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
 SEP_BOUNDARY = '--' + BOUNDARY
@@ -51,7 +54,7 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
     '''
     ret = cStringIO.StringIO()
     first_part = True
-    
+
     for key, value in data.items():
         if not key:
             continue
@@ -65,15 +68,19 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
             else:
                 ret.write('\r\n')
             ret.write(sep_boundary)
-            
+
             # if key starts with a '$' then the entry is a file upload
             if isinstance(value, Upload):
                 ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
-                ret.write('; filename="%s"\r\n\r\n'%value.filename)
+                ret.write('; filename="%s"\r\n' % value.filename)
                 if value.filename:
+                    mimetype = guess_type(value.filename)[0]
+                    if mimetype is not None:
+                        ret.write('Content-Type: %s\r\n' % mimetype)
                     value = open(os.path.join(value.filename), "rb").read()
                 else:
                     value = ''
+                ret.write('\r\n')
             else:
                 ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
                 ret.write("\r\n\r\n")
