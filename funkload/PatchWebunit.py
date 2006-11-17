@@ -42,13 +42,16 @@ from webunit.utility import Upload
 from utils import thread_sleep
 
 BOUNDARY = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
-SEP_BOUNDARY = '\r\n--' + BOUNDARY
+SEP_BOUNDARY = '--' + BOUNDARY
 END_BOUNDARY = SEP_BOUNDARY + '--'
+
 def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
     '''Take the mapping of data and construct the body of a
     multipart/form-data message with it using the indicated boundaries.
     '''
     ret = cStringIO.StringIO()
+    first_part = True
+    
     for key, value in data.items():
         if not key:
             continue
@@ -56,7 +59,13 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
         if type(value) != type([]):
             value = [value]
         for value in value:
+            # Don't add newline before first part
+            if first_part:
+                first_part = False
+            else:
+                ret.write('\r\n')
             ret.write(sep_boundary)
+            
             # if key starts with a '$' then the entry is a file upload
             if isinstance(value, Upload):
                 ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
@@ -71,6 +80,7 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
             ret.write(str(value))
             if value and value[-1] == '\r':
                 ret.write('\r\n')  # write an extra newline
+    ret.write('\r\n')
     ret.write(end_boundary)
     return ret.getvalue()
 
