@@ -27,11 +27,11 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
+* Works with Ruby CGI, fixing webunit mimeEncode and adding Content-type
+  header on file upload, Thanks to Bryan Helmkamp.
+
 * # 1283_: Patching webunit to support http proxy by checking $http_proxy
   env. Thanks to Greg.
-
-* Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
-  3.6.2, patch provided by Ivan Kurmanov.
 
 * Adding Mirko Friedenhagen ``--with-percentiles`` option to
   ``fl-build-report`` to include percentiles in statistic tables and use
@@ -43,6 +43,9 @@ New features
 
 Bug fixes
 ~~~~~~~~~
+
+* Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
+  3.6.2, patch provided by Ivan Kurmanov.
 
 * fix: response string representation url contains double `/`
 
