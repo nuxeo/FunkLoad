@@ -288,7 +288,7 @@ Examples
   %prog myfile.py -V
                         Run default set of tests and view in real time each
                         page fetch with firefox.
-  %prog myfile.py MyTestCase.testSomething -l 3:5 -n 100
+  %prog myfile.py MyTestCase.testSomething -l 3 -n 100
                         Run MyTestCase.testSomething, reload one hundred
                         time the page 3 without concurrency and as fast as
                         possible. Output response time stats. You can loop
