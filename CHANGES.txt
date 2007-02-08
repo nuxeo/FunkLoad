@@ -31,7 +31,7 @@ New features
   header on file upload, Thanks to Bryan Helmkamp.
 
 * # 1283_: Patching webunit to support http proxy by checking $http_proxy
-  env. Thanks to Greg.
+  env. Thanks to Greg, (note that https proxy is not yet supported).
 
 * Adding Mirko Friedenhagen ``--with-percentiles`` option to
   ``fl-build-report`` to include percentiles in statistic tables and use
