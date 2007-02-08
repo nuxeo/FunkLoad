@@ -1074,7 +1074,8 @@ Here are few remarks/advices to obtain workable metrics.
 * A good benching test should not be too long so you can bench faster using
   a short cycle duration.
 
-* The cycle duration should be long enought (~5 times the test duration).
+* The cycle duration should be long enough (~5 times the test duration).
+  XXX : And what is the "test duration" ? Define here.
 
 * A benching test must have the same number of page and in the same
   order.
@@ -1085,6 +1086,15 @@ Here are few remarks/advices to obtain workable metrics.
 * Having a cycle with one user give a usefull reference.
 
 * Use a Makefile to make reproductible bench.
+
+* There is no debug option while doing a bench (since this would be illegible
+  with all the threads). So, if a bench fails (that is using `fl-run-bench`),
+  use ``fl-run-test -d`` to debug.
+
+* Using `fl-record` is very easy and very fast to create a scenario. But since
+  it doesn't support HTTPS, the good practise is to first record a scenario
+  with `fl-record` on HTTP, and then change the `url` back to `https` in your
+  FunkLoad test configuration file.
 
 
 Bench report
@@ -1326,5 +1336,8 @@ missing, send me an email.
 .. _trac: http://svn.nuxeo.org/trac/pub/report/12
 .. _doctest: http://docs.python.org/lib/module-doctest.html
 
+
 .. Local Variables:
 .. mode: rst
+.. End:
+.. vim: set filetype=rst:
