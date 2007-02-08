@@ -218,9 +218,9 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         protocol = self.protocol
     if ok_codes is None:
         ok_codes = self.expect_codes
+    webproxy = {}
 
     if protocol == 'http':
-        webproxy = {}
         try:
             proxystring = os.environ["http_proxy"].replace("http://", "")
             webproxy['host'] = proxystring.split(":")[0]
