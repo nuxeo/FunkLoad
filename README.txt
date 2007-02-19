@@ -169,6 +169,520 @@ Thanks to Frank Cohen's TestMaker_ framework and Richard Jones webunit_
 package.
 
 
+Test runner
+===========
+
+A FunkLoad_ test can be used like a standard unittest using a unittest.main()
+and a 'python MyFile.py'.
+
+To ease testing FunkLoad_ come with an advanced test runner to override
+the static configuration file.
+
+The ``loop-on-pages`` option enable to check response time of some specific
+pages inside a test without changing the script, which make easy to tune a
+page in a complex context. Use the ``debug`` option to find the page numbers.
+
+Note that ``fl-run-test`` can be used to launch normal unittest.TestCase and
+(if you use python2.4) doctest_ in a plain text file or embedded in a python
+docstring. The ``--debug`` option makes doctests verbose.
+
+
+Usage
+-----
+::
+
+  fl-run-test [options] file [class.method|class|suite] [...]
+
+
+Examples
+--------
+::
+
+  fl-run-test myFile.py
+                        Run all tests (including doctest with python2.4).
+  fl-run-test myFile.py test_suite
+                        Run suite named test_suite.
+  fl-run-test myFile.py MyTestCase.testSomething
+                        Run a single test MyTestCase.testSomething.
+  fl-run-test myFile.py MyTestCase
+                        Run all 'test*' test methods in MyTestCase.
+  fl-run-test myFile.py MyTestCase -u http://localhost
+                        Same against localhost.
+  fl-run-test myDocTest.txt
+                        Run doctest from plain text file (requires python2.4).
+  fl-run-test myDocTest.txt -d
+                        Run doctest with debug output (requires python2.4).
+  fl-run-test myfile.py -V
+                        Run default set of tests and view in real time each
+                        page fetch with firefox.
+  fl-run-test  myfile.py MyTestCase.testSomething -l 3 -n 100
+                        Run MyTestCase.testSomething, reload one hundred
+                        time the page 3 without concurrency and as fast as
+                        possible. Output response time stats. You can loop
+                        on many pages using slice -l 2:4.
+  fl-run-test myFile.py -e [Ss]ome
+                        Run all tests that match the regex [Ss]ome.
+  fl-run-test myFile.py -e '!foo$'
+                        Run all tests that does not ends with foo.
+  fl-run-test myFile.py --list
+                        List all the test names.
+  fl-run-test -h
+                        More options.
+
+
+Options
+-------
+::
+
+  --version               show program's version number and exit
+  --help, -h              show this help message and exit
+  --quiet, -q             Minimal output.
+  --verbose, -v           Verbose output.
+  --debug, -d             FunkLoad and doctest debug output.
+  --debug-level=DEBUG_LEVEL
+                          Debug level 2 is more verbose.
+  --url=MAIN_URL, -uMAIN_URL
+                          Base URL to bench without ending '/'.
+  --sleep-time-min=FTEST_SLEEP_TIME_MIN, -mFTEST_SLEEP_TIME_MIN
+                          Minumum sleep time between request.
+  --sleep-time-max=FTEST_SLEEP_TIME_MAX, -MFTEST_SLEEP_TIME_MAX
+                          Maximum sleep time between request.
+  --dump-directory=DUMP_DIR
+                          Directory to dump html pages.
+  --firefox-view, -V      Real time view using firefox, you must have a running
+                          instance of firefox in the same host.
+  --no-color              Monochrome output.
+  --loop-on-pages=LOOP_STEPS, -lLOOP_STEPS
+                          Loop as fast as possible without concurrency on pages
+                          expect a page number or a slice like 3:5. Output some
+                          statistics.
+  --loop-number=LOOP_NUMBER, -nLOOP_NUMBER
+                          Number of loop.
+  --accept-invalid-links  Do not fail if css/image links are not reachable.
+  --simple-fetch          Don't load additional links like css or images when
+                          fetching an html page.
+  --stop-on-fail          Stop tests on first failure or error.
+  --regex=REGEX, -eREGEX  The test names must match the regex.
+  --list                  Just list the test names.
+
+
+
+
+Benching
+========
+
+The same FunkLaod test can be turned into a load test, just by invoking the
+bench runner ``fl-run-bench``.
+
+Principle
+---------
+
+Here are some definitions used in bench mode:
+
+* CUs: Concurrent Users, which is the number of threads.
+* STPS: Average of Successful Tests Per Second during a cycle.
+* SPPS: Average of Successfully Page Per Second during a cycle.
+* RPS: Average Request Per Second, successfully or not.
+* max[STPS|SPPS|RPS]: maximum of STPS|SPPS|RPS for a cycle.
+
+Page
+~~~~
+
+A page is an http get/post request with associated sub requests like
+redirects, images or links (css, js files). This is what users see as a
+single page.
+
+
+Test
+~~~~
+
+A test is made with 3 methods: setUp/test_name/tearDown. During the test_name
+method each get/post request is called a page.
+
+::
+
+  [setUp][page 1]    [page 2] ... [page n]   [tearDown]
+  ======================================================> time
+         <----------------------------------> test method
+                 <--> sleeptime_min to sleeptime_max
+         <-----> page 1 connection time
+
+Cycle
+~~~~~
+
+A cycle is a load of n concurrents test during a 'duration' period.
+Threads are launched every 'startupdelay' seconds, each thread executes
+test in a loop.
+
+Once all threads have been started we start to record stats.
+
+Only tests that end during the 'duration' period are taken into account
+for the test stats (in the representation below test like [---X are not
+take into account).
+
+Only pages and requests that finish during the 'duration' are taken into
+account for the request and pages statistic
+
+Before a cycle a setUpCycle method is called, after a cycle a tearDownCycle
+method is called, you can use these methods to test differents server
+configuration for each cycle.
+
+::
+
+  Threads
+  ^
+  |
+  |
+  |n                   [---test--]   [--------]   [--|---X
+  |...
+  |                    |                             |
+  |2            [------|--]   [--------]   [-------] |
+  |                    |                             |
+  |1          [------X | [--------]   [-------]   [--|--X
+  |                    |                             |
+  |[setUpCycle]        |                             |    [tearDownCycle]
+  ===========================================================> time
+                       <------ cycle duration ------->
+   <----- staging ----->                             <---- staging ----->
+              <-> startupdelay    <---> sleeptime
+
+
+Cycles
+~~~~~~
+
+FunkLoad_ can execute many cycles with different number of CUs, this way you
+can find easily the maximum number of users that your application can
+handle.
+
+Running n cycles with the same CUs is a good way to see how the application
+handles a writing test over time.
+
+Running n cycles with the same CUs with a reading test and a setUpCycle that
+change the application configuration will help you to find the right tuning.
+
+
+::
+
+  cvus = [n1, n2, ...]
+
+  Threads
+  ^
+  |
+  |
+  |n2                            __________
+  |                             /          \
+  |                            /            \
+  |n1   _________             /              \
+  |    /         \           /                \
+  |   /           \         /                  \
+  |  /             \       /                    \
+   ==================================================> time
+        <------->   duration     <-------->
+                    <-----> cycle sleep time
+
+
+
+Bench runner
+------------
+
+Usage
+~~~~~
+::
+
+  fl-run-bench [options] file class.method
+
+
+Examples
+~~~~~~~~
+::
+
+  fl-run-bench myFile.py MyTestCase.testSomething
+                        Bench MyTestCase.testSomething using MyTestCase.conf.
+  fl-run-bench -u http://localhost:8080 -c 10:20 -d 30 myFile.py MyTestCase.testSomething
+                        Bench MyTestCase.testSomething on localhost:8080
+                        with 2 cycles of 10 and 20 users during 30s.
+  fl-run-bench -h
+                        More options.
+
+Options
+~~~~~~~
+::
+
+  --version               show program's version number and exit
+  --help, -h              show this help message and exit
+  --url=MAIN_URL, -uMAIN_URL
+                          Base URL to bench.
+  --cycles=BENCH_CYCLES, -cBENCH_CYCLES
+                          Cycles to bench, this is a list of number of virtual
+                          concurrent users, to run a bench with 3 cycles with 5,
+                          10 and 20 users use: -c 2:10:20
+  --duration=BENCH_DURATION, -DBENCH_DURATION
+                          Duration of a cycle in seconds.
+  --sleep-time-min=BENCH_SLEEP_TIME_MIN, -mBENCH_SLEEP_TIME_MIN
+                          Minimum sleep time between request.
+  --sleep-time-max=BENCH_SLEEP_TIME_MAX, -MBENCH_SLEEP_TIME_MAX
+                          Maximum sleep time between request.
+  --startup-delay=BENCH_STARTUP_DELAY, -sBENCH_STARTUP_DELAY
+                          Startup delay between thread.
+  --no-color              Monochrome output.
+  --accept-invalid-links  Do not fail if css/image links are not reachable.
+  --simple-fetch          Don't load additional links like css or images when
+                          fetching an html page.
+
+
+Tips
+----
+
+Here are few remarks/advices to obtain workable metrics.
+
+* Since it uses significant CPU resources, make sure that performance limits
+  are not hit by FunkLoad_ before your server's limit is reached.
+  Check this by launching a bench from another host.
+
+* Having a cycle with one user gives a usefull reference.
+
+* A bench is composed of a benching test (or scenario) run many times. A good
+  benching test should not be too long so you have a higher testing rate (that
+  is, more benching tests can come to their end).
+
+* The cycle duration for the benching test should be long enough.
+  Around 5 times the duration of a single benching test is a value that is
+  usually a safe bet. You can obtain this duration of a single benching test by
+  running ``fl-run-test myfile.py MyTestCase.testSomething``.
+
+  Rationale : Normally a cycle duration of a single benching test should be
+  enough. But from the testing platform side if there are more than one
+  concurrent user, there are many threads to start and it takes some time. And on
+  from the tested platform side it is common that a benching test will last
+  longer and longer as the server is used by more and more users.
+
+* You should use many cycles with the same step interval to produce readable
+  charts (1:10:20:30:40:50:60 vs 1:10:100)
+
+* A benching test must have the same number of page and in the same
+  order.
+
+* Use a Makefile to make reproductible bench.
+
+* There is no debug option while doing a bench (since this would be illegible
+  with all the threads). So, if a bench fails (that is using `fl-run-bench`),
+  use ``fl-run-test -d`` to debug.
+
+* Using `fl-record` is very easy and very fast to create a scenario. But since
+  it doesn't support HTTPS, the good practise is to first record a scenario
+  with `fl-record` on HTTP, and then change the `url` back to `https` in your
+  FunkLoad test configuration file.
+
+* Always use description in post/get/xmlrpc, this improves the
+  readability of the report.
+
+
+Bench report
+============
+
+To produce an HTML or ReST report you need to invoke the ``fl-build-report``,
+you can easily produce PDF report using Firefox 'Print To File' in
+PostScript then use the ps2pdf converter.
+
+Usage
+-----
+::
+
+  fl-build-report [options] xmlfile
+
+``fl-build-report`` analyze a FunkLoad_ bench xml result file and output a
+report.
+
+
+Examples
+--------
+::
+
+  fl-build-report funkload.xml
+                        ReST rendering into stdout.
+  fl-build-report --html -o /tmp funkload.xml
+                        Build an HTML report in /tmp.
+  fl-build-report -h
+                        More options.
+
+Options
+-------
+::
+
+    --version               show program's version number and exit
+    --help, -h              show this help message and exit
+    --html, -H              Produce an html report.
+    --output-directory=OUTPUT_DIR, -oOUTPUT_DIR
+                            Directory to store reports.
+
+
+ Note that you can preview the report for cycles that have been done while
+ the bench is still running by invoking the above command.
+
+
+
+Test Recorder
+=============
+
+
+Recording a new FunkLoad test
+-----------------------------
+
+Starting with FunkLoad_ 1.3.0 you can use ``fl-record`` to record your
+navigator activity, this requires the TCPWatch_ python proxy see INSTALL_
+for information on how to install TCPWatch_.
+
+1. Start the recorder::
+
+    fl-record basic_navigation
+
+
+  This will output something like this::
+
+    Hit Ctrl-C to stop recording.
+    HTTP proxy listening on :8090
+    Recording to directory /tmp/tmpaYDky9_funkload.
+
+
+2. Setup your browser proxy and play your scenario
+
+  * in Firefox: Edit > Preferencies > General; Connection Settings set
+    `localhost:8090` as your HTTP proxy
+
+  * Play your scenario using your navigator
+
+  * Hit Ctrl-C to stop recording::
+
+      ^C
+      # Saving uploaded file: foo.png
+      # Saving uploaded file: bar.pdf
+      Creating script: ./test_BasicNavigation.py.
+      Creating configuration file: ./BasicNavigation.conf.
+
+
+3. Replay you scenario::
+
+     fl-run-test -dV test_BasicNavigation.py
+
+  You should see all the steps on your navigator.
+
+4. Implement the dynamic part and assertion
+
+  * Code the dynamic part like getting new url of a created document
+  * Add assertion using FunkLoad_ helpers
+  * Use a credential server if you want to make a bench with different users
+    or simply don't want to hard code your login/password.
+
+
+Note that ``fl-record`` works fine with multi-part encoded form and file upload
+but will failed to record https session.
+
+
+The fl-record command
+---------------------
+
+Usage
+~~~~~
+::
+
+    fl-record [options] [test_name]
+
+  fl-record launch a TCPWatch_ proxy and record activities, then output
+  a FunkLoad script or generates a FunkLoad unit test if test_name is specified.
+  The default proxy port is 8090.
+
+  Note that tcpwatch.py executable must be accessible from your env.
+
+
+Examples
+~~~~~~~~
+::
+
+  fl-record foo_bar
+                        Run a proxy and create a FunkLoad test case,
+                        generates test_FooBar.py and FooBar.conf file.
+                        To test it:  fl-run-test -dV test_FooBar.py
+  fl-record -p 9090
+                        Run a proxy on port 9090, output script to stdout.
+  fl-record -i /tmp/tcpwatch
+                        Convert a tcpwatch capture into a script.
+
+Options
+~~~~~~~
+::
+
+  --version               show program's version number and exit
+  --help, -h              show this help message and exit
+  --verbose, -v           Verbose output
+  --port=PORT, -pPORT     The proxy port.
+  --tcp-watch-input=TCPWATCH_PATH, -iTCPWATCH_PATH
+                          Path to an existing tcpwatch capture.
+
+
+Credential server
+=================
+
+If you are writing a bench that requires to be logged with different users
+FunkLoad_ provides an xmlrpc credential server to serve login/pwd between the
+different threads.
+
+It requires 2 files (like unix /etc/passwd and /etc/group) the password file
+have the following format::
+
+  login1:pwd1
+  ...
+
+The group file format is::
+
+  group1:user1, user2
+  group2:user2
+  # you can split group declaration
+  group1:user3
+  ...
+
+Setup a configuration file like in the demo_/cmf folder, then start the
+credential server::
+
+  fl-credential-ctl credential.conf start
+
+More options::
+
+  fl-credential-ctl --help
+
+See the funkload-demo/cmf example for a credential configuration file.
+
+
+Monitor server
+==============
+
+If you want to monitor a linux server health during the bench, you have to
+run a monitor xmlrpc server on the target server, this require to install
+the FunkLoad_ package.
+
+On the server side you need to install the FunkLoad_ tool then launch the
+server using a configuration file (example in the demo_/simple folder.)::
+
+  fl-monitor-ctl monitor.conf start
+
+  # more info
+  fl-monitor-ctl --help
+
+
+On the bench host side setup your test configuration like this::
+
+  [monitor]
+  hosts = server.to.test.com
+
+  [server.to.test.com]
+  description = The web server
+  port = 8008
+
+Then run the bench, the report will include server stats.
+
+Note that you can monitor multiple hosts and that the monitor is linux
+specific.
+
+
 The FunkLoadTestCase
 ====================
 
@@ -796,520 +1310,6 @@ cpsSearchDocId
   cpsSearchDocId(doc_id)
 
 Return the list of url that ends with doc_id, using catalog search.
-
-
-Test runner
-===========
-
-A FunkLoad_ test can be used like a standard unittest using a unittest.main()
-and a 'python MyFile.py'.
-
-To ease testing FunkLoad_ come with an advanced test runner to override
-the static configuration file.
-
-The ``loop-on-pages`` option enable to check response time of some specific
-pages inside a test without changing the script, which make easy to tune a
-page in a complex context. Use the ``debug`` option to find the page numbers.
-
-Note that ``fl-run-test`` can be used to launch normal unittest.TestCase and
-(if you use python2.4) doctest_ in a plain text file or embedded in a python
-docstring. The ``--debug`` option makes doctests verbose.
-
-
-Usage
------
-::
-
-  fl-run-test [options] file [class.method|class|suite] [...]
-
-
-Examples
---------
-::
-
-  fl-run-test myFile.py
-                        Run all tests (including doctest with python2.4).
-  fl-run-test myFile.py test_suite
-                        Run suite named test_suite.
-  fl-run-test myFile.py MyTestCase.testSomething
-                        Run a single test MyTestCase.testSomething.
-  fl-run-test myFile.py MyTestCase
-                        Run all 'test*' test methods in MyTestCase.
-  fl-run-test myFile.py MyTestCase -u http://localhost
-                        Same against localhost.
-  fl-run-test myDocTest.txt
-                        Run doctest from plain text file (requires python2.4).
-  fl-run-test myDocTest.txt -d
-                        Run doctest with debug output (requires python2.4).
-  fl-run-test myfile.py -V
-                        Run default set of tests and view in real time each
-                        page fetch with firefox.
-  fl-run-test  myfile.py MyTestCase.testSomething -l 3 -n 100
-                        Run MyTestCase.testSomething, reload one hundred
-                        time the page 3 without concurrency and as fast as
-                        possible. Output response time stats. You can loop
-                        on many pages using slice -l 2:4.
-  fl-run-test myFile.py -e [Ss]ome
-                        Run all tests that match the regex [Ss]ome.
-  fl-run-test myFile.py -e '!foo$'
-                        Run all tests that does not ends with foo.
-  fl-run-test myFile.py --list
-                        List all the test names.
-  fl-run-test -h
-                        More options.
-
-
-Options
--------
-::
-
-  --version               show program's version number and exit
-  --help, -h              show this help message and exit
-  --quiet, -q             Minimal output.
-  --verbose, -v           Verbose output.
-  --debug, -d             FunkLoad and doctest debug output.
-  --debug-level=DEBUG_LEVEL
-                          Debug level 2 is more verbose.
-  --url=MAIN_URL, -uMAIN_URL
-                          Base URL to bench without ending '/'.
-  --sleep-time-min=FTEST_SLEEP_TIME_MIN, -mFTEST_SLEEP_TIME_MIN
-                          Minumum sleep time between request.
-  --sleep-time-max=FTEST_SLEEP_TIME_MAX, -MFTEST_SLEEP_TIME_MAX
-                          Maximum sleep time between request.
-  --dump-directory=DUMP_DIR
-                          Directory to dump html pages.
-  --firefox-view, -V      Real time view using firefox, you must have a running
-                          instance of firefox in the same host.
-  --no-color              Monochrome output.
-  --loop-on-pages=LOOP_STEPS, -lLOOP_STEPS
-                          Loop as fast as possible without concurrency on pages
-                          expect a page number or a slice like 3:5. Output some
-                          statistics.
-  --loop-number=LOOP_NUMBER, -nLOOP_NUMBER
-                          Number of loop.
-  --accept-invalid-links  Do not fail if css/image links are not reachable.
-  --simple-fetch          Don't load additional links like css or images when
-                          fetching an html page.
-  --stop-on-fail          Stop tests on first failure or error.
-  --regex=REGEX, -eREGEX  The test names must match the regex.
-  --list                  Just list the test names.
-
-
-
-
-Benching
-========
-
-The same FunkLaod test can be turned into a load test, just by invoking the
-bench runner ``fl-run-bench``.
-
-Principle
----------
-
-Here are some definitions used in bench mode:
-
-* CUs: Concurrent Users, which is the number of threads.
-* STPS: Average of Successful Tests Per Second during a cycle.
-* SPPS: Average of Successfully Page Per Second during a cycle.
-* RPS: Average Request Per Second, successfully or not.
-* max[STPS|SPPS|RPS]: maximum of STPS|SPPS|RPS for a cycle.
-
-Page
-~~~~
-
-A page is an http get/post request with associated sub requests like
-redirects, images or links (css, js files). This is what users see as a
-single page.
-
-
-Test
-~~~~
-
-A test is made with 3 methods: setUp/test_name/tearDown. During the test_name
-method each get/post request is called a page.
-
-::
-
-  [setUp][page 1]    [page 2] ... [page n]   [tearDown]
-  ======================================================> time
-         <----------------------------------> test method
-                 <--> sleeptime_min to sleeptime_max
-         <-----> page 1 connection time
-
-Cycle
-~~~~~
-
-A cycle is a load of n concurrents test during a 'duration' period.
-Threads are launched every 'startupdelay' seconds, each thread executes
-test in a loop.
-
-Once all threads have been started we start to record stats.
-
-Only tests that end during the 'duration' period are taken into account
-for the test stats (in the representation below test like [---X are not
-take into account).
-
-Only pages and requests that finish during the 'duration' are taken into
-account for the request and pages statistic
-
-Before a cycle a setUpCycle method is called, after a cycle a tearDownCycle
-method is called, you can use these methods to test differents server
-configuration for each cycle.
-
-::
-
-  Threads
-  ^
-  |
-  |
-  |n                   [---test--]   [--------]   [--|---X
-  |...
-  |                    |                             |
-  |2            [------|--]   [--------]   [-------] |
-  |                    |                             |
-  |1          [------X | [--------]   [-------]   [--|--X
-  |                    |                             |
-  |[setUpCycle]        |                             |    [tearDownCycle]
-  ===========================================================> time
-                       <------ cycle duration ------->
-   <----- staging ----->                             <---- staging ----->
-              <-> startupdelay    <---> sleeptime
-
-
-Cycles
-~~~~~~
-
-FunkLoad_ can execute many cycles with different number of CUs, this way you
-can find easily the maximum number of users that your application can
-handle.
-
-Running n cycles with the same CUs is a good way to see how the application
-handles a writing test over time.
-
-Running n cycles with the same CUs with a reading test and a setUpCycle that
-change the application configuration will help you to find the right tuning.
-
-
-::
-
-  cvus = [n1, n2, ...]
-
-  Threads
-  ^
-  |
-  |
-  |n2                            __________
-  |                             /          \
-  |                            /            \
-  |n1   _________             /              \
-  |    /         \           /                \
-  |   /           \         /                  \
-  |  /             \       /                    \
-   ==================================================> time
-        <------->   duration     <-------->
-                    <-----> cycle sleep time
-
-
-
-Bench runner
-------------
-
-Usage
-~~~~~
-::
-
-  fl-run-bench [options] file class.method
-
-
-Examples
-~~~~~~~~
-::
-
-  fl-run-bench myFile.py MyTestCase.testSomething
-                        Bench MyTestCase.testSomething using MyTestCase.conf.
-  fl-run-bench -u http://localhost:8080 -c 10:20 -d 30 myFile.py MyTestCase.testSomething
-                        Bench MyTestCase.testSomething on localhost:8080
-                        with 2 cycles of 10 and 20 users during 30s.
-  fl-run-bench -h
-                        More options.
-
-Options
-~~~~~~~
-::
-
-  --version               show program's version number and exit
-  --help, -h              show this help message and exit
-  --url=MAIN_URL, -uMAIN_URL
-                          Base URL to bench.
-  --cycles=BENCH_CYCLES, -cBENCH_CYCLES
-                          Cycles to bench, this is a list of number of virtual
-                          concurrent users, to run a bench with 3 cycles with 5,
-                          10 and 20 users use: -c 2:10:20
-  --duration=BENCH_DURATION, -DBENCH_DURATION
-                          Duration of a cycle in seconds.
-  --sleep-time-min=BENCH_SLEEP_TIME_MIN, -mBENCH_SLEEP_TIME_MIN
-                          Minimum sleep time between request.
-  --sleep-time-max=BENCH_SLEEP_TIME_MAX, -MBENCH_SLEEP_TIME_MAX
-                          Maximum sleep time between request.
-  --startup-delay=BENCH_STARTUP_DELAY, -sBENCH_STARTUP_DELAY
-                          Startup delay between thread.
-  --no-color              Monochrome output.
-  --accept-invalid-links  Do not fail if css/image links are not reachable.
-  --simple-fetch          Don't load additional links like css or images when
-                          fetching an html page.
-
-
-Tips
-----
-
-Here are few remarks/advices to obtain workable metrics.
-
-* Since it uses significant CPU resources, make sure that performance limits
-  are not hit by FunkLoad_ before your server's limit is reached.
-  Check this by launching a bench from another host.
-
-* Having a cycle with one user gives a usefull reference.
-
-* A bench is composed of a benching test (or scenario) run many times. A good
-  benching test should not be too long so you have a higher testing rate (that
-  is, more benching tests can come to their end).
-
-* The cycle duration for the benching test should be long enough.
-  Around 5 times the duration of a single benching test is a value that is
-  usually a safe bet. You can obtain this duration of a single benching test by
-  running ``fl-run-test myfile.py MyTestCase.testSomething``.
-
-  Rationale : Normally a cycle duration of a single benching test should be
-  enough. But from the testing platform side if there are more than one
-  concurrent user, there are many threads to start and it takes some time. And on
-  from the tested platform side it is common that a benching test will last
-  longer and longer as the server is used by more and more users.
-
-* You should use many cycles with the same step interval to produce readable
-  charts (1:10:20:30:40:50:60 vs 1:10:100)
-
-* A benching test must have the same number of page and in the same
-  order.
-
-* Use a Makefile to make reproductible bench.
-
-* There is no debug option while doing a bench (since this would be illegible
-  with all the threads). So, if a bench fails (that is using `fl-run-bench`),
-  use ``fl-run-test -d`` to debug.
-
-* Using `fl-record` is very easy and very fast to create a scenario. But since
-  it doesn't support HTTPS, the good practise is to first record a scenario
-  with `fl-record` on HTTP, and then change the `url` back to `https` in your
-  FunkLoad test configuration file.
-
-* Always use description in post/get/xmlrpc, this improves the
-  readability of the report.
-
-
-Bench report
-============
-
-To produce an HTML or ReST report you need to invoke the ``fl-build-report``,
-you can easily produce PDF report using Firefox 'Print To File' in
-PostScript then use the ps2pdf converter.
-
-Usage
------
-::
-
-  fl-build-report [options] xmlfile
-
-``fl-build-report`` analyze a FunkLoad_ bench xml result file and output a
-report.
-
-
-Examples
---------
-::
-
-  fl-build-report funkload.xml
-                        ReST rendering into stdout.
-  fl-build-report --html -o /tmp funkload.xml
-                        Build an HTML report in /tmp.
-  fl-build-report -h
-                        More options.
-
-Options
--------
-::
-
-    --version               show program's version number and exit
-    --help, -h              show this help message and exit
-    --html, -H              Produce an html report.
-    --output-directory=OUTPUT_DIR, -oOUTPUT_DIR
-                            Directory to store reports.
-
-
- Note that you can preview the report for cycles that have been done while
- the bench is still running by invoking the above command.
-
-
-
-Test Recorder
-=============
-
-
-Recording a new FunkLoad test
------------------------------
-
-Starting with FunkLoad_ 1.3.0 you can use ``fl-record`` to record your
-navigator activity, this requires the TCPWatch_ python proxy see INSTALL_
-for information on how to install TCPWatch_.
-
-1. Start the recorder::
-
-    fl-record basic_navigation
-
-
-  This will output something like this::
-
-    Hit Ctrl-C to stop recording.
-    HTTP proxy listening on :8090
-    Recording to directory /tmp/tmpaYDky9_funkload.
-
-
-2. Setup your browser proxy and play your scenario
-
-  * in Firefox: Edit > Preferencies > General; Connection Settings set
-    `localhost:8090` as your HTTP proxy
-
-  * Play your scenario using your navigator
-
-  * Hit Ctrl-C to stop recording::
-
-      ^C
-      # Saving uploaded file: foo.png
-      # Saving uploaded file: bar.pdf
-      Creating script: ./test_BasicNavigation.py.
-      Creating configuration file: ./BasicNavigation.conf.
-
-
-3. Replay you scenario::
-
-     fl-run-test -dV test_BasicNavigation.py
-
-  You should see all the steps on your navigator.
-
-4. Implement the dynamic part and assertion
-
-  * Code the dynamic part like getting new url of a created document
-  * Add assertion using FunkLoad_ helpers
-  * Use a credential server if you want to make a bench with different users
-    or simply don't want to hard code your login/password.
-
-
-Note that ``fl-record`` works fine with multi-part encoded form and file upload
-but will failed to record https session.
-
-
-The fl-record command
----------------------
-
-Usage
-~~~~~
-::
-
-    fl-record [options] [test_name]
-
-  fl-record launch a TCPWatch_ proxy and record activities, then output
-  a FunkLoad script or generates a FunkLoad unit test if test_name is specified.
-  The default proxy port is 8090.
-
-  Note that tcpwatch.py executable must be accessible from your env.
-
-
-Examples
-~~~~~~~~
-::
-
-  fl-record foo_bar
-                        Run a proxy and create a FunkLoad test case,
-                        generates test_FooBar.py and FooBar.conf file.
-                        To test it:  fl-run-test -dV test_FooBar.py
-  fl-record -p 9090
-                        Run a proxy on port 9090, output script to stdout.
-  fl-record -i /tmp/tcpwatch
-                        Convert a tcpwatch capture into a script.
-
-Options
-~~~~~~~
-::
-
-  --version               show program's version number and exit
-  --help, -h              show this help message and exit
-  --verbose, -v           Verbose output
-  --port=PORT, -pPORT     The proxy port.
-  --tcp-watch-input=TCPWATCH_PATH, -iTCPWATCH_PATH
-                          Path to an existing tcpwatch capture.
-
-
-Credential server
-=================
-
-If you are writing a bench that requires to be logged with different users
-FunkLoad_ provides an xmlrpc credential server to serve login/pwd between the
-different threads.
-
-It requires 2 files (like unix /etc/passwd and /etc/group) the password file
-have the following format::
-
-  login1:pwd1
-  ...
-
-The group file format is::
-
-  group1:user1, user2
-  group2:user2
-  # you can split group declaration
-  group1:user3
-  ...
-
-Setup a configuration file like in the demo_/cmf folder, then start the
-credential server::
-
-  fl-credential-ctl credential.conf start
-
-More options::
-
-  fl-credential-ctl --help
-
-See the funkload-demo/cmf example for a credential configuration file.
-
-
-Monitor server
-==============
-
-If you want to monitor a linux server health during the bench, you have to
-run a monitor xmlrpc server on the target server, this require to install
-the FunkLoad_ package.
-
-On the server side you need to install the FunkLoad_ tool then launch the
-server using a configuration file (example in the demo_/simple folder.)::
-
-  fl-monitor-ctl monitor.conf start
-
-  # more info
-  fl-monitor-ctl --help
-
-
-On the bench host side setup your test configuration like this::
-
-  [monitor]
-  hosts = server.to.test.com
-
-  [server.to.test.com]
-  description = The web server
-  port = 8008
-
-Then run the bench, the report will include server stats.
-
-Note that you can monitor multiple hosts and that the monitor is linux
-specific.
 
 
 Todo and bugs
