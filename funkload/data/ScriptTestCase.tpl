@@ -22,7 +22,9 @@ class %(class_name)s(FunkLoadTestCase):
         # credential_host = self.conf_get('credential', 'host')
         # credential_port = self.conf_getInt('credential', 'port')
         # self.login, self.password = xmlrpc_get_credential(credential_host,
-        #                                                   credential_port)
+        #                                                   credential_port,
+        # XXX replace with a valid group
+        #                                                   'members')
 
     def test_%(test_name)s(self):
         # The description should be set in the configuration file
