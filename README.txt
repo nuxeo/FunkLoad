@@ -1068,22 +1068,28 @@ Here are few remarks/advices to obtain workable metrics.
   are not hit by FunkLoad_ before your server's limit is reached.
   Check this by launching a bench from another host.
 
-* Always use description in post/get/xmlrpc, this improves the
-  readability of the report.
+* Having a cycle with one user gives a usefull reference.
 
-* A good benching test should not be too long so you can bench faster using
-  a short cycle duration.
+* A bench is composed of a benching test (or scenario) run many times. A good
+  benching test should not be too long so you have a higher testing rate (that
+  is, more benching tests can come to their end).
 
-* The cycle duration should be long enough (~5 times the test duration).
-  XXX : And what is the "test duration" ? Define here.
+* The cycle duration for the benching test should be long enough.
+  Around 5 times the duration of a single benching test is a value that is
+  usually a safe bet. You can obtain this duration of a single benching test by
+  running ``fl-run-test myfile.py MyTestCase.testSomething``.
 
-* A benching test must have the same number of page and in the same
-  order.
+  Rationale : Normally a cycle duration of a single benching test should be
+  enough. But from the testing platform side if there are more than one
+  concurrent user, there are many threads to start and it takes some time. And on
+  from the tested platform side it is common that a benching test will last
+  longer and longer as the server is used by more and more users.
 
 * You should use many cycles with the same step interval to produce readable
   charts (1:10:20:30:40:50:60 vs 1:10:100)
 
-* Having a cycle with one user give a usefull reference.
+* A benching test must have the same number of page and in the same
+  order.
 
 * Use a Makefile to make reproductible bench.
 
@@ -1095,6 +1101,9 @@ Here are few remarks/advices to obtain workable metrics.
   it doesn't support HTTPS, the good practise is to first record a scenario
   with `fl-record` on HTTP, and then change the `url` back to `https` in your
   FunkLoad test configuration file.
+
+* Always use description in post/get/xmlrpc, this improves the
+  readability of the report.
 
 
 Bench report
