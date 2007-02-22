@@ -58,6 +58,7 @@ class Percentiles:
         results = self.results
         results.sort()
         len_results = len(results)
+        old_value = -1
         for perc in range(0, 100, self.stepsize):
             index = int(perc / 100.0 * len_results)
             try:
@@ -65,6 +66,7 @@ class Percentiles:
             except IndexError:
                 value = -1.0
             setattr(self, "perc%2d" % perc, float(value))
+            old_value = value
 
     def __str__(self):
         self.calcPercentiles()
@@ -113,7 +115,7 @@ class AllResponseStat:
         self.min = min(self.min, float(duration))
         self.total += float(duration)
         self.finalized = False
-        self.percentiles.addResult(duration)
+        self.percentiles.addResult(float(duration))
 
     def finalize(self):
         """Compute avg times."""
@@ -159,7 +161,7 @@ class SinglePageStat:
         if self.date_s is None:
             self.date_s = int(float(date))
         self.duration += float(duration)
-        self.percentiles.addResult(duration)
+        self.percentiles.addResult(float(duration))
         if result != 'Successful':
             self.result = result
 
@@ -191,7 +193,7 @@ class PageStat(AllResponseStat):
         stat = thread['pages'].setdefault(thread['count'],
                                           SinglePageStat(step))
         stat.addResponse(date, result, duration)
-        self.percentiles.addResult(duration)
+        self.percentiles.addResult(float(duration))
         self.finalized = False
 
     def finalize(self):
@@ -249,7 +251,7 @@ class ResponseStat:
         self.max = max(self.max, float(duration))
         self.min = min(self.min, float(duration))
         self.total += float(duration)
-        self.percentiles.addResult(duration)
+        self.percentiles.addResult(float(duration))
         self.url = url
         self.type = rtype
         if description is not None:
@@ -312,7 +314,7 @@ class TestStat:
         self.redirects = max(self.redirects, int(redirects))
         self.images = max(self.images, int(images))
         self.links = max(self.links, int(links))
-        self.percentiles.addResult(duration)
+        self.percentiles.addResult(float(duration))
 
     def finalize(self):
         """Compute avg times."""
