@@ -44,6 +44,8 @@ New features
 Bug fixes
 ~~~~~~~~~
 
+* fix: report with percentiles are buggy sometime P10 value is greater than MED
+
 * Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
   3.6.2, patch provided by Ivan Kurmanov.
 
