@@ -47,7 +47,12 @@ New features
 Bug fixes
 ~~~~~~~~~
 
-* fix: report with percentiles are buggy sometime P10 value is greater than MED
+* fix: # 1279_: Browser form submit encoding, default encoding for post is
+  now application/x-www-form-urlencoded, multipart mime encoding is used
+  only when uploading files.
+
+* fix: report with percentiles are buggy sometime P10 value is greater
+  than MED.
 
 * Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
   3.6.2, patch provided by Ivan Kurmanov.
@@ -433,6 +438,7 @@ See README_ for more information about FunkLoad_.
 .. _1183: http://svn.nuxeo.org/trac/pub/ticket/1183
 .. _1201: http://svn.nuxeo.org/trac/pub/ticket/1201
 .. _1278: http://svn.nuxeo.org/trac/pub/ticket/1278
+.. _1279: http://svn.nuxeo.org/trac/pub/ticket/1279
 .. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
 .. _1283: http://svn.nuxeo.org/trac/pub/ticket/1283
 .. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284

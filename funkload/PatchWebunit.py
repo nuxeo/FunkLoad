@@ -25,6 +25,8 @@
 * fix HTTPResponse __repr__
 * patching webunit mimeEncode to be rfc 1945 3.6.2 compliant using CRLF
 * patching to remove cookie with a 'deleted' value
+* patching to have application/x-www-form-urlencoded by default and only
+  multipart when a file is posted
 
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
@@ -32,6 +34,7 @@ import os
 import sys
 import time
 import urlparse
+from urllib import urlencode
 import httplib
 import cStringIO
 from mimetypes import guess_type
@@ -69,8 +72,6 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
             else:
                 ret.write('\r\n')
             ret.write(sep_boundary)
-
-            # if key starts with a '$' then the entry is a file upload
             if isinstance(value, Upload):
                 ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
                 ret.write('; filename="%s"\r\n' % value.filename)
@@ -250,21 +251,28 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
 
     params = None
     if postdata:
-        for field, value in postdata.items():
-            if type(value) == type({}):
-                postdata[field] = []
-                for k, selected in value.items():
-                    if selected: postdata[field].append(k)
-
-        # Do a post with the data file
-        params = mimeEncode(postdata)
         if webproxy:
             h.putrequest('POST', "http://%s%s" % (host_header, url))
         else:
             # Normal post
             h.putrequest('POST', url)
-        h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
-            BOUNDARY)
+        is_multipart = False
+        for field, value in postdata.items():
+            if type(value) == type({}):
+                postdata[field] = []
+                for k, selected in value.items():
+                    if selected:
+                        postdata[field].append(k)
+            if isinstance(value, Upload):
+                # Post with a data file requires multipart mimeencode
+                is_multipart = True
+        if is_multipart:
+            params = mimeEncode(postdata)
+            h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
+                        BOUNDARY)
+        else:
+            params = urlencode(postdata)
+            h.putheader('Content-type', 'application/x-www-form-urlencoded')
         h.putheader('Content-length', str(len(params)))
     else:
         if webproxy:
