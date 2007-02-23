@@ -24,6 +24,7 @@
 * remove webunit log
 * fix HTTPResponse __repr__
 * patching webunit mimeEncode to be rfc 1945 3.6.2 compliant using CRLF
+* patching to remove cookie with a 'deleted' value
 
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
@@ -302,9 +303,11 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 # and that the cookie is or isn't secure
                 if sendcookie['secure'] and protocol != 'https':
                     continue
+                if sendcookie.coded_value == '"deleted"':
+                    continue
                 # TODO: check max-age
                 cookie_list.append("%s=%s;"%(sendcookie.key,
-                    sendcookie.coded_value))
+                                             sendcookie.coded_value))
                 cookies_used.append(sendcookie.key)
 
     if cookie_list:

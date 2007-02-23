@@ -27,6 +27,9 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~
 
+* Do not send cookie with ``deleted`` value, this fix trouble with Zope's
+  CookieCrumbler and enable benching of Plone_ apps, Thanks to Lin.
+
 * Works with Ruby CGI, fixing webunit mimeEncode and adding Content-type
   header on file upload, Thanks to Bryan Helmkamp.
 
@@ -434,6 +437,7 @@ See README_ for more information about FunkLoad_.
 .. _1283: http://svn.nuxeo.org/trac/pub/ticket/1283
 .. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
 .. _1300: http://svn.nuxeo.org/trac/pub/ticket/1300
+.. _Plone: http://plone.org/
 
 .. Local Variables:
 .. mode: rst
