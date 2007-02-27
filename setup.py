@@ -65,6 +65,7 @@ Main FunkLoad features are:
   - basic authentication support
   - cookies support
   - referrer support
+  - http proxy support
   - fetching css, javascript and images
   - emulating a browser cache
   - file upload and multipart/form-data submission
@@ -87,7 +88,7 @@ Main FunkLoad features are:
   containing:
 
   - the bench configuration
-  - tests, pages, requests stats and charts.
+  - tests, pages, requests stats and charts with percentiles.
   - the 5 slowest requests.
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
