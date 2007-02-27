@@ -24,6 +24,17 @@ FunkLoad SVN trunk
 :Target: ?
 
 
+
+FunkLoad 1.6.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.6.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.6.0/
+
+:Released date: 2007-02-27
+
+
 New features
 ~~~~~~~~~~~~
 
