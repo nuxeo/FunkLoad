@@ -81,6 +81,16 @@ class FunkLoadXmlParser:
                 and str(msg).startswith('no element found')):
                 print "Missing </funkload> tag."
             else:
+                print 'Error: invalid xml bench result file'
+                if len(self.current_element) <= 1 or (
+                    self.current_element[1]['name'] != 'funkload'):
+                    print """Note that you can generate a report only for a
+                    bench result done with fl-run-bench (and not on a test
+                    result done with fl-run-test)."""
+                else:
+                    print """You may need to remove non ascii char that comes
+                    from error pages catched during the bench. iconv
+                    or recode may help you."""
                 print 'Xml parser element stack: %s' % [
                     x['name'] for x in self.current_element]
                 raise
@@ -180,9 +190,13 @@ def main():
     parser.add_option("-H", "--html", action="store_true", default=False,
                       dest="html", help="Produce an html report.")
     parser.add_option("-P", "--with-percentiles", action="store_true",
-                      default=False, dest="with_percentiles",
-                      help=("Include Percentiles in Tables, use 10%, 50% and"
-                            " 90% instead of min, avg and max in images."))
+                      default=True, dest="with_percentiles",
+                      help=("Include percentiles in tables, use 10%, 50% and"
+                            " 90% for charts, default option."))
+    parser.add_option("--no-percentiles", action="store_false",
+                      dest="with_percentiles",
+                      help=("No percentiles in tables display min, "
+                            "avg and max in charts."))
     cur_path = os.path.abspath(os.path.curdir)
     parser.add_option("-o", "--output-directory", type="string",
                       dest="output_dir",

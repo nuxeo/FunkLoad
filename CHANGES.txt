@@ -38,11 +38,13 @@ New features
 
 * Adding Mirko Friedenhagen ``--with-percentiles`` option to
   ``fl-build-report`` to include percentiles in statistic tables and use
-  10%, 50% and 90% percentil instead of min, avg and max in charts.
+  10%, 50% and 90% percentil instead of min, avg and max in charts.  This is
+  now the default option, use ``--no-percentiles`` for the old behaviour.
+
+* Upgrade to setuptools 0.6c3
 
 * FunkLoadTestCase.conf_getList accept a separator parameter
 
-* Upgrade to setuptools 0.6c3
 
 Bug fixes
 ~~~~~~~~~
@@ -50,9 +52,6 @@ Bug fixes
 * fix: # 1279_: Browser form submit encoding, default encoding for post is
   now application/x-www-form-urlencoded, multipart mime encoding is used
   only when uploading files.
-
-* fix: report with percentiles are buggy sometime P10 value is greater
-  than MED.
 
 * Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
   3.6.2, patch provided by Ivan Kurmanov.
