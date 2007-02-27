@@ -6,7 +6,7 @@ FunkLoad_
 
 :address: bdelbosc _at_ nuxeo.com
 
-:version: FunkLoad/1.5.0
+:version: FunkLoad/1.6.0
 
 :revision: $Id$
 
