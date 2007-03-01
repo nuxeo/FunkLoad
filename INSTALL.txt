@@ -35,6 +35,7 @@ Required packages
 
 * python 2.4 is required by the test runner only if you want to launch
   python doctest, other stuff work fine with a python 2.3.5.
+  python 2.5 is supported with funkload > 1.6.0
 
 * python distutils, on a Debian system::
 

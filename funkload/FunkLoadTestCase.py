@@ -135,7 +135,6 @@ class FunkLoadTestCase(unittest.TestCase):
         # init webunit browser (passing a fake methodName)
         self._browser = WebTestCase(methodName='log')
         self.clearContext()
-        
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
     def clearContext(self):
@@ -772,7 +771,10 @@ class FunkLoadTestCase(unittest.TestCase):
         if result is None:
             result = self.defaultTestResult()
         result.startTest(self)
-        testMethod = getattr(self, self._TestCase__testMethodName)
+        if sys.version_info >= (2, 5):
+            testMethod = getattr(self, self._testMethodName)
+        else:
+            testMethod = getattr(self, self._TestCase__testMethodName)
         try:
             ok = False
             try:
@@ -791,19 +793,28 @@ class FunkLoadTestCase(unittest.TestCase):
                 testMethod()
                 ok = True
             except self.failureException:
-                result.addFailure(self, self._TestCase__exc_info())
+                if sys.version_info >= (2, 5):
+                    result.addFailure(self, self._exc_info())
+                else:
+                    result.addFailure(self, self._TestCase__exc_info())
                 self.test_status = 'Failure'
             except KeyboardInterrupt:
                 raise
             except:
-                result.addError(self, self._TestCase__exc_info())
+                if sys.version_info >= (2, 5):
+                    result.addFailure(self, self._exc_info())
+                else:
+                    result.addError(self, self._TestCase__exc_info())
                 self.test_status = 'Error'
             try:
                 self.tearDown()
             except KeyboardInterrupt:
                 raise
             except:
-                result.addError(self, self._TestCase__exc_info())
+                if sys.version_info >= (2, 5):
+                    result.addFailure(self, self._exc_info())
+                else:
+                    result.addError(self, self._TestCase__exc_info())
                 self.test_status = 'Error'
                 ok = False
             if ok:

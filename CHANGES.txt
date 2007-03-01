@@ -23,6 +23,10 @@ FunkLoad SVN trunk
 
 :Target: ?
 
+Bug fixes
+~~~~~~~~~
+
+* Support of python 2.5
 
 
 FunkLoad 1.6.0
