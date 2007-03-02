@@ -119,7 +119,7 @@ Latest snapshot version
 
 Install the latest development snapshot available::
 
-  sudo easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
+  sudo easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
 
 
 
