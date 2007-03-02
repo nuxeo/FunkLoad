@@ -25,7 +25,7 @@ import time
 import re
 from warnings import warn
 from socket import error as SocketError
-from types import ListType
+from types import DictType, ListType, TupleType
 from datetime import datetime
 import unittest
 import traceback
@@ -135,6 +135,7 @@ class FunkLoadTestCase(unittest.TestCase):
         # init webunit browser (passing a fake methodName)
         self._browser = WebTestCase(methodName='log')
         self.clearContext()
+
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
     def clearContext(self):
@@ -227,17 +228,20 @@ class FunkLoadTestCase(unittest.TestCase):
         # ok codes
         if ok_codes is None:
             ok_codes = self.ok_codes
-        if type(params_in) is ListType:
-            # convert list into a dict
-            params = {}
+        if type(params_in) is DictType:
+            params_in = params_in.items()
+        params = []
+        if params_in:
             for key, value in params_in:
-                params[key] = params.setdefault(key, [])
-                params[key].append(value)
-            for key, value in params.items():
-                if len(value) == 1:
-                    params[key] = value[0]
-        else:
-            params = params_in
+                if type(value) is DictType:
+                    for val, selected in value.items():
+                        if selected:
+                            params.append((key, val))
+                elif type(value) in (ListType, TupleType):
+                    for val in value:
+                        params.append((key, val))
+                else:
+                    params.append((key, value))
 
         if method == 'get' and params:
             url = url_in + '?' + urlencode(params)

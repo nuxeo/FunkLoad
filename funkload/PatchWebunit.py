@@ -27,6 +27,7 @@
 * patching to remove cookie with a 'deleted' value
 * patching to have application/x-www-form-urlencoded by default and only
   multipart when a file is posted
+* patch fetch postdata must be [(key, value) ...] no more dict or list value
 
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
@@ -58,37 +59,32 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
     '''
     ret = cStringIO.StringIO()
     first_part = True
-
-    for key, value in data.items():
+    for key, value in data:
         if not key:
             continue
-        # handle multiple entries for the same name
-        if type(value) != type([]):
-            value = [value]
-        for value in value:
-            # Don't add newline before first part
-            if first_part:
-                first_part = False
+        # Don't add newline before first part
+        if first_part:
+            first_part = False
+        else:
+            ret.write('\r\n')
+        ret.write(sep_boundary)
+        if isinstance(value, Upload):
+            ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
+            ret.write('; filename="%s"\r\n' % value.filename)
+            if value.filename:
+                mimetype = guess_type(value.filename)[0]
+                if mimetype is not None:
+                    ret.write('Content-Type: %s\r\n' % mimetype)
+                value = open(os.path.join(value.filename), "rb").read()
             else:
-                ret.write('\r\n')
-            ret.write(sep_boundary)
-            if isinstance(value, Upload):
-                ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
-                ret.write('; filename="%s"\r\n' % value.filename)
-                if value.filename:
-                    mimetype = guess_type(value.filename)[0]
-                    if mimetype is not None:
-                        ret.write('Content-Type: %s\r\n' % mimetype)
-                    value = open(os.path.join(value.filename), "rb").read()
-                else:
-                    value = ''
-                ret.write('\r\n')
-            else:
-                ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
-                ret.write("\r\n\r\n")
-            ret.write(str(value))
-            if value and value[-1] == '\r':
-                ret.write('\r\n')  # write an extra newline
+                value = ''
+            ret.write('\r\n')
+        else:
+            ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
+            ret.write("\r\n\r\n")
+        ret.write(str(value))
+        if value and value[-1] == '\r':
+            ret.write('\r\n')  # write an extra newline
     ret.write('\r\n')
     ret.write(end_boundary)
     return ret.getvalue()
@@ -257,12 +253,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
             # Normal post
             h.putrequest('POST', url)
         is_multipart = False
-        for field, value in postdata.items():
-            if type(value) == type({}):
-                postdata[field] = []
-                for k, selected in value.items():
-                    if selected:
-                        postdata[field].append(k)
+        for field, value in postdata:
             if isinstance(value, Upload):
                 # Post with a data file requires multipart mimeencode
                 is_multipart = True

@@ -21,12 +21,15 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: ?
+:Target: 1.6.1
 
 Bug fixes
 ~~~~~~~~~
 
 * Support of python 2.5
+
+* Fix: 1.6.0 regression invalid encoding of parameters when posting several
+  times the same key.
 
 
 FunkLoad 1.6.0
