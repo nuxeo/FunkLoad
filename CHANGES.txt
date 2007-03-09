@@ -21,8 +21,13 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: ?
+:Target: 1.6.2
 
+
+Bug fixes
+~~~~~~~~~
+
+* fix: Percentiles for 'Page stats' are completely wrong.
 
 
 FunkLoad 1.6.1
