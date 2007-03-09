@@ -65,14 +65,14 @@ class Percentiles:
                 value = results[index]
             except IndexError:
                 value = -1.0
-            setattr(self, "perc%2d" % perc, float(value))
+            setattr(self, "perc%02d" % perc, float(value))
             old_value = value
 
     def __str__(self):
         self.calcPercentiles()
         fmt_string = ["Percentiles: %s" % self.name]
         for perc in range(0, 100, self.stepsize):
-            name = "perc%2d" % perc
+            name = "perc%02d" % perc
             fmt_string.append("%s=%s" % (name, getattr(self, name)))
         return ", ".join(fmt_string)
 
