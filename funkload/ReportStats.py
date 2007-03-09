@@ -153,7 +153,6 @@ class SinglePageStat:
         self.date_s = None
         self.duration = 0.0
         self.result = 'Successful'
-        self.percentiles = Percentiles(stepsize=5, name=step)
 
     def addResponse(self, date, result, duration):
         """Add a response to a page."""
@@ -161,7 +160,6 @@ class SinglePageStat:
         if self.date_s is None:
             self.date_s = int(float(date))
         self.duration += float(duration)
-        self.percentiles.addResult(float(duration))
         if result != 'Successful':
             self.result = result
 
@@ -193,7 +191,6 @@ class PageStat(AllResponseStat):
         stat = thread['pages'].setdefault(thread['count'],
                                           SinglePageStat(step))
         stat.addResponse(date, result, duration)
-        self.percentiles.addResult(float(duration))
         self.finalized = False
 
     def finalize(self):
@@ -208,6 +205,7 @@ class PageStat(AllResponseStat):
                         self.per_second[page.date_s] = count
                     self.success += 1
                     self.total += page.duration
+                    self.percentiles.addResult(page.duration)
                 else:
                     self.error += 1
                     continue
