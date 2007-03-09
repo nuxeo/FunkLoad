@@ -21,12 +21,24 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: 1.6.1
+:Target: ?
+
+
+
+FunkLoad 1.6.1
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.6.1.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.6.1/
+
+:Released date: 2007-03-09
+
 
 Bug fixes
 ~~~~~~~~~
 
-* Support of python 2.5
+* Support of python 2.5.
 
 * Fix: 1.6.0 regression invalid encoding of parameters when posting several
   times the same key.
