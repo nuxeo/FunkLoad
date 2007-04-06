@@ -35,6 +35,8 @@ FunkLoad 1.6.2
 
 :Released date: 2007-04-06
 
+Bug fixes
+~~~~~~~~~
 
 * fix: 'Page stats' percentiles are wrong.
 
