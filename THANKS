@@ -11,3 +11,4 @@ Lin: Patch to remove cookie with 'deleted' value.
 Sylvain Hellegouarch: python 2.5 support.
 M.-A. Darche: extensive use, documentation improvements and FunkLoad name
   co-idea.
+Jehiah Czebotar: mutiple redirects patch.

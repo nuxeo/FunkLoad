@@ -268,6 +268,8 @@ class FunkLoadTestCase(unittest.TestCase):
                 # Figure the location - which may be relative
                 newurl = response.headers['Location']
                 url = urljoin(url_in, newurl)
+                # save the current url as the base for future redirects
+                url_in = url
                 self.logd(' Load redirect link: %s' % url)
                 response = self._connect(url, None, ok_codes, 'redirect', None)
                 max_redirect_count -= 1

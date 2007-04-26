@@ -21,9 +21,12 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: ?
+:Target: 1.6.3
 
+Bug fixes
+~~~~~~~~~
 
+* fix: # 1834_: multiple redirects not handled properly (jehiah patch).
 
 
 FunkLoad 1.6.2
