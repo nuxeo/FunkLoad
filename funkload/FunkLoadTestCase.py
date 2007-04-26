@@ -166,6 +166,9 @@ class FunkLoadTestCase(unittest.TestCase):
     #
     def _connect(self, url, params, ok_codes, rtype, description):
         """Handle fetching, logging, errors and history."""
+        if params is None and rtype == 'post':
+            # enable empty post
+            params = []
         t_start = time.time()
         try:
             response = self._browser.fetch(url, params, ok_codes=ok_codes)
@@ -245,9 +248,10 @@ class FunkLoadTestCase(unittest.TestCase):
 
         if method == 'get' and params:
             url = url_in + '?' + urlencode(params)
-            params = None
         else:
             url = url_in
+        if method == 'get':
+            params = None
 
         if method == 'get':
             self.logd('GET: %s\n\tPage %i: %s ...' % (url, self.steps,

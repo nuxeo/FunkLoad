@@ -28,6 +28,8 @@ Bug fixes
 
 * fix: # 1834_: multiple redirects not handled properly (jehiah patch).
 
+* fix: # 1837_: post() is sent as GET when no params defined.
+
 
 FunkLoad 1.6.2
 --------------
@@ -491,6 +493,8 @@ See README_ for more information about FunkLoad_.
 .. _1283: http://svn.nuxeo.org/trac/pub/ticket/1283
 .. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
 .. _1300: http://svn.nuxeo.org/trac/pub/ticket/1300
+.. _1834: http://svn.nuxeo.org/trac/pub/ticket/1834
+.. _1837: http://svn.nuxeo.org/trac/pub/ticket/1837
 .. _Plone: http://plone.org/
 
 .. Local Variables:

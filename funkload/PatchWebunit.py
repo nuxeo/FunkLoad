@@ -246,17 +246,18 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         raise ValueError, protocol
 
     params = None
-    if postdata:
+    if postdata is not None:
         if webproxy:
             h.putrequest('POST', "http://%s%s" % (host_header, url))
         else:
             # Normal post
             h.putrequest('POST', url)
         is_multipart = False
-        for field, value in postdata:
-            if isinstance(value, Upload):
-                # Post with a data file requires multipart mimeencode
-                is_multipart = True
+        if postdata:
+            for field, value in postdata:
+                if isinstance(value, Upload):
+                    # Post with a data file requires multipart mimeencode
+                    is_multipart = True
         if is_multipart:
             params = mimeEncode(postdata)
             h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
