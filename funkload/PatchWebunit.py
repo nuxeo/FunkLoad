@@ -87,6 +87,7 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
             ret.write('\r\n')  # write an extra newline
     ret.write('\r\n')
     ret.write(end_boundary)
+    ret.write('\r\n')
     return ret.getvalue()
 
 
