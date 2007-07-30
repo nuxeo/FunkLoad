@@ -720,13 +720,17 @@ This method returns a webunit_ HTTPResponse.
 
 Parameters:
 
-- *url* the url without parameters
+- *url* a valid url
 - *params* a dico of parameters that going to be append to the url like
   `url?key1=value1&...`
 - *description* is used on the bench report to describe the user action
 - *ok_codes* is a list of http expected code like [200:301] if the http
   response is not in the list `get` will raise a test failure exception,
   if not provided assume that the default list is [200, 301, 302].
+
+Note that if the *url* already contains encoded parameters you should not
+use the *params* parameter.
+
 
 post
 ~~~~
