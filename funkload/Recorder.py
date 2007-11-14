@@ -60,15 +60,21 @@ class Request:
 
     def extractParam(self):
         """Turn muti part encoded form into params."""
-        environ = {
-            'CONTENT_TYPE': self.headers['content-type'],
-            'CONTENT_LENGTH': self.headers['content-length'],
-            'REQUEST_METHOD': 'POST',
-            }
+        params = []
+        try:
+            environ = {
+                'CONTENT_TYPE': self.headers['content-type'],
+                'CONTENT_LENGTH': self.headers['content-length'],
+                'REQUEST_METHOD': 'POST',
+                }
+        except KeyError:
+            trace('# Warning: missing header content-type or content-length'
+                  ' in file: %s not an http request ?\n' % self.file_path)
+            return params
+
         form = FieldStorage(fp=StringIO(self.body),
                             environ=environ,
                             keep_blank_values=True)
-        params = []
         try:
             keys = form.keys()
         except TypeError:
@@ -203,10 +209,11 @@ Examples
         self.tcpwatch_path = mkdtemp('_funkload')
         cmd = 'tcpwatch.py -p %s -s -r %s' % (self.port,
                                               self.tcpwatch_path)
-        if self.verbose:
-            cmd += ' | grep "T http"'
-        else:
-            cmd += ' > /dev/null'
+        if os.name == 'posix':
+            if self.verbose:
+                cmd += ' | grep "T http"'
+            else:
+                cmd += ' > /dev/null'
         trace("Hit Ctrl-C to stop recording.\n")
         os.system(cmd)
 

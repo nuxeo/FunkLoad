@@ -32,6 +32,8 @@ Bug fixes
 
 * fix: # 1837_: post() is sent as GET when no params defined.
 
+* Apply patch from Dan Rahmel to fix fl-record on non posix os.
+
 
 FunkLoad 1.6.2
 --------------
