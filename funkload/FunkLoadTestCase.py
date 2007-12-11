@@ -795,7 +795,10 @@ class FunkLoadTestCase(unittest.TestCase):
             except KeyboardInterrupt:
                 raise
             except:
-                result.addError(self, self._TestCase__exc_info())
+                if sys.version_info >= (2, 5):
+                    result.addError(self, self._exc_info())
+                else:
+                    result.addError(self, self._TestCase__exc_info())
                 self.test_status = 'Error'
                 self._log_result(t_start, time.time())
                 return
