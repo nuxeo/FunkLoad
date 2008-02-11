@@ -503,20 +503,29 @@ class FunkLoadTestCase(unittest.TestCase):
             return response.body
         return ''
 
-    def listHref(self, pattern=None):
+    def listHref(self, url_pattern=None, content_pattern=None):
         """Return a list of href anchor url present in the last html response.
 
-        Filtering href using the pattern regex if present."""
+        Filtering href with url pattern or link text pattern."""
         response = self._response
         ret = []
         if response is not None:
             a_links = response.getDOM().getByName('a')
             if a_links:
-                ret = [getattr(x, 'href', '') for x in a_links]
-            if pattern is not None:
-                pat = re.compile(pattern)
-                ret = [href for href in ret if pat.search(href) is not None]
-        return ret
+                for link in a_links:
+                    try:
+                        ret.append((link.getContentString(), link.href))
+                    except AttributeError:
+                        pass
+            if url_pattern is not None:
+                pat = re.compile(url_pattern)
+                ret = [link for link in ret
+                       if pat.search(link[1]) is not None]
+            if content_pattern is not None:
+                pat = re.compile(content_pattern)
+                ret = [link for link in ret
+                       if link[0] and (pat.search(link[0]) is not None)]
+        return [link[1] for link in ret]
 
     def getLastBaseUrl(self):
         """Return the base href url."""

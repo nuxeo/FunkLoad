@@ -6,7 +6,7 @@ FunkLoad_
 
 :address: bdelbosc _at_ nuxeo.com
 
-:version: FunkLoad/1.6.2
+:version: FunkLoad/1.7.0
 
 :revision: $Id$
 
@@ -111,6 +111,9 @@ Main FunkLoad_ features are:
 * Provides a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
 
 * Easy to install (EasyInstall_) and use, see examples in the demo_ folder.
+
+* Works fine with CPS or any Zope application, CherryPy, Nuxeo EP or any
+  JBoss Seam application ...
 
 
 Where to find FunkLoad ?
@@ -577,6 +580,9 @@ for information on how to install TCPWatch_.
 Note that ``fl-record`` works fine with multi-part encoded form and file upload
 but will failed to record https session.
 
+Note that ``fl-record`` will handle automaticly JSF Myfaces token, which
+enable to easily record and play any JBoss Seam application.
+
 
 The fl-record command
 ---------------------
@@ -866,10 +872,11 @@ listHref
 ~~~~~~~~
 ::
 
-  listHref(pattern=None)
+  listHref(url_pattern=None, content_pattern=None):
 
 Return a list of href anchor url present in the last html response,
-filtering href using the ``pattern`` regex if present.
+filtering href using the ``url_pattern`` regex if present and filtering the
+text content of the link with content_pattern if present.
 
 
 getBody

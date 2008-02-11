@@ -139,6 +139,8 @@ class Response:
 
 class RecorderProgram:
     """A tcpwatch to funkload recorder."""
+    MYFACES_STATE = 'org.apache.myfaces.trinidad.faces.STATE'
+    MYFACES_FORM = 'org.apache.myfaces.trinidad.faces.FORM'
     USAGE = """%prog [options] [test_name]
 
 %prog launch a TCPWatch proxy and record activities, then output
@@ -173,6 +175,7 @@ Examples
         self.test_name = None
         self.script_path = None
         self.configuration_path = None
+        self.use_myfaces = False
         self.parseArgs(argv)
 
     def parseArgs(self, argv):
@@ -279,11 +282,27 @@ Examples
                                           request.url))
         else:
             text.append('self.%s(server_url + "%s"' % (
-                request.method.lower(),  request.rurl))
+                request.method.lower(),  request.rurl.strip()))
         description = "%s %s" % (request.method.capitalize(),
                                  request.path | truncate(42))
         if request.body:
-            params = ('params=%s' % request.extractParam())
+            params = request.extractParam()
+            myfaces_form = None
+            if self.MYFACES_STATE not in [key for key, value in params]:
+                params = 'params=%s' % params
+            else:
+                # apache myfaces state add a wrapper
+                self.use_myfaces = True
+                new_params = []
+                for key, value in params:
+                    if key == self.MYFACES_STATE:
+                        continue
+                    if key == self.MYFACES_FORM:
+                        myfaces_form = value
+                        continue
+                    new_params.append([key, value])
+                params = "    self.myfacesParams(%s, form='%s')" % (new_params,
+                                                                    myfaces_form)
             params = re.sub("'Upload\(([^\)]*)\)'", "Upload(\\1)", params)
             text.append(', ' + params)
         text.append(', description="%s")' % description)
@@ -305,7 +324,11 @@ Examples
         """Write the FunkLoad test script."""
         trace('Creating script: %s.\n' % self.script_path)
         from pkg_resources import resource_string
-        tpl = resource_string('funkload', 'data/ScriptTestCase.tpl')
+        if self.use_myfaces:
+            tpl_name = 'data/MyFacesScriptTestCase.tpl'
+        else:
+            tpl_name = 'data/ScriptTestCase.tpl'
+        tpl = resource_string('funkload', tpl_name)
         content = tpl % {'script': script,
                          'test_name': self.test_name,
                          'class_name': self.class_name}

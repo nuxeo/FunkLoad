@@ -21,7 +21,18 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: 1.6.3
+:Target: 1.7.0
+
+New features
+~~~~~~~~~~~~
+
+* Recorder and test take care of JSF MyFaces tokens which make FunkLoad
+  ready to record/play Nuxeo EP or any JBoss Seam application.
+
+* Change API of listHref to be able to search on link content as well as
+  link url. `pattern` parameter is renamed into `url_pattern` and a new
+  `content_pattern` can be supply.
+
 
 Bug fixes
 ~~~~~~~~~
