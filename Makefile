@@ -37,14 +37,15 @@ install:
 	python setup.py $(PKGTAG) install
 
 register:
-	-python2.3 setup.py register sdist bdist_egg upload --sign
-	-python2.4 setup.py register bdist_egg upload --sign
+	-python2.4 setup.py register sdist bdist_egg upload --sign
+	-python2.5 setup.py register bdist_egg upload --sign
 
 
 uninstall:
 	-easy_install -m funkload
 	-rm -rf /usr/lib/python2.3/site-packages/funkload*
 	-rm -rf /usr/lib/python2.4/site-packages/funkload*
+	-rm -rf /usr/lib/python2.5/site-packages/funkload*
 	-rm -rf /usr/local/funkload/
 	-rm -f /usr/local/bin/fl-*
 	-rm -f /usr/bin/fl-*
