@@ -25,8 +25,8 @@ sdist:
 	python setup.py $(PKGTAG) sdist
 
 egg:
-	-python2.3 setup.py $(PKGTAG) bdist_egg
 	-python2.4 setup.py $(PKGTAG) bdist_egg
+	-python2.5 setup.py $(PKGTAG) bdist_egg
 
 
 distrib:

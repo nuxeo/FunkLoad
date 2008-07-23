@@ -21,7 +21,17 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: 1.7.0
+:Target: 1.8.0
+
+
+FunkLoad 1.7.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.7.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.7.0/
+
+:Released date: 2008-07-23
 
 New features
 ~~~~~~~~~~~~
