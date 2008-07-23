@@ -90,6 +90,9 @@ Optional packages
 
   No idea under windows.
 
+  NOTE that latest snapshot 1.8.0x works with python-gdchart2 which is
+  available on many unices.
+
 
 * The recorder use TCPWatch_ which is not yet available using easy_install::
 
@@ -240,6 +243,20 @@ Problems ?
   ``import gdchart``. See the `Optional packages`_ for help on how to
   install gdchart.
 
+
+* While building report you Got ::
+
+  File "/usr/bin/fl-build-report", line 25, in ?
+  File "build/bdist.linux-i686/egg/funkload/ReportBuilder.py", line 216, in main
+  File "build/bdist.linux-i686/egg/funkload/ReportRenderer.py", line 612, in render
+  File "build/bdist.linux-i686/egg/funkload/ReportRenderer.py", line 635, in createCharts
+  File "build/bdist.linux-i686/egg/funkload/ReportRenderer.py", line 869, in createMonitorCharts
+  File "build/bdist.linux-i686/egg/funkload/ReportRenderer.py", line 938, in createMonitorChart
+  AttributeError: 'module' object has no attribute 'option'
+
+ python-gdchart2 is installed on your system and FunkLoad_ expects
+ python-gdchart. Hopefully you can give a try to the latest snapshot
+ (>=1.8.0a see section above) that is working with python-gdchart2.
 
 
 --------------------------
