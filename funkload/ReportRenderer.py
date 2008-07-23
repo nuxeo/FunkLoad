@@ -22,6 +22,8 @@ $Id: ReportRenderer.py 24736 2005-08-31 08:59:54Z bdelbosc $
 import os
 try:
     import gdchart
+    # Check python-gdchart2
+    from gdchart import GDChartError
     g_has_gdchart = 1
 except ImportError:
     g_has_gdchart = 0
@@ -658,21 +660,29 @@ class RenderHtml(RenderRst):
             errors.append(error)
             cvus.append(str(test.cvus))
         color_error = has_error and self.color_error or self.color_bg
-        gdchart.option(format=gdchart.GDC_PNG,
-                       set_color=(self.color_success, self.color_success),
-                       vol_color=self.color_error,
-                       bg_color=self.color_bg, plot_color=self.color_plot,
-                       line_color=self.color_line,
-                       title='Successful Tests Per Second', xtitle='CUs',
-                       ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
-                       ytitle='STPS', ytitle2="Errors",
-                       ylabel_density=50,
-                       ytitle2_color=color_error, ylabel2_color=color_error,
-                       requested_ymin=0.0)
-        gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
-                      self.getChartSize(cvus),
-                      image_path,
-                      cvus, stps, errors)
+        x = gdchart.LineBarCombo3D()
+        x.title = 'Successful Tests Per Second'
+        x.xtitle = 'CUs'
+        x.ylabel_fmt = '%.2f'
+        x.ylabel2_fmt = '%.2f %%'
+        x.ytitle = 'STPS'
+        x.ytitle2 = "Errors"
+        x.ylabel_density = 50
+        x.ytitle2_color = color_error
+        x.ylabel2_color = color_error
+        x.requested_ymin = 0.0
+
+        x.set_color = (self.color_success, self.color_success)
+        x.vol_color = self.color_error
+        x.bg_color = self.color_bg
+        x.plot_color=self.color_plot
+        x.line_color = self.color_line
+        x.width, x.height = self.getChartSize(cvus)
+        x.setLabels(cvus)
+        x.setData(stps)
+        x.setComboData(errors)
+        x.draw(image_path)
+
 
     def appendDelays(self, delay, delay_low, delay_high, stats):
         """ Show percentiles or min, avg and max in chart. """
@@ -684,7 +694,7 @@ class RenderHtml(RenderRst):
             delay.append(stats.avg)
             delay_low.append(stats.min)
             delay_high.append(stats.max)
-   
+
     def getYTitle(self):
         if self.options.with_percentiles:
             return "Duration (10%, 50% 90%)"
@@ -714,39 +724,49 @@ class RenderHtml(RenderRst):
             cvus.append(str(page.cvus))
 
         color_error = has_error and self.color_error or self.color_bg
-        gdchart.option(format=gdchart.GDC_PNG,
-                       set_color=(self.color_time_min_max,
-                                  self.color_time_min_max, self.color_time),
-                       vol_color=self.color_error,
-                       bg_color=self.color_bg, plot_color=self.color_plot,
-                       grid_color=self.color_grid,
-                       line_color=self.color_line,
-                       title='Page response time', xtitle='CUs',
-                       ylabel_fmt='%.2fs', ylabel2_fmt='%.2f %%',
-                       ytitle=self.getYTitle(), ytitle2="Errors",
-                       ylabel_density=50,
-                       hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
-                       GDC_HLC_CONNECTING,
-                       ytitle2_color=color_error, ylabel2_color=color_error,
-                       requested_ymin=0.0)
-        gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
-                      self.getChartSize(cvus),
-                      image_path,
-                      cvus, (delay_high, delay_low, delay), errors)
-        gdchart.option(format=gdchart.GDC_PNG,
-                       set_color=(self.color_success, self.color_success),
-                       vol_color=self.color_error,
-                       bg_color=self.color_bg, plot_color=self.color_plot,
-                       line_color=self.color_line,
-                       title='Successful Pages Per Second', xtitle='CUs',
-                       ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
-                       ytitle='SPPS', ytitle2="Errors",
-                       ylabel_density=50,
-                       requested_ymin=0.0)
-        gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
-                      self.getChartSize(cvus),
-                      image2_path,
-                      cvus, spps, errors)
+        x = gdchart.HLCBarCombo3D()
+        x.set_color=(self.color_time_min_max, self.color_time_min_max, self.color_time)
+        x.vol_color=self.color_error
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.grid_color=self.color_grid
+        x.line_color=self.color_line
+        x.title='Page response time'
+        x.xtitle='CUs'
+        x.ylabel_fmt='%.2fs'
+        x.ylabel2_fmt='%.2f %%'
+        x.ytitle=self.getYTitle()
+        x.ytitle2="Errors"
+        x.ylabel_density=50
+        x.hlc_style = ("I_CAP", "CONNECTING")
+        x.ytitle2_color = color_error
+        x.ylabel2_color = color_error
+        x.requested_ymin = 0.0
+        x.width, x.height = self.getChartSize(cvus)
+        x.setLabels(cvus)
+        x.setData((delay_high, delay_low, delay))
+        x.setComboData(errors)
+        x.draw(image_path)
+
+        x = gdchart.LineBarCombo3D()
+        x.set_color = (self.color_success, self.color_success)
+        x.vol_color=self.color_error
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.line_color=self.color_line
+        x.title='Successful Pages Per Second'
+        x.xtitle='CUs'
+        x.ylabel_fmt='%.2f'
+        x.ylabel2_fmt='%.2f %%'
+        x.ytitle='SPPS'
+        x.ytitle2="Errors"
+        x.ylabel_density=50
+        x.requested_ymin=0.0
+        x.width, x.height = self.getChartSize(cvus)
+        x.setLabels(cvus)
+        x.setData(spps)
+        x.setComboData(errors)
+        x.draw(image2_path)
 
 
     def createAllResponseChart(self):
@@ -772,41 +792,53 @@ class RenderHtml(RenderRst):
             cvus.append(str(resp.cvus))
 
         color_error = has_error and self.color_error or self.color_bg
-        gdchart.option(format=gdchart.GDC_PNG,
-                       set_color=(self.color_time_min_max,
-                                  self.color_time_min_max, self.color_time),
-                       vol_color=self.color_error,
-                       bg_color=self.color_bg, plot_color=self.color_plot,
-                       grid_color=self.color_grid,
-                       line_color=self.color_line,
-                       title='Request response time', xtitle='CUs',
-                       ylabel_fmt='%.2fs', ylabel2_fmt='%.2f %%',
-                       ytitle=self.getYTitle(), ytitle2="Errors",
-                       ylabel_density=50,
-                       hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
-                       GDC_HLC_CONNECTING,
-                       ytitle2_color=color_error, ylabel2_color=color_error,
-                       requested_ymin=0.0)
-        gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
-                      self.getChartSize(cvus),
-                      image_path,
-                      cvus, (delay_high, delay_low, delay), errors)
 
-        gdchart.option(format=gdchart.GDC_PNG,
-                       set_color=(self.color_success, self.color_success),
-                       vol_color=self.color_error,
-                       bg_color=self.color_bg, plot_color=self.color_plot,
-                       line_color=self.color_line,
-                       title='Requests Per Second', xtitle='CUs',
-                       ylabel_fmt='%.2f', ylabel2_fmt='%.2f %%',
-                       ytitle='RPS', ytitle2="Errors",
-                       ylabel_density=50,
-                       ytitle2_color=color_error, ylabel2_color=color_error,
-                       requested_ymin=0.0)
-        gdchart.chart(gdchart.GDC_3DCOMBO_LINE_BAR,
-                      self.getChartSize(cvus),
-                      image2_path,
-                      cvus, rps, errors)
+        x = gdchart.HLCBarCombo3D()
+        x.set_color = (self.color_time_min_max,
+                       self.color_time_min_max, self.color_time)
+        x.vol_color = self.color_error
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.grid_color=self.color_grid
+        x.line_color=self.color_line
+        x.title='Request response time'
+        x.xtitle='CUs'
+        x.ylabel_fmt='%.2fs'
+        x.ylabel2_fmt='%.2f %%'
+        x.ytitle=self.getYTitle()
+        x.ytitle2="Errors"
+        x.ylabel_density=50
+        x.hlc_style = ("I_CAP", "CONNECTING")
+        x.ytitle2_color=color_error
+        x.ylabel2_color=color_error
+        x.requested_ymin=0.0
+        x.width, x.height = self.getChartSize(cvus)
+        x.setLabels(cvus)
+        x.setData((delay_high, delay_low, delay))
+        x.setComboData(errors)
+        x.draw(image_path)
+
+        x = gdchart.LineBarCombo3D()
+        x.set_color=(self.color_success, self.color_success)
+        x.vol_color=self.color_error
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.line_color=self.color_line
+        x.title='Requests Per Second'
+        x.xtitle='CUs'
+        x.ylabel_fmt='%.2f'
+        x.ylabel2_fmt='%.2f %%'
+        x.ytitle='RPS'
+        x.ytitle2="Errors"
+        x.ylabel_density=50
+        x.ytitle2_color=color_error
+        x.ylabel2_color=color_error
+        x.requested_ymin=0.0
+        x.width, x.height = self.getChartSize(cvus)
+        x.setLabels(cvus)
+        x.setData(rps)
+        x.setComboData(errors)
+        x.draw(image2_path)
 
 
     def createResponseChart(self, step):
@@ -839,25 +871,32 @@ class RenderHtml(RenderRst):
                                       'request_%s.png' % step))
         title = str('Request %s response time' % step)
         color_error = has_error and self.color_error or self.color_bg
-        gdchart.option(format=gdchart.GDC_PNG,
-                       set_color=(self.color_time_min_max,
-                                  self.color_time_min_max, self.color_time),
-                       vol_color=self.color_error,
-                       bg_color=self.color_bg, plot_color=self.color_plot,
-                       grid_color=self.color_grid,
-                       line_color=self.color_line,
-                       title=title, xtitle='CUs',
-                       ylabel_fmt='%.2fs', ylabel2_fmt='%.2f %%',
-                       ytitle=self.getYTitle(), ytitle2="Errors",
-                       ylabel_density=50,
-                       hlc_style=gdchart.GDC_HLC_I_CAP+gdchart.
-                       GDC_HLC_CONNECTING,
-                       ytitle2_color=color_error, ylabel2_color=color_error,
-                       requested_ymin=0.0)
-        gdchart.chart(gdchart.GDC_3DCOMBO_HLC_BAR,
-                      self.getChartSize(cvus),
-                      image_path,
-                      cvus, (delay_high, delay_low, delay), errors)
+
+        x = gdchart.HLCBarCombo3D()
+        x.set_color=(self.color_time_min_max,
+                     self.color_time_min_max, self.color_time)
+        x.vol_color=self.color_error
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.grid_color=self.color_grid
+        x.line_color=self.color_line
+        x.title=title
+        x.xtitle='CUs'
+        x.ylabel_fmt='%.2fs'
+        x.ylabel2_fmt='%.2f %%'
+        x.ytitle=self.getYTitle()
+        x.ytitle2="Errors"
+        x.ylabel_density=50
+        x.hlc_style = ("I_CAP", "CONNECTING")
+        x.ytitle2_color=color_error
+        x.ylabel2_color=color_error
+        x.requested_ymin=0.0
+        x.width, x.height = self.getChartSize(cvus)
+        x.setLabels(cvus)
+        x.setData((delay_high, delay_low, delay))
+        x.setComboData(errors)
+        x.draw(image_path)
+
 
     # monitoring charts
     def createMonitorCharts(self):
@@ -876,8 +915,9 @@ class RenderHtml(RenderRst):
         times = []
         for stat in stats:
             test, cycle, cvus = stat.key.split(':')
-            times.append(str('%ss / %s CUs' % (
-                int(float(stat.time) - time_start), cvus)))
+            # Limit size to 11 as 12 core dump glibc python: free() on feisty
+            times.append(str('%ss-%sCUs' % (
+                int(float(stat.time) - time_start), cvus))[:11])
 
         mem_total = int(stats[0].memTotal)
         mem_used = [mem_total - int(x.memFree) for x in stats]
@@ -935,37 +975,55 @@ class RenderHtml(RenderRst):
 
         title = str('%s: cpu usage (green 1=100%%) and loadavg 1(red), '
                     '5 and 15 min' % host)
-        gdchart.option(format=gdchart.GDC_PNG,
-                       set_color=(0x00ff00, 0xff0000, 0x0000ff),
-                       vol_color=0xff0000,
-                       bg_color=self.color_bg, plot_color=self.color_plot,
-                       line_color=self.color_line,
-                       title=title,
-                       xtitle='time and CUs',
-                       ylabel_fmt='%.2f',
-                       ytitle='loadavg',
-                       ylabel_density=50,
-                       requested_ymin=0.0)
-        gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
-                      image_path,
-                      times, cpu_usage, load_avg_1, load_avg_5, load_avg_15)
+        x = gdchart.Line()
+        x.set_color=(0x00ff00, 0xff0000, 0x0000ff)
+        x.vol_color=0xff0000
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.line_color=self.color_line
+        x.title=title
+        x.xtitle='time and CUs'
+        x.ylabel_fmt='%.2f'
+        x.ytitle='loadavg'
+        x.ylabel_density=50
+        x.requested_ymin=0.0
+        x.width, x.height = self.big_chart_size
+        x.setLabels(times)
+        x.setData(cpu_usage, load_avg_1, load_avg_5, load_avg_15)
+        x.draw(image_path)
 
         title = str('%s memory (green) and swap (red) usage' % host)
         image_path = str(os.path.join(self.report_dir, '%s_mem.png' % host))
-        gdchart.option(format=gdchart.GDC_PNG,
-                       title=title,
-                       ylabel_fmt='%.0f kB',
-                       ytitle='memory used kB')
-        gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
-                      image_path,
-                      times, mem_used, swap_used)
+        x = gdchart.Line()
+        x.title = title
+        x.ylabel_fmt='%.0f kB'
+        x.ytitle='memory used kB'
+        x.set_color=(0x00ff00, 0xff0000, 0x0000ff)
+        x.vol_color=0xff0000
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.line_color=self.color_line
+        x.title=title
+        x.xtitle='time and CUs'
+        x.width, x.height = self.big_chart_size
+        x.setLabels(times)
+        x.setData(mem_used, swap_used)
+        x.draw(image_path)
 
         title = str('%s network in (green)/out (red)' % host)
         image_path = str(os.path.join(self.report_dir, '%s_net.png' % host))
-        gdchart.option(format=gdchart.GDC_PNG,
-                       title=title,
-                       ylabel_fmt='%.0f kB/s',
-                       ytitle='network')
-        gdchart.chart(gdchart.GDC_LINE, self.big_chart_size,
-                      image_path,
-                      times, net_in, net_out)
+        x = gdchart.Line()
+        x.title = title
+        x.ylabel_fmt='%.0f kB/s'
+        x.ytitle='network'
+        x.set_color=(0x00ff00, 0xff0000, 0x0000ff)
+        x.vol_color=0xff0000
+        x.bg_color=self.color_bg
+        x.plot_color=self.color_plot
+        x.line_color=self.color_line
+        x.title=title
+        x.xtitle='time and CUs'
+        x.width, x.height = self.big_chart_size
+        x.setLabels(times)
+        x.setData(net_in, net_out)
+        x.draw(image_path)
