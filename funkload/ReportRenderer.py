@@ -760,6 +760,8 @@ class RenderHtml(RenderRst):
         x.ylabel2_fmt='%.2f %%'
         x.ytitle='SPPS'
         x.ytitle2="Errors"
+        x.ytitle2_color=color_error
+        x.ylabel2_color=color_error
         x.ylabel_density=50
         x.requested_ymin=0.0
         x.width, x.height = self.getChartSize(cvus)
