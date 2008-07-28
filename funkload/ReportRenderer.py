@@ -725,19 +725,20 @@ class RenderHtml(RenderRst):
 
         color_error = has_error and self.color_error or self.color_bg
         x = gdchart.HLCBarCombo3D()
-        x.set_color=(self.color_time_min_max, self.color_time_min_max, self.color_time)
-        x.vol_color=self.color_error
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.grid_color=self.color_grid
-        x.line_color=self.color_line
-        x.title='Page response time'
-        x.xtitle='CUs'
-        x.ylabel_fmt='%.2fs'
-        x.ylabel2_fmt='%.2f %%'
-        x.ytitle=self.getYTitle()
-        x.ytitle2="Errors"
-        x.ylabel_density=50
+        x.set_color = (self.color_time_min_max, self.color_time_min_max,
+                       self.color_time)
+        x.vol_color = self.color_error
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.grid_color = self.color_grid
+        x.line_color = self.color_line
+        x.title = 'Page response time'
+        x.xtitle = 'CUs'
+        x.ylabel_fmt = '%.2fs'
+        x.ylabel2_fmt = '%.2f %%'
+        x.ytitle = self.getYTitle()
+        x.ytitle2 = "Errors"
+        x.ylabel_density = 50
         x.hlc_style = ("I_CAP", "CONNECTING")
         x.ytitle2_color = color_error
         x.ylabel2_color = color_error
@@ -750,20 +751,20 @@ class RenderHtml(RenderRst):
 
         x = gdchart.LineBarCombo3D()
         x.set_color = (self.color_success, self.color_success)
-        x.vol_color=self.color_error
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.line_color=self.color_line
-        x.title='Successful Pages Per Second'
-        x.xtitle='CUs'
-        x.ylabel_fmt='%.2f'
-        x.ylabel2_fmt='%.2f %%'
-        x.ytitle='SPPS'
-        x.ytitle2="Errors"
-        x.ytitle2_color=color_error
-        x.ylabel2_color=color_error
-        x.ylabel_density=50
-        x.requested_ymin=0.0
+        x.vol_color = self.color_error
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.line_color = self.color_line
+        x.title = 'Successful Pages Per Second'
+        x.xtitle = 'CUs'
+        x.ylabel_fmt = '%.2f'
+        x.ylabel2_fmt = '%.2f %%'
+        x.ytitle = 'SPPS'
+        x.ytitle2 = "Errors"
+        x.ytitle2_color = color_error
+        x.ylabel2_color = color_error
+        x.ylabel_density = 50
+        x.requested_ymin = 0.0
         x.width, x.height = self.getChartSize(cvus)
         x.setLabels(cvus)
         x.setData(spps)
@@ -799,21 +800,21 @@ class RenderHtml(RenderRst):
         x.set_color = (self.color_time_min_max,
                        self.color_time_min_max, self.color_time)
         x.vol_color = self.color_error
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.grid_color=self.color_grid
-        x.line_color=self.color_line
-        x.title='Request response time'
-        x.xtitle='CUs'
-        x.ylabel_fmt='%.2fs'
-        x.ylabel2_fmt='%.2f %%'
-        x.ytitle=self.getYTitle()
-        x.ytitle2="Errors"
-        x.ylabel_density=50
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.grid_color = self.color_grid
+        x.line_color = self.color_line
+        x.title = 'Request response time'
+        x.xtitle = 'CUs'
+        x.ylabel_fmt = '%.2fs'
+        x.ylabel2_fmt = '%.2f %%'
+        x.ytitle = self.getYTitle()
+        x.ytitle2 = "Errors"
+        x.ylabel_density = 50
         x.hlc_style = ("I_CAP", "CONNECTING")
-        x.ytitle2_color=color_error
-        x.ylabel2_color=color_error
-        x.requested_ymin=0.0
+        x.ytitle2_color = color_error
+        x.ylabel2_color = color_error
+        x.requested_ymin = 0.0
         x.width, x.height = self.getChartSize(cvus)
         x.setLabels(cvus)
         x.setData((delay_high, delay_low, delay))
@@ -821,21 +822,21 @@ class RenderHtml(RenderRst):
         x.draw(image_path)
 
         x = gdchart.LineBarCombo3D()
-        x.set_color=(self.color_success, self.color_success)
-        x.vol_color=self.color_error
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.line_color=self.color_line
-        x.title='Requests Per Second'
-        x.xtitle='CUs'
-        x.ylabel_fmt='%.2f'
-        x.ylabel2_fmt='%.2f %%'
-        x.ytitle='RPS'
-        x.ytitle2="Errors"
-        x.ylabel_density=50
-        x.ytitle2_color=color_error
-        x.ylabel2_color=color_error
-        x.requested_ymin=0.0
+        x.set_color = (self.color_success, self.color_success)
+        x.vol_color = self.color_error
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.line_color = self.color_line
+        x.title = 'Requests Per Second'
+        x.xtitle = 'CUs'
+        x.ylabel_fmt = '%.2f'
+        x.ylabel2_fmt = '%.2f %%'
+        x.ytitle = 'RPS'
+        x.ytitle2 = "Errors"
+        x.ylabel_density = 50
+        x.ytitle2_color = color_error
+        x.ylabel2_color = color_error
+        x.requested_ymin = 0.0
         x.width, x.height = self.getChartSize(cvus)
         x.setLabels(cvus)
         x.setData(rps)
@@ -875,24 +876,24 @@ class RenderHtml(RenderRst):
         color_error = has_error and self.color_error or self.color_bg
 
         x = gdchart.HLCBarCombo3D()
-        x.set_color=(self.color_time_min_max,
+        x.set_color = (self.color_time_min_max,
                      self.color_time_min_max, self.color_time)
-        x.vol_color=self.color_error
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.grid_color=self.color_grid
-        x.line_color=self.color_line
-        x.title=title
-        x.xtitle='CUs'
-        x.ylabel_fmt='%.2fs'
-        x.ylabel2_fmt='%.2f %%'
-        x.ytitle=self.getYTitle()
-        x.ytitle2="Errors"
-        x.ylabel_density=50
+        x.vol_color = self.color_error
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.grid_color = self.color_grid
+        x.line_color = self.color_line
+        x.title = title
+        x.xtitle = 'CUs'
+        x.ylabel_fmt = '%.2fs'
+        x.ylabel2_fmt = '%.2f %%'
+        x.ytitle = self.getYTitle()
+        x.ytitle2 = "Errors"
+        x.ylabel_density = 50
         x.hlc_style = ("I_CAP", "CONNECTING")
-        x.ytitle2_color=color_error
-        x.ylabel2_color=color_error
-        x.requested_ymin=0.0
+        x.ytitle2_color = color_error
+        x.ylabel2_color = color_error
+        x.requested_ymin = 0.0
         x.width, x.height = self.getChartSize(cvus)
         x.setLabels(cvus)
         x.setData((delay_high, delay_low, delay))
@@ -975,20 +976,20 @@ class RenderHtml(RenderRst):
 
         image_path = str(os.path.join(self.report_dir, '%s_load.png' % host))
 
-        title = str('%s: cpu usage (green 1=100%%) and loadavg 1(red), '
+        title = str('%s: cpu usage (green 1 = 100%%) and loadavg 1(red), '
                     '5 and 15 min' % host)
         x = gdchart.Line()
-        x.set_color=(0x00ff00, 0xff0000, 0x0000ff)
-        x.vol_color=0xff0000
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.line_color=self.color_line
-        x.title=title
-        x.xtitle='time and CUs'
-        x.ylabel_fmt='%.2f'
-        x.ytitle='loadavg'
-        x.ylabel_density=50
-        x.requested_ymin=0.0
+        x.set_color = (0x00ff00, 0xff0000, 0x0000ff)
+        x.vol_color = 0xff0000
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.line_color = self.color_line
+        x.title = title
+        x.xtitle = 'time and CUs'
+        x.ylabel_fmt = '%.2f'
+        x.ytitle = 'loadavg'
+        x.ylabel_density = 50
+        x.requested_ymin = 0.0
         x.width, x.height = self.big_chart_size
         x.setLabels(times)
         x.setData(cpu_usage, load_avg_1, load_avg_5, load_avg_15)
@@ -998,15 +999,15 @@ class RenderHtml(RenderRst):
         image_path = str(os.path.join(self.report_dir, '%s_mem.png' % host))
         x = gdchart.Line()
         x.title = title
-        x.ylabel_fmt='%.0f kB'
-        x.ytitle='memory used kB'
-        x.set_color=(0x00ff00, 0xff0000, 0x0000ff)
-        x.vol_color=0xff0000
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.line_color=self.color_line
-        x.title=title
-        x.xtitle='time and CUs'
+        x.ylabel_fmt = '%.0f kB'
+        x.ytitle = 'memory used kB'
+        x.set_color = (0x00ff00, 0xff0000, 0x0000ff)
+        x.vol_color = 0xff0000
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.line_color = self.color_line
+        x.title = title
+        x.xtitle = 'time and CUs'
         x.width, x.height = self.big_chart_size
         x.setLabels(times)
         x.setData(mem_used, swap_used)
@@ -1016,15 +1017,15 @@ class RenderHtml(RenderRst):
         image_path = str(os.path.join(self.report_dir, '%s_net.png' % host))
         x = gdchart.Line()
         x.title = title
-        x.ylabel_fmt='%.0f kB/s'
-        x.ytitle='network'
-        x.set_color=(0x00ff00, 0xff0000, 0x0000ff)
-        x.vol_color=0xff0000
-        x.bg_color=self.color_bg
-        x.plot_color=self.color_plot
-        x.line_color=self.color_line
-        x.title=title
-        x.xtitle='time and CUs'
+        x.ylabel_fmt = '%.0f kB/s'
+        x.ytitle = 'network'
+        x.set_color = (0x00ff00, 0xff0000, 0x0000ff)
+        x.vol_color = 0xff0000
+        x.bg_color = self.color_bg
+        x.plot_color = self.color_plot
+        x.line_color = self.color_line
+        x.title = title
+        x.xtitle = 'time and CUs'
         x.width, x.height = self.big_chart_size
         x.setLabels(times)
         x.setData(net_in, net_out)
