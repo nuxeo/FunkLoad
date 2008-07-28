@@ -113,7 +113,8 @@ class FunkLoadTestCase(unittest.TestCase):
             section = 'bench'
         else:
             section = 'ftest'
-        ok_codes = self.conf_getList(section, 'ok_codes', [200, 301, 302],
+        ok_codes = self.conf_getList(section, 'ok_codes',
+                                     [200, 301, 302, 303, 307],
                                      quiet=True)
         self.ok_codes = map(int, ok_codes)
         self.sleep_time_min = self.conf_getFloat(section, 'sleep_time_min', 0)
@@ -265,10 +266,10 @@ class FunkLoadTestCase(unittest.TestCase):
         response = self._connect(url, params, ok_codes, method, description)
 
         # Check redirection
-        if follow_redirect and response.code in (301, 302):
+        if follow_redirect and response.code in (301, 302, 303, 307):
             max_redirect_count = 10
             thread_sleep()              # give a chance to other threads
-            while response.code in (301, 302) and max_redirect_count:
+            while response.code in (301, 302, 303, 307) and max_redirect_count:
                 # Figure the location - which may be relative
                 newurl = response.headers['Location']
                 url = urljoin(url_in, newurl)
@@ -351,8 +352,8 @@ class FunkLoadTestCase(unittest.TestCase):
     def exists(self, url, params=None, description="Checking existence"):
         """Try a GET on URL return True if the page exists or False."""
         resp = self.get(url, params, description=description,
-                        ok_codes=[200, 301, 302, 404, 503])
-        if resp.code not in [200, 301, 302]:
+                        ok_codes=[200, 301, 302, 303, 307, 404, 503])
+        if resp.code not in [200, 301, 302, 303, 307]:
             self.logd('Page %s not found.' % url)
             return False
         self.logd('Page %s exists.' % url)
@@ -415,7 +416,8 @@ class FunkLoadTestCase(unittest.TestCase):
         time_start = time.time()
         while(True):
             try:
-                self._browser.fetch(url, None, ok_codes=[200, 301, 302])
+                self._browser.fetch(url, None,
+                                    ok_codes=[200, 301, 302, 303, 307])
             except SocketError:
                 if time.time() - time_start > time_out:
                     self.fail('Time out service %s not available after %ss' %
@@ -753,7 +755,7 @@ class FunkLoadTestCase(unittest.TestCase):
         dump_dir = self._dump_dir
         if dump_dir is None:
             return
-        if getattr(response, 'code', 301) in [301, 302]:
+        if getattr(response, 'code', 301) in [301, 302, 303, 307]:
             return
         if not response.body:
             return

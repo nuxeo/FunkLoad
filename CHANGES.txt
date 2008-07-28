@@ -23,11 +23,16 @@ FunkLoad SVN trunk
 
 :Target: 1.8.0
 
+
 New features
 ~~~~~~~~~~~~
 
 * Upgrate to python-gdchart2 using libgd2 (gdchart1 is deprecated).
 
+Bug fixes
+~~~~~~~~~
+
+* Handle redirect 303 and 307 like a 302.
 
 FunkLoad 1.7.0
 --------------

@@ -39,11 +39,11 @@ Required packages
 
 * python distutils, on a Debian system::
 
-    sudo apt-get install python-dev
+    sudo aptitude install python-dev
 
 * python xml, for example on a Debian system::
 
-    sudo apt-get install python-xml
+    sudo aptitude install python-xml
 
 * EasyInstall_, download ez_setup.py_, and run it::
 
@@ -58,7 +58,12 @@ Required packages
 Optional packages
 -----------------
 
-* To produce charts : python-gdchart (0.6.1-8 is fine), on Debian::
+* To produce charts with FunkLoad >= 1.8.0: python-gdchart2, on Debian::
+
+    sudo aptitude install python-gdchart2
+
+
+* To produce charts with FunkLoad < 1.8.0: python-gdchart (0.6.1-8 is fine), on Debian::
 
     sudo apt-get install python-gdchart
 
