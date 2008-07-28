@@ -95,9 +95,6 @@ Optional packages
 
   No idea under windows.
 
-  NOTE that latest snapshot 1.8.0x works with python-gdchart2 which is
-  available on many unices.
-
 
 * The recorder use TCPWatch_ which is not yet available using easy_install::
 

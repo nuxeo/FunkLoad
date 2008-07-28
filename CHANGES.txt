@@ -13,7 +13,6 @@ FunkLoad_ CHANGES
 .. contents:: Table of Contents
 
 
-
 FunkLoad SVN trunk
 ------------------
 
@@ -21,7 +20,18 @@ FunkLoad SVN trunk
 
 :Snapshots: http://funkload.nuxeo.org/snapshots/
 
-:Target: 1.8.0
+:Target: 1.9.0
+
+
+
+FunkLoad 1.8.0
+--------------
+
+:Location: http://svn.nuxeo.org/pub/funkload/trunk/
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.8.0/
+
+:Released date: 2008-07-28
 
 
 New features
@@ -32,7 +42,8 @@ New features
 Bug fixes
 ~~~~~~~~~
 
-* Handle redirect 303 and 307 like a 302.
+* Handle redirect code 303 and 307 like a 302.
+
 
 FunkLoad 1.7.0
 --------------
