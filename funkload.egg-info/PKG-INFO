@@ -1,0 +1,97 @@
+Metadata-Version: 1.0
+Name: funkload
+Version: 1.6.2
+Summary: Functional and load web tester.
+Home-page: http://funkload.nuxeo.org/
+Author: Benoit Delbosc
+Author-email: bdelbosc@nuxeo.com
+License: GPL
+Download-URL: http://funkload.nuxeo.org/funkload-1.6.2.tar.gz
+Description: FunkLoad is a functional and load web tester, written in Python, whose
+        main use cases are:
+        
+        * Functional testing of web projects, and thus regression testing as well.
+        
+        * Performance testing: by loading the web application and monitoring
+        your servers it helps you to pinpoint bottlenecks, giving a detailed
+        report of performance measurement.
+        
+        * Load testing tool to expose bugs that do not surface in cursory testing,
+        like volume testing or longevity testing.
+        
+        * Stress testing tool to overwhelm the web application resources and test
+        the application recoverability.
+        
+        * Writing web agents by scripting any web repetitive task, like checking if
+        a site is alive.
+        
+        
+        Main FunkLoad features are:
+        
+        * FunkLoad is free software distributed under the `GNU GPL`.
+        
+        * Functional test are pure Python scripts using the pyUnit framework like
+        normal unit test. Python enable complex scenarios to handle real world
+        applications.
+        
+        * Truly emulates a web browser (single-threaded) using Richard Jones'
+        webunit:
+        
+        - basic authentication support
+        - cookies support
+        - referrer support
+        - http proxy support
+        - fetching css, javascript and images
+        - emulating a browser cache
+        - file upload and multipart/form-data submission
+        - https support
+        
+        * Advanced test runner with many command-line options:
+        
+        - set the target server url
+        - display the fetched page in real time in your browser
+        - debug mode
+        - green/red color mode
+        - select test case using a regex
+        - support normal pyUnit test
+        - support doctest from a plain text file or embedded in python docstring
+        
+        * Turn a functional test into a load test: just by invoking the bench runner
+        you can identify scalability and performance problems.
+        
+        * Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
+        containing:
+        
+        - the bench configuration
+        - tests, pages, requests stats and charts with percentiles.
+        - the 5 slowest requests.
+        - servers cpu usage, load average, memory/swap usage and network traffic
+        charts.
+        - an http error summary list
+        
+        * Easy test customization using a configuration file or command line options.
+        
+        * Easy test creation using TCPWatch as proxy recorder, so you can use your web
+        browser and produce a FunkLoad test automatically.
+        
+        * Provides web assertion helpers.
+        
+        * Provides a funkload.CPSTestCase to ease Zope and Nuxeo CPS testing.
+        
+        * Easy to install (EasyInstall) and use, see examples in the demo folder.
+        
+Keywords: testing benching load performance functional monitoring
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Natural Language :: English
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP :: Site Management
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Software Development :: Quality Assurance
+Classifier: Topic :: System :: Benchmark
+Classifier: Topic :: System :: Monitoring

@@ -1,0 +1,492 @@
+=================
+FunkLoad_ CHANGES
+=================
+
+:author: Benoit Delbosc
+
+:address: bdelbosc _at_ nuxeo.com
+
+:revision: $Id: CHANGES.txt 51461 2007-04-06 08:36:07Z bdelbosc $
+
+:abstract: This document describes changes between FunkLoad_ versions.
+
+.. contents:: Table of Contents
+
+
+
+FunkLoad SVN trunk
+------------------
+
+:Location: http://svn.nuxeo.org/pub/funkload/trunk/
+
+:Snapshots: http://funkload.nuxeo.org/snapshots/
+
+:Target: ?
+
+
+
+
+FunkLoad 1.6.2
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.6.2.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.6.2/
+
+:Released date: 2007-04-06
+
+
+* fix: 'Page stats' percentiles are wrong.
+
+
+FunkLoad 1.6.1
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.6.1.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.6.1/
+
+:Released date: 2007-03-09
+
+
+Bug fixes
+~~~~~~~~~
+
+* Support of python 2.5.
+
+* Fix: 1.6.0 regression invalid encoding of parameters when posting several
+  times the same key.
+
+
+FunkLoad 1.6.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.6.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.6.0/
+
+:Released date: 2007-02-27
+
+
+New features
+~~~~~~~~~~~~
+
+* Do not send cookie with ``deleted`` value, this fix trouble with Zope's
+  CookieCrumbler and enable benching of Plone_ apps, Thanks to Lin.
+
+* Works with Ruby CGI, fixing webunit mimeEncode and adding Content-type
+  header on file upload, Thanks to Bryan Helmkamp.
+
+* # 1283_: Patching webunit to support http proxy by checking $http_proxy
+  env. Thanks to Greg, (note that https proxy is not yet supported).
+
+* Adding Mirko Friedenhagen ``--with-percentiles`` option to
+  ``fl-build-report`` to include percentiles in statistic tables and use
+  10%, 50% and 90% percentil instead of min, avg and max in charts.  This is
+  now the default option, use ``--no-percentiles`` for the old behaviour.
+
+* Upgrade to setuptools 0.6c3
+
+* FunkLoadTestCase.conf_getList accept a separator parameter
+
+
+Bug fixes
+~~~~~~~~~
+
+* fix: # 1279_: Browser form submit encoding, default encoding for post is
+  now application/x-www-form-urlencoded, multipart mime encoding is used
+  only when uploading files.
+
+* Patching webunit mimeEncode method to send CRLF as describe in RFC 1945
+  3.6.2, patch provided by Ivan Kurmanov.
+
+* fix: response string representation url contains double `/`
+
+* fix: xmlrpc url contains basic auth credential in the report
+
+* fix: # 1300_: easy_install failed to install docutils from sourceforge,
+  upgrading ez_install 0.6a10
+
+
+FunkLoad 1.5.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.5.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.5.0/
+
+:Released date: 2006-01-31
+
+
+New features
+~~~~~~~~~~~~
+
+* # 1284_: TestCase: support of doctest
+
+  There is a new FunkLoadDocTest class that ease usage of FunkLoad from
+  doctest::
+
+    >>> from funkload.FunkLoadDocTest import FunkLoadDocTest
+    >>> fl = FunkLoadDocTest()
+    >>> response = fl.get('http://localhost/')
+    >>> 'HTML' in response.body
+    True
+    >>> response
+    <response url="http://127.0.0.1:80//" code="200" message="OK" />
+
+
+  If you use python2.4, the test runner ``fl-run-test`` is able launch
+  doctest from a plain text file or embedded in python docstring::
+
+     $ fl-run-test -v doctest_dummy.txt
+     Doctest: doctest_dummy.txt          Ok
+     -----------------------------------------------------
+     Ran 1 test in 0.077s
+     OK
+
+  And the ``--debug`` option makes doctests verbose::
+
+     $ fl-run-test -d doctest_dummy.txt
+     ...
+     Trying:
+         fl = FunkLoadDocTest()
+     Expecting nothing
+     ok
+     Trying:
+         fl.get('http://localhost/')
+     Expecting:
+         <response url="http://127.0.0.1:80//" code="200" message="OK" />
+     ok
+     Ok
+     ----------------------------------------------------------------------
+     Ran 1 test in 0.051s
+     OK
+
+* Test runner can use a negative regex to select tests. For example if you
+  want to launch all tests that does not ends with 'foo' ::
+
+    fl-run-test myFile.py -e '!foo$'
+
+* # 1282_: TestRunner: more verbosity
+
+  The new ``fl-run-test`` option ``--debug-level=2`` will produce debug
+  output on each link (images or css) fetched.
+
+* Improve firefox view in real time by using approriate file extention for
+  the content type.
+
+* CPSTestCase is up to date for 3.4.0, use CPS338TestCase for a CPS 3.3.8.
+
+
+Bug fixes
+~~~~~~~~~
+
+* fix # 1278_: BenchRunner: UserAgent from config file is not set
+
+
+
+FunkLoad 1.4.1
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.4.1.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.4.1/
+
+:Released date: 2005-12-16
+
+
+Bug fixes
+~~~~~~~~~
+
+* fix # 1201_: Erroneous page stats
+
+* fix # 934_: REPORT: Charts should display origin
+
+
+FunkLoad 1.4.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.4.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.4.0/
+
+:Released date: 2005-12-08
+
+
+New features
+~~~~~~~~~~~~
+
+* New ``--loop-on-pages`` option for ``fl-run-test``.
+
+  This option enable to check response time of some specific pages inside a
+  test without changing the script, which make easy to tune a page in a
+  complex context. Use the ``debug`` option to find the page numbers. For
+  example::
+
+    fl-run-test myfile.py MyTestCase.testSomething -l 3 -n 100
+
+  Run MyTestCase.testSomething, reload one hundred time the page 3 without
+  concurrency and as fast as possible. Output response time stats. You can
+  loop on many pages using slice -l 2:4.
+
+* New ``--accept-invalid-links`` option for ``fl-run-test`` and
+  ``fl-run-bench``
+
+  Don't fail if css/image links are not reachable.
+
+* New ``--list`` option for ``fl-run-test`` to list the test names without
+  running them.
+
+* # 936_: TestRunner: use regexp to load test
+
+  New ``--regex`` or ``-e`` option for ``fl-run-test`` to filter test names
+  that match a regular expression.
+
+* # 939_: Browser: Provide an option to disable image and links load
+
+  New ``--simple-fetch`` option for ``fl-run-test`` and ``fl-run-bench``.
+
+* # 937_: TestRunner: Add an immediate fail option
+
+  New ``--stop-on-fail`` option for ``fl-run-test`` that stops tests on
+  first failure or error.
+
+* # 933_: Report: Add global info
+
+  Adding total number of tests, pages and requests during the bench.
+
+* ``CPSTestCase.listDocumentHref`` is renamed into ``cpsListDocumentHref``
+
+* ``FunkLoadTestCase.xmlrpc_call`` is renamed into ``xmlrpc``
+  (``xmlrpc_call`` is still working)
+
+* Some code cleaning, cheesecake_ index 460/560 ~82%.
+
+* New epydoc_ API_ documentation.
+
+* ``fl-run-test`` is now able to run standard unittest.TestCase.
+
+
+Bug fixes
+~~~~~~~~~
+
+* # 1183_: updating ez_setup to fix broken sourceforge docutils download
+
+
+FunkLoad 1.3.1
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.3.1.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.3.1/
+
+:Released date: 2005-11-10
+
+Bug fixes
+~~~~~~~~~
+
+* fix # 1115_: Recorder: impossible to generate test
+
+
+FunkLoad 1.3.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.3.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.3.0/
+
+:Released date: 2005-11-08
+
+New features
+~~~~~~~~~~~~
+
+* # 944_: Recorder: replace TestMaker recorder.
+
+  Providing a ``fl-record`` command that drive a TCPWatch_ proxy.
+  See INSTALL_ to setup TCPWatch_.
+
+* # 1041_: Browser: implement an addHeader method.
+
+  FunkLoadTestCase provides new methods ``setUserAgent``, ``addHeader`` and
+  ``clearHeaders``.
+
+* # 1088_: TestRunner / BenchRunner: use compatible command line option
+
+    - All ``fl-*`` executables have a ``--version`` option to display the
+      FunkLoad_ version.
+
+    - All `fl-run-*` are now in color mode by default. Use ``--no-color``
+      options for monochrome output.
+      You need to remove the ``-c`` option for ``fl-run-test`` and ``-C``
+      for ``fl-run-bench`` in your scripts.
+
+    - Changing ``fl-run-bench`` short option ``-d`` into ``-D`` for duration,
+      keeping ``-d`` for debug mode.
+
+    - Removing ``fl-run-test`` short option ``-D`` to not conflict with new
+      ``-D`` option of ``fl-run-bench``, you now have to use the long format
+      ``--dump-directory``.
+
+Bug fixes
+~~~~~~~~~
+
+* fix # 935_: Browser: doesn't handle Referer header.
+
+
+
+FunkLoad 1.2.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.2.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.2.0/
+
+:Released date: 2005-10-18
+
+
+New features
+~~~~~~~~~~~~
+
+* Credential and Monitor services have been refactored they are now true
+  unix daemon service, controllers are now in pure python (no more bash
+  scripts).
+
+* Switching from distutils to setuptools using EasyInstall_, installing
+  FunkLoad is now just a question of ``sudo easy_install funkload``.
+
+* Moving demo examples into the egg, just type ``fl-install-demo`` to extract
+  the demo folder
+
+Bug fixes
+~~~~~~~~~
+
+* fix # 1027_ Report: min and max page response time are wrong.
+
+* fix # 1017_ Report: request charts is alway the same.
+
+* fix # 1022_ Monitor: no cpu usage monitoring on linux 2.4.x
+
+* fix # 1000_ easy_install failed to install funkload.
+
+* fix # 1009_ Report: remove error scale in graph if there is no errors.
+
+* fix # 1008_ Report: missing legend.
+
+
+FunkLoad 1.1.0
+--------------
+
+:Package: http://funkload.nuxeo.org/funkload-1.1.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.1.0/
+
+:Released date: 2005-10-07
+
+New features
+~~~~~~~~~~~~
+
+* FunkLoadTestCase: adding ``exists`` method.
+
+* FunkLoadTestCase: support XML RPC test/bench using ``xmlrpc_call``.
+
+* FunkLoadTestCase: adding a regex pattern to ``listHref``.
+
+* FunkLoadTestCase: new ``setUpCycle`` and ``tearDownCycle`` methods to
+  configure bench between cycle.
+
+* FunkLoadTestCase: Patching webunit to send a User-Agent header.
+
+* # 950_ Report: display failure and error (first part).
+
+* # 948_ Report: provide the 5 slowest requests.
+
+* # 941_ Demo: provide usefull examples.
+
+* CPSTestCase: add cpsVerifyUser, cpsVerifyGroup, cpsSetLocalRole,
+  cpsCreateSite, cpsCreateSection.
+
+* ZopeTestCase: adding zopeRestartZope, zopeFlushCache, zopePackZodb,
+  zopeAddExternalMethod.
+
+* Lipsum: handle iso 8859-15 vocabulary.
+
+* Lipsum: adding random phone number and address generator.
+
+* credentiald: add methods listCredentials and listGroups.
+
+* Moving TODO and bugs to trac: http://svn.nuxeo.org/trac/pub/report/12
+
+* Improve documentation.
+
+
+Bug fixes
+~~~~~~~~~
+
+* # 971_ Report: the network load monitor should record network speed instead
+  of cumulative downlaod
+
+* XML result file is resetted at beginning of a test or bench.
+
+* Fix threadframe module requirement.
+
+* No more python 2.3 dependency for scripts `fl-*-ctl`
+
+
+FunkLoad 1.0.0
+--------------
+
+:Location: http://funkload.nuxeo.org/funkload-1.0.0.tar.gz
+
+:Released date: 2005-09-01
+
+**First public release.**
+
+
+---------------------------------------------
+
+See the INSTALL_ file for requirement and installation.
+
+See README_ for more information about FunkLoad_.
+
+
+
+.. _FunkLoad: http://funkload.nuxeo.org/
+.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
+.. _README: README.html
+.. _INSTALL: INSTALL.html
+.. _API: api/index.html
+.. _epydoc: http://epydoc.sourceforge.net/
+.. _cheesecake: http://tracos.org/cheesecake/
+.. _933: http://svn.nuxeo.org/trac/pub/ticket/933
+.. _934: http://svn.nuxeo.org/trac/pub/ticket/934
+.. _935: http://svn.nuxeo.org/trac/pub/ticket/935
+.. _936: http://svn.nuxeo.org/trac/pub/ticket/936
+.. _937: http://svn.nuxeo.org/trac/pub/ticket/937
+.. _939: http://svn.nuxeo.org/trac/pub/ticket/939
+.. _941: http://svn.nuxeo.org/trac/pub/ticket/941
+.. _944: http://svn.nuxeo.org/trac/pub/ticket/944
+.. _948: http://svn.nuxeo.org/trac/pub/ticket/948
+.. _950: http://svn.nuxeo.org/trac/pub/ticket/950
+.. _971: http://svn.nuxeo.org/trac/pub/ticket/971
+.. _1000: http://svn.nuxeo.org/trac/pub/ticket/1000
+.. _1008: http://svn.nuxeo.org/trac/pub/ticket/1008
+.. _1009: http://svn.nuxeo.org/trac/pub/ticket/1009
+.. _1017: http://svn.nuxeo.org/trac/pub/ticket/1017
+.. _1022: http://svn.nuxeo.org/trac/pub/ticket/1022
+.. _1027: http://svn.nuxeo.org/trac/pub/ticket/1027
+.. _1041: http://svn.nuxeo.org/trac/pub/ticket/1041
+.. _1088: http://svn.nuxeo.org/trac/pub/ticket/1088
+.. _1115: http://svn.nuxeo.org/trac/pub/ticket/1115
+.. _1183: http://svn.nuxeo.org/trac/pub/ticket/1183
+.. _1201: http://svn.nuxeo.org/trac/pub/ticket/1201
+.. _1278: http://svn.nuxeo.org/trac/pub/ticket/1278
+.. _1279: http://svn.nuxeo.org/trac/pub/ticket/1279
+.. _1282: http://svn.nuxeo.org/trac/pub/ticket/1282
+.. _1283: http://svn.nuxeo.org/trac/pub/ticket/1283
+.. _1284: http://svn.nuxeo.org/trac/pub/ticket/1284
+.. _1300: http://svn.nuxeo.org/trac/pub/ticket/1300
+.. _Plone: http://plone.org/
+
+.. Local Variables:
+.. mode: rst

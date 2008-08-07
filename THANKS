@@ -1,0 +1,13 @@
+======
+THANKS
+======
+
+Mirko Friedenhagen: providing reports percentiles features.
+Ivan Kurmanov: webunit mimeEncode patch using CRLF.
+Greg 912: http_proxy support.
+Bryan Helmkamp: webunit mimeEncode patch extra CRLF on first boundary, adding
+  Content-Type header for file upload.
+Lin: Patch to remove cookie with 'deleted' value.
+Sylvain Hellegouarch: python 2.5 support.
+M.-A. Darche: extensive use, documentation improvements and FunkLoad name
+  co-idea.

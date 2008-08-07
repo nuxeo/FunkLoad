@@ -1,0 +1,270 @@
+=================
+FunkLoad_ INSTALL
+=================
+
+:author: Benoit Delbosc
+
+:address: bdelbosc _at_ nuxeo.com
+
+:revision: $Id: INSTALL.txt 51278 2007-03-02 08:50:44Z bdelbosc $
+
+:abstract: This document describes how to install the FunkLoad_ tool.
+
+.. sectnum::    :depth: 1
+
+.. contents:: Table of Contents
+
+
+OS support
+----------
+
+Some parts are OS specific:
+
+* the monitor server works only on Linux
+* the credential server is a unix daemon but can run on windows if launched
+  in debug mode (-d)
+
+Under windows there is a trick to install docutils (see below), you may
+also rename the scripts with a ``.py`` extension.
+
+
+Required packages
+-----------------
+
+* libexpat1
+
+* python 2.4 is required by the test runner only if you want to launch
+  python doctest, other stuff work fine with a python 2.3.5.
+  python 2.5 is supported with funkload > 1.6.0
+
+* python distutils, on a Debian system::
+
+    sudo apt-get install python-dev
+
+* python xml, for example on a Debian system::
+
+    sudo apt-get install python-xml
+
+* EasyInstall_, download ez_setup.py_, and run it::
+
+    cd /tmp
+    wget http://peak.telecommunity.com/dist/ez_setup.py
+    sudo python ez_setup.py
+
+  This will download and install the appropriate setuptools egg for your
+  Python version.
+
+
+Optional packages
+-----------------
+
+* To produce charts : python-gdchart (0.6.1-8 is fine), on Debian::
+
+    sudo apt-get install python-gdchart
+
+  If the package is only available for python2.3 you may try to copy the
+  ``gdchart.so`` to the ``python2.4/site-pacakges``.
+
+  On non Debian systems you can build the gdchart following the
+  `Francois Meehan`_'s page.
+
+  On Fedora FC4 (tested with python 2.3.5)::
+
+    cd /tmp
+    wget http://ftp.debian.org/debian/pool/main/p/python-gdchart/python-gdchart_0.6.1.orig.tar.gz
+    tar xzvf python-gdchart_0.6.1.orig.tar.gz
+    cd python-gdchart-0.6.1.orig/
+    wget http://funkload.nuxeo.org/patch_gdc_py.diff
+    wget http://funkload.nuxeo.org/patch_gdc_pie.diff
+    patch -p0 < patch_gdc_py.diff
+    patch -p0 < patch_gdc_pie.diff
+    # change in Makefile
+    # PY_INCLUDE = -I/usr/local/include/python2.0
+    # to your corresponding path
+    make
+    # as a 'root' copy produced gdchart.so into your python's site-packages
+    # directory
+
+
+  Should work also for Fedora FC5, it requires libpng-devel and libjpeg-dev.
+
+  No idea under windows.
+
+
+* The recorder use TCPWatch_ which is not yet available using easy_install::
+
+    cd /tmp
+    wget http://hathawaymix.org/Software/TCPWatch/tcpwatch-1.3.tar.gz
+    tar xzvf tcpwatch-1.3.tar.gz
+    cd tcpwatch
+    python setup.py build
+    sudo python setup.py install
+
+
+Installation
+------------
+
+Easy installation
+~~~~~~~~~~~~~~~~~
+
+Install the latest stable package::
+
+  sudo easy_install -U funkload
+
+This will install FunkLoad_, webunit_ and docutils_ eggs.
+
+
+Latest snapshot version
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install the latest development snapshot available::
+
+  sudo easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
+
+
+
+Development version
+~~~~~~~~~~~~~~~~~~~
+
+If you want to try the latest unstable sources from svn ::
+
+    easy_install -eb /tmp funkload==dev
+
+or::
+
+    svn co http://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
+
+then::
+
+    cd /tmp/funkload/
+    python setup.py build
+    sudo python setup.py install
+
+
+Test it
+-------
+
+Install the FunkLoad_ examples::
+
+  fl-install-demo
+
+Go to the demo/xmlrpc folder then::
+
+  cd funkload-demo/xmlrpc/
+  make test
+
+To test benching and report building just::
+
+  make bench
+
+See ``funkload-demo/README`` for others examples.
+
+
+
+Problems ?
+----------
+
+* got a ::
+
+    error: invalid Python installation: unable to open /usr/lib/python2.4/config/Makefile (No such file or directory)
+
+  Install python2.4-dev package.
+
+* easy_install complains about conflict::
+
+    ...
+    /usr/lib/site-python/docutils
+
+    Note: you can attempt this installation again with EasyInstall, and use
+    either the --delete-conflicting (-D) option or the
+    --ignore-conflicts-at-my-risk option, to either delete the above files
+    and directories, or to ignore the conflicts, respectively.  Note that if
+    you ignore the conflicts, the installed package(s) may not work.
+    -------------------------------------------------------------------------
+    error: Installation aborted due to conflicts
+
+
+  If FunkLoad_, webunit_ or docutils_ were previously installed without
+  using EasyInstall_.  You need to reinstall the package that raises the
+  conflict with the ``--delete-conflicting`` option, see easy_install_
+  documentation.
+
+* If you still have conflict try to remove FunkLoad_ from your system::
+
+    easy_install -m funkload
+    rm -rf /usr/lib/python2.3/site-packages/funkload*
+    rm -rf /usr/local/funkload/
+    rm /usr/local/bin/fl-*
+    rm /usr/bin/fl-*
+
+  then reinstall
+
+* easy_install ends with::
+
+    error: Unexpected HTML page found at
+    http://prdownloads.sourceforge.net...
+
+  Source Forge has changed their donwload page you need to update your
+  setuptools::
+
+     sudo easy_install -U setuptools
+
+* Failed to install docutils 0.4 with easy_install 0.6a9 getting a::
+
+    ...
+    Best match: docutils 0.4
+    Downloading http://prdownloads.sourceforge.net/docutils/docutils-0.4.tar.gz?download
+    Requesting redirect to (randomly selected) 'mesh' mirror
+    error: No META HTTP-EQUIV="refresh" found in Sourceforge page at http://prdownloads.sourceforge.net/docutils/docutils-0.4.tar.gz?use_mirror=mesh
+
+ It looks like sourceforge change their download page again :(
+
+ - download manually the docutils tar gz from
+   http://prdownloads.sourceforge.net/docutils/docutils-0.4.tar.gz?download
+ - then ``sudo easy_install /path/to/docutils-0.4.tar.gz``
+
+
+
+* When testing ``make test`` return ::
+
+    ### credentialctl: Stopping credential server.
+    python: can't open file '/usr/lib/python2.4/site-packages/funkload-1.2.0-py2.4.egg/funkload/credentialctl.py': [Errno 20] Not a directory
+
+  Starting with FunkLoad_ 1.2.0 scripts are installed in /usr/bin, previously
+  they were in /usr/local/bin, you need to remove them::
+
+    sudo rm /usr/local/bin/fl-*
+
+
+* No charts on your report. You need to have gdchart python module check
+  ``import gdchart``. See the `Optional packages`_ for help on how to
+  install gdchart.
+
+
+
+--------------------------
+
+See README_ for more information about FunkLoad_.
+
+See CHANGES_ for information on FunkLoad_ packages.
+
+See demo_ folder for other examples.
+
+
+.. _FunkLoad: http://funkload.nuxeo.org/
+.. _webunit: http://mechanicalcat.net/tech/webunit/
+.. _README: README.html
+.. _CHANGES: CHANGES.html
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
+.. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
+.. _ez_setup.py: http://peak.telecommunity.com/dist/ez_setup.py
+.. _docutils: http://docutils.sourceforge.net/
+.. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
+.. _`Francois Meehan`: http://moinmoin.wikiwikiweb.de/FrancoisMeehan
+
+
+.. Local Variables:
+.. mode: rst
+.. End:
+.. vim: set filetype=rst:

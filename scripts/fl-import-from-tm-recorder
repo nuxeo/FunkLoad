@@ -1,0 +1,165 @@
+#!/usr/bin/python
+
+# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# Author: bdelbosc@nuxeo.com
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+#
+"""Convert a unit Test build with the TestMaker Recorder into a FunkLoad test.
+
+$Id: ftest_utils.py 22915 2005-06-09 15:38:07Z bdelbosc $
+"""
+import os
+import re
+from optparse import OptionParser, TitledHelpFormatter
+from funkload.utils import trace
+
+class TMImportProgram:
+    """See usage."""
+    usage = """%prog tm_script
+
+This will convert a TestMaker script build with the TM Recorder into a FunkLoad
+script and configuration file.
+
+
+Examples
+========
+
+  %prog scenarioName.tm
+
+This will generate scenario_name.py and scenario_name.conf.
+Then you can use
+
+  fl-run-test scenarionName.py
+"""
+    def __init__(self):
+        self.tm_path = self.scenario = self.server_url = self.options = None
+        self.parseArgs()
+        test_name = os.path.splitext(os.path.basename(self.tm_path))[0]
+        class_name = ''.join([x.capitalize()
+                              for x in re.split('_|-', test_name)])
+        self.script_path = os.path.join(os.path.abspath(
+            self.options.output_dir), 'test_%s.py' % class_name)
+        self.configuration_path = os.path.join(os.path.abspath(
+            self.options.output_dir), class_name + '.conf')
+        self.test_name = test_name
+        self.class_name = class_name
+
+    def parseArgs(self):
+        """Parse command line."""
+        parser = OptionParser(self.usage, formatter=TitledHelpFormatter())
+        cur_path = os.path.abspath(os.path.curdir)
+        parser.add_option("-o", "--output-directory", type="string",
+                          dest="output_dir",
+                          help="Directory to dump html pages.",
+                          default=cur_path)
+        self.options, args = parser.parse_args()
+        if len(args) != 1:
+            parser.error("incorrect number of arguments")
+        self.tm_path = os.path.abspath(args[0])
+
+
+    def grep(self, text):
+        """Grep interesting lines."""
+        patterns = ('self.get(', 'self.post(', 'self.params = ')
+        for pattern in patterns:
+            if text.find(pattern) != -1:
+                return 1
+        return 0
+
+    def format(self, text, server_url):
+        """Reformat python code."""
+        text = text.replace("'''", '"')
+        text = text.replace("self.params", "params")
+        if text.find('params') != -1:
+            # always use post if we have some params
+            text = text.replace('self.get', 'self.post')
+        text = text.replace('( ', '(')
+        text = text.replace(' )', ')')
+        text = text.replace('[ ', '[')
+        text = text.replace(' ]', ']')
+        text = text.replace('],[', '],\n                  [')
+        if text.find(server_url) != -1:
+            text = text.replace(server_url, '%s')
+            text = text.replace('",', '" % server_url,')
+            text = text.replace('")', '" % server_url)')
+        return text
+
+    def extractScenario(self):
+        """Extract and format testmaker action."""
+        lines = open(self.tm_path).readlines()
+        server_url = '?'
+        for line in lines:
+            match = re.search('\'(https?://[^\'\/]*)', line)
+            if match is not None:
+                server_url = match.group(1)
+                break
+        self.scenario = ''.join([self.format(line, server_url)
+                                 for line in lines if self.grep(line)])
+        self.server_url = server_url
+
+
+    def writeScript(self):
+        """Write the FunkLoad test script."""
+        from pkg_resources import resource_string
+        tpl = resource_string('funkload', 'data/ScriptTestCase.tpl')
+        content = tpl % {'script': self.scenario,
+                         'test_name': self.test_name,
+                         'class_name': self.class_name}
+        if os.path.exists(self.script_path):
+            trace("\nError file %s already exists.\n" % self.script_path)
+            return
+        f = open(self.script_path, 'w')
+        f.write(content)
+        f.close()
+
+    def writeConfiguration(self):
+        """Write the FunkLoad configuration test script."""
+        from pkg_resources import resource_string
+        tpl = resource_string('funkload', 'data/ConfigurationTestCase.tpl')
+        content = tpl % {'server_url': self.server_url,
+                         'test_name': self.test_name,
+                         'class_name': self.class_name}
+        if os.path.exists(self.configuration_path):
+            trace("\nError file %s already exists.\n" %
+                  self.configuration_path)
+            return
+        f = open(self.configuration_path, 'w')
+        f.write(content)
+        f.close()
+
+    def main(self):
+        """Convert."""
+        self.parseArgs()
+        trace("Importing %s: ... " % self.tm_path)
+        self.extractScenario()
+        trace('done.\n')
+        trace("Creating %s: ... " % self.script_path)
+        self.writeScript()
+        trace('done.\n')
+        trace("Creating %s: ... " % self.configuration_path)
+        self.writeConfiguration()
+        trace('done.\n')
+
+    __call__ = main
+
+
+def main():
+    """main."""
+    importer = TMImportProgram()
+    importer()
+
+if __name__ == '__main__':
+    main()
