@@ -34,7 +34,8 @@ from random import random
 from xmlrpclib import ServerProxy
 from utils import get_version, is_html, thread_sleep, trace
 
-from webunit.webunittest import WebTestCase, HTTPError
+from google3.third_party.python.webunit.webunit.webunittest import WebTestCase
+from google3.third_party.python.webunit.webunit.webunittest import HTTPError
 
 import PatchWebunit
 
@@ -477,14 +478,14 @@ class FunkLoadWebBrowser:
         info['step'] = '%.3i' % self.steps
         info['number'] = '%.3i' % self.page_responses
         info['type'] = rtype
-        info['url'] = quoteattr(url)
+        info['url'] = url
         info['code'] = -1
-        info['description'] = description and quoteattr(description) or '""'
+        info['description'] = description
         info['time'] = '%.6f' % time_start
         info['duration'] = '%.6f' % (time_stop - time_start)
         info['result'] = 'Error'
-        info['traceback'] = quoteattr(' '.join(
-            traceback.format_exception(*sys.exc_info())))
+        info['traceback'] = ' '.join(
+            traceback.format_exception(*sys.exc_info()))
         self.flogger.results.write('response', info)
 
     def _log_response(self, response, rtype, description, time_start,
@@ -496,9 +497,9 @@ class FunkLoadWebBrowser:
         info['step'] = '%.3i' % self.steps
         info['number'] = '%.3i' % self.page_responses
         info['type'] = rtype
-        info['url'] = quoteattr(response.url)
+        info['url'] = response.url
         info['code'] = response.code
-        info['description'] = description and quoteattr(description) or '""'
+        info['description'] = description
         info['time'] = '%.6f' % time_start
         info['duration'] = '%.6f' % (time_stop - time_start)
         info['result'] = self.step_success and 'Successful' or 'Failure'
@@ -526,9 +527,9 @@ class FunkLoadWebBrowser:
         info['step'] = '%.3i' % self.steps
         info['number'] = '%.3i' % self.page_responses
         info['type'] = 'xmlrpc'
-        info['url'] = quoteattr(url + '#' + method)
+        info['url'] = '%s#%s' % (url, method)
         info['code'] = code
-        info['description'] = description and quoteattr(description) or '""'
+        info['description'] = description
         info['time'] = '%.6f' % time_start
         info['duration'] = '%.6f' % (time_stop - time_start)
         info['result'] = self.step_success and 'Successful' or 'Failure'
@@ -547,8 +548,8 @@ class FunkLoadWebBrowser:
         info['links'] = self.total_links
         info['browser_status'] = self.browser_status
         if self.browser_status != 'Successful':
-            info['traceback'] = 'traceback=' + quoteattr(' '.join(
-                traceback.format_exception(*sys.exc_info()))) + ' '
+            info['traceback'] = ' '.join(
+                traceback.format_exception(*sys.exc_info()))
         else:
             info['traceback'] = ''
         return info

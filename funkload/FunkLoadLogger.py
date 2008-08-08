@@ -324,10 +324,9 @@ class XMLResultStream(ResultStream):
         """
         pairs = []
         for k, v in attributes.items():
-            s = '%s' % v
-            if not s.startswith('"'):
-                s = '"%s"' % s
-            pairs.append('%s=%s' % (k, s))
+            if not v.startswith('"'):
+                v = quoteattr(v)
+            pairs.append('%s=%s' % (k, v))
         return ' '.join(pairs)
 
     def write_header(self, **kw):
@@ -367,4 +366,3 @@ class XMLResultStream(ResultStream):
         """Close the result log.
         """
         self.logger.info("</funkload>")
-
