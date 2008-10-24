@@ -43,7 +43,8 @@ from optparse import OptionParser, TitledHelpFormatter
 
 from ReportStats import AllResponseStat, PageStat, ResponseStat, TestStat
 from ReportStats import MonitorStat, ErrorStat
-from ReportRenderer import RenderRst, RenderHtml
+from ReportRenderRst import RenderRst
+from ReportRenderHtml import RenderHtml
 from utils import trace, get_version
 
 
@@ -196,7 +197,7 @@ def main():
     parser.add_option("--no-percentiles", action="store_false",
                       dest="with_percentiles",
                       help=("No percentiles in tables display min, "
-                            "avg and max in charts."))
+                            "avg and max in charts (gdchart only)."))
     cur_path = os.path.abspath(os.path.curdir)
     parser.add_option("-o", "--output-directory", type="string",
                       dest="output_dir",

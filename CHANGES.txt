@@ -23,6 +23,11 @@ FunkLoad SVN trunk
 :Target: 1.9.0
 
 
+New features
+~~~~~~~~~~~~
+
+* Use gnuplot 4.2 by default for charts.
+
 
 FunkLoad 1.8.0
 --------------

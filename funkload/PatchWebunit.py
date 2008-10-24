@@ -316,6 +316,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
 
     if cookie_list:
         h.putheader('Cookie', ' '.join(cookie_list))
+        #print '  Cookies: ' + str(cookie_list)
 
     # check that we sent the cookies we expected to
     if self.expect_cookies is not None:
