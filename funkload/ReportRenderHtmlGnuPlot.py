@@ -40,25 +40,19 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     Simply render stuff in ReST than ask docutils to build an html doc.
     """
-    # for testing TODO: remove
     chart_size = (640, 480)
-
-    color_success = 0x00ff00
-    color_error = 0xff0000
-    color_time = 0x0000ff
-    color_time_min_max = 0xccccee
-    color_grid = 0xcccccc
-    color_line = 0x333333
-    color_plot = 0x003a6b
-    color_bg = 0xffffff
-    color_line = 0x000000
-
+    big_chart_size = (640, 480)
 
     def getChartSizeTmp(self, cvus):
         """Override for gnuplot format"""
         size = RenderHtmlBase.getChartSize(self, cvus)
         return str(size[0]) + ',' + str(size[1])
 
+    def getXRange(self):
+        """Return the max CVUs range."""
+        maxCycle = self.config['cycles'].split(',')[-1]
+        maxCycle = str(maxCycle[:-1].strip())
+        return "[0:" + maxCycle + "]"
 
     def createTestChart(self):
         """Create the test chart."""
@@ -69,6 +63,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         # data
         lines = ["CUs STPS ERROR"]
         cvus = []
+        has_error = False
         for cycle in self.cycles:
             if not stats[cycle].has_key('test'):
                 continue
@@ -78,6 +73,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             cvus.append(str(test.cvus))
             values.append(str(test.tps))
             error = test.error_percent
+            if error:
+                has_error = True
             values.append(str(error))
             lines.append(' '.join(values))
         f = open(data_path, 'w')
@@ -86,18 +83,40 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         # script
         lines = ['set output "' + image_path +'"']
         lines.append('set title "Successful Tests Per Second"')
-        lines.append('set xlabel "Concurrent Users"')
-        lines.append('set ylabel "Tests Per Second"')
-        lines.append('set grid')
         lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
-
-        lines.append('plot "%s" u 1:3 w boxes lw 2 t "Errors", '
-                     '"" u 1:2 w linespoints lw 2 t "STTPS"' % data_path)
+        lines.append('set xlabel "Concurrent Users"')
+        lines.append('set ylabel "Test/s"')
+        lines.append('set grid back')
+        lines.append('set xrange ' + self.getXRange())
+        if not has_error:
+            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "STPS"' % data_path)
+        else:
+            lines.append('set format x ""')
+            lines.append('set multiplot')
+            lines.append('unset title')
+            lines.append('unset xlabel')
+            lines.append('set size 1, 0.7')
+            lines.append('set origin 0, 0.3')
+            lines.append('set lmargin 5')
+            lines.append('set bmargin 0')
+            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "STPS"' % data_path)
+            lines.append('set format x "% g"')
+            lines.append('set bmargin 3')
+            lines.append('set autoscale y')
+            lines.append('set style fill solid .25')
+            lines.append('set size 1.0, 0.3')
+            lines.append('set ytics 20')
+            lines.append('set xlabel "Concurrent Users"')
+            lines.append('set ylabel "% errors"')
+            lines.append('set origin 0.0, 0.0')
+            lines.append('set yrange [0:100]')
+            lines.append('plot "%s" u 1:3 w linespoints lt 1 lw 2 t "%% Errors"' % data_path)
+            lines.append('unset multiplot')
         f = open(gplot_path, 'w')
         f.write('\n'.join(lines) + '\n')
         f.close()
         gnuplot(gplot_path)
-
+        return
 
     def appendDelays(self, delay, delay_low, delay_high, stats):
         """ Show percentiles or min, avg and max in chart. """
@@ -121,6 +140,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         # data
         lines = ["CUs SPPS ERROR MIN AVG MAX P10 P50 P90 P95"]
         cvus = []
+        has_error = False
         for cycle in self.cycles:
             if not stats[cycle].has_key('page'):
                 continue
@@ -130,6 +150,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             cvus.append(str(page.cvus))
             values.append(str(page.rps))
             error = page.error_percent
+            if error:
+                has_error = True
             values.append(str(error))
             values.append(str(page.min))
             values.append(str(page.avg))
@@ -147,24 +169,44 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set title "Successful Pages Per Second"')
         lines.append('set xlabel "Concurrent Users"')
         lines.append('set ylabel "Pages Per Second"')
-        lines.append('set grid')
+        lines.append('set grid back')
+        lines.append('set xrange ' + self.getXRange())
         lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
-        lines.append('plot "%s" u 1:3 w boxes lw 2 t "Errors", '
-                     '"" u 1:2 w linespoints lw 2 t "STTPS"' % data_path)
-
+        if not has_error:
+            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "SPPS"' % data_path)
+        else:
+            lines.append('set format x ""')
+            lines.append('set multiplot')
+            lines.append('unset title')
+            lines.append('unset xlabel')
+            lines.append('set size 1, 0.7')
+            lines.append('set origin 0, 0.3')
+            lines.append('set lmargin 5')
+            lines.append('set bmargin 0')
+            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "SPPS"' % data_path)
+            lines.append('set format x "% g"')
+            lines.append('set bmargin 3')
+            lines.append('set autoscale y')
+            lines.append('set style fill solid .25')
+            lines.append('set size 1.0, 0.3')
+            lines.append('set xlabel "Concurrent Users"')
+            lines.append('set ylabel "% errors"')
+            lines.append('set origin 0.0, 0.0')
+            #lines.append('set yrange [0:100]')
+            #lines.append('set ytics 20')
+            lines.append('plot "%s" u 1:3 w linespoints lt 1 lw 2 t "%% Errors"' % data_path)
+            lines.append('unset multiplot')
+            lines.append('set size 1.0, 1.0')
         lines.append('set output "%s"' % image2_path)
         lines.append('set title "Pages Response time"')
         lines.append('set ylabel "Duration (s)"')
         lines.append('set bars 5.0')
-        lines.append('set grid back')
         lines.append('set style fill solid .25')
         lines.append('plot "%s" u 1:8:8:10:9 t "med/p90/p95" w candlesticks lt 1 lw 1 whiskerbars 0.5, "" u 1:7:4:8:8 w candlesticks lt 2 lw 1 t "min/p10/med" whiskerbars 0.5, "" u 1:5 t "avg" w lines lt 3 lw 2' % data_path)
         f = open(gplot_path, 'w')
         f.write('\n'.join(lines) + '\n')
         f.close()
         gnuplot(gplot_path)
-
-
 
     def createAllResponseChart(self):
         """Create global responses chart."""
@@ -176,6 +218,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         # data
         lines = ["CUs RPS ERROR MIN AVG MAX P10 P50 P90 P95"]
         cvus = []
+        has_error = False
         for cycle in self.cycles:
             if not stats[cycle].has_key('response'):
                 continue
@@ -185,6 +228,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             cvus.append(str(resp.cvus))
             values.append(str(resp.rps))
             error = resp.error_percent
+            if error:
+                has_error = True
             values.append(str(error))
             values.append(str(resp.min))
             values.append(str(resp.avg))
@@ -203,10 +248,33 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set xlabel "Concurrent Users"')
         lines.append('set ylabel "Requests Per Second"')
         lines.append('set grid')
+        lines.append('set xrange ' + self.getXRange())
         lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
-        lines.append('plot "%s" u 1:3 w boxes lw 2 t "Errors", '
-                     '"" u 1:2 w linespoints lw 2 t "STTPS"' % data_path)
-
+        if not has_error:
+            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "RPS"' % data_path)
+        else:
+            lines.append('set format x ""')
+            lines.append('set multiplot')
+            lines.append('unset title')
+            lines.append('unset xlabel')
+            lines.append('set size 1, 0.7')
+            lines.append('set origin 0, 0.3')
+            lines.append('set lmargin 5')
+            lines.append('set bmargin 0')
+            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "RPS"' % data_path)
+            lines.append('set format x "% g"')
+            lines.append('set bmargin 3')
+            lines.append('set autoscale y')
+            lines.append('set style fill solid .25')
+            lines.append('set size 1.0, 0.3')
+            lines.append('set xlabel "Concurrent Users"')
+            lines.append('set ylabel "% errors"')
+            lines.append('set origin 0.0, 0.0')
+            #lines.append('set yrange [0:100]')
+            #lines.append('set ytics 20')
+            lines.append('plot "%s" u 1:3 w linespoints lt 1 lw 2 t "%% Errors"' % data_path)
+            lines.append('unset multiplot')
+            lines.append('set size 1.0, 1.0')
         lines.append('set output "%s"' % image2_path)
         lines.append('set title "Requests Response time"')
         lines.append('set ylabel "Duration (s)"')
@@ -232,6 +300,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         # data
         lines = ["CUs STEP ERROR MIN AVG MAX P10 P50 P90 P95"]
         cvus = []
+        has_error = False
         for cycle in self.cycles:
             if not stats[cycle]['response_step'].has_key(step):
                 continue
@@ -241,6 +310,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             cvus.append(str(resp.cvus))
             values.append(str(step))
             error = resp.error_percent
+            if error:
+                has_error = True
             values.append(str(error))
             values.append(str(resp.min))
             values.append(str(resp.avg))
@@ -264,12 +335,36 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set ylabel "Duration (s)"')
         lines.append('set grid back')
         lines.append('set style fill solid .25')
-        lines.append('plot "%s" u 1:8:8:10:9 t "med/p90/p95" w candlesticks lt 1 lw 1 whiskerbars 0.5, "" u 1:7:4:8:8 w candlesticks lt 2 lw 1 t "min/p10/med" whiskerbars 0.5, "" u 1:5 t "avg" w lines lt 3 lw 2' % data_path)
+        lines.append('set xrange ' + self.getXRange())
+        if not has_error:
+            lines.append('plot "%s" u 1:8:8:10:9 t "med/p90/p95" w candlesticks lt 1 lw 1 whiskerbars 0.5, "" u 1:7:4:8:8 w candlesticks lt 2 lw 1 t "min/p10/med" whiskerbars 0.5, "" u 1:5 t "avg" w lines lt 3 lw 2' % data_path)
+        else:
+            lines.append('set format x ""')
+            lines.append('set multiplot')
+            lines.append('unset title')
+            lines.append('unset xlabel')
+            lines.append('set size 1, 0.7')
+            lines.append('set origin 0, 0.3')
+            lines.append('set lmargin 5')
+            lines.append('set bmargin 0')
+            lines.append('plot "%s" u 1:8:8:10:9 t "med/p90/p95" w candlesticks lt 1 lw 1 whiskerbars 0.5, "" u 1:7:4:8:8 w candlesticks lt 2 lw 1 t "min/p10/med" whiskerbars 0.5, "" u 1:5 t "avg" w lines lt 3 lw 2' % data_path)
+            lines.append('set format x "% g"')
+            lines.append('set bmargin 3')
+            lines.append('set autoscale y')
+            lines.append('set style fill solid .25')
+            lines.append('set size 1.0, 0.3')
+            lines.append('set xlabel "Concurrent Users"')
+            lines.append('set ylabel "% errors"')
+            lines.append('set origin 0.0, 0.0')
+            #lines.append('set yrange [0:100]')
+            #lines.append('set ytics 20')
+            lines.append('plot "%s" u 1:3 w linespoints lt 1 lw 2 t "%% Errors"' % data_path)
+            lines.append('unset multiplot')
+            lines.append('set size 1.0, 1.0')
         f = open(gplot_path, 'w')
         f.write('\n'.join(lines) + '\n')
         f.close()
         gnuplot(gplot_path)
-
         return
 
 
@@ -360,6 +455,43 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             f.write(' '.join([str(item) for item in line]) + '\n')
         f.close()
 
+
+        lines = []
+        lines.append('set output "%s"' % image_path)
+        lines.append('set terminal png size 640,720')
+        lines.append('set multiplot layout 4, 1 title "Monitoring %s"' % host)
+        lines.append('set grid back')
+        lines.append('set xdata time')
+        lines.append('set timefmt "%H:%M:%S"')
+        lines.append('set format x "%H:%M"')
+
+        lines.append('set title "Concurrent Users" offset 0, -2')
+        lines.append('set ylabel "CUs"')
+        lines.append('plot "%s" u 1:2 notitle with impulse lw 2 lt 3' % data_path)
+
+        lines.append('set title "Load average"')
+        lines.append('set ylabel "loadavg"')
+        lines.append('plot "%s" u 1:3 t "CPU 1=100%%" w impulse lw 2 lt 1, "" u 1:4 t "Load 1min" w lines lw 2 lt 3, "" u 1:5 t "Load 5min" w lines lw 2 lt 4, "" u 1:6 t "Load 15min" w lines lw 2 lt 5' % data_path)
+
+        lines.append('set title "Network traffic"')
+        lines.append('set ylabel "kB/s"')
+        lines.append('plot "%s" u 1:8 t "In" w lines lw 2 lt 2, "" u 1:9 t "Out" w lines lw 1 lt 1' % data_path)
+
+        lines.append('set title "Memory usage"')
+        lines.append('set ylabel "kB"')
+        lines.append('plot "%s" u 1:7 t "Memory" w lines lw 2 lt 2, "" u 1:8 t "Swap" w lines lw 2 lt 1' % data_path)
+
+        lines.append('unset multiplot')
+        f = open(gplot_path, 'w')
+        f.write('\n'.join(lines) + '\n')
+        f.close()
+        gnuplot(gplot_path)
+        return
+
+
+
+
+
         lines = []
         lines.append('set output "%s"' % image_path)
         lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
@@ -386,7 +518,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set autoscale y')
         lines.append('set style fill solid .25')
         lines.append('set size 1.0, 0.3')
-        lines.append('set ytics 10')
+        #lines.append('set ytics 10')
         lines.append('set xlabel "Time"')
         lines.append('set origin 0.0, 0.0')
         lines.append('plot "%s" u 1:2 notitle with impulse lw 2 lt 3' % data_path)
@@ -398,6 +530,4 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
         # TODO: add mem and net charts !
         return
-
-
 

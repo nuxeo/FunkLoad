@@ -41,10 +41,13 @@ class RenderHtmlBase(RenderRst):
         """Compute the right size lenght depending on the number of cvus."""
         size = list(self.chart_size)
         len_cvus = len(cvus)
-        if len_cvus > 7:
-            size = list(self.big_chart_size)
-            size[0] = min(800, 50 * len(cvus))
-        return tuple(size)
+        chart_size = self.chart_size
+        big_chart_size = self.big_chart_size
+        if ((len_cvus * 50) > chart_size[0]):
+            if (len_cvus * 50 < big_chart_size):
+                return ((len_cvus * 50), big_chart_size[1])
+            return big_chart_size
+        return chart_size
 
     def prepareReportDirectory(self):
         """Create a folder to save the report."""
