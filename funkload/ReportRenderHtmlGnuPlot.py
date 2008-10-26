@@ -40,8 +40,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     Simply render stuff in ReST than ask docutils to build an html doc.
     """
-    chart_size = (640, 480)
-    big_chart_size = (640, 480)
+    chart_size = (480, 480)
+    #big_chart_size = (640, 480)
 
     def getChartSizeTmp(self, cvus):
         """Override for gnuplot format"""
@@ -458,7 +458,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
         lines = []
         lines.append('set output "%s"' % image_path)
-        lines.append('set terminal png size 640,720')
+        lines.append('set terminal png size 640,768')
         lines.append('set multiplot layout 4, 1 title "Monitoring %s"' % host)
         lines.append('set grid back')
         lines.append('set xdata time')
@@ -487,47 +487,3 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         f.close()
         gnuplot(gplot_path)
         return
-
-
-
-
-
-        lines = []
-        lines.append('set output "%s"' % image_path)
-        lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
-        lines.append('set grid')
-        lines.append('set title "%s Load' % host)
-        lines.append('set ylabel "Load"')
-        lines.append('set xdata time')
-        lines.append('set timefmt "%H:%M:%S"')
-        lines.append('set grid back')
-        lines.append('set multiplot')
-        lines.append('set size 1, 0.7')
-        lines.append('set origin 0, 0.3')
-        lines.append('set bmargin 0')
-        lines.append('set lmargin 9')
-        lines.append('set rmargin 2')
-        lines.append('set format x ""')
-        lines.append('set style fill solid .25')
-        lines.append('plot "%s" u 1:3 t "CPU 1=100%%" w impulse lw 2 lt 1, "" u 1:4 t "Load 1min" w lines lw 2 lt 3, "" u 1:5 t "Load 5min" w lines lw 2 lt 4, "" u 1:6 t "Load 15min" w lines lw 2 lt 5' % data_path)
-        lines.append('set ylabel "CUS"')
-        lines.append('set bmargin')
-        lines.append('set format x "%H:%M"')
-        lines.append('unset title')
-        lines.append('unset grid')
-        lines.append('set autoscale y')
-        lines.append('set style fill solid .25')
-        lines.append('set size 1.0, 0.3')
-        #lines.append('set ytics 10')
-        lines.append('set xlabel "Time"')
-        lines.append('set origin 0.0, 0.0')
-        lines.append('plot "%s" u 1:2 notitle with impulse lw 2 lt 3' % data_path)
-        lines.append('unset multiplot')
-        f = open(gplot_path, 'w')
-        f.write('\n'.join(lines) + '\n')
-        f.close()
-        gnuplot(gplot_path)
-
-        # TODO: add mem and net charts !
-        return
-

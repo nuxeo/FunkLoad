@@ -30,7 +30,7 @@ class RenderHtmlBase(RenderRst):
     Simply render stuff in ReST than ask docutils to build an html doc.
     """
     chart_size = (350, 250)
-    big_chart_size = (640, 320)
+    big_chart_size = (640, 480)
 
     def __init__(self, config, stats, error, monitor, options, css_file=None):
         RenderRst.__init__(self, config, stats, error, monitor, options)
