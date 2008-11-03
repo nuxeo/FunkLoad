@@ -34,7 +34,7 @@ from tempfile import mkdtemp
 import rfc822
 from cgi import FieldStorage
 from urlparse import urlsplit
-from utils import truncate, trace, get_version
+from utils import truncate, trace, get_version, Data
 
 class Request:
     """Store a tcpwatch request."""
@@ -78,8 +78,8 @@ class Request:
         try:
             keys = form.keys()
         except TypeError:
-            trace('# Warning: skipping invalid http post param in file: %s '
-                  'may be an xmlrpc call ?\n' % self.file_path)
+            trace('# Using custom data for request: %s ' % self.file_path)
+            params = Data(self.headers['content-type'], self.body)
             return params
 
         for key in keys:
@@ -287,23 +287,27 @@ Examples
                                  request.path | truncate(42))
         if request.body:
             params = request.extractParam()
-            myfaces_form = None
-            if self.MYFACES_STATE not in [key for key, value in params]:
-                params = 'params=%s' % params
+            if isinstance(params, Data):
+                params = "Data('%s', '''%s''')" % (params.content_type,
+                                                       params.data)
             else:
-                # apache myfaces state add a wrapper
-                self.use_myfaces = True
-                new_params = []
-                for key, value in params:
-                    if key == self.MYFACES_STATE:
-                        continue
-                    if key == self.MYFACES_FORM:
-                        myfaces_form = value
-                        continue
-                    new_params.append([key, value])
-                params = "    self.myfacesParams(%s, form='%s')" % (new_params,
-                                                                    myfaces_form)
-            params = re.sub("'Upload\(([^\)]*)\)'", "Upload(\\1)", params)
+                myfaces_form = None
+                if self.MYFACES_STATE not in [key for key, value in params]:
+                    params = 'params=%s' % params
+                else:
+                    # apache myfaces state add a wrapper
+                    self.use_myfaces = True
+                    new_params = []
+                    for key, value in params:
+                        if key == self.MYFACES_STATE:
+                            continue
+                        if key == self.MYFACES_FORM:
+                            myfaces_form = value
+                            continue
+                        new_params.append([key, value])
+                    params = "    self.myfacesParams(%s, form='%s')" % (
+                        new_params, myfaces_form)
+                params = re.sub("'Upload\(([^\)]*)\)'", "Upload(\\1)", params)
             text.append(', ' + params)
         text.append(', description="%s")' % description)
         return ''.join(text)
