@@ -67,7 +67,7 @@ class RenderDiff(RenderHtmlBase):
         """Create the ReST file."""
         rst_path = os.path.join(self.output_dir, 'index.rst')
         lines = []
-        lines.append(rst_title("Diff report %s vs %s" % (self.report_dir2, self.report_dir1)))
+        lines.append(rst_title("FunkLoad diff report: %s vs %s" % (self.report_dir2, self.report_dir1)))
         lines.append(" * Reference bench report **B1**: " + self.report_dir1 + "_")
         lines.append(" * Challenger bench report **B2**: " + self.report_dir2 + "_")
         lines.append("")
