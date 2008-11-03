@@ -29,7 +29,8 @@ from datetime import datetime
 
 def gnuplot(script_path):
     """Execute a gnuplot script."""
-    cmd = 'gnuplot ' + script_path
+    path = os.path.dirname(os.path.abspath(script_path))
+    cmd = 'cd ' + path + '; gnuplot ' + script_path
     ret, output = getstatusoutput(cmd)
     if ret != 0:
         raise RuntimeError("Failed to run gnuplot cmd: " + cmd +

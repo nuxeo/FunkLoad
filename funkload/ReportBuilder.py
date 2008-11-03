@@ -24,6 +24,10 @@ $Id: ReportBuilder.py 24737 2005-08-31 09:00:16Z bdelbosc $
 
 USAGE = """%prog [options] xmlfile
 
+or
+
+  %prog --diff REPORT_PATH1 REPORT_PATH2
+
 %prog analyze a FunkLoad bench xml result file and output a report.
 
 See http://funkload.nuxeo.org/ for more information.
@@ -36,6 +40,7 @@ Examples
                         Build an HTML report in /tmp.
   %prog -h
                         More options.
+  %prog --diff /tmp/test_reader-2008-01-01 /tmp/test_reader-2008-01-02
 """
 import os
 import xml.parsers.expat
@@ -45,6 +50,7 @@ from ReportStats import AllResponseStat, PageStat, ResponseStat, TestStat
 from ReportStats import MonitorStat, ErrorStat
 from ReportRenderRst import RenderRst
 from ReportRenderHtml import RenderHtml
+from ReportRenderDiff import RenderDiff
 from utils import trace, get_version
 
 
@@ -203,24 +209,38 @@ def main():
                       dest="output_dir",
                       help="Directory to store reports.",
                       default=cur_path)
+    parser.add_option("-d", "--diff", action="store_true",
+                      default=False, dest="diffreport",
+                      help=("Create differential report."))
 
     options, args = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
-    options.xml_file = args[0]
-    xml_parser = FunkLoadXmlParser()
-    xml_parser.parse(options.xml_file)
-    if options.html:
-        trace("Creating html report: ...")
-        html_path = RenderHtml(xml_parser.config, xml_parser.stats,
-                               xml_parser.error, xml_parser.monitor,
-                               options)()
+    if options.diffreport:
+        if len(args) != 2:
+            parser.error("incorrect number of arguments")
+        trace("Creating diff report ...")
+        output_dir = options.output_dir
+        if output_dir == cur_path:
+            output_dir = None
+        html_path = RenderDiff(args[0], args[1], output_dir)
         trace("done: \n")
         trace("file://%s\n" % html_path)
     else:
-        print str(RenderRst(xml_parser.config, xml_parser.stats,
-                            xml_parser.error, xml_parser.monitor,
-                            options))
+        if len(args) != 1:
+            parser.error("incorrect number of arguments")
+        options.xml_file = args[0]
+        xml_parser = FunkLoadXmlParser()
+        xml_parser.parse(options.xml_file)
+        if options.html:
+            trace("Creating html report: ...")
+            html_path = RenderHtml(xml_parser.config, xml_parser.stats,
+                                   xml_parser.error, xml_parser.monitor,
+                                   options)()
+            trace("done: \n")
+            trace("file://%s\n" % html_path)
+        else:
+            print str(RenderRst(xml_parser.config, xml_parser.stats,
+                                xml_parser.error, xml_parser.monitor,
+                                options))
 
 
 if __name__ == '__main__':

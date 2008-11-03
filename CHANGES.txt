@@ -28,6 +28,14 @@ New features
 
 * Use gnuplot 4.2 by default for charts.
 
+* New diff report, benching is fine but comparing 2 reports is a long and error
+  prone task. `fl-build-report` has been enhanced to produce a differencial
+  report. This new feature require gnuplot.
+  
+  To produce a diff report::
+
+   fl-build-report --diff path/to/report-reference path/to/report-challanger -o path/to/diff_challanger-vs-reference
+   
 
 FunkLoad 1.8.0
 --------------
