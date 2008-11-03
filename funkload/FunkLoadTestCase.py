@@ -39,7 +39,7 @@ from ConfigParser import ConfigParser, NoSectionError, NoOptionError
 from webunit.webunittest import WebTestCase, HTTPError
 
 import PatchWebunit
-from utils import get_default_logger, mmn_is_bench, mmn_decode
+from utils import get_default_logger, mmn_is_bench, mmn_decode, Data
 from utils import recording, thread_sleep, is_html, get_version, trace
 from xmlrpclib import ServerProxy
 
@@ -236,16 +236,19 @@ class FunkLoadTestCase(unittest.TestCase):
             params_in = params_in.items()
         params = []
         if params_in:
-            for key, value in params_in:
-                if type(value) is DictType:
-                    for val, selected in value.items():
-                        if selected:
+            if isinstance(params_in, Data):
+                params = params_in
+            else:
+                for key, value in params_in:
+                    if type(value) is DictType:
+                        for val, selected in value.items():
+                            if selected:
+                                params.append((key, val))
+                    elif type(value) in (ListType, TupleType):
+                        for val in value:
                             params.append((key, val))
-                elif type(value) in (ListType, TupleType):
-                    for val in value:
-                        params.append((key, val))
-                else:
-                    params.append((key, value))
+                    else:
+                        params.append((key, value))
 
         if method == 'get' and params:
             url = url_in + '?' + urlencode(params)

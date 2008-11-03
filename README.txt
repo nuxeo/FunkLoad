@@ -6,7 +6,7 @@ FunkLoad_
 
 :address: bdelbosc _at_ nuxeo.com
 
-:version: FunkLoad/1.8.0
+:version: FunkLoad/1.9.0
 
 :revision: $Id$
 
@@ -100,6 +100,9 @@ Main FunkLoad_ features are:
   - servers cpu usage, load average, memory/swap usage and network traffic
     charts.
   - an http error summary list
+
+* Differential reports to compare 2 bench reports giving a quick overview of
+  scalability and velocity changes.
 
 * Easy test customization using a configuration file or command line options.
 
@@ -505,6 +508,9 @@ Examples
                         ReST rendering into stdout.
   fl-build-report --html -o /tmp funkload.xml
                         Build an HTML report in /tmp.
+  fl-build-report --diff /tmp/test_reader-20080101 /tmp/test_reader-20080102
+                        Build a differential report to compare 2 bench reports,
+                        requires gnuplot.
   fl-build-report -h
                         More options.
 
@@ -515,9 +521,13 @@ Options
     --version               show program's version number and exit
     --help, -h              show this help message and exit
     --html, -H              Produce an html report.
-    --output-directory=OUTPUT_DIR, -oOUTPUT_DIR
-                            Directory to store reports.
-
+    --with-percentiles, -P  Include percentiles in tables, use 10%, 50% and 90%
+                        for charts, default option.
+    --no-percentiles        No percentiles in tables display min, avg and max in
+                        charts (gdchart only).
+    --diff, -d              Create differential report.
+    --output-directory=OUTPUT_DIR, -o OUTPUT_DIR
+                        Parent directory to store reports.
 
  Note that you can preview the report for cycles that have been done while
  the bench is still running by invoking the above command.
@@ -750,6 +760,12 @@ You can upload a file by setting a params like this::
 
   from webunit.utility import Upload
   params['file_up'] = Upload('/tmp/foo.txt')
+
+You can even post any contents like this (available since 1.9.0)::
+
+  from funkload.utils import Data
+  params = Data('text/xml', "<?xml version='1.0'?><methodCall><methodName>getStatus</methodName><params></params></methodCall>")
+  self.post(server_url, params, description="Simulate an xmlrpc call")
 
 
 exists

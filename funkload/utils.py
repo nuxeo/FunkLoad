@@ -288,3 +288,18 @@ def is_valid_html(html=None, file_path=None, accept_warning=False):
                            (tidy_cmd, ret, output))
     return status, output
 
+class Data:
+    '''Simple "sentinel" class that lets us identify user data
+    and content type in POST'''
+    def __init__(self, content_type, data):
+        self.content_type = content_type
+        self.data = data
+
+    def __cmp__(self, other):
+        diff = cmp(self.content_type, other.content_type)
+        if not diff:
+            diff = cmp(self.data, other.data)
+        return diff
+
+    def __repr__(self):
+        return "[User data " + self.content_type + "]"

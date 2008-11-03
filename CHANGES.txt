@@ -34,7 +34,21 @@ New features
 
   To produce a diff report::
 
-   fl-build-report --diff path/to/report-reference path/to/report-challanger -o path/to/diff_challanger-vs-reference
+   fl-build-report --diff path/to/report-reference path/to/report-challanger 
+
+* Post method handles custom data and content type. For example to post a xmlrpc by hand::
+
+    from funkload.utils import Data
+    ...
+        data = Data('text/xml', """<?xml version='1.0'?>
+    <methodCall>
+    <methodName>getStatus</methodName>
+    <params>
+    </params>
+    </methodCall>
+    """)
+        self.post(server_url, data, description="Post user data")
+    ...
 
 
 FunkLoad 1.8.0

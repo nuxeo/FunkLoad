@@ -46,7 +46,7 @@ from webunit.webunittest import WebTestCase, WebFetcher
 from webunit.webunittest import HTTPResponse, HTTPError, VERBOSE
 from webunit.utility import Upload
 
-from utils import thread_sleep
+from utils import thread_sleep, Data
 
 
 BOUNDARY = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
@@ -253,20 +253,27 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         else:
             # Normal post
             h.putrequest('POST', url)
-        is_multipart = False
         if postdata:
-            for field, value in postdata:
-                if isinstance(value, Upload):
-                    # Post with a data file requires multipart mimeencode
-                    is_multipart = True
-        if is_multipart:
-            params = mimeEncode(postdata)
-            h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
-                        BOUNDARY)
-        else:
-            params = urlencode(postdata)
-            h.putheader('Content-type', 'application/x-www-form-urlencoded')
-        h.putheader('Content-length', str(len(params)))
+            if isinstance(postdata, Data):
+                # User data and content_type
+                params = postdata.data
+                h.putheader('Content-ypte', postdata.content_type)
+            else:
+                # Check for File upload
+                is_multipart = False
+                for field, value in postdata:
+                    if isinstance(value, Upload):
+                        # Post with a data file requires multipart mimeencode
+                        is_multipart = True
+                        break
+                if is_multipart:
+                    params = mimeEncode(postdata)
+                    h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
+                                BOUNDARY)
+                else:
+                    params = urlencode(postdata)
+                    h.putheader('Content-type', 'application/x-www-form-urlencoded')
+            h.putheader('Content-length', str(len(params)))
     else:
         if webproxy:
             h.putrequest('GET', "http://%s%s" % (host_header, url))
