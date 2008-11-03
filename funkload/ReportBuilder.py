@@ -207,7 +207,7 @@ def main():
     cur_path = os.path.abspath(os.path.curdir)
     parser.add_option("-o", "--output-directory", type="string",
                       dest="output_dir",
-                      help="Directory to store reports.",
+                      help="Parent directory to store reports.",
                       default=cur_path)
     parser.add_option("-d", "--diff", action="store_true",
                       default=False, dest="diffreport",
@@ -219,8 +219,6 @@ def main():
             parser.error("incorrect number of arguments")
         trace("Creating diff report ...")
         output_dir = options.output_dir
-        if output_dir == cur_path:
-            output_dir = None
         html_path = RenderDiff(args[0], args[1], output_dir)
         trace("done: \n")
         trace("file://%s\n" % html_path)

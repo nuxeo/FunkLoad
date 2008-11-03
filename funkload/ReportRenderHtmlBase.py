@@ -57,7 +57,8 @@ class RenderHtmlBase(RenderRst):
             os.mkdir(output_dir, 0775)
         # init report dir
         config = self.config
-        stamp = config['time'][:19].replace(':', '-')
+        stamp = config['time'][:19].replace(':', '')
+        stamp = stamp.replace('-', '')
         report_dir = os.path.join(output_dir, '%s-%s' % (config['id'],
                                                          stamp))
         if not os.access(report_dir, os.W_OK):

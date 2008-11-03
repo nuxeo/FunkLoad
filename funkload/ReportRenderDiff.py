@@ -20,42 +20,71 @@
 $Id$
 """
 import os
-from shutil import copyfile
-from tempfile import mkdtemp
 from ReportRenderRst import rst_title
 from ReportRenderHtmlBase import RenderHtmlBase
 from ReportRenderHtmlGnuPlot import gnuplot
 
+def generateOutputDirectory(a, b):
+    """Return a readeable diff report name using 2 reports"""
+    a = os.path.basename(a)
+    b = os.path.basename(b)
+    if a == b:
+        return "diff_" + a + "_vs_idem"
+    for i in range(min(len(a), len(b))):
+        if a[i] != b[i]:
+            break
+    for i in range(i, 0, -1):
+        # try to keep numbers
+        if a[i] not in "_-0123456789":
+            i += 1
+            break
+
+    r = b[:i] + "_" + b[i:] + "_vs_" + a[i:]
+    if r.startswith('test_'):
+        r = r[5:]
+    r = r.replace('-_', '_')
+    r = r.replace('_-', '_')
+    r = r.replace('__', '_')
+    return "diff_" + r
+
+def getRPath(a, b):
+    """Return a relative path of b from a."""
+    a_path = a.split('/')
+    b_path = b.split('/')
+    for i in range(min(len(a_path), len(b_path))):
+        if a_path[i] != b_path[i]:
+            break
+    return '../' * len(a_path[i:]) + '/'.join(b_path[i:])
+
 class RenderDiff(RenderHtmlBase):
-    """ """
+    """Differential report."""
     report_dir1 = None
     report_dir2 = None
     header = None
     sep = ', '
-    date_file = None
+    data_file = None
     output_dir = None
+    script_file = None
 
-    def __init__(self, report_dir1, report_dir2, output_dir=None, css_file=None):
-        self.report_dir1 = report_dir1
-        self.report_dir2 = report_dir2
+    def __init__(self, report_dir1, report_dir2, output_dir=None,
+                 css_file=None):
+        self.report_dir1 = os.path.abspath(report_dir1)
+        self.report_dir2 = os.path.abspath(report_dir2)
         self.output_dir = output_dir
-        self.report_dir = output_dir
         self.css_file = css_file
 
     def prepareReportDirectory(self):
         """Create a folder to save the report."""
         # init output dir
-        if self.output_dir is not None:
-            output_dir = os.path.abspath(self.output_dir)
-        else:
-            # TODO: compute diff_b2_vs_b1
-            output_dir = mkdtemp(prefix='fl-diff_')
+        output_dir = os.path.abspath(self.output_dir)
         if not os.access(output_dir, os.W_OK):
             os.mkdir(output_dir, 0775)
         output_dir = os.path.abspath(output_dir)
-        self.output_dir = output_dir
-        self.report_dir = output_dir
-        print "Using output dir: " + output_dir
+        report_dir = os.path.join(output_dir, generateOutputDirectory(
+            self.report_dir1, self.report_dir2))
+        if not os.access(report_dir, os.W_OK):
+            os.mkdir(report_dir, 0775)
+        self.report_dir = report_dir
 
     def createCharts(self):
         """Render stats."""
@@ -65,23 +94,33 @@ class RenderDiff(RenderHtmlBase):
 
     def createRstFile(self):
         """Create the ReST file."""
-        rst_path = os.path.join(self.output_dir, 'index.rst')
+        rst_path = os.path.join(self.report_dir, 'index.rst')
         lines = []
-        lines.append(rst_title("FunkLoad diff report: %s vs %s" % (self.report_dir2, self.report_dir1)))
-        lines.append(" * Reference bench report **B1**: " + self.report_dir1 + "_")
-        lines.append(" * Challenger bench report **B2**: " + self.report_dir2 + "_")
+        b1 = os.path.basename(self.report_dir1)
+        b2 = os.path.basename(self.report_dir2)
+        b1_rpath = getRPath(self.report_dir,
+                            os.path.join(self.report_dir1, 'index.html'))
+        b2_rpath = getRPath(self.report_dir,
+                            os.path.join(self.report_dir2, 'index.html'))
+        lines.append(rst_title("FunkLoad_ differential report", level=0))
         lines.append("")
-        # TODO: fix path compute relative path
-        lines.append(".. _" + self.report_dir1 + ": " +
-                     os.path.join("..", self.report_dir1, 'index.html'))
-        lines.append(".. _" + self.report_dir2 + ": " +
-                     os.path.join("..", self.report_dir2, 'index.html'))
+        lines.append(".. sectnum::    :depth: 2")
+        lines.append("")
+        lines.append(rst_title("%s vs %s" % (b2, b1), level=1))
+        lines.append(" * Reference bench report **B1**: `" +
+                     b1 + " <" + b1_rpath + ">`_ [#]_")
+        lines.append(" * Challenger bench report **B2**: `" +
+                     b2 + " <" + b2_rpath + ">`_ [#]_")
+
         lines.append("")
         lines.append(rst_title("Requests", level=2))
         lines.append(" .. image:: rps_diff.png")
         lines.append(" .. image:: request.png")
         lines.append(rst_title("Pages", level=2))
         lines.append(" .. image:: spps_diff.png")
+        lines.append(" .. [#] B1 path: " + self.report_dir1)
+        lines.append(" .. [#] B2 path: " + self.report_dir2)
+        lines.append(" .. _FunkLoad: http://funkload.nuxeo.org/")
         lines.append("")
         f = open(rst_path, 'w')
         f.write('\n'.join(lines))
@@ -94,12 +133,13 @@ class RenderDiff(RenderHtmlBase):
     def __repr__(self):
         return self.render()
 
-    def extract_stat(self, tag, output_dir):
-        lines = open(os.path.join(output_dir, "index.rst")).readlines()
+    def extract_stat(self, tag, report_dir):
+        """Extract stat from the ReST index file."""
+        lines = open(os.path.join(report_dir, "index.rst")).readlines()
         try:
             idx = lines.index("%s stats\n" % tag)
         except ValueError:
-            print "ERROR tag %s not found in rst report %s" % (tag, output_dir)
+            print "ERROR tag %s not found in rst report %s" % (tag, report_dir)
             return []
         delim = 0
         ret =  []
@@ -134,7 +174,8 @@ class RenderDiff(RenderHtmlBase):
             stat2 = self.extract_stat(tag, rep2)
             text = []
             text.append('# ' + tag + " stat for: " + rep1 + " and " + rep2)
-            text.append('# ' + ' '.join(self.header) + ' ' + ' '.join([x+ "-2" for x in self.header]))
+            text.append('# ' + ' '.join(self.header) + ' ' +
+                        ' '.join([x+ "-2" for x in self.header]))
             for s1 in stat1:
                 for s2 in stat2:
                     if s1[0] == s2[0]:
@@ -147,7 +188,7 @@ class RenderDiff(RenderHtmlBase):
         rep1 = self.report_dir1
         rep2 = self.report_dir2
 
-        data_file = os.path.join(self.output_dir, 'diffbench.dat')
+        data_file = os.path.join(self.report_dir, 'diffbench.dat')
         self.data_file = data_file
         f = open(data_file, 'w')
         f.write('# ' + rep1 + ' vs ' + rep2 + '\n')
@@ -160,8 +201,8 @@ class RenderDiff(RenderHtmlBase):
 
 
     def createGnuplotScript(self):
-        script_file = os.path.join(self.output_dir, 'script.gplot')
-        print "Creating gnuplot %s" % script_file
+        """Build gnuplot script"""
+        script_file = os.path.join(self.report_dir, 'script.gplot')
         self.script_file = script_file
         f = open(script_file, 'w')
         rep1 = self.report_dir1
