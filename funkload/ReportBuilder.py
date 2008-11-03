@@ -38,9 +38,11 @@ Examples
                         ReST rendering into stdout.
   %prog --html -o /tmp funkload.xml
                         Build an HTML report in /tmp.
+  %prog --diff /tmp/test_reader-20080101 /tmp/test_reader-20080102
+                        Build a differential report to compare 2 bench reports,
+                        requires gnuplot.
   %prog -h
                         More options.
-  %prog --diff /tmp/test_reader-2008-01-01 /tmp/test_reader-2008-01-02
 """
 import os
 import xml.parsers.expat
@@ -205,13 +207,13 @@ def main():
                       help=("No percentiles in tables display min, "
                             "avg and max in charts (gdchart only)."))
     cur_path = os.path.abspath(os.path.curdir)
+    parser.add_option("-d", "--diff", action="store_true",
+                      default=False, dest="diffreport",
+                      help=("Create differential report."))
     parser.add_option("-o", "--output-directory", type="string",
                       dest="output_dir",
                       help="Parent directory to store reports.",
                       default=cur_path)
-    parser.add_option("-d", "--diff", action="store_true",
-                      default=False, dest="diffreport",
-                      help=("Create differential report."))
 
     options, args = parser.parse_args()
     if options.diffreport:

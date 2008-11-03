@@ -249,7 +249,7 @@ unset multiplot
 # RESPONSE TIMES
 set output "request.png"
 set terminal png size 640,640
-set multiplot title "Request Response time"
+set multiplot title "Request Response time (Velocity)"
 
 # AVG
 set title "Average"  offset 0, -2
