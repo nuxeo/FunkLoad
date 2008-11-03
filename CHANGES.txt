@@ -50,6 +50,9 @@ New features
         self.post(server_url, data, description="Post user data")
     ...
 
+* ``fl-record`` translates xml post (like application/xml) using the above custom
+   data.
+
 
 FunkLoad 1.8.0
 --------------
