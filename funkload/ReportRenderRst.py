@@ -21,7 +21,7 @@ $Id$
 """
 import os
 from shutil import copyfile
-
+from utils import get_version
 
 # ------------------------------------------------------------
 # ReST rendering
@@ -483,6 +483,35 @@ class RenderRst:
                         len(errors[err_type]),
                         err_type[0], traceback))
 
+    def renderDefinitions(self):
+        """Render field definition."""
+        self.append(rst_title("Definitions", 2))
+        self.append('* CUs: Concurrent users or number of concurrent threads'
+                    ' executing tests.')
+        self.append('* Request: a single GET/POST/redirect/xmlrpc request.')
+        self.append('* Page: a request with redirects and ressource'
+                    ' links (image, css, js) for an html page.')
+        self.append('* STPS: Successful tests per second.')
+        self.append('* SPPS: Successful pages per second.')
+        self.append('* RPS: Requests per second successful or not.')
+        self.append('* maxSPPS: Maximum SPPS during the cycle.')
+        self.append('* maxRPS: Maximum RPS during the cycle.')
+        self.append('* MIN: Minimum response time for a page or request.')
+        self.append('* AVG: Average response time for a page or request.')
+        self.append('* MAX: Maximmum response time for a page or request.')
+        self.append('* P10: Percentil 10 or response time where 10 percent'
+                    ' of pages or requests are delivred.')
+        self.append('* MED: Median or Percentil 50, response time where half'
+                    ' of pages or requests are delivred.')
+        self.append('* P90: Percentil 90 or response time where 90 percent'
+                    ' of pages or requests are delivred.')
+        self.append('* P95: Percentil 95 or response time where 95 percent'
+                    ' of pages or requests are delivred.')
+        self.append('')
+        self.append('Report generated with FunkLoad_ ' + get_version() +
+                    ', more information available on the '
+                    '`FunkLoad site <http://funkload.nuxeo.org/#benching>`_.')
+
     def __repr__(self):
         self.renderConfig()
         if not self.cycles:
@@ -507,6 +536,7 @@ class RenderRst:
         self.renderMonitors()
         self.renderPageDetail(cycle_r)
         self.renderErrors()
+        self.renderDefinitions()
         return '\n'.join(self.rst)
 
 

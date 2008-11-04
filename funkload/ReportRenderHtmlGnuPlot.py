@@ -370,6 +370,13 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
 
     # monitoring charts
+    def renderMonitor(self, host):
+        """Render a monitored host."""
+        description = self.config.get(host, '')
+        self.append(rst_title("%s: %s" % (host, description), 3))
+        self.append(".. image:: %s_monitor.png\n" % host)
+
+
     def createMonitorCharts(self):
         """Create all montirored server charts."""
         if not self.monitor or not self.with_chart:
@@ -382,7 +389,6 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
     def createMonitorChart(self, host):
         """Create monitrored server charts."""
         stats = self.monitor[host]
-        time_start = float(stats[0].time)
         times = []
         cvus_list = []
         for stat in stats:
@@ -443,12 +449,15 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
                               (1024 * (float(stats[i].time) -
                                        float(stats[i-1].time))))
 
-        image_path = str(os.path.join(self.report_dir, '%s_load.png' % host))
-        data_path = str(os.path.join(self.report_dir, '%s_load.data' % host))
-        gplot_path = str(os.path.join(self.report_dir, '%s_load.gplot' % host))
+        image_path = str(os.path.join(self.report_dir,
+                                      '%s_monitor.png' % host))
+        data_path = str(os.path.join(self.report_dir,
+                                     '%s_monitor.data' % host))
+        gplot_path = str(os.path.join(self.report_dir,
+                                      '%s_monitor.gplot' % host))
 
-        data = [times, cvus_list, cpu_usage, load_avg_1, load_avg_5, load_avg_15,
-                mem_used, swap_used, net_in, net_out ]
+        data = [times, cvus_list, cpu_usage, load_avg_1, load_avg_5,
+                load_avg_15, mem_used, swap_used, net_in, net_out ]
         data = zip(*data)
         f = open(data_path, 'w')
         f.write("TIME CUs CPU LOAD1 LOAD5 LOAD15 MEM SWAP NETIN NETOUT\n")
