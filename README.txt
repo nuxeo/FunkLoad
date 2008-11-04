@@ -101,8 +101,11 @@ Main FunkLoad_ features are:
     charts.
   - an http error summary list
 
+  View a `report example <http://funkload.nuxeo.org/report-example/test_credential-20081104T101321/>`_.
+
 * Differential reports to compare 2 bench reports giving a quick overview of
   scalability and velocity changes.
+  View a `diff report example <http://funkload.nuxeo.org/report-example/diff_credential-20081104T_101321_vs_101101/>`_.
 
 * Easy test customization using a configuration file or command line options.
 
