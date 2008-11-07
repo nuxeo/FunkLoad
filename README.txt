@@ -74,6 +74,7 @@ Main FunkLoad_ features are:
   - fetching css, javascript and images
   - emulating a browser cache
   - file upload and multipart/form-data submission
+  - post any kind of content type like ``application/xml``
   - https support
   - http_proxy support
 
@@ -97,29 +98,32 @@ Main FunkLoad_ features are:
   - the bench configuration
   - tests, pages, requests stats and charts.
   - the 5 slowest requests.
-  - servers cpu usage, load average, memory/swap usage and network traffic
-    charts.
+  - monitoring one or many servers cpu usage, load average, memory/swap
+    usage and network traffic charts.
   - an http error summary list
 
-  View a `report example <http://funkload.nuxeo.org/report-example/test_credential-20081104T101321/>`_.
+  View a `report example <http://funkload.nuxeo.org/report-example/test_seam_java6/>`_.
 
 * Differential reports to compare 2 bench reports giving a quick overview of
   scalability and velocity changes.
-  View a `diff report example <http://funkload.nuxeo.org/report-example/diff_credential-20081104T_101321_vs_101101/>`_.
+  View a `diff report example <http://funkload.nuxeo.org/report-example/diff_seam_java_6_vs_5/>`_.
 
 * Easy test customization using a configuration file or command line options.
 
-* Easy test creation using TCPWatch_ as proxy recorder, so you can use your web
-  browser and produce a FunkLoad_ test automatically.
+* Easy test creation using embeded TCPWatch_ as proxy recorder, so you can
+  use your web browser and produce a FunkLoad_ test automatically, including
+  file upload or any ajax call.
 
-* Provides web assertion helpers.
+* Provides web assertion helpers to check expected results in responses.
+
+* Provides helpers to retrieve contents in responses page using DOM.
 
 * Provides a funkload.CPSTestCase to ease Zope_ and Nuxeo_ CPS_ testing.
 
 * Easy to install (EasyInstall_) and use, see examples in the demo_ folder.
 
 * Works fine with CPS or any Zope application, CherryPy, Nuxeo EP or any
-  JBoss Seam application ...
+  JBoss Seam JSF MyFaces applications ...
 
 
 Where to find FunkLoad ?
@@ -148,7 +152,7 @@ See CHANGES_ file for information about distribution contents.
 Installation
 ------------
 
-See the INSTALL_ file for requirement and installation.
+See the INSTALL_ file for requirements and installation.
 
 
 Examples
@@ -174,8 +178,8 @@ This page is the main FunkLoad_ documentation, there are also:
 Credits
 -------
 
-Thanks to Frank Cohen's TestMaker_ framework and Richard Jones webunit_
-package.
+Thanks to Frank Cohen's TestMaker_ framework, Richard Jones and all
+contributors_.
 
 
 Test runner
@@ -1359,6 +1363,7 @@ missing, send me an email.
 .. _pyUnit: http://pyunit.sourceforge.net/
 .. _INSTALL: INSTALL.html
 .. _CHANGES: CHANGES.html
+.. _contributors: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/THANKS
 .. _API: api/index.html
 .. _Slides: http://blogs.nuxeo.com/sections/blogs/fermigier/2005_11_17_slides-introducing
 .. _epydoc: http://epydoc.sourceforge.net/
