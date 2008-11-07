@@ -36,7 +36,13 @@ New features
 
    fl-build-report --diff path/to/report-reference path/to/report-challanger
 
-* Post method handles custom data and content type. For example to post a xmlrpc by hand::
+  View a `diff report example
+  <http://funkload.nuxeo.org/report-example/diff_seam_java_6_vs_5/>`_.
+
+* Post method handles custom data and content type. For example to post a
+  xmlrpc by hand
+
+  ::
 
     from funkload.utils import Data
     ...
@@ -48,12 +54,14 @@ New features
     </methodCall>
     """)
         self.post(server_url, data, description="Post user data")
-    ...
 
-* ``fl-record`` translates xml post (like application/xml) using the above custom
-   data.
+* The recorder translates properly ``application/xml`` or any content type
+  using the new ``Data`` class (see above exemple).
 
-* New test script provided with ``fl-install-demo`` to bench the JBoss Seam Booking application.
+* New `test script
+  <http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/seam-booking-1.1.5>`_
+  provided with ``fl-install-demo`` to bench the JBoss Seam Booking
+  application.
 
 
 FunkLoad 1.8.0
