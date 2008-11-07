@@ -26,7 +26,11 @@ FunkLoad 1.9.0
 New features
 ~~~~~~~~~~~~
 
-* Use gnuplot 4.2 by default for charts.
+* Switch to `gnuplot 4.2 <http://gnuplot.sourceforge.net/>`_ for charts
+  generation. Gnuplot script and data are kept with the report enabling
+  charts customization. No more gdchart charting woes.
+
+* Enhanced charts displaying more information, view a `report example <http://funkload.nuxeo.org/report-example/test_seam_java6/>`_.
 
 * New diff report option, comparing 2 reports is a long and error prone
   task, `fl-build-report` has been enhanced to produce a differencial
