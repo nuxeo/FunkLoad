@@ -116,7 +116,6 @@ Main FunkLoad features are:
     scripts=['scripts/fl-monitor-ctl', 'scripts/fl-credential-ctl',
              'scripts/fl-run-bench', 'scripts/fl-run-test',
              'scripts/fl-build-report',
-             'scripts/fl-import-from-tm-recorder',
              'scripts/fl-install-demo',
              'scripts/fl-record'],
     classifiers=[
@@ -141,7 +140,7 @@ Main FunkLoad features are:
     package_data={'funkload': ['data/*',
                                'demo/simple/*', 'demo/zope/*',
                                'demo/cmf/*', 'demo/xmlrpc/*',
-                               'demo/*.txt',
+                               'demo/seam-booking-1.1.5/*', 'demo/*.txt',
                                'tests/*',]},
     # this test suite works only on an installed version :(
     # test_suite = "funkload.tests.test_Install.test_suite",
