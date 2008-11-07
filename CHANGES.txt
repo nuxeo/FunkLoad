@@ -34,7 +34,7 @@ New features
 
   To produce a diff report::
 
-   fl-build-report --diff path/to/report-reference path/to/report-challanger 
+   fl-build-report --diff path/to/report-reference path/to/report-challanger
 
 * Post method handles custom data and content type. For example to post a xmlrpc by hand::
 
@@ -52,6 +52,9 @@ New features
 
 * ``fl-record`` translates xml post (like application/xml) using the above custom
    data.
+
+* New demo provided with ``fl-install-demo`` providing a test for the JBoss
+  Seam Booking application.
 
 
 FunkLoad 1.8.0
