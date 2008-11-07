@@ -13,14 +13,14 @@ FunkLoad_ CHANGES
 .. contents:: Table of Contents
 
 
-FunkLoad SVN trunk
+FunkLoad 1.9.0
 ------------------
 
-:Location: http://svn.nuxeo.org/pub/funkload/trunk/
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.9.0.tar.gz
 
-:Snapshots: http://funkload.nuxeo.org/snapshots/
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.9.0
 
-:Target: 1.9.0
+:Released date: 2008-11-07
 
 
 New features
@@ -53,14 +53,13 @@ New features
 * ``fl-record`` translates xml post (like application/xml) using the above custom
    data.
 
-* New demo provided with ``fl-install-demo`` providing a test for the JBoss
-  Seam Booking application.
+* New test script provided with ``fl-install-demo`` to bench the JBoss Seam Booking application.
 
 
 FunkLoad 1.8.0
 --------------
 
-:Location: http://svn.nuxeo.org/pub/funkload/trunk/
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.8.0.tar.gz
 
 :Svn: http://svn.nuxeo.org/pub/funkload/tags/1.8.0/
 

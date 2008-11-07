@@ -53,31 +53,33 @@ main use cases are:
 
 Main FunkLoad features are:
 
-* FunkLoad is free software distributed under the `GNU GPL`.
+* FunkLoad is free software distributed under the `GNU GPL`_.
 
 * Functional test are pure Python scripts using the pyUnit framework like
   normal unit test. Python enable complex scenarios to handle real world
   applications.
 
 * Truly emulates a web browser (single-threaded) using Richard Jones'
-  webunit:
+  webunit_:
 
   - basic authentication support
   - cookies support
   - referrer support
-  - http proxy support
   - fetching css, javascript and images
   - emulating a browser cache
   - file upload and multipart/form-data submission
+  - post any kind of content type like ``application/xml``
   - https support
+  - http_proxy support
 
 * Advanced test runner with many command-line options:
 
   - set the target server url
   - display the fetched page in real time in your browser
   - debug mode
+  - check performance of a single page (or set of pages) inside a test
   - green/red color mode
-  - select test case using a regex
+  - select or exclude tests cases using a regex
   - support normal pyUnit test
   - support doctest from a plain text file or embedded in python docstring
 
@@ -88,22 +90,35 @@ Main FunkLoad features are:
   containing:
 
   - the bench configuration
-  - tests, pages, requests stats and charts with percentiles.
+  - tests, pages, requests stats and charts.
   - the 5 slowest requests.
-  - servers cpu usage, load average, memory/swap usage and network traffic
-    charts.
+  - monitoring one or many servers cpu usage, load average, memory/swap
+    usage and network traffic charts.
   - an http error summary list
+
+  View a `report example <http://funkload.nuxeo.org/report-example/test_seam_java6/>`.
+
+* Differential reports to compare 2 bench reports giving a quick overview of
+  scalability and velocity changes.
+  View a `diff report example <http://funkload.nuxeo.org/report-example/diff_seam_java_6_vs_5/>`.
 
 * Easy test customization using a configuration file or command line options.
 
-* Easy test creation using TCPWatch as proxy recorder, so you can use your web
-  browser and produce a FunkLoad test automatically.
+* Easy test creation using embeded TCPWatch as proxy recorder, so you can
+  use your web browser and produce a FunkLoad test automatically, including
+  file upload or any ajax call.
 
-* Provides web assertion helpers.
+* Provides web assertion helpers to check expected results in responses.
+
+* Provides helpers to retrieve contents in responses page using DOM.
 
 * Provides a funkload.CPSTestCase to ease Zope and Nuxeo CPS testing.
 
-* Easy to install (EasyInstall) and use, see examples in the demo folder.
+* Easy to install (EasyInstall_) and use, see examples in the demo folder.
+
+* Works fine with CPS or any Zope application, CherryPy, Nuxeo EP or any
+  JBoss Seam JSF MyFaces applications ...
+
 """,
     author="Benoit Delbosc",
     author_email="bdelbosc@nuxeo.com",
@@ -119,7 +134,7 @@ Main FunkLoad features are:
              'scripts/fl-install-demo',
              'scripts/fl-record'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
