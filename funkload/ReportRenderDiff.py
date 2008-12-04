@@ -262,13 +262,13 @@ set format x ""
 plot "diffbench.dat" i 5 u 1:21:8 w filledcurves above t "B2<B1", "" i 5 u 1:21:8 w filledcurves below t "B2>B1", "" i 5 u 1:8 w lines lw 2 t "B1", "" i 5 u 1:21 w lines lw 2 t "B2
 
 # % AVG
-set title "Average B2/B1 %"  offset 0, -2
+set title "Average B1/B2 %"  offset 0, -2
 set size 0.5, 0.31
 set origin 0, 0
 set format y "% g%%"
 set format x "% g"
 set xlabel "Concurrent Users"
-plot "diffbench.dat" i 5 u 1:($21>$8?(100 - (($21*100)/$8)): 0) w boxes notitle, "" i 5 u 1:($21<=$8?(100 - (($21*100)/$8)): 0) w boxes notitle
+plot "diffbench.dat" i 5 u 1:($21>$8?((($8*100)/$21) - 100): 0) w boxes notitle, "" i 5 u 1:($21<=$8?((($8*100)/$21) - 100): 0) w boxes notitle
 
 # MEDIAN
 set size 0.5, 0.31
