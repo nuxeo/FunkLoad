@@ -13,6 +13,19 @@ FunkLoad_ CHANGES
 .. contents:: Table of Contents
 
 
+FunkLoad SVN trunk 
+------------------
+
+:Svn: http://svn.nuxeo.org/pub/funkload/trunk
+
+:Target: 1.9.1
+
+Bug fixes
+~~~~~~~~~
+
+* Fix differential report average percent profit chart.
+
+
 FunkLoad 1.9.0
 ------------------
 
