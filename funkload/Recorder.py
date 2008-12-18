@@ -372,5 +372,8 @@ Examples
         else:
             print script
 
-if __name__ == '__main__':
+def main():
     RecorderProgram().run()
+
+if __name__ == '__main__':
+    main()

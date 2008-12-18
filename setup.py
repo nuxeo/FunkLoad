@@ -157,6 +157,15 @@ Main FunkLoad features are:
                                'demo/cmf/*', 'demo/xmlrpc/*',
                                'demo/seam-booking-1.1.5/*', 'demo/*.txt',
                                'tests/*',]},
+    entry_points = {
+        'console_scripts': [
+            'fl-monitor-ctl = funkload.Monitor:main',
+            'fl-credential-ctl = funkload.CredentialFile:main',
+            'fl-run-bench = funkload.BenchRunner:main',
+            'fl-run-test = funkload.TestRunner:main',
+            'fl-build-report = funkload.ReportBuilder:main',
+            'fl-install-demo = funkload.DemoInstaller:main',
+            'fl-record = funkload.Recorder:main']},
     # this test suite works only on an installed version :(
     # test_suite = "funkload.tests.test_Install.test_suite",
     )

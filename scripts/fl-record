@@ -20,6 +20,7 @@
 
 $Id: fl-run-bench 24487 2005-08-24 16:13:39Z bdelbosc $
 """
-from funkload.Recorder import RecorderProgram
-RecorderProgram().run()
+from funkload.Recorder import main
+
+main()
 
