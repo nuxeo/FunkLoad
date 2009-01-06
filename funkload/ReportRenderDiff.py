@@ -102,6 +102,8 @@ class RenderDiff(RenderHtmlBase):
                             os.path.join(self.report_dir1, 'index.html'))
         b2_rpath = getRPath(self.report_dir,
                             os.path.join(self.report_dir2, 'index.html'))
+        if b1 == b2:
+            b2 = b2 +"(2)"
         lines.append(rst_title("FunkLoad_ differential report", level=0))
         lines.append("")
         lines.append(".. sectnum::    :depth: 2")
@@ -118,8 +120,10 @@ class RenderDiff(RenderHtmlBase):
         lines.append(" .. image:: request.png")
         lines.append(rst_title("Pages", level=2))
         lines.append(" .. image:: spps_diff.png")
-        lines.append(" .. [#] B1 path: " + self.report_dir1)
-        lines.append(" .. [#] B2 path: " + self.report_dir2)
+        lines.append(" .. [#] B1 path: " + self.report_dir1.replace('_',
+                                                                    '\\_'))
+        lines.append(" .. [#] B2 path: " + self.report_dir2.replace('_',
+                                                                    '\\_'))
         lines.append(" .. _FunkLoad: http://funkload.nuxeo.org/")
         lines.append("")
         f = open(rst_path, 'w')

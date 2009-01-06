@@ -25,6 +25,8 @@ Bug fixes
 
 * Fix differential report average percent profit chart.
 
+* Fix possible error on differential report ReStructuredText.
+
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~~
 
