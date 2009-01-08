@@ -49,18 +49,26 @@ class RenderHtmlBase(RenderRst):
             return big_chart_size
         return chart_size
 
-    def prepareReportDirectory(self):
-        """Create a folder to save the report."""
-        # init output dir
-        output_dir = os.path.abspath(self.options.output_dir)
-        if not os.access(output_dir, os.W_OK):
-            os.mkdir(output_dir, 0775)
-        # init report dir
+    def generateReportDirectory(self, output_dir):
+        """Generate a directory name for a report."""
         config = self.config
         stamp = config['time'][:19].replace(':', '')
         stamp = stamp.replace('-', '')
         report_dir = os.path.join(output_dir, '%s-%s' % (config['id'],
                                                          stamp))
+        return report_dir
+
+    def prepareReportDirectory(self):
+        """Create a report directory."""
+        if self.options.report_dir:
+            report_dir = self.options.report_dir
+        else:
+            # init output dir
+            output_dir = os.path.abspath(self.options.output_dir)
+            if not os.access(output_dir, os.W_OK):
+                os.mkdir(output_dir, 0775)
+            # init report dir
+            report_dir = self.generateReportDirectory(output_dir)
         if not os.access(report_dir, os.W_OK):
             os.mkdir(report_dir, 0775)
         self.report_dir = report_dir

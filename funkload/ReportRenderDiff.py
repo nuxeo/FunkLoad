@@ -24,7 +24,7 @@ from ReportRenderRst import rst_title
 from ReportRenderHtmlBase import RenderHtmlBase
 from ReportRenderHtmlGnuPlot import gnuplot
 
-def generateOutputDirectory(a, b):
+def getReadableDiffReportName(a, b):
     """Return a readeable diff report name using 2 reports"""
     a = os.path.basename(a)
     b = os.path.basename(b)
@@ -66,25 +66,20 @@ class RenderDiff(RenderHtmlBase):
     output_dir = None
     script_file = None
 
-    def __init__(self, report_dir1, report_dir2, output_dir=None,
-                 css_file=None):
+    def __init__(self, report_dir1, report_dir2, options, css_file=None):
         self.report_dir1 = os.path.abspath(report_dir1)
         self.report_dir2 = os.path.abspath(report_dir2)
-        self.output_dir = output_dir
+        self.options = options
         self.css_file = css_file
 
-    def prepareReportDirectory(self):
-        """Create a folder to save the report."""
-        # init output dir
-        output_dir = os.path.abspath(self.output_dir)
-        if not os.access(output_dir, os.W_OK):
-            os.mkdir(output_dir, 0775)
+    def generateReportDirectory(self, output_dir):
+        """Generate a directory name for a report."""
         output_dir = os.path.abspath(output_dir)
-        report_dir = os.path.join(output_dir, generateOutputDirectory(
+        report_dir = os.path.join(output_dir, getReadableDiffReportName(
             self.report_dir1, self.report_dir2))
         if not os.access(report_dir, os.W_OK):
             os.mkdir(report_dir, 0775)
-        self.report_dir = report_dir
+        return report_dir
 
     def createCharts(self):
         """Render stats."""

@@ -53,6 +53,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         """Return the max CVUs range."""
         maxCycle = self.config['cycles'].split(',')[-1]
         maxCycle = str(maxCycle[:-1].strip())
+        if maxCycle.startswith("["):
+            maxCycle = maxCycle[1:]
         return "[0:" + maxCycle + "]"
 
     def createTestChart(self):

@@ -27,12 +27,17 @@ Bug fixes
 
 * Fix possible error on differential report ReStructuredText.
 
+* Fix report generation for bench with only one cycle.
+
+
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * Support setuptools console_scripts entry point for funkload
   scripts. Thanks to Ross Patterson.
 
+* Adding a --report-directory to ``fl-build-report`` to set report directory
+  path.
 
 FunkLoad 1.9.0
 ------------------

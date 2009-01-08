@@ -212,8 +212,15 @@ def main():
                       help=("Create differential report."))
     parser.add_option("-o", "--output-directory", type="string",
                       dest="output_dir",
-                      help="Parent directory to store reports.",
+                      help="Parent directory to store reports, the directory"
+                      "name of the report will be generated automatically.",
                       default=cur_path)
+    parser.add_option("-r", "--report-directory", type="string",
+                      dest="report_dir",
+                      help="Directory name to store the report.",
+                      default=None)
+
+
 
     options, args = parser.parse_args()
     if options.diffreport:
@@ -221,7 +228,7 @@ def main():
             parser.error("incorrect number of arguments")
         trace("Creating diff report ...")
         output_dir = options.output_dir
-        html_path = RenderDiff(args[0], args[1], output_dir)
+        html_path = RenderDiff(args[0], args[1], options)
         trace("done: \n")
         trace("file://%s\n" % html_path)
     else:
