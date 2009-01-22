@@ -30,14 +30,17 @@ Bug fixes
 * Fix report generation for bench with only one cycle.
 
 
-New internal features
-~~~~~~~~~~~~~~~~~~~~~~
+New features
+~~~~~~~~~~~~~~
 
 * Support setuptools console_scripts entry point for funkload
   scripts. Thanks to Ross Patterson.
 
 * Adding a --report-directory to ``fl-build-report`` to set report directory
   path.
+
+* Adding ``--pause`` option to ``fl-run-test``, the test runner will wait for
+  the ENTER key to be pressed between requests.
 
 FunkLoad 1.9.0
 ------------------

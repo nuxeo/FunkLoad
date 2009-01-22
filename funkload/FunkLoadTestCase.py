@@ -78,6 +78,7 @@ class FunkLoadTestCase(unittest.TestCase):
                                              False)
         self._simple_fetch = getattr(options, 'simple_fetch', False)
         self._stop_on_fail = getattr(options, 'stop_on_fail', False)
+        self._pause = getattr(options, 'pause', False)
         if self._viewing and not self._dumping:
             # viewing requires dumping contents
             self._dumping = True
@@ -480,6 +481,9 @@ class FunkLoadTestCase(unittest.TestCase):
 
         Between the predefined sleep_time_min and sleep_time_max values.
         """
+        if self._pause:
+            raw_input("Press ENTER to continue ")
+            return
         s_min = self.sleep_time_min
         s_max = self.sleep_time_max
         if s_max != s_min:

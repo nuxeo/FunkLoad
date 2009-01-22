@@ -410,6 +410,9 @@ Examples
                           help="The test names must match the regex.")
         parser.add_option("--list", action="store_true",
                           help="Just list the test names.")
+        parser.add_option("--pause", action="store_true",
+                          help="Pause between request, "
+                          "press ENTER to continue.")
 
         options, args = parser.parse_args()
         if self.module is None:
