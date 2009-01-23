@@ -61,7 +61,7 @@ class RenderHtmlBase(RenderRst):
     def prepareReportDirectory(self):
         """Create a report directory."""
         if self.options.report_dir:
-            report_dir = self.options.report_dir
+            report_dir = os.path.abspath(self.options.report_dir)
         else:
             # init output dir
             output_dir = os.path.abspath(self.options.output_dir)
@@ -128,7 +128,7 @@ class RenderHtmlBase(RenderRst):
             return ''
         self.createCharts()
         self.copyXmlResult()
-        return self.html_path
+        return os.path.abspath(self.html_path)
 
     __call__ = render
 

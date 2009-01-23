@@ -230,7 +230,7 @@ def main():
         output_dir = options.output_dir
         html_path = RenderDiff(args[0], args[1], options)
         trace("done: \n")
-        trace("file://%s\n" % html_path)
+        trace("%s\n" % html_path)
     else:
         if len(args) != 1:
             parser.error("incorrect number of arguments")
