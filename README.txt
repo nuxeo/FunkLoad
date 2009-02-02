@@ -32,7 +32,6 @@ FunkLoad_
 .. contents:: Table of Contents
 
 
-
 Introducing FunkLoad
 ====================
 
