@@ -77,6 +77,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self._accept_invalid_links = getattr(options, 'accept_invalid_links',
                                              False)
         self._simple_fetch = getattr(options, 'simple_fetch', False)
+        self._bench_label = getattr(options, 'label', None)
         self._stop_on_fail = getattr(options, 'stop_on_fail', False)
         self._pause = getattr(options, 'pause', False)
         if self._viewing and not self._dumping:
