@@ -128,7 +128,7 @@ class RenderHtmlBase(RenderRst):
             self.generateHtml()
             pass
         except ImportError:
-            print "WARNING docultils not found, no html output."
+            print "WARNING docutils not found, no html output."
             return ''
         self.createCharts()
         self.copyXmlResult()
