@@ -24,8 +24,7 @@ $Id: setup.py 24768 2005-08-31 14:01:05Z bdelbosc $
 import ez_setup
 ez_setup.use_setuptools()
 from setuptools import setup, find_packages
-#from distutils.core import setup
-from funkload.version import __version__
+__version__ = '1.9.1'
 
 setup(
     name="funkload",
