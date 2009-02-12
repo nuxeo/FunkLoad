@@ -17,7 +17,7 @@
 #
 """TCPWatch FunkLoad Test Recorder.
 
-Requires tcpwatch.py available at:
+Requires tcpwatch-httpproxy or tcpwatch.py available at:
 
 * http://hathawaymix.org/Software/TCPWatch/tcpwatch-1.3.tar.gz
 
@@ -139,6 +139,7 @@ class Response:
 
 class RecorderProgram:
     """A tcpwatch to funkload recorder."""
+    tcpwatch_cmd = ['tcpwatch-httpproxy', 'tcpwatch.py']
     MYFACES_STATE = 'org.apache.myfaces.trinidad.faces.STATE'
     MYFACES_FORM = 'org.apache.myfaces.trinidad.faces.FORM'
     USAGE = """%prog [options] [test_name]
@@ -178,6 +179,16 @@ Examples
         self.use_myfaces = False
         self.parseArgs(argv)
 
+    def getTcpWatchCmd(self):
+        """Return the tcpwatch cmd to use."""
+        for cmd in self.tcpwatch_cmd:
+            ret = os.system(cmd + ' -h  2> /dev/null')
+            if ret == 0:
+                return cmd
+        raise RuntimeError('Tcpwatch is not installed no %s found. '
+                           'Visit http://funkload.nuxeo.org/install.' %
+                           str(self.tcpwatch_cmd))
+
     def parseArgs(self, argv):
         """Parse programs args."""
         parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
@@ -210,8 +221,8 @@ Examples
     def startProxy(self):
         """Start a tcpwatch session."""
         self.tcpwatch_path = mkdtemp('_funkload')
-        cmd = 'tcpwatch.py -p %s -s -r %s' % (self.port,
-                                              self.tcpwatch_path)
+        cmd = self.getTcpWatchCmd() + ' -p %s -s -r %s' % (self.port,
+                                                           self.tcpwatch_path)
         if os.name == 'posix':
             if self.verbose:
                 cmd += ' | grep "T http"'
