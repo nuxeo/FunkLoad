@@ -29,6 +29,7 @@ Bug fixes
 
 * Fix report generation for bench with only one cycle.
 
+* Only attempt to retrieve syntactically valid URLs 
 
 New features
 ~~~~~~~~~~~~~~
@@ -43,6 +44,13 @@ New features
 
 * Adding ``--pause`` option to ``fl-run-test``, the test runner will wait for
   the ENTER key to be pressed between requests.
+
+* Added a two sample buildout configurations: a minimal one that just contains what
+  is necessary to run tests and a default one that also enables recording.
+
+* Added a ``--label`` option to ``fl-run-bench`` which the report generator then 
+  appends to the output directory of the report. This is to make it easier to keep
+  different bench runs apart from each other. 
 
 FunkLoad 1.9.0
 ------------------
