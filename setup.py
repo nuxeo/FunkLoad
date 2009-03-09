@@ -150,7 +150,8 @@ Main FunkLoad features are:
     ],
     # setuptools specific keywords
     install_requires = ['webunit  == 1.3.8',
-                        'docutils >= 0.3.7'],
+                        'docutils >= 0.3.7',
+                        'setuptools'],
     zip_safe=True,
     package_data={'funkload': ['data/*',
                                'demo/simple/*', 'demo/zope/*',
