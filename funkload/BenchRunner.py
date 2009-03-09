@@ -405,6 +405,9 @@ class BenchRunner:
                   'configuration_file': self.config_path,
                   'server_url': self.test_url,
                   'log_xml': self.result_path,}
+        if self.options.label:
+            config['label'] = self.options.label
+
         for (host, port, desc) in self.monitor_hosts:
             config[host] = desc
         self.test._open_result_log(**config)
@@ -478,6 +481,10 @@ def main():
     parser.add_option("", "--simple-fetch", action="store_true",
                       help="Don't load additional links like css "
                       "or images when fetching an html page.")
+    parser.add_option("-l", "--label", type="string",
+                      help="Add a label to this bench run "
+                      "for easier identification (it will be appended to the directory name "
+                      "for reports generated from it).")
     options, args = parser.parse_args()
     if len(args) != 2:
         parser.error("incorrect number of arguments")

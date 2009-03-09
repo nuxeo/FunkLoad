@@ -54,8 +54,12 @@ class RenderHtmlBase(RenderRst):
         config = self.config
         stamp = config['time'][:19].replace(':', '')
         stamp = stamp.replace('-', '')
-        report_dir = os.path.join(output_dir, '%s-%s' % (config['id'],
-                                                         stamp))
+        if config.get('label', None) is None:
+            report_dir = os.path.join(output_dir, '%s-%s' % (
+                config['id'], stamp))
+        else:
+            report_dir = os.path.join(output_dir, '%s-%s-%s' % (
+                config['id'], stamp, config.get('label')))
         return report_dir
 
     def prepareReportDirectory(self):
