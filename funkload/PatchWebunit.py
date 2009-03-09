@@ -47,7 +47,9 @@ from webunit.webunittest import HTTPResponse, HTTPError, VERBOSE
 from webunit.utility import Upload
 
 from utils import thread_sleep, Data
+import re
 
+valid_url = re.compile(r'^(http|https)://[a-z0-9][a-z0-9\-\.]*\.[a-z]+(:[0-9]+)?([?/].*)?$', re.I)
 
 BOUNDARY = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
 SEP_BOUNDARY = '--' + BOUNDARY
@@ -102,7 +104,11 @@ class FKLIMGSucker(IMGSucker):
         newattributes = []
         for name, value in attributes:
             if name == 'src':
+                # construct full url
                 url = urlparse.urljoin(self.base, value)
+                # make sure it's syntactically valid
+                if not valid_url.match(url):
+                    continue
                 # TODO: figure the re-write path
                 # newattributes.append((name, path))
                 if not self.session.images.has_key(url):
@@ -129,7 +135,11 @@ class FKLIMGSucker(IMGSucker):
         newattributes = [('rel', 'stylesheet'), ('type', 'text/css')]
         for name, value in attributes:
             if name == 'href':
+                # construct full url
                 url = urlparse.urljoin(self.base, value)
+                # make sure it's syntactically valid
+                if not valid_url.match(url):
+                    continue
                 # TODO: figure the re-write path
                 # newattributes.append((name, path))
                 if not self.session.css.has_key(url):
