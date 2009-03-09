@@ -1,0 +1,12 @@
+We provide buildouts for funkload in two flavours: default and minimal.
+
+The default ``buildout.cfg`` also installs TCPWatch, which is needed to *record* tests.
+
+The ``minimial.cfg`` installs funkload only, without any dependencies. It is useful for 
+installations where you only want to *run* the tests.
+
+If you also want to generate reports (i.e. use ``fl-build-report``) you need to install
+gnuplot. See the `installation instructions<http://funkload.nuxeo.org/INSTALL.html#id3>`_ 
+for details. gnuplot has quite a few platform specific dependencies and is thus outside the 
+scope of a buildout.
+
