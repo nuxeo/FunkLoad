@@ -33,6 +33,8 @@ Bug fixes
 New features
 ~~~~~~~~~~~~~~
 
+* Easier installation on Debian Lenny/Ubuntu 8.10
+
 * Support setuptools console_scripts entry point for funkload
   scripts. Thanks to Ross Patterson.
 
