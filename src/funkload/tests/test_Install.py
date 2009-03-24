@@ -53,11 +53,11 @@ class TestInstall(unittest.TestCase):
         except ImportError:
             print ("WARNING: missing docutils module, "
                    "no HTML report available.")
-        try:
-            import gdchart
-        except ImportError:
-            print ("WARNING: missing gdchart module, "
-                   "no charts available in the HTML report.")
+        ret = commands.getstatusoutput('gnuplot --version')
+        print ret[1]
+        if ret[0]:
+            print ("WARNING: gnuplot is missing, no charts available in "
+                   "HTML reports.")
 
         from funkload.TestRunner import g_has_doctest
         if not g_has_doctest:

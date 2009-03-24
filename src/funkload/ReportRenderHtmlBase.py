@@ -1,5 +1,6 @@
 # (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
+# Contributors: Tom Lazar
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published

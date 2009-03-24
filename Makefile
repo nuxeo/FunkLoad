@@ -3,7 +3,7 @@
 #
 .PHONY: build pkg sdist egg install clean rpm
 
-TARGET := cvs.in.nuxeo.com:~/public_public_html/funkload
+TARGET := bertha_:~/public_public_html/funkload
 
 # use TAG=a for alpha, b for beta, rc for release candidate
 ifdef TAG
@@ -17,7 +17,7 @@ build:
 	python setup.py $(PKGTAG) build
 
 test:
-	cd funkload/tests && fl-run-test -v test_Install.py
+	cd src/funkload/tests && fl-run-test -v test_Install.py
 
 pkg: sdist egg
 
