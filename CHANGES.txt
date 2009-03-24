@@ -56,6 +56,8 @@ New features
   then appends to the output directory of the report. This is to make it
   easier to keep different bench runs apart from each other.
 
+* Add a ``--loop`` option to ``fl-record``, this way it is easy to type a
+  comment then hit Ctrl-C to dump the script and continue with the next action.
 
 Bug fixes
 ~~~~~~~~~

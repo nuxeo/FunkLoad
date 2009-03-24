@@ -174,6 +174,7 @@ Examples
         self.server_url = None
         self.class_name = None
         self.test_name = None
+        self.loop = 1
         self.script_path = None
         self.configuration_path = None
         self.use_myfaces = False
@@ -200,6 +201,9 @@ Examples
         parser.add_option("-i", "--tcp-watch-input", type="string",
                           dest="tcpwatch_path", default=None,
                           help="Path to an existing tcpwatch capture.")
+        parser.add_option("-l", "--loop", type="int",
+                          dest="loop", default=1,
+                          help="Loop mode.")
 
         options, args = parser.parse_args(argv)
         if len(args) == 1:
@@ -210,6 +214,8 @@ Examples
         self.verbose = options.verbose
         self.tcpwatch_path = options.tcpwatch_path
         self.port = options.port
+        if not test_name and not self.tcpwatch_path:
+            self.loop = options.loop
         if test_name:
             class_name = ''.join([x.capitalize()
                                   for x in re.split('_|-', test_name)])
@@ -372,16 +378,25 @@ Examples
 
     def run(self):
         """run it."""
-        if self.tcpwatch_path is None:
-            self.startProxy()
-        script = self.extractScript()
-        if not script:
-            return
-        if self.test_name is not None:
-            self.writeScript(script)
-            self.writeConfiguration()
-        else:
-            print script
+        count = self.loop
+        while count:
+            count -= 1
+            if count:
+                print "Remaining loop: %i" % count
+            if self.tcpwatch_path is None:
+                self.startProxy()
+            script = self.extractScript()
+            if not script:
+                self.tcpwatch_path = None
+                continue
+            if self.test_name is not None:
+                self.writeScript(script)
+                self.writeConfiguration()
+            else:
+                print script
+                print
+            self.tcpwatch_path = None
+
 
 def main():
     RecorderProgram().run()
