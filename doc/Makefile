@@ -17,7 +17,7 @@ doc: ${HTML_DOCS}
 	${RST2HTML} $< $@
 
 epydoc:
-	epydoc --name FunkLoad -u ../../ --html --output ./api/  ../funkload/
+	epydoc --name FunkLoad -u ../../ --html --output ./api/  ../src/funkload/
 
 distrib: doc
 	scp -r ${HTML_DOCS} api $(TARGET)/
