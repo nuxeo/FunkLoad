@@ -1,0 +1,69 @@
+#!/usr/bin/perl -w
+#
+# dh_installoverrides
+
+=head 1 NAME
+
+dh_installoverrides = install lintian/linda override files
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head 1 SYNOPSIS
+
+B<dh_installoverrides>
+
+=head1 DESCRIPTION
+
+dh_installoverrides is a debhelper program that is responsible for
+installing lintian and linda overrides into package build directories.
+
+If a file named debian/package.lintian exists, it is installed
+into /usr/share/lintian/overrides/package.
+If a file named debian/package.linda exists, it is installed
+into /usr/share/linda/overrides/package.
+
+=cut
+
+init();
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+    my $tmp=tmpdir($package);
+
+    my $file=$package;
+
+    my $lintian_overrides=pkgfile($package,"lintian");
+    my $linda_overrides=pkgfile($package,"linda");
+
+    if($lintian_overrides ne '') {
+	if(! -d "$tmp/usr/share/lintian/overrides") {
+	    doit("install", "-d", "$tmp/usr/share/lintian/overrides");
+	}
+
+	doit("install","-p","-m644",$lintian_overrides,
+	     "$tmp/usr/share/lintian/overrides/$file");
+    }
+
+    if($linda_overrides ne '') {
+	if (! -d "$tmp/usr/share/linda/overrides") {
+	    doit("install", "-d", "$tmp/usr/share/linda/overrides");
+	}
+
+	doit("install", "-p", "-m644", $linda_overrides,
+	     "$tmp/usr/share/linda/overrides/$file");
+    }
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper
+
+=head1 AUTHOR
+
+Rene Engelhard <rene@debian.org>
+
+=cut

@@ -1,0 +1,85 @@
+.TH "FL-RUN-TEST" "1" "26 March 2009" "Debian Project" "Debian manual"
+.SH "NAME"
+fl\-run\-test \- runs a funkload test file
+.SH "SYNOPSIS"
+.B fl\-run-test
+.B [ options ]
+.B file
+.B [ class.method | class | suite ]
+.SH "DESCRIPTION"
+A FunkLoad test can be used like a standard unittest using a unittest.main() and a 'python MyFile.py'.
+
+Note that fl\-run\-test can be used to launch normal unittest.TestCase and (if you use python2.4) doctest in a plain text file or embedded in a python docstring. The \-\-debug option makes doctests verbose.
+.SH "OPTIONS"
+.TP 
+.B \-\-version
+show program's version number and exit
+.TP 
+.B \-\-help, \-h
+show this help message and exit
+.TP 
+.B \-\-quiet, \-q
+Minimal output.
+.TP 
+.B \-\-verbose, \-v
+Verbose output.
+.TP 
+.B \-\-debug, \-d
+FunkLoad and doctest debug output.
+.TP 
+.B \-\-debug\-level=DEBUG_LEVEL
+Debug level 2 is more verbose.
+.TP 
+.B \-\-url=MAIN_URL, \-uMAIN_URL
+Base URL to bench without ending '/'.
+.TP 
+.B \-\-sleep\-time\-min=FTEST_SLEEP_TIME_MIN, \-mFTEST_SLEEP_TIME_MIN
+Minumum sleep time between request.
+.TP 
+.B \-\-sleep\-time\-max=FTEST_SLEEP_TIME_MAX, \-MFTEST_SLEEP_TIME_MAX
+Maximum sleep time between request.
+.TP 
+.B \-\-dump\-directory=DUMP_DIR
+Directory to dump html pages.
+.TP 
+.B \-\-firefox\-view, \-V
+Real time view using firefox, you must have a running instance of firefox in the same host.
+.TP 
+.B \-\-no\-color
+Monochrome output.
+.TP 
+.B \-\-loop\-on\-pages=LOOP_STEPS, \-lLOOP_STEPS
+Loop as fast as possible without concurrency on pages expect a page number or a slice like 3:5. Output some statistics.
+.TP 
+.B \-\-loop\-number=LOOP_NUMBER, \-nLOOP_NUMBER
+Number of loop.
+.TP 
+.B \-\-accept\-invalid\-links
+Do not fail if css/image links are not reachable.
+.TP 
+.B \-\-simple\-fetch
+Don't load additional links like css or images when fetching an html page.
+.TP 
+.B \-\-stop\-on\-fail
+Stop tests on first failure or error.
+.TP 
+.B \-\-regex=REGEX, \-eREGEX
+The test names must match the regex.
+.TP 
+.B \-\-list
+Just list the test names.
+.TP
+.B --pause
+Pause between request, press ENTER to continue.
+.SH "SEE ALSO"
+.BR fl\-build\-report (1),
+.BR fl\-credential\-ctl (1),
+.BR fl\-install\-demo (1),
+.BR fl\-monitor\-ctl (1),
+.BR fl\-record (1),
+.BR fl\-run\-bench (1).
+.SH "AUTHOR"
+Funkload was written by Benoit Delbosc.
+.PP 
+This manual page was written by Jose Parrella <bureado@debian.org>,
+for the Debian project (but may be used by others).

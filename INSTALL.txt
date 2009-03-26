@@ -19,9 +19,11 @@ FunkLoad_ INSTALL
 Quick installation guide for Debian Lenny/Ubuntu 8.10
 -------------------------------------------------------
 
-Unfortunatly the FunkLoad_ Debian package (1.6.2-3) is not yet functional,
+Unfortunatly the FunkLoad_ Debian package (old 1.6.2-3) does not work properly.
 
-You can install the latest snapshot this way::
+In the mean time you can find the latest stable `Debian package here <http://funkload.nuxeo.org/debian/funkload_1.10.0_all.deb>`_.
+
+Or you can install the latest snapshot this way::
 
   sudo aptitude install python-dev python-xml python-setuptools \
        python-webunit=1.3.8-1 python-docutils gnuplot

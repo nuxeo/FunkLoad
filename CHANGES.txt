@@ -37,38 +37,40 @@ FunkLoad 1.10.0
 New features
 ~~~~~~~~~~~~~~
 
-* Easier installation on Debian Lenny/Ubuntu 8.10
+* Easier installation on Debian Lenny/Ubuntu 8.10, See INSTALL_.
 
 * Support setuptools console_scripts entry point for funkload
   scripts. Thanks to Ross Patterson.
 
-* Adding a --report-directory to ``fl-build-report`` to set report directory
-  path.
-
-* Adding ``--pause`` option to ``fl-run-test``, the test runner will wait for
-  the ENTER key to be pressed between requests.
-
 * Added a two sample buildout configurations: a minimal one that just
   contains what is necessary to run tests and a default one that also
-  enables recording.
+  enables recording. Thanks to Tom Lazar.
+
+* Added a ``--report-directory`` option to ``fl-build-report`` to set report
+  directory path.
 
 * Added a ``--label`` option to ``fl-run-bench`` which the report generator
   then appends to the output directory of the report. This is to make it
-  easier to keep different bench runs apart from each other.
+  easier to keep different bench runs apart from each other. Thanks to Tom
+  Lazar.
 
-* Add a ``--loop`` option to ``fl-record``, this way it is easy to type a
+* Added a ``--pause`` option to ``fl-run-test``, the test runner will wait for
+  the ENTER key to be pressed between requests.
+
+* Added a ``--loop`` option to ``fl-record``, this way it is easy to type a
   comment then hit Ctrl-C to dump the script and continue with the next action.
 
 Bug fixes
 ~~~~~~~~~
 
+* Only attempt to retrieve syntactically valid URLs links.
+
+* Fix report generation for bench with only one cycle.
+
 * Fix differential report average percent profit chart.
 
 * Fix possible error on differential report ReStructuredText.
 
-* Fix report generation for bench with only one cycle.
-
-* Only attempt to retrieve syntactically valid URLs
 
 
 FunkLoad 1.9.0

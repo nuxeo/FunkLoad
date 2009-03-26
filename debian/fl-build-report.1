@@ -1,0 +1,51 @@
+.TH "FL-BUILD-REPORT" "1" "26 March 2009" "Debian Project" "Debian manual"
+.SH "NAME"
+fl\-build\-report - generate a report from a FunkLoad bench result file
+.SH "SYNOPSIS"
+.B fl\-build\-report
+.B [options]
+.B XMLFILE
+.PP
+.B fl\-build\-report
+.B \-\-diff
+.B REPORT_PATH1 REPORT_PATH2
+
+.SH "DESCRIPTION"
+fl-build-report analyze a FunkLoad bench xml result file and output a
+report.
+.PP
+The --diff option expect two report directories and output a differential report.
+.PP
+Note that you can preview the report for cycles that have been done while the bench is still running by invoking fl\-build\-report.
+.SH "OPTIONS"
+.TP
+.B \-\-version
+Show program's version number and exit
+.TP
+.B \-\-help, \-h
+Shows a help message and exit
+.TP
+.B \-\-html, \-H
+Produce an HTML report
+.TP
+.B \-\-output\-directory=OUTPUT_DIR, \-oOUTPUT_DIR
+Parent directory to store reports, the directoryname
+of the report will be generated automatically.
+.TP
+.B --report-directory=REPORT_DIR, -r REPORT_DIR
+Directory name to store the report.
+.TP
+.B --diff, -d
+Create differential report.
+.SH "SEE ALSO"
+.BR fl\-credential\-ctl (1),
+.BR fl\-monitor\-ctl (1),
+.BR fl\-record (1),
+.BR fl\-run\-bench (1),
+.BR fl\-run\-test (1).
+.BR fl\-install\-demo (1),
+.SH "AUTHOR"
+Funkload was written by Benoit Delbosc.
+.PP
+This manual page was written by Jose Parrella <bureado@debian.org>,
+for the Debian project (but may be used by others).

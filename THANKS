@@ -16,3 +16,5 @@ Dan Rahmel: Recorder patch.
 Daniel Swärd: Feedback on post method.
 Ross Patterson: Support of setuptools console_scripts.
 Tom Lazar: Support of buildout, label option for the bench runner, many fixes.
+Toni Mueller: Debian package maintener.
+Jose Parrella: Debian man page writter.

@@ -1373,7 +1373,7 @@ missing, send me an email.
 .. _CPS: http://www.cps-project.org/
 .. _`python cheese shop`: http://www.python.org/pypi/funkload/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/funkload/demo/
 .. _report: http://funkload.nuxeo.org/report-example/
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
 .. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev

@@ -1,0 +1,34 @@
+.TH "FL-MONITOR-CTL" "1" "26 March 2009" "Debian Project" "Debian manual"
+.SH "NAME"
+fl\-monitor\-ctl \- monitors server health during funkload benchs
+.SH "SYNOPSIS"
+.B fl\-monitor\-ctl
+.B [ options ]
+.B config_file
+.B [ start | startd | stop | restart | status | test ]
+.SH "DESCRIPTION"
+fl\-monitor\-ctl monitors server health during a Funkload bench. It is implemented as an XML\-RPC server.
+.PP 
+A configuration file needs to be setup in order to use this server. Please refer to demo/simple/credential.conf for an example.
+.SH "OPTIONS"
+.TP 
+.B \-\-version
+Show program's version number and exit
+.TP 
+.B \-\-help, \-h
+Show a help message and exit
+.TP 
+.B \-\-quiet, \-q
+Verbose output
+.SH "SEE ALSO"
+.BR fl\-build\-report (1),
+.BR fl\-credential\-ctl (1),
+.BR fl\-install\-demo (1),
+.BR fl\-record (1),
+.BR fl\-run\-bench (1),
+.BR fl\-run\-test (1).
+.SH "AUTHOR"
+Funkload was written by Benoit Delbosc.
+.PP 
+This manual page was written by Jose Parrella <bureado@debian.org>,
+for the Debian project (but may be used by others).
