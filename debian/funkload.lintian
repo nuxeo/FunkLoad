@@ -1,4 +1,0 @@
-funkload: package-contains-upstream-install-documentation usr/share/doc/funkload/INSTALL.txt.gz
-funkload: extra-license-file usr/share/doc/funkload/LICENSE.txt.gz
-funkload: script-not-executable ./usr/share/pycentral/funkload/site-packages/funkload/BenchRunner.py
-funkload: script-not-executable ./usr/share/pycentral/funkload/site-packages/funkload/TestRunner.py

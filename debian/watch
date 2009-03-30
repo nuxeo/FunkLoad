@@ -1,3 +1,0 @@
-# watch control file for uscan
-version=3
-http://funkload.nuxeo.org/ funkload-([\d+\.]+|\d+)[a-z]*\.tar\.gz
