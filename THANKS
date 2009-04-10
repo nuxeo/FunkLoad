@@ -13,7 +13,7 @@ M.-A. Darche: Extensive use, documentation improvements and FunkLoad name
   co-idea.
 Jehiah Czebotar: Mutiple redirects patch.
 Dan Rahmel: Recorder patch.
-Daniel Swärd: Feedback on post method.
+Daniel Swärd: Feedback on post method and cookie patch.
 Ross Patterson: Support of setuptools console_scripts.
 Tom Lazar: Support of buildout, label option for the bench runner, many fixes.
 Toni Mueller: Debian package maintener.

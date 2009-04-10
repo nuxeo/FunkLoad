@@ -50,7 +50,8 @@ from webunit.utility import Upload
 from utils import thread_sleep, Data
 import re
 
-valid_url = re.compile(r'^(http|https)://[a-z0-9][a-z0-9\-\.]*\.[a-z]+(:[0-9]+)?([?/].*)?$', re.I)
+valid_url = re.compile(r'^(http|https)://[a-z0-9\.\-\:]+(\/[^\ \t\<\>]*)?$',
+                       re.I)
 
 BOUNDARY = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
 SEP_BOUNDARY = '--' + BOUNDARY
@@ -328,12 +329,12 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 if sendcookie.coded_value == '"deleted"':
                     continue
                 # TODO: check max-age
-                cookie_list.append("%s=%s;"%(sendcookie.key,
-                                             sendcookie.coded_value))
+                cookie_list.append("%s=%s"%(sendcookie.key,
+                                            sendcookie.coded_value))
                 cookies_used.append(sendcookie.key)
 
     if cookie_list:
-        h.putheader('Cookie', ' '.join(cookie_list))
+        h.putheader('Cookie', '; '.join(cookie_list))
         #print '  Cookies: ' + str(cookie_list)
 
     # check that we sent the cookies we expected to
