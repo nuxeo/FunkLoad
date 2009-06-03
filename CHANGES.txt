@@ -25,6 +25,11 @@ FunkLoad SVN trunk
 Bug fixes
 ~~~~~~~~~
 
+* Fixing gnuplot charts when concurrent users are not in ascending order or
+  have duplicates. (like ``-c 1:10:50:10:1`` instead of ``-c 1:10:20:30``)
+
+* Prevent ``fl-record`` to generate invalid python test case name.
+
 * Fix regex to check valid resources urls, it was too restrictive.
 
 * Fix cookie support, there was an extra ";" if there was only one cookie,

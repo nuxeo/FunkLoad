@@ -21,6 +21,7 @@ $Id$
 """
 
 import os
+import re
 from commands import getstatusoutput
 from ReportRenderRst import rst_title
 from ReportRenderHtmlBase import RenderHtmlBase
@@ -43,6 +44,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
     """
     chart_size = (480, 480)
     #big_chart_size = (640, 480)
+    ticpattern = re.compile('(\:\d+)\ ')
 
     def getChartSizeTmp(self, cvus):
         """Override for gnuplot format"""
@@ -56,6 +58,33 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         if maxCycle.startswith("["):
             maxCycle = maxCycle[1:]
         return "[0:" + maxCycle + "]"
+
+    def useXTicLabels(self):
+        """Guess if we need to use labels for x axis or number."""
+        cycles = self.config['cycles'][1:-1].split(',')
+        if len(cycles) <= 1:
+            # single cycle
+            return True
+        if len(cycles) != len(set(cycles)):
+            # duplicates cycles
+            return True
+        cycles = [int(i) for i in cycles]
+        for i, v in enumerate(cycles[1:]):
+            # unordered cycles
+            if cycles[i] > v:
+                return True
+        return False
+
+    def fixXLabels(self, lines):
+        """Fix gnuplot script if CUs are not ordered."""
+        if not self.useXTicLabels():
+            return lines
+        # remove xrange line
+        out = lines.replace('set xrange', '#set xrange')
+        # rewrite plot using xticlabels
+        out = out.replace(' 1:', ' :')
+        out = self.ticpattern.sub(r'\1:xticlabels(1) ', out)
+        return out
 
     def createTestChart(self):
         """Create the test chart."""
@@ -91,6 +120,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set ylabel "Test/s"')
         lines.append('set grid back')
         lines.append('set xrange ' + self.getXRange())
+
         if not has_error:
             lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "STPS"' % data_path)
         else:
@@ -116,7 +146,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             lines.append('plot "%s" u 1:3 w linespoints lt 1 lw 2 t "%% Errors"' % data_path)
             lines.append('unset multiplot')
         f = open(gplot_path, 'w')
-        f.write('\n'.join(lines) + '\n')
+        lines = self.fixXLabels('\n'.join(lines) + '\n')
+        f.write(lines)
         f.close()
         gnuplot(gplot_path)
         return
@@ -207,7 +238,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set style fill solid .25')
         lines.append('plot "%s" u 1:8:8:10:9 t "med/p90/p95" w candlesticks lt 1 lw 1 whiskerbars 0.5, "" u 1:7:4:8:8 w candlesticks lt 2 lw 1 t "min/p10/med" whiskerbars 0.5, "" u 1:5 t "avg" w lines lt 3 lw 2' % data_path)
         f = open(gplot_path, 'w')
-        f.write('\n'.join(lines) + '\n')
+        lines = self.fixXLabels('\n'.join(lines) + '\n')
+        f.write(lines)
         f.close()
         gnuplot(gplot_path)
 
@@ -286,7 +318,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set style fill solid .25')
         lines.append('plot "%s" u 1:8:8:10:9 t "med/p90/p95" w candlesticks lt 1 lw 1 whiskerbars 0.5, "" u 1:7:4:8:8 w candlesticks lt 2 lw 1 t "min/p10/med" whiskerbars 0.5, "" u 1:5 t "avg" w lines lt 3 lw 2' % data_path)
         f = open(gplot_path, 'w')
-        f.write('\n'.join(lines) + '\n')
+        lines = self.fixXLabels('\n'.join(lines) + '\n')
+        f.write(lines)
         f.close()
         gnuplot(gplot_path)
 
@@ -365,7 +398,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             lines.append('unset multiplot')
             lines.append('set size 1.0, 1.0')
         f = open(gplot_path, 'w')
-        f.write('\n'.join(lines) + '\n')
+        lines = self.fixXLabels('\n'.join(lines) + '\n')
+        f.write(lines)
         f.close()
         gnuplot(gplot_path)
         return
