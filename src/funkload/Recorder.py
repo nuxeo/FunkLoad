@@ -216,8 +216,8 @@ Examples
         self.port = options.port
         if not test_name and not self.tcpwatch_path:
             self.loop = options.loop
-        test_name = test_name.replace('-', '_')
         if test_name:
+            test_name = test_name.replace('-', '_')
             class_name = ''.join([x.capitalize()
                                   for x in re.split('_|-', test_name)])
             self.test_name = test_name
