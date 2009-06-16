@@ -16,8 +16,8 @@ FunkLoad_ INSTALL
 
 
 
-Quick installation guide for Debian Lenny/Ubuntu 8.10
--------------------------------------------------------
+Quick installation guide for Debian Lenny/Ubuntu 8.10, 9.04
+--------------------------------------------------------------
 
 Unfortunatly the FunkLoad_ Debian package (old 1.6.2-3) does not work properly.
 
@@ -26,7 +26,7 @@ In the mean time you can find the latest stable `Debian package here <http://fun
 Or you can install the latest snapshot this way::
 
   sudo aptitude install python-dev python-xml python-setuptools \
-       python-webunit=1.3.8-1 python-docutils gnuplot
+       python-webunit python-docutils gnuplot
   sudo aptitude install tcpwatch-httpproxy --without-recommends
   sudo easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
 
