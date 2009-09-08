@@ -34,7 +34,9 @@ Bug fixes
 
 * Fix cookie support, there was an extra ";" if there was only one cookie,
   thanks to Daniel Swärd.
-
+ 
+* Patch Recorder to work on non linux os, enable TCPWATCH env variable to set 
+  the tcpwatch binary path, thanks to David Fraser.
 
 FunkLoad 1.10.0
 ------------------

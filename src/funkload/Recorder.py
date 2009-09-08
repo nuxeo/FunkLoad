@@ -36,6 +36,12 @@ from cgi import FieldStorage
 from urlparse import urlsplit
 from utils import truncate, trace, get_version, Data
 
+def get_null_file():
+    if sys.platform == "win32":
+        return "NUL"
+    else:
+        return "/dev/null"
+
 class Request:
     """Store a tcpwatch request."""
     def __init__(self, file_path):
@@ -182,12 +188,15 @@ Examples
 
     def getTcpWatchCmd(self):
         """Return the tcpwatch cmd to use."""
-        for cmd in self.tcpwatch_cmd:
-            ret = os.system(cmd + ' -h  2> /dev/null')
+        tcpwatch_cmd = self.tcpwatch_cmd[:]
+        if os.getenv("TCPWATCH"):
+            tcpwatch_cmd.insert(0, os.getenv("TCPWATCH"))
+        for cmd in tcpwatch_cmd:
+            ret = os.system(cmd + ' -h  2> %s' % get_null_file())
             if ret == 0:
                 return cmd
         raise RuntimeError('Tcpwatch is not installed no %s found. '
-                           'Visit http://funkload.nuxeo.org/install.' %
+                           'Visit http://funkload.nuxeo.org/INSTALL.html' %
                            str(self.tcpwatch_cmd))
 
     def parseArgs(self, argv):
@@ -234,7 +243,7 @@ Examples
             if self.verbose:
                 cmd += ' | grep "T http"'
             else:
-                cmd += ' > /dev/null'
+                cmd += ' > %s' % get_null_file()
         trace("Hit Ctrl-C to stop recording.\n")
         os.system(cmd)
 
