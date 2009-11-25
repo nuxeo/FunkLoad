@@ -1,5 +1,6 @@
-# (C) Copyright 2008 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2009 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
+# Contributors: Kelvin Ward
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -21,6 +22,7 @@ $Id$
 """
 
 import os
+import sys
 import re
 from commands import getstatusoutput
 from ReportRenderRst import rst_title
@@ -31,11 +33,32 @@ from datetime import datetime
 def gnuplot(script_path):
     """Execute a gnuplot script."""
     path = os.path.dirname(os.path.abspath(script_path))
-    cmd = 'cd ' + path + '; gnuplot ' + os.path.abspath(script_path)
-    ret, output = getstatusoutput(cmd)
-    if ret != 0:
-        raise RuntimeError("Failed to run gnuplot cmd: " + cmd +
-                           "\n" + str(output))
+    if 'win' in sys.platform.lower():
+        # commands module doesn't work on win and gnuplot is named
+        # wgnuplot
+        ret = os.system('cd "' + path + '" && wgnuplot "' +
+                        os.path.abspath(script_path) + '"')
+        if ret != 0:
+            raise RuntimeError("Failed to run wgnuplot cmd on " +
+                               os.path.abspath(script_path))
+
+    else:
+        cmd = 'cd ' + path + '; gnuplot ' + os.path.abspath(script_path)
+        ret, output = getstatusoutput(cmd)
+        if ret != 0:
+            raise RuntimeError("Failed to run gnuplot cmd: " + cmd +
+                               "\n" + str(output))
+
+def gnuplot_scriptpath(base, filename):
+    """Return a file path string from the join of base and file name for use
+    inside a gnuplot script.
+
+    Backslashes (the win os separator) are replaced with forward
+    slashes. This is done because gnuplot scripts interpret backslashes
+    specially even in path elements.
+    """
+    return os.path.join(base, filename).replace("\\", "/")
+
 
 class RenderHtmlGnuPlot(RenderHtmlBase):
     """Render stats in html using gnuplot
@@ -88,9 +111,9 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     def createTestChart(self):
         """Create the test chart."""
-        image_path = str(os.path.join(self.report_dir, 'tests.png'))
+        image_path = gnuplot_scriptpath(self.report_dir, 'tests.png')
         gplot_path = str(os.path.join(self.report_dir, 'tests.gplot'))
-        data_path = str(os.path.join(self.report_dir, 'tests.data'))
+        data_path  = gnuplot_scriptpath(self.report_dir, 'tests.data')
         stats = self.stats
         # data
         lines = ["CUs STPS ERROR"]
@@ -166,10 +189,10 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     def createPageChart(self):
         """Create the page chart."""
-        image_path = str(os.path.join(self.report_dir, 'pages_spps.png'))
-        image2_path = str(os.path.join(self.report_dir, 'pages.png'))
+        image_path = gnuplot_scriptpath(self.report_dir, 'pages_spps.png')
+        image2_path = gnuplot_scriptpath(self.report_dir, 'pages.png')
         gplot_path = str(os.path.join(self.report_dir, 'pages.gplot'))
-        data_path = str(os.path.join(self.report_dir, 'pages.data'))
+        data_path = gnuplot_scriptpath(self.report_dir, 'pages.data')
         stats = self.stats
         # data
         lines = ["CUs SPPS ERROR MIN AVG MAX P10 P50 P90 P95"]
@@ -245,10 +268,10 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     def createAllResponseChart(self):
         """Create global responses chart."""
-        image_path = str(os.path.join(self.report_dir, 'requests_rps.png'))
-        image2_path = str(os.path.join(self.report_dir, 'requests.png'))
+        image_path = gnuplot_scriptpath(self.report_dir, 'requests_rps.png')
+        image2_path = gnuplot_scriptpath(self.report_dir, 'requests.png')
         gplot_path = str(os.path.join(self.report_dir, 'requests.gplot'))
-        data_path = str(os.path.join(self.report_dir, 'requests.data'))
+        data_path = gnuplot_scriptpath(self.report_dir, 'requests.data')
         stats = self.stats
         # data
         lines = ["CUs RPS ERROR MIN AVG MAX P10 P50 P90 P95"]
@@ -328,10 +351,12 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     def createResponseChart(self, step):
         """Create responses chart."""
-        image_path = str(os.path.join(self.report_dir,
-                                      'request_%s.png' % step))
-        gplot_path = str(os.path.join(self.report_dir, 'request_%s.gplot' % step))
-        data_path = str(os.path.join(self.report_dir, 'request_%s.data' % step))
+        image_path = gnuplot_scriptpath(self.report_dir,
+                                        'request_%s.png' % step)
+        gplot_path = str(os.path.join(self.report_dir,
+                                      'request_%s.gplot' % step))
+        data_path = gnuplot_scriptpath(self.report_dir,
+                                       'request_%s.data' % step)
         stats = self.stats
         # data
         lines = ["CUs STEP ERROR MIN AVG MAX P10 P50 P90 P95"]
@@ -485,10 +510,10 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
                               (1024 * (float(stats[i].time) -
                                        float(stats[i-1].time))))
 
-        image_path = str(os.path.join(self.report_dir,
-                                      '%s_monitor.png' % host))
-        data_path = str(os.path.join(self.report_dir,
-                                     '%s_monitor.data' % host))
+        image_path = gnuplot_scriptpath(self.report_dir,
+                                        '%s_monitor.png' % host)
+        data_path = gnuplot_scriptpath(self.report_dir,
+                                       '%s_monitor.data' % host)
         gplot_path = str(os.path.join(self.report_dir,
                                       '%s_monitor.gplot' % host))
 

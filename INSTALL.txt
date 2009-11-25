@@ -87,6 +87,8 @@ Optional packages
 
   or visit the http://www.gnuplot.info/ site.
 
+  gnuplot (or wgnuplot for win) must be in the executable path.
+
 
 * The recorder use TCPWatch_ which is not yet available using easy_install::
 
