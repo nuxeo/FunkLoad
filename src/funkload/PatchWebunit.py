@@ -181,9 +181,10 @@ WebTestCase.pageImages = WTC_pageImages
 
 # WebFetcher fetch
 def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
-             ok_codes=None):
+             ok_codes=None, key_file=None, cert_file=None):
     '''Run a single test request to the indicated url. Use the POST data
-    if supplied.
+    if supplied. Accepts key and certificate file paths for https (ssl/tls)
+    connections.
 
     Raises failureException if the returned data contains any of the
     strings indicated to be Error Content.
@@ -250,7 +251,14 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     elif protocol == 'https':
         #if httpslib is None:
             #raise ValueError, "Can't fetch HTTPS: M2Crypto not installed"
-        h = httplib.HTTPS(server, int(port))
+
+        # FL Patch -------------------------
+
+        # patched to use the given key and cert file
+        h = httplib.HTTPS(server, int(port), key_file, cert_file)
+
+        # FL Patch end  -------------------------
+
         if int(port) == 443:
             host_header = server
         else:
