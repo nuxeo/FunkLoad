@@ -19,8 +19,23 @@ FunkLoad SVN trunk
 
 :Svn: http://svn.nuxeo.org/pub/funkload/trunk
 
-:Target: 1.10.1
+:Target: 1.11.0
 
+
+New features
+~~~~~~~~~~~~~~
+
+* Support https with ssl/tls by providing a private key and certificate (PEM
+  formatted) to the new setKeyAndCertificateFile method. This feature has been
+  provided by Kelvin Ward.
+
+* Better win support:
+
+  - Patch recorder to work on non linux os, enable TCPWATCH env variable to set
+    the tcpwatch binary path, thanks to David Fraser.
+
+  - Patch report builder to produce gnuplot chart on win, thanks to Kelvin
+    Ward.
 
 Bug fixes
 ~~~~~~~~~
@@ -35,11 +50,6 @@ Bug fixes
 * Fix cookie support, there was an extra ";" if there was only one cookie,
   thanks to Daniel Swärd.
 
-* Patch recorder to work on non linux os, enable TCPWATCH env variable to set
-  the tcpwatch binary path, thanks to David Fraser.
-
-* Patch report builder to produce gnuplot chart on non linux os, thanks to
-  Kelvin Ward.
 
 FunkLoad 1.10.0
 ------------------

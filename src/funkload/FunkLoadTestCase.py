@@ -81,6 +81,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self._bench_label = getattr(options, 'label', None)
         self._stop_on_fail = getattr(options, 'stop_on_fail', False)
         self._pause = getattr(options, 'pause', False)
+        self._keyfile_path = None
+        self._certfile_path = None
         if self._viewing and not self._dumping:
             # viewing requires dumping contents
             self._dumping = True
@@ -143,7 +145,7 @@ class FunkLoadTestCase(unittest.TestCase):
         #self.logd('# FunkLoadTestCase._funkload_init done')
 
     def clearContext(self):
-        """Resset the testcase."""
+        """Reset the testcase."""
         self._browser.clearContext()
         self._browser.css = {}
         self._browser.history = []
@@ -159,6 +161,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_xmlrpc = 0
         self.clearBasicAuth()
         self.clearHeaders()
+        self.clearKeyAndCertificateFile()
         self.setUserAgent(self.default_user_agent)
 
         self.logdd('FunkLoadTestCase.clearContext done')
@@ -175,7 +178,9 @@ class FunkLoadTestCase(unittest.TestCase):
             params = []
         t_start = time.time()
         try:
-            response = self._browser.fetch(url, params, ok_codes=ok_codes)
+            response = self._browser.fetch(url, params, ok_codes=ok_codes,
+                                           key_file=self._keyfile_path,
+                                           cert_file=self._certfile_path)
         except:
             etype, value, tback = sys.exc_info()
             t_stop = time.time()
@@ -423,7 +428,9 @@ class FunkLoadTestCase(unittest.TestCase):
         while(True):
             try:
                 self._browser.fetch(url, None,
-                                    ok_codes=[200, 301, 302, 303, 307])
+                                    ok_codes=[200, 301, 302, 303, 307],
+                                    key_file=self._keyfile_path,
+                                    cert_file=self._certfile_path)
             except SocketError:
                 if time.time() - time_start > time_out:
                     self.fail('Time out service %s not available after %ss' %
@@ -495,7 +502,25 @@ class FunkLoadTestCase(unittest.TestCase):
         # we should always sleep something
         thread_sleep(s_val)
 
+    def setKeyAndCertificateFile(self, keyfile_path, certfile_path):
+        """Set the paths to a key file and a certificate file that will be
+        used by a https (ssl/tls) connection when calling the post or get
+        methods.
 
+        keyfile_path : path to a PEM formatted file that contains your
+        private key.
+        certfile_path : path to a PEM formatted certificate chain file.
+        """
+        self._keyfile_path = keyfile_path
+        self._certfile_path = certfile_path
+
+    def clearKeyAndCertificateFile(self):
+        """Clear any key file or certificate file paths set by calls to
+        setKeyAndCertificateFile.
+        """
+        self._keyfile_path = None
+        self._certfile_path = None
+        
 
     #------------------------------------------------------------
     # Assertion helpers
