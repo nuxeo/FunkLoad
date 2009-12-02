@@ -21,8 +21,29 @@
 $Id$
 """
 import os
+import sys
 import unittest
 import commands
+
+def winplatform_getstatusoutput(cmd):
+    """A replacement for commands.getstatusoutput on the windows platform.
+    commands.getstatusoutput only works on unix platforms.
+    This only works with python2.6+ as the subprocess module is required.
+    os.system provides the return code value but not the output streams of the
+    commands.
+    os.popen provides the output streams but no reliable easy to get return code.
+    """
+    try:        
+        import subprocess
+    except ImportError:
+        return None
+
+    # create a new handle for the stdout pipe of cmd, and redirect cmd's stderr to stdout
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               shell=True, universal_newlines=True)
+    stdoutdata, stderrdata = process.communicate()    
+    return (process.returncode, stdoutdata)
+
 
 class TestInstall(unittest.TestCase):
     """Check installation."""
@@ -33,7 +54,14 @@ class TestInstall(unittest.TestCase):
 
     def system(self, cmd, expected_code=0):
         """Execute a cmd and exit on fail return cmd output."""
-        ret = commands.getstatusoutput(cmd)
+                
+        if 'win' in sys.platform:
+            ret = winplatform_getstatusoutput(cmd)
+            if not ret:
+                self.fail('Cannot run self.system on windows without the subprocess module (python 2.6)')
+        else:
+            ret = commands.getstatusoutput(cmd)
+            
         if ret[0] != expected_code:
             self.fail("exec [%s] return code %s != %s output:\n%s" %
                       (cmd, ret[0], expected_code, ret[1]))
@@ -53,7 +81,14 @@ class TestInstall(unittest.TestCase):
         except ImportError:
             print ("WARNING: missing docutils module, "
                    "no HTML report available.")
-        ret = commands.getstatusoutput('gnuplot --version')
+
+        if 'win' in sys.platform:
+            ret = winplatform_getstatusoutput('wgnuplot --version')
+            if not ret:
+                self.fail('Cannot run self.system on windows without the subprocess module (python 2.6)')
+        else:
+            ret = commands.getstatusoutput('gnuplot --version')
+
         print ret[1]
         if ret[0]:
             print ("WARNING: gnuplot is missing, no charts available in "
@@ -166,23 +201,24 @@ class TestInstall(unittest.TestCase):
 
 
     def test_xmlrpc(self):
-        # extract demo example and run the xmlrpc test
-        from tempfile import mkdtemp
-        pwd = os.getcwd()
-        tmp_path = mkdtemp('funkload')
-        os.chdir(tmp_path)
-        self.system('fl-install-demo')
-        os.chdir(os.path.join(tmp_path, 'funkload-demo', 'xmlrpc'))
-        self.system("fl-credential-ctl cred.conf restart")
-        self.system("fl-monitor-ctl monitor.conf restart")
-        self.system("fl-run-test -v test_Credential.py")
-        self.system("fl-run-bench -c 1:10:20 -D 4 "
-                    "test_Credential.py Credential.test_credential")
-        self.system("fl-monitor-ctl monitor.conf stop")
-        self.system("fl-credential-ctl cred.conf stop")
-        self.system("fl-build-report credential-bench.xml --html")
-        os.chdir(pwd)
-
+        # windows os does not support the monitor server 
+        if 'win' not in sys.platform:
+            # extract demo example and run the xmlrpc test
+            from tempfile import mkdtemp
+            pwd = os.getcwd()
+            tmp_path = mkdtemp('funkload')
+            os.chdir(tmp_path)
+            self.system('fl-install-demo')
+            os.chdir(os.path.join(tmp_path, 'funkload-demo', 'xmlrpc'))
+            self.system("fl-credential-ctl cred.conf restart")
+            self.system("fl-monitor-ctl monitor.conf restart")
+            self.system("fl-run-test -v test_Credential.py")
+            self.system("fl-run-bench -c 1:10:20 -D 4 "
+                        "test_Credential.py Credential.test_credential")
+            self.system("fl-monitor-ctl monitor.conf stop")
+            self.system("fl-credential-ctl cred.conf stop")
+            self.system("fl-build-report credential-bench.xml --html")
+            os.chdir(pwd)
 
 
 def test_suite():
