@@ -48,7 +48,7 @@ def getReadableDiffReportName(a, b):
     return "diff_" + r
 
 def getRPath(a, b):
-    """Return a relative path of b from a."""
+    """Return a relative path of b from a."""    
     a_path = a.split('/')
     b_path = b.split('/')
     for i in range(min(len(a_path), len(b_path))):
@@ -67,8 +67,11 @@ class RenderDiff(RenderHtmlBase):
     script_file = None
 
     def __init__(self, report_dir1, report_dir2, options, css_file=None):
-        self.report_dir1 = os.path.abspath(report_dir1)
-        self.report_dir2 = os.path.abspath(report_dir2)
+        # Swap windows path separator backslashes for forward slashes
+        # Windows accepts '/' but some file formats like rest treat the
+        # backslash specially.
+        self.report_dir1 = os.path.abspath(report_dir1).replace('\\', '/')
+        self.report_dir2 = os.path.abspath(report_dir2).replace('\\', '/')        
         self.options = options
         self.css_file = css_file
 
@@ -93,10 +96,14 @@ class RenderDiff(RenderHtmlBase):
         lines = []
         b1 = os.path.basename(self.report_dir1)
         b2 = os.path.basename(self.report_dir2)
-        b1_rpath = getRPath(self.report_dir,
-                            os.path.join(self.report_dir1, 'index.html'))
-        b2_rpath = getRPath(self.report_dir,
-                            os.path.join(self.report_dir2, 'index.html'))
+
+        # Swap windows path separator backslashes for forward slashes        
+        b1_rpath = getRPath(self.report_dir.replace('\\', '/'),
+                            os.path.join(self.report_dir1,
+                                         'index.html').replace('\\', '/'))
+        b2_rpath = getRPath(self.report_dir.replace('\\', '/'),
+                            os.path.join(self.report_dir2,
+                                         'index.html').replace('\\', '/'))
         if b1 == b2:
             b2 = b2 +"(2)"
         lines.append(rst_title("FunkLoad_ differential report", level=0))
@@ -115,10 +122,11 @@ class RenderDiff(RenderHtmlBase):
         lines.append(" .. image:: request.png")
         lines.append(rst_title("Pages", level=2))
         lines.append(" .. image:: spps_diff.png")
-        lines.append(" .. [#] B1 path: " + self.report_dir1.replace('_',
-                                                                    '\\_'))
-        lines.append(" .. [#] B2 path: " + self.report_dir2.replace('_',
-                                                                    '\\_'))
+
+        escapeReportDir = lambda rd: rd.replace('\\', '/').replace('_', '\\_')
+        lines.append(" .. [#] B1 path: " + escapeReportDir(self.report_dir1))
+        lines.append(" .. [#] B2 path: " + escapeReportDir(self.report_dir2))
+
         lines.append(" .. _FunkLoad: http://funkload.nuxeo.org/")
         lines.append("")
         f = open(rst_path, 'w')
