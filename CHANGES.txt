@@ -50,6 +50,9 @@ Bug fixes
 * Fix cookie support, there was an extra ";" if there was only one cookie,
   thanks to Daniel Swärd.
 
+* Fixing filename in mime encoding when uploading a file using an absolute 
+  path.
+
 
 FunkLoad 1.10.0
 ------------------

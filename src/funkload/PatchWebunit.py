@@ -74,7 +74,7 @@ def mimeEncode(data, sep_boundary=SEP_BOUNDARY, end_boundary=END_BOUNDARY):
         ret.write(sep_boundary)
         if isinstance(value, Upload):
             ret.write('\r\nContent-Disposition: form-data; name="%s"'%key)
-            ret.write('; filename="%s"\r\n' % value.filename)
+            ret.write('; filename="%s"\r\n' % os.path.basename(value.filename))
             if value.filename:
                 mimetype = guess_type(value.filename)[0]
                 if mimetype is not None:
