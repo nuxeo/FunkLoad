@@ -149,7 +149,7 @@ Main FunkLoad features are:
         'Topic :: System :: Monitoring',
     ],
     # setuptools specific keywords
-    install_requires = ['webunit  == 1.3.8',
+    install_requires = ['webunit  >= 1.3.8',
                         'docutils >= 0.3.7',
                         'setuptools'],
     zip_safe=True,

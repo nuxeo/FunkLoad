@@ -37,6 +37,12 @@ New features
   - Patch report builder to produce gnuplot chart on win, thanks to Kelvin
     Ward.
 
+* Enable to view the request headers either using an api (method debugHeaders)
+  or command line option ``-d --debug-level=3``.
+
+* Support of WebUnit 1.3.9 (in addition of 1.3.8) this new version brings
+  cookie max-age support.
+
 Bug fixes
 ~~~~~~~~~
 

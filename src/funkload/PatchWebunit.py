@@ -266,6 +266,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     else:
         raise ValueError, protocol
 
+    headers = []
     params = None
     if postdata is not None:
         if webproxy:
@@ -277,7 +278,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
             if isinstance(postdata, Data):
                 # User data and content_type
                 params = postdata.data
-                h.putheader('Content-type', postdata.content_type)
+                headers.append(('Content-type', postdata.content_type))
             else:
                 # Check for File upload
                 is_multipart = False
@@ -288,12 +289,12 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                         break
                 if is_multipart:
                     params = mimeEncode(postdata)
-                    h.putheader('Content-type', 'multipart/form-data; boundary=%s'%
-                                BOUNDARY)
+                    headers.append(('Content-type', 'multipart/form-data; boundary=%s'%
+                                    BOUNDARY))
                 else:
                     params = urlencode(postdata)
-                    h.putheader('Content-type', 'application/x-www-form-urlencoded')
-            h.putheader('Content-length', str(len(params)))
+                    headers.append(('Content-type', 'application/x-www-form-urlencoded'))
+            headers.append(('Content-length', str(len(params))))
     else:
         if webproxy:
             h.putrequest('GET', "http://%s%s" % (host_header, url))
@@ -303,15 +304,15 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
 
     # Other Full Request headers
     if self.authinfo:
-        h.putheader('Authorization', "Basic %s"%self.authinfo)
+        headers.append(('Authorization', "Basic %s"%self.authinfo))
     if not webproxy:
         # HTTPConnection seems to add a host header itself.
         # So we only need to do this if we are not using a proxy.
-        h.putheader('Host', host_header)
+        headers.append(('Host', host_header))
 
     # FL Patch -------------------------
     for key, value in self.extra_headers:
-        h.putheader(key, value)
+        headers.append((key, value))
 
     # FL Patch end ---------------------
 
@@ -342,8 +343,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 cookies_used.append(sendcookie.key)
 
     if cookie_list:
-        h.putheader('Cookie', '; '.join(cookie_list))
-        #print '  Cookies: ' + str(cookie_list)
+        headers.append(('Cookie', ' '.join(cookie_list)))
 
     # check that we sent the cookies we expected to
     if self.expect_cookies is not None:
@@ -351,8 +351,15 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
             "Didn't use all cookies (%s expected, %s used)"%(
             self.expect_cookies, cookies_used)
 
-    # finish the headers
+
+    # write and finish the headers
+    for header in headers:
+        h.putheader(*header)
     h.endheaders()
+
+    if self.debug_headers:
+        for header in headers:
+            print "Putting header -- %s: %s" % header
 
     if params is not None:
         h.send(params)

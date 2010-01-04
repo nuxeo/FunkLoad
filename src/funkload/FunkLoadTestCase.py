@@ -150,6 +150,10 @@ class FunkLoadTestCase(unittest.TestCase):
         self._browser.css = {}
         self._browser.history = []
         self._browser.extra_headers = []
+        if self.debug_level >= 3:
+            self._browser.debug_headers = True
+        else:
+            self._browser.debug_headers = False
         self.step_success = True
         self.test_status = 'Successful'
         self.steps = 0
@@ -478,6 +482,10 @@ class FunkLoadTestCase(unittest.TestCase):
 
         Note that the Referer is also removed."""
         self._browser.extra_headers = []
+
+    def debugHeaders(self, debug_headers=True):
+        """Print request headers."""
+        self._browser.debug_headers = debug_headers
 
     def setUserAgent(self, agent):
         """Set User-Agent http header for the next requests.

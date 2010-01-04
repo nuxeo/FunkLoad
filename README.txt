@@ -6,7 +6,7 @@ FunkLoad_
 
 :address: bdelbosc _at_ nuxeo.com
 
-:version: FunkLoad/1.10.0
+:version: FunkLoad/1.11.0
 
 :revision: $Id$
 
@@ -253,7 +253,7 @@ Options
   --verbose, -v           Verbose output.
   --debug, -d             FunkLoad and doctest debug output.
   --debug-level=DEBUG_LEVEL
-                          Debug level 2 is more verbose.
+                          Debug level 3 is more verbose.
   --url=MAIN_URL, -uMAIN_URL
                           Base URL to bench without ending '/'.
   --sleep-time-min=FTEST_SLEEP_TIME_MIN, -mFTEST_SLEEP_TIME_MIN
@@ -840,6 +840,16 @@ New in 1.3.0. version.
 
 Remove all headers previously added by `addHeader`_ or `setUserAgent`_,
 and remove the referer as well.
+
+debugHeaders
+~~~~~~~~~~~~
+::
+
+  debugHeaders()
+
+New in 1.11.0. version.
+
+Display headers sent to the server for the next get or post request.
 
 
 XML RPC API

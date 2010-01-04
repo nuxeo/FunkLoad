@@ -372,7 +372,7 @@ Examples
         parser.add_option("-d", "--debug", action="store_true",
                           help="FunkLoad and doctest debug output.")
         parser.add_option("--debug-level", type="int",
-                          help="Debug level 2 is more verbose.")
+                          help="Debug level 3 is more verbose.")
         parser.add_option("-u", "--url", type="string", dest="main_url",
                           help="Base URL to bench without ending '/'.")
         parser.add_option("-m", "--sleep-time-min", type="string",
