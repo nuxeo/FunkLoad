@@ -19,8 +19,21 @@ FunkLoad SVN trunk
 
 :Svn: http://svn.nuxeo.org/pub/funkload/trunk
 
-:Target: 1.11.0
+:Target: 1.11.1
 
+Bug fixes
+~~~~~~~~~
+
+
+
+FunkLoad 1.11.0
+------------------
+
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.11.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.11.0
+
+:Released date: 2010-01-26
 
 New features
 ~~~~~~~~~~~~~~
