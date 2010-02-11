@@ -132,6 +132,9 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
                 has_error = True
             values.append(str(error))
             lines.append(' '.join(values))
+        if len(lines) == 1:
+            # No tests finished during the cycle
+            return
         f = open(data_path, 'w')
         f.write('\n'.join(lines) + '\n')
         f.close()
@@ -218,6 +221,9 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             values.append(str(page.percentiles.perc90))
             values.append(str(page.percentiles.perc95))
             lines.append(' '.join(values))
+        if len(lines) == 1:
+            # No pages finished during a cycle
+            return
         f = open(data_path, 'w')
         f.write('\n'.join(lines) + '\n')
         f.close()
@@ -297,6 +303,9 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             values.append(str(resp.percentiles.perc90))
             values.append(str(resp.percentiles.perc95))
             lines.append(' '.join(values))
+        if len(lines) == 1:
+            # No result during a cycle
+            return
         f = open(data_path, 'w')
         f.write('\n'.join(lines) + '\n')
         f.close()
@@ -382,6 +391,9 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             values.append(str(resp.percentiles.perc90))
             values.append(str(resp.percentiles.perc95))
             lines.append(' '.join(values))
+        if len(lines) == 1:
+            # No result during a cycle
+            return
         f = open(data_path, 'w')
         f.write('\n'.join(lines) + '\n')
         f.close()

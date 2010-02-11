@@ -24,6 +24,9 @@ FunkLoad SVN trunk
 Bug fixes
 ~~~~~~~~~
 
+* Do not generate charts when there are no data available preventing:
+  "RuntimeError: Failed to run gnuplot cmd: ... Skipping data file with no valid
+  points" error when building a report.
 
 
 FunkLoad 1.11.0

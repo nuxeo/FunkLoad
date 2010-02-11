@@ -294,6 +294,32 @@ Problems ?
  (>=1.8.0a see section above) that is working with python-gdchart2.
 
 
+* While runing a test you got ::
+
+
+  Traceback (most recent call last):
+  File "/usr/local/bin/fl-run-test", line 8, in <module>
+    load_entry_point('funkload==1.11.0', 'console_scripts', 'fl-run-test')()
+  File "build/bdist.linux-i686/egg/funkload/TestRunner.py", line 478, in main
+  File "build/bdist.linux-i686/egg/funkload/TestRunner.py", line 337, in __init__
+  File "build/bdist.linux-i686/egg/funkload/TestRunner.py", line 347, in loadTests
+  File "/usr/lib/python2.6/doctest.py", line 2412, in DocFileSuite
+    suite.addTest(DocFileTest(path, **kw))
+  File "/usr/lib/python2.6/doctest.py", line 2331, in DocFileTest
+    doc, path = _load_testfile(path, package, module_relative)
+  File "/usr/lib/python2.6/doctest.py", line 219, in _load_testfile
+    return open(filename).read(), filename
+  IOError: [Errno 2] No such file or directory: 'path/to/your/testcase'
+
+ This means that your test file can not be loaded as a python module, (may
+ be due to import error) FunkLoad then badly report it as an invalid doc
+ test file.
+
+ To view the original error just run the testcase using python instead of
+ fl-run-test (``python your_test_case.py``).
+
+
+
 --------------------------
 
 See README_ for more information about FunkLoad_.
