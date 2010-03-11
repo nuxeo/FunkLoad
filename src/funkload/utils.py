@@ -43,7 +43,6 @@ def thread_sleep(seconds=0):
 # semaphores
 #
 g_recording = False
-g_running = False
 
 def recording():
     """A semaphore to tell the running threads when to begin recording."""
@@ -54,17 +53,6 @@ def set_recording_flag(value):
     """Enable recording."""
     global g_recording
     g_recording = value
-
-def running():
-    """A semaphore to tell the running threads that it should continue running
-    ftest."""
-    global g_running
-    return g_running
-
-def set_running_flag(value):
-    """Set running mode on."""
-    global g_running
-    g_running = value
 
 # ------------------------------------------------------------
 # daemon

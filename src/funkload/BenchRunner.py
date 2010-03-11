@@ -55,11 +55,10 @@ import unittest
 from optparse import OptionParser, TitledHelpFormatter
 
 from utils import mmn_encode, set_recording_flag, recording
-from utils import set_running_flag, running
 from utils import thread_sleep, trace, red_str, green_str
 from utils import get_version
-
-
+from FunkLoadHTTPServer import FunkLoadHTTPRequestHandler
+from FunkLoadHTTPServer import FunkLoadHTTPServer
 
 
 # ------------------------------------------------------------
@@ -113,10 +112,29 @@ def reset_cycle_results():
 
 
 def load_unittest(test_module, test_class, test_name, options):
-    """Instanciate a unittest."""
+    """Instantiate a unittest."""
     module = __import__(test_module)
     klass = getattr(module, test_class)
     return klass(test_name, options)
+
+
+class ThreadSignaller:
+    """A simple class to signal whether a thread should continue running or stop."""
+    def __init__(self):
+        self.keep_running = True
+
+    def running(self):
+        return self.keep_running
+
+    def set_running(self, val):
+        self.keep_running = val
+
+class ThreadData:
+    """Container for thread related data."""
+    def __init__(self, thread, thread_id, thread_signaller):
+        self.thread = thread
+        self.thread_id = thread_id
+        self.thread_signaller = thread_signaller
 
 
 # ------------------------------------------------------------
@@ -126,7 +144,8 @@ class LoopTestRunner(threading.Thread):
     """Run a unit test in loop."""
 
     def __init__(self, test_module, test_class, test_name, options,
-                 cycle, cvus, thread_id, sleep_time, debug=False):
+                 cycle, cvus, thread_id, thread_signaller, sleep_time,
+                 debug=False):
         meta_method_name = mmn_encode(test_name, cycle, cvus, thread_id)
         threading.Thread.__init__(self, target=self.run, name=meta_method_name,
                                   args=())
@@ -135,13 +154,14 @@ class LoopTestRunner(threading.Thread):
         self.color = not options.no_color
         self.sleep_time = sleep_time
         self.debug = debug
+        self.thread_signaller = thread_signaller
         # this makes threads endings if main stop with a KeyboardInterupt
         self.setDaemon(1)
 
 
     def run(self):
         """Run a test in loop."""
-        while (running()):
+        while (self.thread_signaller.running()):
             test_result = unittest.TestResult()
             self.test.clearContext()
             self.test(test_result)
@@ -183,7 +203,6 @@ class BenchRunner:
     """Run a unit test in bench mode."""
 
     def __init__(self, module_file, class_name, method_name, options):
-        self.threads = []
         self.module_name = os.path.basename(os.path.splitext(module_file)[0])
         self.class_name = class_name
         self.method_name = method_name
@@ -207,6 +226,9 @@ class BenchRunner:
         self.sleep_time = test.conf_getFloat('bench', 'sleep_time')
         self.sleep_time_min = test.conf_getFloat('bench', 'sleep_time_min')
         self.sleep_time_max = test.conf_getFloat('bench', 'sleep_time_max')
+        self.threads = []  # Contains list of ThreadData objects
+        self.last_thread_id = -1
+        self.thread_creation_lock = threading.Lock()
 
         # setup monitoring
         monitor_hosts = []                  # list of (host, port, descr)
@@ -268,34 +290,65 @@ class BenchRunner:
         trace("Bench status: **%s**\n" % status)
         return code
 
+    def createThreadId(self):
+        self.last_thread_id += 1
+        return self.last_thread_id
 
     def startThreads(self, cycle, number_of_threads):
-        """Starting threads."""
-        trace("* Current time: %s\n" % datetime.now().isoformat())
-        trace("* Starting threads: ")
+        """Starts threads."""
+        self.thread_creation_lock.acquire()
+        try:
+            trace("* Current time: %s\n" % datetime.now().isoformat())
+            trace("* Starting threads: ")
+            set_recording_flag(False)
+            threads = self.createThreads(cycle, number_of_threads)
+            self.threads.extend(threads)
+        finally:
+            set_recording_flag(True)
+            self.thread_creation_lock.release()
+
+    def addThreads(self, number_of_threads):
+        """Adds new threads to existing list. Used to dynamically add new
+           threads during a debug bench run."""
+        self.thread_creation_lock.acquire()
+        try:
+            trace("Adding new threads: ")
+            set_recording_flag(False)
+            # In debug bench, 'cycle' value is irrelevant.
+            threads = self.createThreads(0, number_of_threads)
+            self.threads.extend(threads)
+        finally:
+            set_recording_flag(True)
+            self.thread_creation_lock.release()
+
+    def createThreads(self, cycle, number_of_threads):
+        """Creates number_of_threads threads and returns as a list.
+
+        NOTE: This method is not thread safe. Thread safety must be
+        handled by the caller."""
         threads = []
         i = 0
-        set_running_flag(True)
-        set_recording_flag(False)
-        for thread_id in range(number_of_threads):
-            i += 1
+        for i in range(number_of_threads):
+            thread_id = self.createThreadId()
+            thread_signaller = ThreadSignaller()
             thread = LoopTestRunner(self.module_name, self.class_name,
                                     self.method_name, self.options,
                                     cycle, number_of_threads,
-                                    thread_id, self.sleep_time)
+                                    thread_id, thread_signaller,
+                                    self.sleep_time)
             trace(".")
             try:
                 thread.start()
             except ThreadError:
                 trace("\nERROR: Can not create more than %i threads, try a "
                       "smaller stack size using: 'ulimit -s 2048' "
-                      "for example\n" % i)
+                      "for example\n" % (i + 1))
                 raise
-            threads.append(thread)
+            thread_data = ThreadData(thread, thread_id, thread_signaller)
+            threads.append(thread_data)
             thread_sleep(self.startup_delay)
         trace(' done.\n')
-        self.threads = threads
-
+        return threads
 
     def logging(self):
         """Log activity during duration."""
@@ -310,21 +363,50 @@ class BenchRunner:
         set_recording_flag(False)
         trace(" done.\n")
 
-
     def stopThreads(self):
-        """Wait for thread endings."""
-        set_running_flag(False)
-        trace("* Waiting end of threads: ")
-        for thread in self.threads:
-            thread.join()
-            del thread
-            trace('.')
-        del self.threads
-        trace(" done.\n")
-        trace("* Waiting cycle sleeptime %ds: ..." % self.cycle_time)
-        time.sleep(self.cycle_time)
-        trace(" done.\n")
+        """Stops all running threads."""
+        self.thread_creation_lock.acquire()
+        try:
+            trace("* Waiting end of threads: ")
+            self.deleteThreads(len(self.threads))
+            self.threads = []
+            trace(" done.\n")
+            trace("* Waiting cycle sleeptime %ds: ..." % self.cycle_time)
+            time.sleep(self.cycle_time)
+            trace(" done.\n")
+        finally:
+            self.thread_creation_lock.release()
 
+    def removeThreads(self, number_of_threads):
+        """Removes threads. Used to dynamically remove threads during a
+           debug bench run."""
+        self.thread_creation_lock.acquire()
+        try:
+            trace('* Removing threads: ')
+            self.deleteThreads(number_of_threads)
+            trace(' done.\n')
+        finally:
+            self.thread_creation_lock.release()
+
+    def deleteThreads(self, number_of_threads):
+        """Stops given number of threads and deletes from thread list.
+
+        NOTE: This method is not thread safe. Thread safety must be
+        handled by the caller."""
+        removed_threads = []
+        if number_of_threads > len(self.threads):
+            number_of_threads = len(self.threads)
+        for i in range(number_of_threads):
+            thread_data = self.threads.pop()
+            thread_data.thread_signaller.set_running(False)
+            removed_threads.append(thread_data)
+        for thread_data in removed_threads:
+            thread_data.thread.join()
+            del thread_data
+            trace('.')
+
+    def getNumberOfThreads(self):
+        return len(self.threads)
 
     def dumpThreads(self):
         """Display all different traceback of Threads for debugging.
@@ -486,6 +568,15 @@ def main():
                       help="Add a label to this bench run "
                       "for easier identification (it will be appended to the directory name "
                       "for reports generated from it).")
+    parser.add_option("", "--enable-debug-server", action="store_true", dest="debugserver",
+                      help="Instantiates a debug HTTP server which exposes an "
+                      "interface using which parameters can be modified at "
+                      "run-time. Currently supported parameters: "
+                      "/cvu?inc=<integer> to increase the number of CVUs, "
+                      "/cvu?dec=<integer> to decrease the number of CVUs, "
+                      "/getcvu returns number of CVUs ")
+    parser.add_option("", "--debug-server-port", type="string", dest="debugport",
+                      help="Port at which debug server should run during the test")
     options, args = parser.parse_args()
     if len(args) != 2:
         parser.error("incorrect number of arguments")
@@ -493,10 +584,18 @@ def main():
         parser.error("invalid argument should be class.method")
     klass, method = args[1].split('.')
     bench = BenchRunner(args[0], klass, method, options)
-    ret = bench.run()
+
+    # Start a HTTP server optionally
+    if options.debugserver == True:
+        http_server_thread = FunkLoadHTTPServer(bench, options.debugport)
+        http_server_thread.start()
+
+    ret = None
+    try:
+        ret = bench.run()
+    except KeyboardInterrupt:
+        trace("* ^C received *")
     sys.exit(ret)
 
 if __name__ == '__main__':
     main()
-
-
