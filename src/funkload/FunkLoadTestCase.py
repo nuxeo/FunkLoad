@@ -1,4 +1,4 @@
-# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2010 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 # Contributors: Tom Lazar
 #

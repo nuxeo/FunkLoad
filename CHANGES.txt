@@ -19,14 +19,36 @@ FunkLoad SVN trunk
 
 :Svn: http://svn.nuxeo.org/pub/funkload/trunk
 
-:Target: 1.11.1
+:Target: 1.12.0
+
+
+New features
+~~~~~~~~~~~~~~
+
+* New ``--enable-debug-server`` option for ``fl-run-bench`` command. This
+  option run a debug HTTP server which exposes an interface using which
+  parameters can be modified at run-time.
+
+  Currently supported parameters:
+
+  - http://localhost:8000/cvu?inc=<integer> to increase the number of CVUs,
+
+  - http://localhost:8000/cvu?dec=<integer> to decrease the number of CVUs,
+
+  - http://localhost:8000/getcvu returns number of CVUs.
+
+  You can load a server and be able to change the number of concurrent users
+  during the run without pre-specifying it through 'cycles' argument, this
+  is usefull during debugging or profiling.
+
+  This feature has been provided by Goutham Bhat.
 
 Bug fixes
 ~~~~~~~~~
 
 * Do not generate charts when there are no data available preventing:
-  "RuntimeError: Failed to run gnuplot cmd: ... Skipping data file with no valid
-  points" error when building a report.
+  "RuntimeError: Failed to run gnuplot cmd: ... Skipping data file with no
+  valid points" error when building a report.
 
 
 FunkLoad 1.11.0
@@ -72,7 +94,7 @@ Bug fixes
 * Fix cookie support, there was an extra ";" if there was only one cookie,
   thanks to Daniel Swärd.
 
-* Fixing filename in mime encoding when uploading a file using an absolute 
+* Fixing filename in mime encoding when uploading a file using an absolute
   path.
 
 

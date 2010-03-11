@@ -1,7 +1,8 @@
 #!/usr/bin/python
-# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2010 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 # Contributors: Tom Lazar
+#               Goutham Bhat
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
