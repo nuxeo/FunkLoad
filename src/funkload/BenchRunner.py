@@ -375,6 +375,7 @@ class BenchRunner:
             trace("* Waiting cycle sleeptime %ds: ..." % self.cycle_time)
             time.sleep(self.cycle_time)
             trace(" done.\n")
+            self.last_thread_id = -1
         finally:
             self.thread_creation_lock.release()
 
