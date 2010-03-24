@@ -245,7 +245,10 @@ Examples
             else:
                 cmd += ' > %s' % get_null_file()
         trace("Hit Ctrl-C to stop recording.\n")
-        os.system(cmd)
+        try:
+            os.system(cmd)
+        except KeyboardInterrupt:
+            pass
 
     def searchFiles(self):
         """Search tcpwatch file."""
