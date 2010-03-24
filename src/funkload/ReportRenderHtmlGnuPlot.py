@@ -33,7 +33,7 @@ from datetime import datetime
 def gnuplot(script_path):
     """Execute a gnuplot script."""
     path = os.path.dirname(os.path.abspath(script_path))
-    if 'win' in sys.platform.lower():
+    if sys.platform.lower().startswith('win'):
         # commands module doesn't work on win and gnuplot is named
         # wgnuplot
         ret = os.system('cd "' + path + '" && wgnuplot "' +

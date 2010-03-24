@@ -33,7 +33,7 @@ def winplatform_getstatusoutput(cmd):
     commands.
     os.popen provides the output streams but no reliable easy to get return code.
     """
-    try:        
+    try:
         import subprocess
     except ImportError:
         return None
@@ -41,7 +41,7 @@ def winplatform_getstatusoutput(cmd):
     # create a new handle for the stdout pipe of cmd, and redirect cmd's stderr to stdout
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                shell=True, universal_newlines=True)
-    stdoutdata, stderrdata = process.communicate()    
+    stdoutdata, stderrdata = process.communicate()
     return (process.returncode, stdoutdata)
 
 
@@ -54,14 +54,14 @@ class TestInstall(unittest.TestCase):
 
     def system(self, cmd, expected_code=0):
         """Execute a cmd and exit on fail return cmd output."""
-                
-        if 'win' in sys.platform:
+
+        if sys.platform.lower().startswith('win'):
             ret = winplatform_getstatusoutput(cmd)
             if not ret:
                 self.fail('Cannot run self.system on windows without the subprocess module (python 2.6)')
         else:
             ret = commands.getstatusoutput(cmd)
-            
+
         if ret[0] != expected_code:
             self.fail("exec [%s] return code %s != %s output:\n%s" %
                       (cmd, ret[0], expected_code, ret[1]))
@@ -82,7 +82,7 @@ class TestInstall(unittest.TestCase):
             print ("WARNING: missing docutils module, "
                    "no HTML report available.")
 
-        if 'win' in sys.platform:
+        if sys.platform.lower().startswith('win'):
             ret = winplatform_getstatusoutput('wgnuplot --version')
             if not ret:
                 self.fail('Cannot run self.system on windows without the subprocess module (python 2.6)')
@@ -201,8 +201,8 @@ class TestInstall(unittest.TestCase):
 
 
     def test_xmlrpc(self):
-        # windows os does not support the monitor server 
-        if 'win' not in sys.platform:
+        # windows os does not support the monitor server
+        if not sys.platform.lower().startswith('win'):
             # extract demo example and run the xmlrpc test
             from tempfile import mkdtemp
             pwd = os.getcwd()

@@ -37,7 +37,7 @@ from urlparse import urlsplit
 from utils import truncate, trace, get_version, Data
 
 def get_null_file():
-    if sys.platform == "win32":
+    if sys.platform.lower().startswith('win'):
         return "NUL"
     else:
         return "/dev/null"

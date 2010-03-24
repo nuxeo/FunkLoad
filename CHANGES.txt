@@ -50,6 +50,9 @@ Bug fixes
   "RuntimeError: Failed to run gnuplot cmd: ... Skipping data file with no
   valid points" error when building a report.
 
+* Fix report charts on OS X darwin, thanks to Ethan Winn and Arshavski
+  Alexander.
+
 
 FunkLoad 1.11.0
 ------------------
