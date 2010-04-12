@@ -43,8 +43,14 @@ Examples
   %prog -h
                         More options.
 """
+try:
+    import psyco
+    psyco.full()
+except ImportError:
+    pass
 import os
 import sys
+import platform
 import time
 from datetime import datetime
 import traceback
@@ -489,7 +495,9 @@ class BenchRunner:
                   'cycle_time': self.cycle_time,
                   'configuration_file': self.config_path,
                   'server_url': self.test_url,
-                  'log_xml': self.result_path,}
+                  'log_xml': self.result_path,
+                  'node': platform.node(),
+                  'python_version': platform.python_version()}
         if self.options.label:
             config['label'] = self.options.label
 

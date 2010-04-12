@@ -65,8 +65,8 @@ Main FunkLoad_ features are:
   normal unit test. Python enable complex scenarios to handle real world
   applications.
 
-* Truly emulates a web browser (single-threaded) using Richard Jones'
-  webunit_:
+* Truly emulates a web browser (single-threaded) using an enhanced Richard
+  Jones' webunit_:
 
   - basic authentication support
   - cookies support
@@ -76,13 +76,15 @@ Main FunkLoad_ features are:
   - file upload and multipart/form-data submission
   - post any kind of content type like ``application/xml``
   - https support
+  - https with ssl/tls by providing a private key and certificate (PEM
+  formatted)
   - http_proxy support
 
 * Advanced test runner with many command-line options:
 
   - set the target server url
   - display the fetched page in real time in your browser
-  - debug mode
+  - debug mode to display http headers
   - check performance of a single page (or set of pages) inside a test
   - green/red color mode
   - select or exclude tests cases using a regex
@@ -1356,13 +1358,16 @@ cpsSearchDocId
 Return the list of url that ends with doc_id, using catalog search.
 
 
-Todo and bugs
-=============
+Bug reporting
+=====================
 
-* See the trac tickets: http://svn.nuxeo.org/trac/pub/report/12
+The list of open task and bugs are here:
+http://svn.nuxeo.org/trac/pub/report/12
 
 If you want to report a bug or if you think that something is
-missing, send me an email.
+missing, send me an email bdelbosc _at_ nuxeo.com.
+
+
 
 
 

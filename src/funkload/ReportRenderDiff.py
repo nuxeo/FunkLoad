@@ -48,7 +48,7 @@ def getReadableDiffReportName(a, b):
     return "diff_" + r
 
 def getRPath(a, b):
-    """Return a relative path of b from a."""    
+    """Return a relative path of b from a."""
     a_path = a.split('/')
     b_path = b.split('/')
     for i in range(min(len(a_path), len(b_path))):
@@ -71,7 +71,7 @@ class RenderDiff(RenderHtmlBase):
         # Windows accepts '/' but some file formats like rest treat the
         # backslash specially.
         self.report_dir1 = os.path.abspath(report_dir1).replace('\\', '/')
-        self.report_dir2 = os.path.abspath(report_dir2).replace('\\', '/')        
+        self.report_dir2 = os.path.abspath(report_dir2).replace('\\', '/')
         self.options = options
         self.css_file = css_file
 
@@ -97,7 +97,7 @@ class RenderDiff(RenderHtmlBase):
         b1 = os.path.basename(self.report_dir1)
         b2 = os.path.basename(self.report_dir2)
 
-        # Swap windows path separator backslashes for forward slashes        
+        # Swap windows path separator backslashes for forward slashes
         b1_rpath = getRPath(self.report_dir.replace('\\', '/'),
                             os.path.join(self.report_dir1,
                                          'index.html').replace('\\', '/'))

@@ -41,10 +41,10 @@ def rst_title(title, level=1):
 
 class BaseRst:
     """Base class for ReST renderer."""
-    fmt_int = "%7d"
-    fmt_float = "%7.3f"
+    fmt_int = "%8d"
+    fmt_float = "%8.3f"
     fmt_percent = "%6.2f%%"
-    fmt_deco = "======="
+    fmt_deco = "========"
     headers = []
     indent = 0
     image_names = []
@@ -76,7 +76,7 @@ class BaseRst:
         if self.with_percentiles:
             self._attach_percentiles_header(headers)
         deco = ' ' + " ".join([self.fmt_deco] * len(headers))
-        header = " " + " ".join([ "%7s" % h for h in headers ])
+        header = " " + " ".join([ "%8s" % h for h in headers ])
         indent = ' ' * self.indent
         ret = []
         if with_chart:
@@ -275,10 +275,12 @@ class RenderRst:
 
         self.append(rst_title("Bench configuration", 2))
         self.append("* Launched: %s" % date)
+        if config.get('node'):
+            self.append("* From: %s" % config['node'])
         self.append("* Test: ``%s.py %s.%s``" % (config['module'],
                                                  config['class'],
                                                  config['method']))
-        self.append("* Server: %s" % config['server_url'])
+        self.append("* Target server: %s" % config['server_url'])
         self.append("* Cycles of concurrent users: %s" % config['cycles'])
         self.append("* Cycle duration: %ss" % config['duration'])
         self.append("* Sleeptime between request: from %ss to %ss" % (
