@@ -63,6 +63,9 @@ New features
 Bug fixes
 ~~~~~~~~~
 
+* Fixed a missing semicolon in WebUnit patch, caused all cookies to be combined
+  into one ubercookie, thanks to Gareth Davidson.
+
 * Do not generate charts when there are no data available preventing:
   "RuntimeError: Failed to run gnuplot cmd: ... Skipping data file with no
   valid points" error when building a report.
