@@ -181,7 +181,7 @@ WebTestCase.pageImages = WTC_pageImages
 
 # WebFetcher fetch
 def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
-             ok_codes=None, key_file=None, cert_file=None):
+             ok_codes=None, key_file=None, cert_file=None, method=None):
     '''Run a single test request to the indicated url. Use the POST data
     if supplied. Accepts key and certificate file paths for https (ssl/tls)
     connections.
@@ -270,10 +270,10 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     params = None
     if postdata is not None:
         if webproxy:
-            h.putrequest('POST', "http://%s%s" % (host_header, url))
+            h.putrequest(method.upper(), "http://%s%s" % (host_header, url))
         else:
             # Normal post
-            h.putrequest('POST', url)
+            h.putrequest(method.upper(), url)
         if postdata:
             if isinstance(postdata, Data):
                 # User data and content_type
@@ -297,10 +297,9 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
             headers.append(('Content-length', str(len(params))))
     else:
         if webproxy:
-            h.putrequest('GET', "http://%s%s" % (host_header, url))
+            h.putrequest(method.upper(), "http://%s%s" % (host_header, url))
         else:
-            # Normal GET
-            h.putrequest('GET', url)
+            h.putrequest(method.upper(), url)
 
     # Other Full Request headers
     if self.authinfo:
