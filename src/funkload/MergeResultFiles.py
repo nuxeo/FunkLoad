@@ -142,11 +142,5 @@ class MergeResultFiles:
         output.write("</funkload>\n")
         output.close()
 
-        # YYYY TODO: parse earch file and replace cycles
-        # replace hostname
-
-        # file f
-        # replace  cycles="X" cvus="C" thread="T" -> cvus="cycles[i]" thread =i+ ""
-
 
 

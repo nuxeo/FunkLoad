@@ -77,7 +77,7 @@ Main FunkLoad_ features are:
   - post any kind of content type like ``application/xml``
   - https support
   - https with ssl/tls by providing a private key and certificate (PEM
-  formatted)
+    formatted)
   - http_proxy support
 
 * Advanced test runner with many command-line options:

@@ -25,14 +25,22 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~~~
 
-* ``fl-build-report`` is able to merge results files, enabling generating report
-  done with distributed bench.
+* ``fl-build-report`` is now able to create a report using many result
+  files. The goal of this feature is to create bench report for a
+  distributed bench. To be merged the result files must have the same cycles
+  and cycle duration.
 
-* Bencher now log hostname and python version 
+* The hostname and python version is now logged in the result file.
 
-* Use psyco if installed (only useful on 32-bit system)
+* Try to use `psyco <http://psyco.sourceforge.net/>`_ if installed. Note
+  that psyco works only on 32-bit system.
 
-* Many bencher optimizations to increase speed.
+* Miscellaneous speed improvments: removing minimal sleep time between
+  actions, removing useless logs.
+
+* New ``--as-fast-as-possible`` or ``-f`` option to ``fl-run-bench`` to remove
+  sleep any times between requests and test cases, this is equivalent to
+  ``-m0 -M0 -t0``.
 
 * New ``--enable-debug-server`` option for ``fl-run-bench`` command. This
   option run a debug HTTP server which exposes an interface using which

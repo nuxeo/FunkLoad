@@ -559,13 +559,19 @@ def main():
                       help="Duration of a cycle in seconds.")
     parser.add_option("-m", "--sleep-time-min", type="string",
                       dest="bench_sleep_time_min",
-                      help="Minimum sleep time between request.")
+                      help="Minimum sleep time between requests.")
     parser.add_option("-M", "--sleep-time-max", type="string",
                       dest="bench_sleep_time_max",
-                      help="Maximum sleep time between request.")
+                      help="Maximum sleep time between requests.")
+    parser.add_option("-t", "--test-sleep-time", type="string",
+                      dest="bench_sleep_time",
+                      help="Sleep time between tests.")
     parser.add_option("-s", "--startup-delay", type="string",
                       dest="bench_startup_delay",
                       help="Startup delay between thread.")
+    parser.add_option("-f", "--as-fast-as-possible", action="store_true",
+                      help="Remove sleep times between requests and"
+                      " between tests, shortcut for -m0 -M0 -t0")
     parser.add_option("", "--no-color", action="store_true",
                       help="Monochrome output.")
     parser.add_option("", "--accept-invalid-links", action="store_true",
@@ -592,6 +598,10 @@ def main():
         parser.error("incorrect number of arguments")
     if not args[1].count('.'):
         parser.error("invalid argument should be class.method")
+    if options.as_fast_as_possible:
+        options.bench_sleep_time_min = '0'
+        options.bench_sleep_time_max = '0'
+        options.bench_sleep_time = '0'
     klass, method = args[1].split('.')
     bench = BenchRunner(args[0], klass, method, options)
 
