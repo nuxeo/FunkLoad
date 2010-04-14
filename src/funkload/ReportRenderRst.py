@@ -280,6 +280,8 @@ class RenderRst:
         self.append("* Test: ``%s.py %s.%s``" % (config['module'],
                                                  config['class'],
                                                  config['method']))
+        if config.get('label'):
+            self.append("* Label: %s" % config['label'])
         self.append("* Target server: %s" % config['server_url'])
         self.append("* Cycles of concurrent users: %s" % config['cycles'])
         self.append("* Cycle duration: %ss" % config['duration'])
