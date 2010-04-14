@@ -261,7 +261,7 @@ def main():
                                    xml_parser.error, xml_parser.monitor,
                                    options)()
             trace("done: \n")
-            trace("file://%s\n" % html_path)
+            trace(html_path + "\n")
         else:
             print str(RenderRst(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
