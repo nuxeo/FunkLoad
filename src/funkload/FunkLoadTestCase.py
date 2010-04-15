@@ -180,7 +180,7 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # browser simulation
     #
-    def _connect(self, url, params, ok_codes, rtype, description):
+    def _connect(self, url, params, ok_codes, rtype, description,redirect=False):
         """Handle fetching, logging, errors and history."""
         if params is None and rtype in ('post','put'):
             # enable empty put/post
@@ -214,13 +214,14 @@ class FunkLoadTestCase(unittest.TestCase):
         # Log response
         t_delta = t_stop - t_start
         self.total_time += t_delta
-        if rtype in ('post', 'get', 'put', 'delete'):
-            self.total_pages += 1
-        elif rtype == 'redirect':
+        if redirect:
             self.total_redirects += 1
+        elif rtype in ('post', 'get', 'put', 'delete'):
+            self.total_pages += 1
         elif rtype == 'link':
             self.total_links += 1
-        if rtype in ('put','post', 'get', 'delete','redirect'):
+        
+        if rtype in ('put','post', 'get', 'delete'):
             # this is a valid referer for the next request
             self.setHeader('Referer', url)
         self._browser.history.append((rtype, url))
@@ -299,7 +300,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 # save the current url as the base for future redirects
                 url_in = url
                 self.logd(' Load redirect link: %s' % url)
-                response = self._connect(url, None, ok_codes, 'redirect', None)
+                response = self._connect(url, None, ok_codes, rtype=method,description=None,redirect=True)
                 max_redirect_count -= 1
             if not max_redirect_count:
                 self.logd(' WARNING Too many redirects give up.')
