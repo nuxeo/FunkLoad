@@ -107,8 +107,8 @@ class FunkLoadXmlParser:
                     bench result done with fl-run-bench (and not on a test
                     result done with fl-run-test)."""
                 else:
-                    print """You may need to remove non ascii char that comes
-                    from error pages catched during the bench. iconv
+                    print """You may need to remove non ascii characters which
+                    come from error pages caught during the bench test. iconv
                     or recode may help you."""
                 print 'Xml parser element stack: %s' % [
                     x['name'] for x in self.current_element]
