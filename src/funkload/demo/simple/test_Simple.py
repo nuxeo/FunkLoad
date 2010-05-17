@@ -12,7 +12,6 @@ class Simple(FunkLoadTestCase):
 
     def setUp(self):
         """Setting up test."""
-        self.logd("setUp")
         self.server_url = self.conf_get('main', 'url')
 
     def test_simple(self):
@@ -20,18 +19,9 @@ class Simple(FunkLoadTestCase):
         server_url = self.server_url
         # begin of test ---------------------------------------------
         nb_time = self.conf_getInt('test_simple', 'nb_time')
-        pages = self.conf_getList('test_simple', 'pages')
-
         for i in range(nb_time):
-            self.logd('Try %i' % i)
-            for page in pages:
-                self.get(server_url + page, description='Get %s' % page)
-
+            self.get(server_url, description='Get url')
         # end of test -----------------------------------------------
-
-    def tearDown(self):
-        """Setting up test."""
-        self.logd("tearDown.\n")
 
 
 if __name__ in ('main', '__main__'):

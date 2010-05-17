@@ -337,7 +337,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 if sendcookie.coded_value == '"deleted"':
                     continue
                 # TODO: check max-age
-                cookie_list.append("%s=%s"%(sendcookie.key,
+                cookie_list.append("%s=%s;"%(sendcookie.key,
                                             sendcookie.coded_value))
                 cookies_used.append(sendcookie.key)
 

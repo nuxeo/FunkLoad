@@ -41,10 +41,10 @@ def rst_title(title, level=1):
 
 class BaseRst:
     """Base class for ReST renderer."""
-    fmt_int = "%7d"
-    fmt_float = "%7.3f"
+    fmt_int = "%8d"
+    fmt_float = "%8.3f"
     fmt_percent = "%6.2f%%"
-    fmt_deco = "======="
+    fmt_deco = "========"
     headers = []
     indent = 0
     image_names = []
@@ -76,7 +76,7 @@ class BaseRst:
         if self.with_percentiles:
             self._attach_percentiles_header(headers)
         deco = ' ' + " ".join([self.fmt_deco] * len(headers))
-        header = " " + " ".join([ "%7s" % h for h in headers ])
+        header = " " + " ".join([ "%8s" % h for h in headers ])
         indent = ' ' * self.indent
         ret = []
         if with_chart:
@@ -275,10 +275,14 @@ class RenderRst:
 
         self.append(rst_title("Bench configuration", 2))
         self.append("* Launched: %s" % date)
+        if config.get('node'):
+            self.append("* From: %s" % config['node'])
         self.append("* Test: ``%s.py %s.%s``" % (config['module'],
                                                  config['class'],
                                                  config['method']))
-        self.append("* Server: %s" % config['server_url'])
+        if config.get('label'):
+            self.append("* Label: %s" % config['label'])
+        self.append("* Target server: %s" % config['server_url'])
         self.append("* Cycles of concurrent users: %s" % config['cycles'])
         self.append("* Cycle duration: %ss" % config['duration'])
         self.append("* Sleeptime between request: from %ss to %ss" % (
@@ -489,24 +493,24 @@ class RenderRst:
         self.append('* CUs: Concurrent users or number of concurrent threads'
                     ' executing tests.')
         self.append('* Request: a single GET/POST/redirect/xmlrpc request.')
-        self.append('* Page: a request with redirects and ressource'
+        self.append('* Page: a request with redirects and resource'
                     ' links (image, css, js) for an html page.')
         self.append('* STPS: Successful tests per second.')
         self.append('* SPPS: Successful pages per second.')
-        self.append('* RPS: Requests per second successful or not.')
+        self.append('* RPS: Requests per second, successful or not.')
         self.append('* maxSPPS: Maximum SPPS during the cycle.')
         self.append('* maxRPS: Maximum RPS during the cycle.')
         self.append('* MIN: Minimum response time for a page or request.')
         self.append('* AVG: Average response time for a page or request.')
         self.append('* MAX: Maximmum response time for a page or request.')
-        self.append('* P10: Percentil 10 or response time where 10 percent'
-                    ' of pages or requests are delivred.')
-        self.append('* MED: Median or Percentil 50, response time where half'
-                    ' of pages or requests are delivred.')
-        self.append('* P90: Percentil 90 or response time where 90 percent'
-                    ' of pages or requests are delivred.')
-        self.append('* P95: Percentil 95 or response time where 95 percent'
-                    ' of pages or requests are delivred.')
+        self.append('* P10: 10th percentile, response time where 10 percent'
+                    ' of pages or requests are delivered.')
+        self.append('* MED: Median or 50th percentile, response time where half'
+                    ' of pages or requests are delivered.')
+        self.append('* P90: 90th percentile, response time where 90 percent'
+                    ' of pages or requests are delivered.')
+        self.append('* P95: 95th percentile, response time where 95 percent'
+                    ' of pages or requests are delivered.')
         self.append('')
         self.append('Report generated with FunkLoad_ ' + get_version() +
                     ', more information available on the '
@@ -523,14 +527,14 @@ class RenderRst:
             self.renderTestContent(cycle_r['test'])
 
         self.renderCyclesStat('test', 'Test stats',
-                              'The number of Successful **Test** Per Second '
+                              'The number of Successful **Tests** Per Second '
                               '(STPS) over Concurrent Users (CUs).')
         self.renderCyclesStat('page', 'Page stats',
-                              'The number of Successful **Page** Per Second '
+                              'The number of Successful **Pages** Per Second '
                               '(SPPS) over Concurrent Users (CUs).\n'
                               'Note that an XML RPC call count like a page.')
         self.renderCyclesStat('response', 'Request stats',
-                              'The number of **Request** Per Second (RPS) '
+                              'The number of **Requests** Per Second (RPS) '
                               'successful or not over Concurrent Users (CUs).')
         self.renderSlowestRequests(self.slowest_items)
         self.renderMonitors()

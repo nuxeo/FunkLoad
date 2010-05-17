@@ -29,16 +29,12 @@ from socket import error as SocketError
 from xmlrpclib import ServerProxy
 
 
-MIN_SLEEPTIME = 0.005                   # minimum sleep time to let
-                                        # python threads working properly
 def thread_sleep(seconds=0):
-    """Sleep seconds.
-
-    Insure that seconds is at least MIN_SLEEPTIME to let
-    threads working properly."""
-    #if seconds:
-    #    trace('sleep %s' % seconds)
-    sleep(max(abs(seconds), MIN_SLEEPTIME))
+    """Sleep seconds."""
+    # looks like python >= 2.5 does not need a minimal sleep to let thread
+    # working properly
+    if seconds:
+        sleep(seconds)
 
 # ------------------------------------------------------------
 # semaphores

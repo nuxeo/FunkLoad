@@ -25,6 +25,23 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~~~
 
+* ``fl-build-report`` is now able to create a report using many result
+  files. The goal of this feature is to create bench report for a
+  distributed bench. To be merged the result files must have the same cycles
+  and cycle duration.
+
+* The hostname and python version is now logged in the result file.
+
+* Try to use `psyco <http://psyco.sourceforge.net/>`_ if installed. Note
+  that psyco works only on 32-bit system.
+
+* Miscellaneous speed improvments: removing minimal sleep time between
+  actions, removing useless logs.
+
+* New ``--as-fast-as-possible`` or ``-f`` option to ``fl-run-bench`` to remove
+  sleep any times between requests and test cases, this is equivalent to
+  ``-m0 -M0 -t0``.
+
 * New ``--enable-debug-server`` option for ``fl-run-bench`` command. This
   option run a debug HTTP server which exposes an interface using which
   parameters can be modified at run-time.
@@ -45,6 +62,9 @@ New features
 
 Bug fixes
 ~~~~~~~~~
+
+* Fixed a missing semicolon in WebUnit patch, caused all cookies to be combined
+  into one ubercookie, thanks to Gareth Davidson.
 
 * Do not generate charts when there are no data available preventing:
   "RuntimeError: Failed to run gnuplot cmd: ... Skipping data file with no

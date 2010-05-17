@@ -24,6 +24,7 @@ import os
 import sys
 import time
 import re
+import logging
 from warnings import warn
 from socket import error as SocketError
 from types import DictType, ListType, TupleType
@@ -129,7 +130,12 @@ class FunkLoadTestCase(unittest.TestCase):
             self.conf_get(section, 'result_path', 'funkload.xml'))
 
         # init loggers
-        self.logger = get_default_logger(self.log_to, self.log_path)
+        if self.in_bench_mode:
+            level = logging.INFO
+        else:
+            level = logging.DEBUG
+        self.logger = get_default_logger(self.log_to, self.log_path,
+                                         level=level)
         self.logger_result = get_default_logger(log_to="xml",
                                                 log_path=self.result_path,
                                                 name="FunkLoadResult")
@@ -276,17 +282,20 @@ class FunkLoadTestCase(unittest.TestCase):
             params = None
 
         if method == 'get':
-            self.logd('GET: %s\n\tPage %i: %s ...' % (url, self.steps,
-                                                      description or ''))
+            if not self.in_bench_mode:
+                self.logd('GET: %s\n\tPage %i: %s ...' % (url, self.steps,
+                                                          description or ''))
         elif method == 'delete':
-            self.logd('DELETE:%s\n\tPage %i: %s ...' %(url, self.steps,
+            if not self.in_bench_mode:
+                self.logd('DELETE:%s\n\tPage %i: %s ...' %(url, self.steps,
                                                         description or ''))
         else:
-            url = url_in
-            self.logd('%s: %s %s\n\tPage %i: %s ...' % (method.upper(), url, str(params),
-                                                          self.steps,
-                                                          description or ''))
-        # Fetching
+            if not self.in_bench_mode:
+                url = url_in
+                self.logd('%s: %s %s\n\tPage %i: %s ...' % (method.upper(), url, str(params),
+                                                              self.steps,
+                                                              description or ''))
+            # Fetching
         response = self._connect(url, params, ok_codes, method, description)
 
         # Check redirection
@@ -317,7 +326,8 @@ class FunkLoadTestCase(unittest.TestCase):
                 self._browser.pageImages(url, page, self)
             except HTTPError, error:
                 if self._accept_invalid_links:
-                    self.logd('  ' + str(error))
+                    if not self.in_bench_mode:
+                        self.logd('  ' + str(error))
                 else:
                     t_stop = time.time()
                     t_delta = t_stop - t_start
@@ -553,7 +563,7 @@ class FunkLoadTestCase(unittest.TestCase):
         """
         self._keyfile_path = None
         self._certfile_path = None
-        
+
 
     #------------------------------------------------------------
     # Assertion helpers
@@ -866,9 +876,9 @@ class FunkLoadTestCase(unittest.TestCase):
         try:
             ok = False
             try:
-                self.logd('Starting -----------------------------------\n\t%s'
-                          % self.conf_get(self.meta_method_name, 'description',
-                                          ''))
+                if not self.in_bench_mode:
+                    self.logd('Starting -----------------------------------\n\t%s'
+                              % self.conf_get(self.meta_method_name, 'description', ''))
                 self.setUp()
             except KeyboardInterrupt:
                 raise

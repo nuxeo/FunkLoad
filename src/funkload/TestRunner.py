@@ -26,6 +26,11 @@ Similar to unittest.TestProgram but:
 
 $Id: TestRunner.py 24758 2005-08-31 12:33:00Z bdelbosc $
 """
+try:
+    import psyco
+    psyco.full()
+except ImportError:
+    pass
 import os
 import sys
 import types

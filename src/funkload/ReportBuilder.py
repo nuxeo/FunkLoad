@@ -22,13 +22,14 @@ Producing html and png chart require python-docutils and python-gdchart
 $Id: ReportBuilder.py 24737 2005-08-31 09:00:16Z bdelbosc $
 """
 
-USAGE = """%prog [options] xmlfile
+USAGE = """%prog [options] xmlfile [xmlfile...]
 
 or
 
   %prog --diff REPORT_PATH1 REPORT_PATH2
 
 %prog analyze a FunkLoad bench xml result file and output a report.
+If there are more than one file the xml results are merged.
 
 See http://funkload.nuxeo.org/ for more information.
 
@@ -37,22 +38,31 @@ Examples
   %prog funkload.xml
                         ReST rendering into stdout.
   %prog --html -o /tmp funkload.xml
-                        Build an HTML report in /tmp.
+                        Build an HTML report in /tmp
+  %prog --html node1.xml node2.xml node3.xml
+                        Build an HTML report merging test result from 3 nodes.
   %prog --diff /tmp/test_reader-20080101 /tmp/test_reader-20080102
                         Build a differential report to compare 2 bench reports,
                         requires gnuplot.
   %prog -h
                         More options.
 """
+try:
+    import psyco
+    psyco.full()
+except ImportError:
+    pass
 import os
 import xml.parsers.expat
 from optparse import OptionParser, TitledHelpFormatter
+from tempfile import NamedTemporaryFile
 
 from ReportStats import AllResponseStat, PageStat, ResponseStat, TestStat
 from ReportStats import MonitorStat, ErrorStat
 from ReportRenderRst import RenderRst
 from ReportRenderHtml import RenderHtml
 from ReportRenderDiff import RenderDiff
+from MergeResultFiles import MergeResultFiles
 from utils import trace, get_version
 
 
@@ -97,8 +107,8 @@ class FunkLoadXmlParser:
                     bench result done with fl-run-bench (and not on a test
                     result done with fl-run-test)."""
                 else:
-                    print """You may need to remove non ascii char that comes
-                    from error pages catched during the bench. iconv
+                    print """You may need to remove non ascii characters which
+                    come from error pages caught during the bench test. iconv
                     or recode may help you."""
                 print 'Xml parser element stack: %s' % [
                     x['name'] for x in self.current_element]
@@ -226,14 +236,22 @@ def main():
     if options.diffreport:
         if len(args) != 2:
             parser.error("incorrect number of arguments")
-        trace("Creating diff report ...")
+        trace("Creating diff report ... ")
         output_dir = options.output_dir
         html_path = RenderDiff(args[0], args[1], options)
         trace("done: \n")
         trace("%s\n" % html_path)
     else:
-        if len(args) != 1:
+        if len(args) < 1:
             parser.error("incorrect number of arguments")
+        if len(args) > 1:
+            trace("Merging results files: ")
+            f = NamedTemporaryFile(prefix='fl-mrg-', suffix='.xml')
+            tmp_file = f.name
+            f.close()
+            MergeResultFiles(args, tmp_file)
+            trace("Results merged in tmp file: %s\n" % os.path.abspath(tmp_file))
+            args = [tmp_file]
         options.xml_file = args[0]
         xml_parser = FunkLoadXmlParser()
         xml_parser.parse(options.xml_file)
@@ -243,7 +261,7 @@ def main():
                                    xml_parser.error, xml_parser.monitor,
                                    options)()
             trace("done: \n")
-            trace("file://%s\n" % html_path)
+            trace(html_path + "\n")
         else:
             print str(RenderRst(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
