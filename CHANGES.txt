@@ -19,7 +19,23 @@ FunkLoad SVN trunk
 
 :Svn: http://svn.nuxeo.org/pub/funkload/trunk
 
-:Target: 1.12.0
+:Target: 1.13.0
+
+New features
+~~~~~~~~~~~~~
+
+* TODO: Merging of Ali-Akber Saifee's branch on distributed mode and http put/delete support.
+
+
+
+FunkLoad 1.12.0
+------------------
+
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.12.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.12.0
+
+:Released date: 2010-05-26
 
 
 New features

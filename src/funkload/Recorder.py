@@ -307,6 +307,7 @@ Examples
     def convertToFunkLoad(self, request):
         """return a funkload python instruction."""
         text = []
+        text.append('        # ' + request.file_path)
         if request.host != self.server_url:
             text.append('self.%s("%s"' % (request.method.lower(),
                                           request.url))
