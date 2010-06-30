@@ -265,7 +265,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             lines.append('set origin 0, 0.4')
         lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "SPPS"' % data_path)
         # apdex
-        lines.append('set boxwidth 1')
+        lines.append('set boxwidth 0.8')
         lines.append('set style fill solid .7')
         lines.append('set ylabel "Apdex %.1f" ' % apdex_t)
         lines.append('set yrange [0:1]')
@@ -281,7 +281,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             lines.append('set origin 0.0, 0.0')
 
         lines.append('plot "%s" u 1:12 w boxes lw 2 lt rgb "#99CDFF" t "E", "" u 1:13 w boxes lw 2 lt rgb "#00FF01" t "G", "" u 1:14 w boxes lw 2 lt rgb "#FFFF00" t "F", "" u 1:15 w boxes lw 2 lt rgb "#FF7C81" t "P", "" u 1:16 w boxes lw 2 lt rgb "#C0C0C0" t "U"' % data_path)
-
+        lines.append('unset boxwidth')
         lines.append('set key inside top')
         if has_error:
             lines.append('set bmargin 3')
