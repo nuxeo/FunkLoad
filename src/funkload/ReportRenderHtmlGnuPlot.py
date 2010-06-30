@@ -65,7 +65,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     Simply render stuff in ReST than ask docutils to build an html doc.
     """
-    chart_size = (480, 480)
+    chart_size = (480, 540)
     #big_chart_size = (640, 480)
     ticpattern = re.compile('(\:\d+)\ ')
 
@@ -80,7 +80,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         maxCycle = str(maxCycle[:-1].strip())
         if maxCycle.startswith("["):
             maxCycle = maxCycle[1:]
-        return "[0:" + maxCycle + "]"
+        return "[0:" + str(int(maxCycle) + 1) + "]"
 
     def useXTicLabels(self):
         """Guess if we need to use labels for x axis or number."""
@@ -198,9 +198,10 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         data_path = gnuplot_scriptpath(self.report_dir, 'pages.data')
         stats = self.stats
         # data
-        lines = ["CUs SPPS ERROR MIN AVG MAX P10 P50 P90 P95"]
+        lines = ["CUs SPPS ERROR MIN AVG MAX P10 P50 P90 P95 APDEX E G F P U"]
         cvus = []
         has_error = False
+        apdex_t = 0
         for cycle in self.cycles:
             if not stats[cycle].has_key('page'):
                 continue
@@ -220,6 +221,21 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             values.append(str(page.percentiles.perc50))
             values.append(str(page.percentiles.perc90))
             values.append(str(page.percentiles.perc95))
+            score = page.apdex_score
+            apdex_t = page.apdex.apdex_t
+            values.append(str(score))
+            apdex = ['0', '0', '0', '0', '0']
+            if score < 0.5:
+                apdex[4] = str(score)
+            elif score < 0.7:
+                apdex[3] = str(score)
+            elif score < 0.85:
+                apdex[2] = str(score)
+            elif score < 0.94:
+                apdex[1] = str(score)
+            else:
+                apdex[0] = str(score)
+            values = values + apdex
             lines.append(' '.join(values))
         if len(lines) == 1:
             # No pages finished during a cycle
@@ -230,36 +246,55 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         # script
         lines = ['set output "' + image_path +'"']
         lines.append('set title "Successful Pages Per Second"')
-        lines.append('set xlabel "Concurrent Users"')
         lines.append('set ylabel "Pages Per Second"')
         lines.append('set grid back')
         lines.append('set xrange ' + self.getXRange())
         lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
-        if not has_error:
-            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "SPPS"' % data_path)
+        lines.append('set format x ""')
+        lines.append('set multiplot')
+        lines.append('unset title')
+        lines.append('unset xlabel')
+        lines.append('set bmargin 0')
+        lines.append('set lmargin 8')
+        lines.append('set rmargin 9.5')
+        lines.append('set key inside top')
+        if has_error:
+            lines.append('set size 1, 0.5')
+            lines.append('set origin 0, 0.5')
         else:
-            lines.append('set format x ""')
-            lines.append('set multiplot')
-            lines.append('unset title')
-            lines.append('unset xlabel')
-            lines.append('set size 1, 0.7')
-            lines.append('set origin 0, 0.3')
-            lines.append('set lmargin 5')
-            lines.append('set bmargin 0')
-            lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "SPPS"' % data_path)
+            lines.append('set size 1, 0.75')
+            lines.append('set origin 0, 0.75')
+        lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "SPPS"' % data_path)
+        # apdex
+        lines.append('set boxwidth 1')
+        lines.append('set style fill solid .75')
+        lines.append('set size 1.0, 0.25')
+        lines.append('set ylabel "Apdex %.1f" ' % apdex_t)
+        lines.append('set yrange [0:1]')
+        lines.append('set key outside top')
+        if has_error:
+            lines.append('set origin 0.0, 0.25')
+        else:
             lines.append('set format x "% g"')
-            lines.append('set bmargin 3')
-            lines.append('set autoscale y')
-            lines.append('set style fill solid .25')
-            lines.append('set size 1.0, 0.3')
+            lines.append('set xlabel "Concurrent Users"')
+            lines.append('set origin 0.0, 0.0')
+            lines.append('set key inside top')
+        lines.append('plot "%s" u 1:12 w boxes lw 2 lt rgb "#99CDFF" t "E", "" u 1:13 w boxes lw 2 lt rgb "#00FF01" t "G", "" u 1:14 w boxes lw 2 lt rgb "#FFFF00" t "F", "" u 1:15 w boxes lw 2 lt rgb "#FF7C81" t "P", "" u 1:16 w boxes lw 2 lt rgb "#C0C0C0" t "U"' % data_path)
+
+        lines.append('set key inside top')
+        if has_error:
+            lines.append('set size 1.0, 0.25')
             lines.append('set xlabel "Concurrent Users"')
             lines.append('set ylabel "% errors"')
+            lines.append('set yrange [0:100]')
             lines.append('set origin 0.0, 0.0')
-            #lines.append('set yrange [0:100]')
-            #lines.append('set ytics 20')
-            lines.append('plot "%s" u 1:3 w linespoints lt 1 lw 2 t "%% Errors"' % data_path)
-            lines.append('unset multiplot')
-            lines.append('set size 1.0, 1.0')
+            lines.append('plot "%s" u 1:3 w boxes lt 1 lw 2 t "%% Errors"' % data_path)
+
+        lines.append('unset yrange')
+        lines.append('set autoscale y')
+        lines.append('unset multiplot')
+        lines.append('set size 1.0, 1.0')
+        lines.append('unset rmargin')
         lines.append('set output "%s"' % image2_path)
         lines.append('set title "Pages Response time"')
         lines.append('set ylabel "Duration (s)"')
@@ -280,7 +315,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         data_path = gnuplot_scriptpath(self.report_dir, 'requests.data')
         stats = self.stats
         # data
-        lines = ["CUs RPS ERROR MIN AVG MAX P10 P50 P90 P95"]
+        lines = ["CUs RPS ERROR MIN AVG MAX P10 P50 P90 P95 APDEX"]
         cvus = []
         has_error = False
         for cycle in self.cycles:
@@ -302,6 +337,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             values.append(str(resp.percentiles.perc50))
             values.append(str(resp.percentiles.perc90))
             values.append(str(resp.percentiles.perc95))
+            values.append(str(resp.apdex_score))
             lines.append(' '.join(values))
         if len(lines) == 1:
             # No result during a cycle
@@ -368,7 +404,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
                                        'request_%s.data' % step)
         stats = self.stats
         # data
-        lines = ["CUs STEP ERROR MIN AVG MAX P10 P50 P90 P95"]
+        lines = ["CUs STEP ERROR MIN AVG MAX P10 P50 P90 P95 APDEX"]
         cvus = []
         has_error = False
         for cycle in self.cycles:
@@ -390,6 +426,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             values.append(str(resp.percentiles.perc50))
             values.append(str(resp.percentiles.perc90))
             values.append(str(resp.percentiles.perc95))
+            values.append(str(resp.apdex_score))
             lines.append(' '.join(values))
         if len(lines) == 1:
             # No result during a cycle

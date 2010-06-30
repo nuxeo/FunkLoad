@@ -24,9 +24,8 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~~
 
-* TODO: Merging of Ali-Akber Saifee's branch on distributed mode and http put/delete support.
-
-
+* Adding Apdex (Application Performance inDEX) on reporting 
+  visit http://www.apdex.org/ for more information.
 
 FunkLoad 1.12.0
 ------------------

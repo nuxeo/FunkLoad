@@ -38,17 +38,31 @@ def rst_title(title, level=1):
     rst.append('')
     return '\n'.join(rst)
 
+def get_apdex_label(score):
+    if score < 0.5:
+        return "Unacceptable"
+    if score < 0.7:
+        return "Poor"
+    if score < 0.85:
+        return "Fair"
+    if score < 0.94:
+        return "Good"
+    return "Excellent"
+
+
 
 class BaseRst:
     """Base class for ReST renderer."""
-    fmt_int = "%8d"
-    fmt_float = "%8.3f"
-    fmt_percent = "%6.2f%%"
-    fmt_deco = "========"
+    fmt_int = "%18d"
+    fmt_float = "%18.3f"
+    fmt_str = "%18s"
+    fmt_percent = "%16.2f%%"
+    fmt_deco = "=================="
     headers = []
     indent = 0
     image_names = []
     with_percentiles = False
+    with_apdex = False
 
     def __init__(self, stats):
         self.stats = stats
@@ -76,7 +90,7 @@ class BaseRst:
         if self.with_percentiles:
             self._attach_percentiles_header(headers)
         deco = ' ' + " ".join([self.fmt_deco] * len(headers))
-        header = " " + " ".join([ "%8s" % h for h in headers ])
+        header = " " + " ".join([ "%18s" % h for h in headers ])
         indent = ' ' * self.indent
         ret = []
         if with_chart:
@@ -108,7 +122,11 @@ class BaseRst:
         if self.with_percentiles:
             self._attach_percentiles_header(headers)
         deco = " ".join([self.fmt_deco] * len(headers))
-        return ' ' * (self.indent + 1) + deco
+        footer =  ' ' * (self.indent + 1) + deco
+        footer +=  '\n\n'
+        if self.with_apdex:
+            footer +=  ' ' * (self.indent + 1) + "\* Apdex |APDEXT|"
+        return footer
 
     def render_stat(self):
         """Render rst stat."""
@@ -117,9 +135,10 @@ class BaseRst:
 
 class AllResponseRst(BaseRst):
     """AllResponseStat rendering."""
-    headers = [ "CUs", "RPS", "maxRPS", "TOTAL", "SUCCESS","ERROR",
-        "MIN", "AVG", "MAX" ]
+    headers = [ "CUs", "Apdex*", "Rating*", "RPS", "maxRPS", "TOTAL", "SUCCESS","ERROR",
+        "MIN", "AVG", "MAX"]
     image_names = ['requests_rps', 'requests']
+    with_apdex = True
 
     def render_stat(self):
         """Render rst stat."""
@@ -127,6 +146,9 @@ class AllResponseRst(BaseRst):
         stats = self.stats
         stats.finalize()
         ret.append(self.fmt_int % stats.cvus)
+        if self.with_apdex:
+            ret.append(self.fmt_float % stats.apdex_score)
+            ret.append(self.fmt_str % get_apdex_label(stats.apdex_score))
         ret.append(self.fmt_float % stats.rps)
         ret.append(self.fmt_float % stats.rps_max)
         ret.append(self.fmt_int % stats.count)
@@ -143,15 +165,17 @@ class AllResponseRst(BaseRst):
 
 class PageRst(AllResponseRst):
     """Page rendering."""
-    headers = ["CUs", "SPPS", "maxSPPS", "TOTAL", "SUCCESS",
+    headers = ["CUs", "Apdex*", "Rating*", "SPPS", "maxSPPS", "TOTAL", "SUCCESS",
               "ERROR", "MIN", "AVG", "MAX"]
     image_names = ['pages_spps', 'pages']
+    with_apdex = True
 
 class ResponseRst(BaseRst):
     """Response rendering."""
-    headers = ["CUs", "TOTAL", "SUCCESS", "ERROR", "MIN", "AVG", "MAX"]
+    headers = ["CUs", "Apdex*", "Rating*", "TOTAL", "SUCCESS", "ERROR", "MIN", "AVG", "MAX"]
     indent = 4
     image_names = ['request_']
+    with_apdex = True
 
     def __init__(self, stats):
         BaseRst.__init__(self, stats)
@@ -165,6 +189,8 @@ class ResponseRst(BaseRst):
         stats.finalize()
         ret = [' ' * self.indent]
         ret.append(self.fmt_int % stats.cvus)
+        ret.append(self.fmt_float % stats.apdex_score)
+        ret.append(self.fmt_str % get_apdex_label(stats.apdex_score))
         ret.append(self.fmt_int % stats.count)
         ret.append(self.fmt_int % stats.success)
         ret.append(self.fmt_percent % stats.error_percent)
@@ -272,6 +298,7 @@ class RenderRst:
         self.append(".. _FunkLoad: http://funkload.nuxeo.org/")
         self.append(".. sectnum::    :depth: 2")
         self.append(".. contents:: Table of contents")
+        self.append(".. |APDEXT| replace:: \ :sub:`%.1f`" % self.options.apdex_t)
 
         self.append(rst_title("Bench configuration", 2))
         self.append("* Launched: %s" % date)
@@ -291,6 +318,7 @@ class RenderRst:
                     config['sleep_time'])
         self.append("* Startup delay between thread: %ss" %
                     config['startup_delay'])
+        self.append("* Apdex |APDEXT|")
         self.append("* FunkLoad_ version: %s" % config['version'])
         self.append("")
 
@@ -511,6 +539,9 @@ class RenderRst:
                     ' of pages or requests are delivered.')
         self.append('* P95: 95th percentile, response time where 95 percent'
                     ' of pages or requests are delivered.')
+        self.append('* Apdex: Application Performance Index, '
+                    'visit http://www.apdex.org/ for more information.')
+        self.append('* Apdex rating: E: Excellent, G: Good, F: Fair, P: Poor, U: Unacceptable.')
         self.append('')
         self.append('Report generated with FunkLoad_ ' + get_version() +
                     ', more information available on the '

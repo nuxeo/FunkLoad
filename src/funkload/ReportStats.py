@@ -80,9 +80,35 @@ class Percentiles:
         return "Percentiles(stepsize=%r, name=%r, results=%r)" % (
             self.stepsize, self.name, self.results)
 
+class ApdexStat:
+    def __init__(self, apdex_t):
+        self.apdex_satisfied = 0
+        self.apdex_tolerating = 0
+        self.apdex_frustrating = 0
+        self.apdex_satisfied_t = apdex_t
+        self.apdex_tolerating_t = 4*apdex_t 
+        self.apdex_t = apdex_t
+        self.count = 0
+
+    def add(self, duration):
+        if duration < self.apdex_satisfied_t:
+            self.apdex_satisfied += 1
+        elif duration < self.apdex_tolerating_t:
+            self.apdex_tolerating += 1
+        else:
+            self.apdex_frustrating += 1
+        self.count += 1
+
+    def getScore(self):
+        score = 0
+        if self.count:
+            score = (self.apdex_satisfied + (self.apdex_tolerating/2.0)) / self.count
+        return score
+
+
 class AllResponseStat:
     """Collect stat for all response in a cycle."""
-    def __init__(self, cycle, cycle_duration, cvus):
+    def __init__(self, cycle, cycle_duration, cvus, apdex_t):
         self.cycle = cycle
         self.cycle_duration = cycle_duration
         self.cvus = int(cvus)
@@ -100,6 +126,8 @@ class AllResponseStat:
         self.rps_max = 0
         self.finalized = False
         self.percentiles = Percentiles(stepsize = 5, name = cycle)
+        self.apdex = ApdexStat(apdex_t)
+        self.apdex_score = None
 
     def add(self, date, result, duration):
         """Add a new response to stat."""
@@ -111,11 +139,13 @@ class AllResponseStat:
             self.success += 1
         else:
             self.error += 1
-        self.max = max(self.max, float(duration))
-        self.min = min(self.min, float(duration))
-        self.total += float(duration)
+        duration_f = float(duration)
+        self.max = max(self.max, duration_f)
+        self.min = min(self.min, duration_f)
+        self.total += duration_f
         self.finalized = False
-        self.percentiles.addResult(float(duration))
+        self.percentiles.addResult(duration_f)
+        self.apdex.add(duration_f)
 
     def finalize(self):
         """Compute avg times."""
@@ -141,8 +171,8 @@ class AllResponseStat:
         self.rps_max = rps_max
         self.rps_min = rps_min
         self.percentiles.calcPercentiles()
+        self.apdex_score = self.apdex.getScore()
         self.finalized = True
-
 
 
 class SinglePageStat:
@@ -170,8 +200,8 @@ class SinglePageStat:
 
 class PageStat(AllResponseStat):
     """Collect stat for asked pages in a cycle."""
-    def __init__(self, cycle, cycle_duration, cvus):
-        AllResponseStat.__init__(self, cycle, cycle_duration, cvus)
+    def __init__(self, cycle, cycle_duration, cvus, apdex_t):
+        AllResponseStat.__init__(self, cycle, cycle_duration, cvus, apdex_t)
         self.threads = {}
 
     def add(self, thread, step,  date, result, duration, rtype):
@@ -191,6 +221,7 @@ class PageStat(AllResponseStat):
         stat = thread['pages'].setdefault(thread['count'],
                                           SinglePageStat(step))
         stat.addResponse(date, result, duration)
+        self.apdex.add(float(duration))
         self.finalized = False
 
     def finalize(self):
@@ -221,7 +252,7 @@ class PageStat(AllResponseStat):
 
 class ResponseStat:
     """Collect stat a specific response in a cycle."""
-    def __init__(self, step, number, cvus):
+    def __init__(self, step, number, cvus, apdex_t):
         self.step = step
         self.number = number
         self.cvus = int(cvus)
@@ -238,6 +269,8 @@ class ResponseStat:
         self.type = '?'
         self.finalized = False
         self.percentiles = Percentiles(stepsize=5, name=step)
+        self.apdex = ApdexStat(apdex_t)
+        self.apdex_score = None
 
     def add(self, rtype, result, url, duration, description=None):
         """Add a new response to stat."""
@@ -255,6 +288,7 @@ class ResponseStat:
         if description is not None:
             self.description = description
         self.finalized = False
+        self.apdex.add(float(duration))
 
     def finalize(self):
         """Compute avg times."""
@@ -266,6 +300,7 @@ class ResponseStat:
         if self.error:
             self.error_percent = 100.0 * self.error / float(self.count)
         self.percentiles.calcPercentiles()
+        self.apdex_score = self.apdex.getScore()
         self.finalized = True
 
 class TestStat:
