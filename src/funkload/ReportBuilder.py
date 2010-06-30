@@ -234,9 +234,7 @@ def main():
     parser.add_option("-T", "--apdex-T", type="float",
                       dest="apdex_t",
                       help="Apdex T constant.",
-                      default=1.0)
-
-
+                      default=1.5)
 
     options, args = parser.parse_args()
     if options.diffreport:

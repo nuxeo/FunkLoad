@@ -65,14 +65,13 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
     Simply render stuff in ReST than ask docutils to build an html doc.
     """
-    chart_size = (480, 540)
+    chart_size = (640, 540)
     #big_chart_size = (640, 480)
     ticpattern = re.compile('(\:\d+)\ ')
 
     def getChartSizeTmp(self, cvus):
         """Override for gnuplot format"""
-        size = RenderHtmlBase.getChartSize(self, cvus)
-        return str(size[0]) + ',' + str(size[1])
+        return str(self.chart_size[0]) + ',' + str(self.chart_size[1])
 
     def getXRange(self):
         """Return the max CVUs range."""
@@ -259,35 +258,39 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set rmargin 9.5')
         lines.append('set key inside top')
         if has_error:
-            lines.append('set size 1, 0.5')
-            lines.append('set origin 0, 0.5')
+            lines.append('set size 1, 0.4')
+            lines.append('set origin 0, 0.6')
         else:
-            lines.append('set size 1, 0.75')
-            lines.append('set origin 0, 0.75')
+            lines.append('set size 1, 0.6')
+            lines.append('set origin 0, 0.4')
         lines.append('plot "%s" u 1:2 w linespoints lw 2 lt 2 t "SPPS"' % data_path)
         # apdex
         lines.append('set boxwidth 1')
-        lines.append('set style fill solid .75')
-        lines.append('set size 1.0, 0.25')
+        lines.append('set style fill solid .7')
         lines.append('set ylabel "Apdex %.1f" ' % apdex_t)
         lines.append('set yrange [0:1]')
         lines.append('set key outside top')
         if has_error:
-            lines.append('set origin 0.0, 0.25')
+            lines.append('set origin 0.0, 0.3')
+            lines.append('set size 1.0, 0.3')
         else:
+            lines.append('set size 1.0, 0.4')
+            lines.append('set bmargin 3')
             lines.append('set format x "% g"')
             lines.append('set xlabel "Concurrent Users"')
             lines.append('set origin 0.0, 0.0')
-            lines.append('set key inside top')
+
         lines.append('plot "%s" u 1:12 w boxes lw 2 lt rgb "#99CDFF" t "E", "" u 1:13 w boxes lw 2 lt rgb "#00FF01" t "G", "" u 1:14 w boxes lw 2 lt rgb "#FFFF00" t "F", "" u 1:15 w boxes lw 2 lt rgb "#FF7C81" t "P", "" u 1:16 w boxes lw 2 lt rgb "#C0C0C0" t "U"' % data_path)
 
         lines.append('set key inside top')
         if has_error:
-            lines.append('set size 1.0, 0.25')
+            lines.append('set bmargin 3')
+            lines.append('set format x "% g"')
             lines.append('set xlabel "Concurrent Users"')
+            lines.append('set origin 0.0, 0.0')
+            lines.append('set size 1.0, 0.3')
             lines.append('set ylabel "% errors"')
             lines.append('set yrange [0:100]')
-            lines.append('set origin 0.0, 0.0')
             lines.append('plot "%s" u 1:3 w boxes lt 1 lw 2 t "%% Errors"' % data_path)
 
         lines.append('unset yrange')
