@@ -23,3 +23,4 @@ Kelvin Ward: Patch on Report builder to support win gnuplot.
 Goutham Bath: HTTP debug server for the bench runner.
 Arshavski Alexander, Ethan Winn: Bug report and patch for OS X.
 Gareth Davidson: Cookies patch, improve win support.
+Martin Aspeli: Patch on recorder/report generation.

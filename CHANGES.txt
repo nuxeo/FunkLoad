@@ -27,6 +27,15 @@ New features
 * Adding Apdex (Application Performance inDEX) on reporting 
   visit http://www.apdex.org/ for more information.
 
+Bug fixes
+~~~~~~~~~
+
+* The recorder now maintain the order of input elements, patch submited by
+  Martin Aspeli
+
+* Fix unicode decode errors when merging reports when an error occurred on a
+  page with unicode, patch submited by Martin Aspeli.
+ 
 FunkLoad 1.12.0
 ------------------
 
