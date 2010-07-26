@@ -335,9 +335,11 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 # and that the cookie is or isn't secure
                 if sendcookie['secure'] and protocol != 'https':
                     continue
-                if sendcookie.coded_value == '"deleted"':
+                # TODO: check for expires (max-age is working)
+                # hard coded value that application can use to work
+                # around expires
+                if sendcookie.coded_value in ('"deleted"', "null"):
                     continue
-                # TODO: check max-age
                 cookie_list.append("%s=%s;"%(sendcookie.key,
                                             sendcookie.coded_value))
                 cookies_used.append(sendcookie.key)
