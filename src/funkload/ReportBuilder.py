@@ -233,7 +233,8 @@ def main():
                       default=None)
     parser.add_option("-T", "--apdex-T", type="float",
                       dest="apdex_t",
-                      help="Apdex T constant.",
+                      help="Apdex T constant in second, default is set to 1.5s. "
+                      "Visit http://www.apdex.org/ for more information.",
                       default=1.5)
 
     options, args = parser.parse_args()

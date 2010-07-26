@@ -40,15 +40,14 @@ def rst_title(title, level=1):
 
 def get_apdex_label(score):
     if score < 0.5:
-        return "Unacceptable"
+        return "UNACCEPTABLE"
     if score < 0.7:
-        return "Poor"
+        return "POOR"
     if score < 0.85:
-        return "Fair"
+        return "FAIR"
     if score < 0.94:
         return "Good"
     return "Excellent"
-
 
 
 class BaseRst:
@@ -277,6 +276,25 @@ class RenderRst:
             cycle_r = self.cycles[0]
         return cycle_r
 
+    def getBestCycle(self):
+        """Return the cycle with the maximum Apdex and SPPS."""
+        stats = self.stats
+        max_spps = -1
+        cycle_r = None
+        for cycle in self.cycles:
+            if not stats[cycle].has_key('page'):
+                continue
+            if stats[cycle]['page'].apdex_score < 0.85:
+                continue
+            spps = stats[cycle]['page'].rps * stats[cycle]['page'].apdex_score
+            if spps > max_spps:
+                max_spps = spps
+                cycle_r = cycle
+        if cycle_r is None and len(self.cycles):
+            # no test ends during a cycle return the first one
+            cycle_r = self.cycles[0]
+        return cycle_r
+
     def append(self, text):
         """Append text to rst output."""
         self.rst.append(text)
@@ -453,7 +471,7 @@ class RenderRst:
         """Render the n slowest requests of the best cycle."""
         stats = self.stats
         self.append(rst_title("%i Slowest requests"% number, 2))
-        cycle = self.getBestStpsCycle()
+        cycle = self.getBestCycle()
         cycle_name = None
         if not (cycle and stats[cycle].has_key('response_step')):
             return
@@ -463,7 +481,8 @@ class RenderRst:
             stat = stats[cycle]['response_step'][step_name]
             stat.finalize()
             items.append((stat.avg, stat.step,
-                          stat.type, stat.url, stat.description))
+                          stat.type, stat.url, stat.description, 
+                          stat.apdex_score))
             if not cycle_name:
                 cycle_name = stat.cvus
 
@@ -472,9 +491,9 @@ class RenderRst:
         self.append('Slowest average response time during the best cycle '
                     'with **%s** CUs:\n' % cycle_name)
         for item in items[:number]:
-            self.append('* In page %s %s: %s took **%.3fs**\n'
+            self.append('* In page %s, Apdex rating: %s, avg response time: %3.2fs, %s: %s\n'
                         '  `%s`' % (
-                item[1], item[2], item[3], item[0], item[4]))
+                item[1], get_apdex_label(item[5]), item[0], item[2], item[3], item[4]))
 
     def renderErrors(self):
         """Render error list."""
@@ -539,9 +558,41 @@ class RenderRst:
                     ' of pages or requests are delivered.')
         self.append('* P95: 95th percentile, response time where 95 percent'
                     ' of pages or requests are delivered.')
-        self.append('* Apdex: Application Performance Index, '
-                    'visit http://www.apdex.org/ for more information.')
-        self.append('* Apdex rating: E: Excellent, G: Good, F: Fair, P: Poor, U: Unacceptable.')
+        self.append('''* Apdex: Application Performance Index, 
+  this is a numerical measure of user satisfaction, it is based
+  on three zones of application responsiveness:
+
+    - Satisfied: The user is fully productive. This represents the
+      time value (T seconds) below which users are not impeded by
+      application response time.
+
+    - Tolerating: The user notices performance lagging within
+      responses greater than T, but continues the process.
+
+    - Frustrated: Performance with a response time greater than 4*T
+      seconds is unacceptable, and users may abandon the process.
+
+  By default T is set to 1.5s this means that response time between 0
+  and 1.5s the user is fully productive, between 1.5 and 6s the
+  responsivness is tolerating and above 6s the user is frustrated.
+
+  The Apdex score converts many measurements into one number on a
+  uniform scale of 0-to-1 (0 = no users satisfied, 1 = all users
+  satisfied).
+
+  To ease interpretation the Apdex score is also represented as a rating:
+
+  - U for UNACCEPTABLE represented in gray for a score between 0 and 0.5 
+
+  - P for POOR represented in red for a score between 0.5 and 0.7
+
+  - F for FAIR represented in yellow for a score between 0.7 and 0.85
+
+  - G for Good represented in green for a score between 0.85 and 0.94
+
+  - E for Excellent represented in blue for a score between 0.94 and 1
+
+  visit http://www.apdex.org/ for more information.''')
         self.append('')
         self.append('Report generated with FunkLoad_ ' + get_version() +
                     ', more information available on the '

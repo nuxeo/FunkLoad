@@ -24,8 +24,52 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~~
 
-* Adding Apdex (Application Performance inDEX) on reporting 
+* Adding Apdex (Application Performance inDEX) on reporting. 
+
+  The Apdex is a numerical measure of user satisfaction, it is based
+  on three zones of application responsiveness:
+
+    - Satisfied: The user is fully productive. This represents the
+      time value (T seconds) below which users are not impeded by
+      application response time.
+
+    - Tolerating: The user notices performance lagging within
+      responses greater than T, but continues the process.
+
+    - Frustrated: Performance with a response time greater than 4*T
+      seconds is unacceptable, and users may abandon the process.
+
+  By default T is set to 1.5s this means that response time between 0
+  and 1.5s the user is fully productive, between 1.5 and 6s the
+  responsivness is tolerating and above 6s the user is frustrated.
+
+  The T variable can be set using the ``fl-build-report`` option
+  ``--apdex-T``.
+
+  The Apdex score converts many measurements into one number on a
+  uniform scale of 0-to-1 (0 = no users satisfied, 1 = all users
+  satisfied).
+
+  To ease interpretation the Apdex score can be converted to a rating:
+
+  - Unacceptable represented in gray for a score between 0 and 0.5 
+
+  - Poor represented in red for a score between 0.5 and 0.7
+
+  - Fair represented in yellow for a score between 0.7 and 0.85
+
+  - Good represented in green for a score between 0.85 and 0.94
+
+  - Excellent represented in blue for a score between 0.94 and 1
+
+  By looking at the Page stats in the report you can take the maximum
+  throughput with a Good rating as an overall performance score.
+
   visit http://www.apdex.org/ for more information.
+
+* The selection of the best cycle to sort slowest requests in the report
+  is found using the product of throuthput and apdex score instead of simple
+  maximum.
 
 Bug fixes
 ~~~~~~~~~
