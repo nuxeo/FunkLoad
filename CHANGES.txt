@@ -75,9 +75,14 @@ New features
   - Excellent represented in blue for a score between 0.94 and 1
 
   By looking at the Page stats in the report you can take the maximum
-  throughput with a Good rating as an overall performance score.
+  throughput with a Good/Excellent rating as an overall performance score.
 
-  visit http://www.apdex.org/ for more information.
+  Note that this new metric can be generated with old funkload results file. 
+
+  Here is a report example:
+  http://funkload.nuxeo.org/report-example/test_seam_java6/#page-stats
+
+  Visit http://www.apdex.org/ for more information on Apdex.
 
 * The selection of the best cycle to sort slowest requests in the report
   is found using the product of throuthput and apdex score instead of simple

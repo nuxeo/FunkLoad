@@ -48,6 +48,8 @@ uninstall:
 	-rm -rf /usr/lib/python2.3/site-packages/funkload*
 	-rm -rf /usr/lib/python2.4/site-packages/funkload*
 	-rm -rf /usr/lib/python2.5/site-packages/funkload*
+	-rm -rf /usr/lib/python2.6/dist-packages/funkload*
+	-rm -rf /usr/local/lib/python2.6/dist-packages/funkload*
 	-rm -rf /usr/local/funkload/
 	-rm -f /usr/local/bin/fl-*
 	-rm -f /usr/bin/fl-*
