@@ -305,7 +305,7 @@ def make_pkg():
     """
     _pkg = pkg_resources.get_distribution('funkload')
     _dst = tempfile.gettempdir() 
-    if _pkg.location.find('.egg')>=0:
+    if not os.path.isdir(_pkg.location):
         _path = os.path.join( _dst, 'funkload.egg')
         shutil.copy(_pkg.location, _path )
         return _path
