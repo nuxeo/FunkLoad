@@ -119,10 +119,9 @@ class FunkLoadTestCase(unittest.TestCase):
             section = 'bench'
         else:
             section = 'ftest'
-        ok_codes = self.conf_getList(section, 'ok_codes',
-                                     [200, 301, 302, 303, 307],
-                                     quiet=True)
-        self.ok_codes = map(int, ok_codes)
+        self.setOkCodes( self.conf_getList(section, 'ok_codes',
+                                           [200, 301, 302, 303, 307],
+                                           quiet=True) )
         self.sleep_time_min = self.conf_getFloat(section, 'sleep_time_min', 0)
         self.sleep_time_max = self.conf_getFloat(section, 'sleep_time_max', 0)
         self.log_to = self.conf_get(section, 'log_to', 'console file')
@@ -149,7 +148,13 @@ class FunkLoadTestCase(unittest.TestCase):
         self.clearContext()
 
         #self.logd('# FunkLoadTestCase._funkload_init done')
-
+    
+    
+    def setOkCodes(self, ok_codes):
+        """Set ok codes."""
+        self.ok_codes = map(int, ok_codes) 
+    
+    
     def clearContext(self):
         """Reset the testcase."""
         self._browser.clearContext()
@@ -181,16 +186,16 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # browser simulation
     #
-    def _connect(self, url, params, ok_codes, rtype, description):
+    def _connect(self, url, params, ok_codes, rtype, description, redirect=False):
         """Handle fetching, logging, errors and history."""
-        if params is None and rtype == 'post':
-            # enable empty post
+        if params is None and rtype in ('post','put'):
+            # enable empty put/post
             params = []
         t_start = time.time()
         try:
             response = self._browser.fetch(url, params, ok_codes=ok_codes,
                                            key_file=self._keyfile_path,
-                                           cert_file=self._certfile_path)
+                                           cert_file=self._certfile_path, method=rtype)
         except:
             etype, value, tback = sys.exc_info()
             t_stop = time.time()
@@ -215,13 +220,14 @@ class FunkLoadTestCase(unittest.TestCase):
         # Log response
         t_delta = t_stop - t_start
         self.total_time += t_delta
-        if rtype in ('post', 'get'):
-            self.total_pages += 1
-        elif rtype == 'redirect':
+        if redirect:
             self.total_redirects += 1
+        elif rtype in ('post', 'get', 'put', 'delete'):
+            self.total_pages += 1
         elif rtype == 'link':
             self.total_links += 1
-        if rtype in ('post', 'get', 'redirect'):
+        
+        if rtype in ('put','post', 'get', 'delete'):
             # this is a valid referer for the next request
             self.setHeader('Referer', url)
         self._browser.history.append((rtype, url))
@@ -279,13 +285,17 @@ class FunkLoadTestCase(unittest.TestCase):
             if not self.in_bench_mode:
                 self.logd('GET: %s\n\tPage %i: %s ...' % (url, self.steps,
                                                           description or ''))
+        elif method == 'delete':
+            if not self.in_bench_mode:
+                self.logd('DELETE:%s\n\tPage %i: %s ...' %(url, self.steps,
+                                                        description or ''))
         else:
             url = url_in
             if not self.in_bench_mode:
-                self.logd('POST: %s %s\n\tPage %i: %s ...' % (url, str(params),
-                                                              self.steps,
-                                                              description or ''))
-        # Fetching
+                self.logd('%s: %s %s\n\tPage %i: %s ...' % (
+                        method.upper(), url, str(params),
+                        self.steps, description or ''))
+            # Fetching
         response = self._connect(url, params, ok_codes, method, description)
 
         # Check redirection
@@ -296,10 +306,14 @@ class FunkLoadTestCase(unittest.TestCase):
                 # Figure the location - which may be relative
                 newurl = response.headers['Location']
                 url = urljoin(url_in, newurl)
-                # save the current url as the base for future redirects
+                # Save the current url as the base for future redirects
                 url_in = url
                 self.logd(' Load redirect link: %s' % url)
-                response = self._connect(url, None, ok_codes, 'redirect', None)
+                # Use the appropriate method for redirection
+                if response.code in (302, 303):
+                    method = 'get'
+                response = self._connect(url, None, ok_codes, rtype=method,
+                                         description=None, redirect=True)
                 max_redirect_count -= 1
             if not max_redirect_count:
                 self.logd(' WARNING Too many redirects give up.')
@@ -372,7 +386,23 @@ class FunkLoadTestCase(unittest.TestCase):
         response = self._browse(url, params, description, ok_codes,
                                 method="get")
         return response
-
+    
+    def put(self, url, params=None, description=None, ok_codes=None):
+        """PUT method on url with params."""
+        self.steps += 1
+        self.page_responses = 0
+        response = self._browse(url, params, description, ok_codes,
+                                method="put")
+        return response
+    
+    def delete(self, url, description=None, ok_codes=None):
+        """DELETE method on url."""
+        self.steps += 1
+        self.page_responses = 0
+        response = self._browse(url, None, description, ok_codes,
+                                method="delete")
+        return response
+    
     def exists(self, url, params=None, description="Checking existence"):
         """Try a GET on URL return True if the page exists or False."""
         resp = self.get(url, params, description=description,
@@ -380,7 +410,6 @@ class FunkLoadTestCase(unittest.TestCase):
         if resp.code not in [200, 301, 302, 303, 307]:
             self.logd('Page %s not found.' % url)
             return False
-        self.logd('Page %s exists.' % url)
         return True
 
     def xmlrpc(self, url_in, method_name, params=None, description=None):
@@ -443,7 +472,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 self._browser.fetch(url, None,
                                     ok_codes=[200, 301, 302, 303, 307],
                                     key_file=self._keyfile_path,
-                                    cert_file=self._certfile_path)
+                                    cert_file=self._certfile_path, method="get")
             except SocketError:
                 if time.time() - time_start > time_out:
                     self.fail('Time out service %s not available after %ss' %

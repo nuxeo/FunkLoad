@@ -27,6 +27,11 @@ import logging
 from time import sleep
 from socket import error as SocketError
 from xmlrpclib import ServerProxy
+import pkg_resources
+import tarfile
+import shutil
+import tempfile
+import hashlib
 
 
 def thread_sleep(seconds=0):
@@ -288,3 +293,63 @@ class Data:
 
     def __repr__(self):
         return "[User data " + self.content_type + "]"
+
+
+
+def make_pkg():
+    """
+    tests whether the funkload package is installed as an egg or whether
+    it is in a dev checkout. based on the circumstance, either copies the 
+    egg to `dst` or creates a tarball of the source tree and returns the 
+    full path.
+    """
+    _pkg = pkg_resources.get_distribution('funkload')
+    _dst = tempfile.gettempdir() 
+    if not os.path.isdir(_pkg.location):
+        _path = os.path.join( _dst, 'funkload.egg')
+        shutil.copy(_pkg.location, _path )
+        return _path
+    else:
+        loc = os.path.split(_pkg.location)[0]
+        _path =  os.path.join ( _dst, 'funkload.tar')
+        _tar = tarfile.TarFile(_path,'w')
+        _tar.add(loc, '.')
+        _tar.close()
+        return _path
+
+def get_virtualenv_script():
+    """
+    returns the path of the virtualenv.py script that is 
+    installed in the system. if it doesn't exist returns
+    None.
+    """
+    pkg = pkg_resources.get_distribution('virtualenv')
+    script_path =  os.path.join( pkg.location, 'virtualenv.py')
+    
+    if os.path.isfile( script_path ):
+        return script_path
+    else:
+        return None
+    
+
+def package_tests(module_file):
+    """
+    this function will basically allow you to create a tarball
+    of the current working directory (of tests) for transport over
+    to a remote machine. It uses a few heuristics to avoid packaging
+    log files.
+    """
+    exclude_func = lambda filename: filename.find(".log")>=0 or\
+                                    filename.find(".bak")>=0 or\
+                                    filename.find(".pyc")>=0 or\
+                                    os.path.split(filename)[1] == "bin" or\
+                                    os.path.split(filename)[1] == "lib" 
+        
+    _path = tempfile.mktemp(suffix='.tar') 
+    _targetdir = hashlib.md5(os.path.splitext(module_file)[0]).hexdigest()
+    _directory = os.path.split(os.path.abspath(module_file))[0]
+    _tar = tarfile.TarFile( _path  ,'w')
+    _tar.add ( _directory, _targetdir , exclude = exclude_func )
+    
+    return _path, _targetdir
+

@@ -66,7 +66,7 @@ from utils import thread_sleep, trace, red_str, green_str
 from utils import get_version
 from FunkLoadHTTPServer import FunkLoadHTTPRequestHandler
 from FunkLoadHTTPServer import FunkLoadHTTPServer
-
+from Distributed import DistributionMgr
 
 # ------------------------------------------------------------
 # utils
@@ -119,7 +119,7 @@ def reset_cycle_results():
 
 
 def load_unittest(test_module, test_class, test_name, options):
-    """Instantiate a unittest."""
+    """instantiate a unittest."""
     module = __import__(test_module)
     klass = getattr(module, test_class)
     return klass(test_name, options)
@@ -239,10 +239,11 @@ class BenchRunner:
 
         # setup monitoring
         monitor_hosts = []                  # list of (host, port, descr)
-        for host in test.conf_get('monitor', 'hosts', '', quiet=True).split():
-            host = host.strip()
-            monitor_hosts.append((host, test.conf_getInt(host, 'port'),
-                                  test.conf_get(host, 'description', '')))
+        if not options.is_distributed:
+            for host in test.conf_get('monitor', 'hosts', '', quiet=True).split():
+                host = host.strip()
+                monitor_hosts.append((host, test.conf_getInt(host, 'port'),
+                                      test.conf_get(host, 'description', '')))
         self.monitor_hosts = monitor_hosts
         # keep the test to use the result logger for monitoring
         # and call setUp/tearDown Cycle
@@ -593,7 +594,20 @@ def main():
                       "/getcvu returns number of CVUs ")
     parser.add_option("", "--debug-server-port", type="string", dest="debugport",
                       help="Port at which debug server should run during the test")
+    
+    parser.add_option("","--distribute", action="store_true", dest="distribute",
+                      help="distributes the CVUs over a group of worker machines "
+                      "that are defined in the section [workers]")
+    parser.add_option("","--distribute-workers", type="string", dest="workerlist",
+                      help="this parameter will  over-ride the list of workers defined "
+                      "in the config file. expected notation is username@hostname,...") 
+    parser.add_option("","--is-distributed", action="store_true", dest="is_distributed",
+                      help="this parameter is for internal use only. it signals to a "
+                      "worker node that it is in distributed mode and shouldn't "
+                      "perform certain actions.")
+
     options, args = parser.parse_args()
+    cmd_args = " ".join((k for k in sys.argv[1:] if k.find('--distribute')<0))
     if len(args) != 2:
         parser.error("incorrect number of arguments")
     if not args[1].count('.'):
@@ -603,19 +617,33 @@ def main():
         options.bench_sleep_time_max = '0'
         options.bench_sleep_time = '0'
     klass, method = args[1].split('.')
-    bench = BenchRunner(args[0], klass, method, options)
+    if options.distribute:
+        ret = None
+        try:
+            distmgr = DistributionMgr( args[0] , klass, method, options, cmd_args )     
+            try:
+                distmgr.prepare_workers(allow_errors = True)
+                ret = distmgr.run()
+                distmgr.final_collect()
+            except KeyboardInterrupt:
+                trace("* ^C received *")
+                distmgr.abort()
+        except UserWarning,error:
+            trace(red_str("Distribution failed with:%s \n" % (error)))
+        sys.exit(ret)
+    else:
+        bench = BenchRunner(args[0], klass, method, options)
+        # Start a HTTP server optionally
+        if options.debugserver == True:
+            http_server_thread = FunkLoadHTTPServer(bench, options.debugport)
+            http_server_thread.start()
 
-    # Start a HTTP server optionally
-    if options.debugserver == True:
-        http_server_thread = FunkLoadHTTPServer(bench, options.debugport)
-        http_server_thread.start()
-
-    ret = None
-    try:
-        ret = bench.run()
-    except KeyboardInterrupt:
-        trace("* ^C received *")
-    sys.exit(ret)
+        ret = None
+        try:
+            ret = bench.run()
+        except KeyboardInterrupt:
+            trace("* ^C received *")
+        sys.exit(ret)
 
 if __name__ == '__main__':
     main()
