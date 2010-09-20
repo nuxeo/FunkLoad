@@ -579,6 +579,7 @@ def main():
                       help="Do not fail if css/image links are "
                       "not reachable.")
     parser.add_option("", "--simple-fetch", action="store_true",
+                      dest="bench_simple_fetch",
                       help="Don't load additional links like css "
                       "or images when fetching an html page.")
     parser.add_option("-l", "--label", type="string",

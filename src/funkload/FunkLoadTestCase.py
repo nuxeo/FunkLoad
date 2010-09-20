@@ -78,7 +78,6 @@ class FunkLoadTestCase(unittest.TestCase):
         self._viewing = getattr(options, 'firefox_view', False)
         self._accept_invalid_links = getattr(options, 'accept_invalid_links',
                                              False)
-        self._simple_fetch = getattr(options, 'simple_fetch', False)
         self._bench_label = getattr(options, 'label', None)
         self._stop_on_fail = getattr(options, 'stop_on_fail', False)
         self._pause = getattr(options, 'pause', False)
@@ -124,6 +123,7 @@ class FunkLoadTestCase(unittest.TestCase):
                                            quiet=True) )
         self.sleep_time_min = self.conf_getFloat(section, 'sleep_time_min', 0)
         self.sleep_time_max = self.conf_getFloat(section, 'sleep_time_max', 0)
+        self._simple_fetch = self.conf_getInt(section, 'simple_fetch', 0)
         self.log_to = self.conf_get(section, 'log_to', 'console file')
         self.log_path = self.conf_get(section, 'log_path', 'funkload.log')
         self.result_path = os.path.abspath(

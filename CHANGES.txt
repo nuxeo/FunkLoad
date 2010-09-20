@@ -21,7 +21,20 @@ FunkLoad SVN trunk
 
 :Target: 1.14.0
 
+New features
+~~~~~~~~~~~~~
 
+* Distributed mode, provided by Ali-Akber Saifee (more description soon).
+
+* Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
+
+* Switch to Sphinx for documentation, work in progress, contribution of
+  Ali-Akber Saifee.
+
+* Support of the ``--simple-fetch`` option using the configuration
+  file. This can be useful when using benchmaster
+  http://pypi.python.org/pypi/benchmaster. Just add ``simple_fetch = 1``
+  in the bench section.
 
 FunkLoad 1.13.0
 ------------------

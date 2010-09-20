@@ -24,3 +24,5 @@ Goutham Bath: HTTP debug server for the bench runner.
 Arshavski Alexander, Ethan Winn: Bug report and patch for OS X.
 Gareth Davidson: Cookies patch, improve win support.
 Martin Aspeli: Patch on recorder/report generation.
+Ali-Akber Saifee: Distributed mode, PUT/DELETE support, Sphinx documentation
+  layout.
