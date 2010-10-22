@@ -227,7 +227,7 @@ set output "spps_diff.png"
 set terminal png size 640,380
 set title "Successful Pages Per Second"
 set ylabel "SPPS"
-plot "diffbench.dat" i 4 u 1:2:15 w filledcurves above t "B2<B1", "" i 4 u 1:2:15 w filledcurves below t "B2>B1", "" i 4 u 1:2 w lines lw 2 t "B1", "" i 4 u 1:15 w lines lw 2 t "B2"
+plot "diffbench.dat" i 4 u 1:4:19 w filledcurves above t "B2<B1", "" i 4 u 1:4:19 w filledcurves below t "B2>B1", "" i 4 u 1:4 w lines lw 2 t "B1", "" i 4 u 1:19 w lines lw 2 t "B2"
 
 # RPS
 set output "rps_diff.png"
@@ -239,7 +239,7 @@ set origin 0, 0.3
 set ylabel ""
 set format x ""
 set xlabel ""
-plot "diffbench.dat" i 5 u 1:2:15 w filledcurves above t "B2<B1", "" i 5 u 1:2:15 w filledcurves below t "B2>B1", "" i 5 u 1:2 w lines lw 2 t "B1", "" i 5 u 1:15 w lines lw 2 t "B2"
+plot "diffbench.dat" i 5 u 1:4:19 w filledcurves above t "B2<B1", "" i 5 u 1:4:19 w filledcurves below t "B2>B1", "" i 5 u 1:4 w lines lw 2 t "B1", "" i 5 u 1:19 w lines lw 2 t "B2"
 
 # % RPS
 set title "RPS B2/B1 %"  offset 0, -2
@@ -249,7 +249,7 @@ set format y "% g%%"
 set format x "% g"
 set xlabel "Concurrent Users"
 
-plot "diffbench.dat" i 5 u 1:($15<$2?((($15*100)/$2) - 100): 0) w boxes notitle, "" i 5 u 1:($15>=$2?((($15*100)/$2)-100): 0) w boxes notitle
+plot "diffbench.dat" i 5 u 1:($19<$4?((($19*100)/$2) - 100): 0) w boxes notitle, "" i 5 u 1:($19>=$4?((($19*100)/$4)-100): 0) w boxes notitle
 unset multiplot
 
 
@@ -266,7 +266,7 @@ set ylabel ""
 set format y "% gs"
 set xlabel ""
 set format x ""
-plot "diffbench.dat" i 5 u 1:21:8 w filledcurves above t "B2<B1", "" i 5 u 1:21:8 w filledcurves below t "B2>B1", "" i 5 u 1:8 w lines lw 2 t "B1", "" i 5 u 1:21 w lines lw 2 t "B2
+plot "diffbench.dat" i 5 u 1:25:10 w filledcurves above t "B2<B1", "" i 5 u 1:25:10 w filledcurves below t "B2>B1", "" i 5 u 1:10 w lines lw 2 t "B1", "" i 5 u 1:25 w lines lw 2 t "B2
 
 # % AVG
 set title "Average B1/B2 %"  offset 0, -2
@@ -275,7 +275,7 @@ set origin 0, 0
 set format y "% g%%"
 set format x "% g"
 set xlabel "Concurrent Users"
-plot "diffbench.dat" i 5 u 1:($21>$8?((($8*100)/$21) - 100): 0) w boxes notitle, "" i 5 u 1:($21<=$8?((($8*100)/$21) - 100): 0) w boxes notitle
+plot "diffbench.dat" i 5 u 1:($25>$10?((($8*100)/$25) - 100): 0) w boxes notitle, "" i 5 u 1:($25<=$10?((($10*100)/$25) - 100): 0) w boxes notitle
 
 # MEDIAN
 set size 0.5, 0.31
@@ -285,19 +285,19 @@ set format x ""
 
 set title "Median"
 set origin 0.5, 0.66
-plot "diffbench.dat" i 5 u 1:24:11 w filledcurves above notitle, "" i 5 u 1:24:11 w filledcurves below notitle, "" i 5 u 1:11 w lines lw 2 notitle, "" i 5 u 1:24 w lines lw 2 notitle
+plot "diffbench.dat" i 5 u 1:28:13 w filledcurves above notitle, "" i 5 u 1:28:13 w filledcurves below notitle, "" i 5 u 1:13 w lines lw 2 notitle, "" i 5 u 1:28 w lines lw 2 notitle
 
 # P90
 set title "p90"
 set origin 0.5, 0.33
-plot "diffbench.dat" i 5 u 1:25:12 w filledcurves above notitle, "" i 5 u 1:25:12 w filledcurves below notitle, "" i 5 u 1:12 w lines lw 2 notitle, "" i 5 u 1:25 w lines lw 2 notitle
+plot "diffbench.dat" i 5 u 1:29:14 w filledcurves above notitle, "" i 5 u 1:29:14 w filledcurves below notitle, "" i 5 u 1:14 w lines lw 2 notitle, "" i 5 u 1:29 w lines lw 2 notitle
 
 # MAX
 set title "Max"
 set origin 0.5, 0
 set format x "% g"
 set xlabel "Concurrent Users"
-plot "diffbench.dat" i 5 u 1:22:9 w filledcurves above notitle, "" i 5 u 1:22:9 w filledcurves below notitle, "" i 5 u 1:9 w lines lw 2 notitle, "" i 5 u 1:22 w lines lw 2 notitle
+plot "diffbench.dat" i 5 u 1:26:11 w filledcurves above notitle, "" i 5 u 1:26:11 w filledcurves below notitle, "" i 5 u 1:11 w lines lw 2 notitle, "" i 5 u 1:26 w lines lw 2 notitle
 unset multiplot
 ''')
 
