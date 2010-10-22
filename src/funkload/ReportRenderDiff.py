@@ -249,7 +249,7 @@ set format y "% g%%"
 set format x "% g"
 set xlabel "Concurrent Users"
 
-plot "diffbench.dat" i 5 u 1:($19<$4?((($19*100)/$2) - 100): 0) w boxes notitle, "" i 5 u 1:($19>=$4?((($19*100)/$4)-100): 0) w boxes notitle
+plot "diffbench.dat" i 5 u 1:($19<$4?((($19*100)/$4) - 100): 0) w boxes notitle, "" i 5 u 1:($19>=$4?((($19*100)/$4)-100): 0) w boxes notitle
 unset multiplot
 
 

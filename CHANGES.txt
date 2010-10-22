@@ -36,6 +36,12 @@ New features
   http://pypi.python.org/pypi/benchmaster. Just add ``simple_fetch = 1``
   in the bench section.
 
+Bug fixes
+~~~~~~~~~
+
+* Fixing invalid diff report if the report contains Apdex information.
+
+
 FunkLoad 1.13.0
 ------------------
 
