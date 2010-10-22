@@ -275,7 +275,7 @@ set origin 0, 0
 set format y "% g%%"
 set format x "% g"
 set xlabel "Concurrent Users"
-plot "diffbench.dat" i 5 u 1:($25>$10?((($8*100)/$25) - 100): 0) w boxes notitle, "" i 5 u 1:($25<=$10?((($10*100)/$25) - 100): 0) w boxes notitle
+plot "diffbench.dat" i 5 u 1:($25>$10?((($10*100)/$25) - 100): 0) w boxes notitle, "" i 5 u 1:($25<=$10?((($10*100)/$25) - 100): 0) w boxes notitle
 
 # MEDIAN
 set size 0.5, 0.31
