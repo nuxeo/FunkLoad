@@ -312,6 +312,10 @@ class FunkLoadTestCase(unittest.TestCase):
                 # Use the appropriate method for redirection
                 if response.code in (302, 303):
                     method = 'get'
+                if response.code == 303:
+                    # 303 is HTTP/1.1, make sure the connection 
+                    # is not in keep alive mode
+                    self.setHeader('Connection', 'close')
                 response = self._connect(url, None, ok_codes, rtype=method,
                                          description=None, redirect=True)
                 max_redirect_count -= 1

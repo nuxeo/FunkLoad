@@ -26,3 +26,4 @@ Gareth Davidson: Cookies patch, improve win support.
 Martin Aspeli: Patch on recorder/report generation.
 Ali-Akber Saifee: Distributed mode, PUT/DELETE support, Sphinx documentation
   layout.
+Jan Kotuc: Debugging keep alive problem on http/1.1 303.
