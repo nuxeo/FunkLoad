@@ -39,9 +39,9 @@ New features
 Bug fixes
 ~~~~~~~~~
 
-* Fix: xmlrpc_get_credential(host, port) without a group parameter it
-  raises a "TypeError: cannot marshal None unless allow_none is
-  enabled".
+* Fix: xmlrpc_get_credential(host, port) and xmlrpc_list_credentials
+  without a group parameter it raises a "TypeError: cannot marshal
+  None unless allow_none is enabled".
 
 * Fix: 303 Redirect is handled as an HTTP/1.1 request by apache using
   a keep alive connection while FunkLoad is HTTP/1.0. This add a 15s

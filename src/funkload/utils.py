@@ -189,7 +189,7 @@ def xmlrpc_list_groups(host, port):
 def xmlrpc_list_credentials(host, port, group=None):
     """Get list of users thru xmlrpc credential_server."""
     url = "http://%s:%s" % (host, port)
-    server = ServerProxy(url)
+    server = ServerProxy(url, allow_none=True)
     try:
         return server.listCredentials(group)
     except SocketError:
