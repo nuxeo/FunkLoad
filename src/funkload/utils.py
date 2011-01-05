@@ -167,7 +167,7 @@ def trace(message):
 def xmlrpc_get_credential(host, port, group=None):
     """Get credential thru xmlrpc credential_server."""
     url = "http://%s:%s" % (host, port)
-    server = ServerProxy(url)
+    server = ServerProxy(url, allow_none=True)
     try:
         return server.getCredential(group)
     except SocketError:
