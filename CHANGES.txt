@@ -24,9 +24,25 @@ FunkLoad SVN trunk
 New features
 ~~~~~~~~~~~~~
 
-* Distributed mode, provided by Ali-Akber Saifee (more description soon).
+* Add setUpBench and tearDownBench hooks, they are called only once
+  per bench before and after all cycles. 
+  
+  Note that these hooks are called only using ``fl-run-bench`` and no
+  ``fl-run-test``.
+
+  This comes in addition to the existing setUpCycle and tearDownCycle
+  hooks that are run before and after each bench cycle.
+
+* Enable to add metadata for a bench using addMetadata(**kw), metadata
+  are stored into the bench result file and are displayed on the bench
+  configuration section. 
+
+  A typical usage is to add metadata during setUpBench or
+  tearDownBench hooks.
 
 * Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
+
+* Distributed mode, provided by Ali-Akber Saifee (more description soon).
 
 * Switch to Sphinx for documentation, work in progress, contribution of
   Ali-Akber Saifee.

@@ -123,7 +123,8 @@ class FunkLoadTestCase(unittest.TestCase):
                                            quiet=True) )
         self.sleep_time_min = self.conf_getFloat(section, 'sleep_time_min', 0)
         self.sleep_time_max = self.conf_getFloat(section, 'sleep_time_max', 0)
-        self._simple_fetch = self.conf_getInt(section, 'simple_fetch', 0)
+        self._simple_fetch = self.conf_getInt(section, 'simple_fetch', 0, 
+                                              quiet=True)
         self.log_to = self.conf_get(section, 'log_to', 'console file')
         self.log_path = self.conf_get(section, 'log_path', 'funkload.log')
         self.result_path = os.path.abspath(
@@ -680,6 +681,17 @@ class FunkLoadTestCase(unittest.TestCase):
         """Called after a cycle in bench mode."""
         pass
 
+    #------------------------------------------------------------
+    # Extend unittest.TestCase to provide bench setup/teardown hook
+    #
+    def setUpBench(self):
+        """Called before the start of the bench."""
+        pass
+
+    def tearDownBench(self):
+        """Called after a the bench."""
+        pass
+
 
 
     #------------------------------------------------------------
@@ -708,11 +720,20 @@ class FunkLoadTestCase(unittest.TestCase):
 
     def _open_result_log(self, **kw):
         """Open the result log."""
-        xml = ['<funkload version="%s" time="%s">' % (
-            get_version(), datetime.now().isoformat())]
+        self._logr('<funkload version="%s" time="%s">' % (
+                get_version(), datetime.now().isoformat()), force=True)
+        self.addMetadata(ns=None, **kw)
+
+    def addMetadata(self, ns="meta", **kw):
+        """Add metadata info."""
+        xml = []
         for key, value in kw.items():
-            xml.append('<config key="%s" value=%s />' % (
-                key, quoteattr(str(value))))
+            if ns is not None:
+                xml.append('<config key="%s:%s" value=%s />' % (
+                        ns, key, quoteattr(str(value))))
+            else:
+                xml.append('<config key="%s" value=%s />' % (
+                        key, quoteattr(str(value))))
         self._logr('\n'.join(xml), force=True)
 
     def _close_result_log(self):

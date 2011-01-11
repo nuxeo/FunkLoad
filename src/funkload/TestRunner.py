@@ -355,7 +355,7 @@ Examples
                 self.test = self.testLoader.loadTestsFromModule(self.module)
             else:
                 self.test = self.testLoader.loadTestsFromNames(self.testNames,
-                                                           self.module)
+                                                               self.module)
         if self.test_name_pattern is not None:
             test_name_pattern = self.test_name_pattern
             negative_pattern = False

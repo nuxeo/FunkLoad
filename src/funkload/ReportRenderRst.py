@@ -300,7 +300,7 @@ class RenderRst:
         self.rst.append(text)
 
     def renderConfig(self):
-        """Render bench configuration."""
+        """Render bench configuration and metadata."""
         config = self.config
         self.append(rst_title("FunkLoad_ bench report", 0))
         self.append('')
@@ -339,6 +339,17 @@ class RenderRst:
         self.append("* Apdex |APDEXT|")
         self.append("* FunkLoad_ version: %s" % config['version'])
         self.append("")
+        # check for metadata
+        has_meta = False
+        for key in config.keys():
+            if key.startswith("meta:"):
+                if not has_meta:
+                    self.append("Bench metadata:")
+                    self.append('')
+                    has_meta = True
+                self.append("* %s: %s" % (key[5:], config[key]))
+        if has_meta:
+            self.append("")
 
     def renderTestContent(self, test):
         """Render global information about test content."""

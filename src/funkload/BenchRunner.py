@@ -260,6 +260,9 @@ class BenchRunner:
         cycle = total_success = total_failures = total_errors = 0
 
         self.logr_open()
+        trace("* setUpBench hook: ...")
+        self.test.setUpBench()
+        trace(' done.\n\n')
         for cvus in self.cycles:
             t_start = time.time()
             reset_cycle_results()
@@ -267,7 +270,9 @@ class BenchRunner:
             trace(text)
             trace('-' * (len(text) - 1) + "\n\n")
             monitor_key = '%s:%s:%s' % (self.method_name, cycle, cvus)
+            trace("* setUpCycle hook: ...")
             self.test.setUpCycle()
+            trace(' done.\n')
             self.startMonitors(monitor_key)
             self.startThreads(cycle, cvus)
             self.logging()
@@ -275,7 +280,9 @@ class BenchRunner:
             self.stopThreads()
             self.stopMonitors(monitor_key)
             cycle += 1
+            trace("* tearDownCycle hook: ...")
             self.test.tearDownCycle()
+            trace(' done.\n')
             t_stop = time.time()
             trace("* End of cycle, %.2fs elapsed.\n" % (t_stop - t_start))
             success, failures, errors = get_cycle_results()
@@ -286,6 +293,9 @@ class BenchRunner:
             total_success += success
             total_failures += failures
             total_errors += errors
+        trace("* tearDownBench hook: ...")
+        self.test.tearDownBench()
+        trace(' done.\n\n')
         self.logr_close()
 
         # display bench result
