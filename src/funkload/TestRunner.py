@@ -277,18 +277,18 @@ See http://funkload.nuxeo.org/ for more information.
 Examples
 ========
   %prog myFile.py
-                        Run all tests (including doctest with python2.4).
+                        Run all tests.
   %prog myFile.py test_suite
                         Run suite named test_suite.
   %prog myFile.py MyTestCase.testSomething
                         Run a single test MyTestCase.testSomething.
   %prog myFile.py MyTestCase
-                        Run all 'test*' test methods and doctest in MyTestCase.
+                        Run all 'test*' test methods in MyTestCase.
   %prog myFile.py MyTestCase -u http://localhost
                         Same against localhost.
-  %prog myDocTest.txt
+  %prog --doctest myDocTest.txt
                         Run doctest from plain text file (requires python2.4).
-  %prog myDocTest.txt -d
+  %prog --doctest -d myDocTest.txt
                         Run doctest with debug output (requires python2.4).
   %prog myfile.py -V
                         Run default set of tests and view in real time each
@@ -416,6 +416,8 @@ Examples
                           help="The test names must match the regex.")
         parser.add_option("--list", action="store_true",
                           help="Just list the test names.")
+        parser.add_option("--doctest", action="store_true", default=False,
+                          help="Check for a doc test.")
         parser.add_option("--pause", action="store_true",
                           help="Pause between request, "
                           "press ENTER to continue.")
@@ -431,7 +433,9 @@ Examples
             self.module = module
         else:
             args.insert(0, self.module)
-
+        if not options.doctest:
+            global g_has_doctest
+            g_has_doctest = False
         if options.verbose:
             self.verbosity = 2
         if options.quiet:

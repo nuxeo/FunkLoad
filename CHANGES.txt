@@ -55,6 +55,11 @@ New features
 Bug fixes
 ~~~~~~~~~
 
+* Fix: ImportError are reported as IOError using ``fl-run-test``
+  because FunkLoad is switching in doctest mode when ImportError occurs.
+  Fixed by adding an explicit option to run doctest:
+  ``--doctest``.
+
 * Fix: xmlrpc_get_credential(host, port) and xmlrpc_list_credentials
   without a group parameter it raises a "TypeError: cannot marshal
   None unless allow_none is enabled".

@@ -17,7 +17,7 @@ build:
 	python setup.py $(PKGTAG) build
 
 test:
-	cd src/funkload/tests && fl-run-test -v test_Install.py
+	cd src/funkload/tests && fl-run-test -v --doctest test_Install.py
 
 pkg: sdist egg
 
