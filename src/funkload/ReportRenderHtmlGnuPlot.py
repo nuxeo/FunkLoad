@@ -500,13 +500,13 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
         charts=[]
         for plugin in Plugins.MONITORS.values():
-            image_path = gnuplot_scriptpath(self.report_dir, '%s_%s.png' % (host, plugin.name))
-            data_path = gnuplot_scriptpath(self.report_dir, '%s_%s.data' % (host, plugin.name))
+            image_prefix = gnuplot_scriptpath(self.report_dir, '%s_%s' % (host, plugin.name))
+            data_prefix = gnuplot_scriptpath(self.report_dir, '%s_%s' % (host, plugin.name))
             gplot_path = str(os.path.join(self.report_dir, '%s_%s.gplot' % (host, plugin.name)))
         
-            r=plugin.gnuplot(times, host, image_path, data_path, gplot_path, self.chart_size, stats)
+            r=plugin.gnuplot(times, host, image_prefix, data_prefix, gplot_path, self.chart_size, stats)
             if r!=None:
                 gnuplot(gplot_path)
-                charts.append(r)
+                charts.extend(r)
         
         return charts

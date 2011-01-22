@@ -330,11 +330,11 @@ class RenderHtmlGDChart(RenderHtmlBase):
 
         charts=[]
         for plugin in Plugins.MONITORS.values():
-            image_name="%s_%s.png" % (host, plugin.name)
-            image_path = str(os.path.join(self.report_dir, image_name))
+            image_prefix="%s_%s" % (host, plugin.name)
+            image_path = str(os.path.join(self.report_dir, image_prefix))
 
             r=plugin.gdchart(x, times, host, image_path, stats)
             if r!=None:
-                charts.append((r, image_name))
+                charts.extend(r)
         
         return charts

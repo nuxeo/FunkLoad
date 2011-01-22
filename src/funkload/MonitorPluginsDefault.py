@@ -1,9 +1,8 @@
-from  MonitorPlugins import MonitorPlugin
+from  MonitorPlugins import MonitorPlugin, Plot
 
 class MonitorCUs(MonitorPlugin):
-    title="Concurent users"
-    ylabel="CUs"
-    plots={'CUs': ['impulse', 'CUs']}
+    plot1={'CUs': ['impulse', 'CUs']}
+    plots=[Plot(plot1, title="Concurent users", ylabel="CUs")]
 
     def getStat(self):
         return {}
@@ -16,10 +15,9 @@ class MonitorCUs(MonitorPlugin):
         return {'CUs': cus}
 
 class MonitorMemFree(MonitorPlugin):
-    title="Memory usage"
-    unit = "kB"
-    plots={'Memory': ['lines lw 2', 'MEM'],
+    plot1={'Memory': ['lines lw 2', 'MEM'],
            'Swap': ['lines lw 2', 'SWAP']}
+    plots=[Plot(plot1, title="Memory usage", unit="kB")]
 
     def getStat(self):
         meminfo_fields = ["MemTotal", "MemFree", "SwapTotal", "SwapFree"]
@@ -60,12 +58,11 @@ class MonitorMemFree(MonitorPlugin):
         return {'MEM': mem_used, 'SWAP': swap_used}
 
 class MonitorCPU(MonitorPlugin):
-    title="Load average"
-    ylabel="loadavg"
-    plots={'CPU 1=100%%': ['impulse lw 2', 'CPU'],
+    plot1={'CPU 1=100%%': ['impulse lw 2', 'CPU'],
            'Load 1min': ['lines lw 2','LOAD1'],
            'Load 5min': ['lines lw 2', 'LOAD5'],
            'Load 15min': ['lines lw 2', 'LOAD15']}
+    plots=[Plot(plot1, title="Load average", ylabel="loadavg")]
 
     def getStat(self):
         return dict(self._getCPU().items() + self._getLoad().items())
@@ -137,11 +134,9 @@ class MonitorCPU(MonitorPlugin):
 
 class MonitorNetwork(MonitorPlugin):
     interface='eth0'
-    title="Network traffic"
-    ylabel=""
-    unit = "kB"
-    plots={'In': ['lines lw 2', 'NETIN'],
+    plot1={'In': ['lines lw 2', 'NETIN'],
            'Out': ['lines lw 2','NETOUT']}
+    plots=[Plot(plot1, title="Network traffic", ylabel="", unit = "kB")]
 
     def __init__(self, conf):
         super(MonitorNetwork, self).__init__(conf)
