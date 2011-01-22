@@ -29,6 +29,7 @@ except ImportError:
     raise ImportError("FunkLoad > 1.8.0R requires python-gdchart2.")
 from ReportRenderRst import rst_title
 from ReportRenderHtmlBase import RenderHtmlBase
+from MonitorPlugins import MonitorPlugins
 
 
 class RenderHtmlGDChart(RenderHtmlBase):
@@ -306,17 +307,6 @@ class RenderHtmlGDChart(RenderHtmlBase):
         x.setComboData(errors)
         x.draw(image_path)
 
-
-    # monitoring charts
-    def createMonitorCharts(self):
-        """Create all montirored server charts."""
-        if not self.monitor or not self.with_chart:
-            return
-        self.append(rst_title("Monitored hosts", 2))
-        for host in self.monitor.keys():
-            self.createMonitorChart(host)
-
-
     def createMonitorChart(self, host):
         """Create monitrored server charts."""
         stats = self.monitor[host]
@@ -324,116 +314,27 @@ class RenderHtmlGDChart(RenderHtmlBase):
         times = []
         for stat in stats:
             test, cycle, cvus = stat.key.split(':')
+            stat.cvus=cvus
             # Limit size to 11 as 12 core dump glibc python: free() on feisty
             times.append(str('%ss-%sCUs' % (
                 int(float(stat.time) - time_start), cvus))[:11])
 
-        mem_total = int(stats[0].memTotal)
-        mem_used = [mem_total - int(x.memFree) for x in stats]
-        mem_used_start = mem_used[0]
-        mem_used = [x - mem_used_start for x in mem_used]
-
-        swap_total = int(stats[0].swapTotal)
-        swap_used = [swap_total - int(x.swapFree) for x in stats]
-        swap_used_start = swap_used[0]
-        swap_used = [x - swap_used_start for x in swap_used]
-
-        load_avg_1 = [float(x.loadAvg1min) for x in stats]
-        load_avg_5 = [float(x.loadAvg5min) for x in stats]
-        load_avg_15 = [float(x.loadAvg15min) for x in stats]
-
-        net_in = [None]
-        net_out = [None]
-        cpu_usage = [0]
-        for i in range(1, len(stats)):
-            if not (hasattr(stats[i], 'CPUTotalJiffies') and
-                    hasattr(stats[i-1], 'CPUTotalJiffies')):
-                cpu_usage.append(None)
-            else:
-                dt = ((long(stats[i].IDLTotalJiffies) +
-                       long(stats[i].CPUTotalJiffies)) -
-                      (long(stats[i-1].IDLTotalJiffies) +
-                       long(stats[i-1].CPUTotalJiffies)))
-                if dt:
-                    ttl = (float(long(stats[i].CPUTotalJiffies) -
-                                 long(stats[i-1].CPUTotalJiffies)) /
-                           dt)
-                else:
-                    ttl = None
-                cpu_usage.append(ttl)
-            if not (hasattr(stats[i], 'receiveBytes') and
-                    hasattr(stats[i-1], 'receiveBytes')):
-                net_in.append(None)
-            else:
-                net_in.append((int(stats[i].receiveBytes) -
-                               int(stats[i-1].receiveBytes)) /
-                              (1024 * (float(stats[i].time) -
-                                       float(stats[i-1].time))))
-
-            if not (hasattr(stats[i], 'transmitBytes') and
-                    hasattr(stats[i-1], 'transmitBytes')):
-                net_out.append(None)
-            else:
-                net_out.append((int(stats[i].transmitBytes) -
-                                int(stats[i-1].transmitBytes))/
-                              (1024 * (float(stats[i].time) -
-                                       float(stats[i-1].time))))
-
-
-        image_path = str(os.path.join(self.report_dir, '%s_load.png' % host))
-
-        title = str('%s: cpu usage (green 1 = 100%%) and loadavg 1(red), '
-                    '5 and 15 min' % host)
-        x = gdchart.Line()
-        x.set_color = (0x00ff00, 0xff0000, 0x0000ff)
-        x.vol_color = 0xff0000
+        Plugins=MonitorPlugins()
+        Plugins.registerPlugins()
+        
+        x=gdchart.Line()
         x.bg_color = self.color_bg
         x.plot_color = self.color_plot
         x.line_color = self.color_line
-        x.title = title
-        x.xtitle = 'time and CUs'
-        x.ylabel_fmt = '%.2f'
-        x.ytitle = 'loadavg'
-        x.ylabel_density = 50
-        x.requested_ymin = 0.0
         x.width, x.height = self.big_chart_size
-        x.setLabels(times)
-        x.setData(cpu_usage, load_avg_1, load_avg_5, load_avg_15)
-        x.draw(image_path)
 
-        title = str('%s memory (green) and swap (red) usage' % host)
-        image_path = str(os.path.join(self.report_dir, '%s_mem.png' % host))
-        x = gdchart.Line()
-        x.title = title
-        x.ylabel_fmt = '%.0f kB'
-        x.ytitle = 'memory used kB'
-        x.set_color = (0x00ff00, 0xff0000, 0x0000ff)
-        x.vol_color = 0xff0000
-        x.bg_color = self.color_bg
-        x.plot_color = self.color_plot
-        x.line_color = self.color_line
-        x.title = title
-        x.xtitle = 'time and CUs'
-        x.width, x.height = self.big_chart_size
-        x.setLabels(times)
-        x.setData(mem_used, swap_used)
-        x.draw(image_path)
+        charts=[]
+        for plugin in Plugins.MONITORS.values():
+            image_name="%s_%s.png" % (host, plugin.name)
+            image_path = str(os.path.join(self.report_dir, image_name))
 
-        title = str('%s network in (green)/out (red)' % host)
-        image_path = str(os.path.join(self.report_dir, '%s_net.png' % host))
-        x = gdchart.Line()
-        x.title = title
-        x.ylabel_fmt = '%.0f kB/s'
-        x.ytitle = 'network'
-        x.set_color = (0x00ff00, 0xff0000, 0x0000ff)
-        x.vol_color = 0xff0000
-        x.bg_color = self.color_bg
-        x.plot_color = self.color_plot
-        x.line_color = self.color_line
-        x.title = title
-        x.xtitle = 'time and CUs'
-        x.width, x.height = self.big_chart_size
-        x.setLabels(times)
-        x.setData(net_in, net_out)
-        x.draw(image_path)
-
+            r=plugin.gdchart(x, times, host, image_path, stats)
+            if r!=None:
+                charts.append((r, image_name))
+        
+        return charts

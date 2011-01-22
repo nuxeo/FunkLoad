@@ -28,6 +28,7 @@ from commands import getstatusoutput
 from ReportRenderRst import rst_title
 from ReportRenderHtmlBase import RenderHtmlBase
 from datetime import datetime
+from MonitorPlugins import MonitorPlugins
 
 
 def gnuplot(script_path):
@@ -481,24 +482,6 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         gnuplot(gplot_path)
         return
 
-
-    # monitoring charts
-    def renderMonitor(self, host):
-        """Render a monitored host."""
-        description = self.config.get(host, '')
-        self.append(rst_title("%s: %s" % (host, description), 3))
-        self.append(".. image:: %s_monitor.png\n" % host)
-
-
-    def createMonitorCharts(self):
-        """Create all montirored server charts."""
-        if not self.monitor or not self.with_chart:
-            return
-        self.append(rst_title("Monitored hosts", 2))
-        for host in self.monitor.keys():
-            self.createMonitorChart(host)
-
-
     def createMonitorChart(self, host):
         """Create monitrored server charts."""
         stats = self.monitor[host]
@@ -506,107 +489,24 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         cvus_list = []
         for stat in stats:
             test, cycle, cvus = stat.key.split(':')
+            stat.cvus=cvus
             date = datetime.fromtimestamp(float(stat.time))
             times.append(date.strftime("%H:%M:%S"))
             #times.append(int(float(stat.time))) # - time_start))
             cvus_list.append(cvus)
 
-        mem_total = int(stats[0].memTotal)
-        mem_used = [mem_total - int(x.memFree) for x in stats]
-        mem_used_start = mem_used[0]
-        mem_used = [x - mem_used_start for x in mem_used]
+        Plugins=MonitorPlugins()
+        Plugins.registerPlugins()
 
-        swap_total = int(stats[0].swapTotal)
-        swap_used = [swap_total - int(x.swapFree) for x in stats]
-        swap_used_start = swap_used[0]
-        swap_used = [x - swap_used_start for x in swap_used]
-
-        load_avg_1 = [float(x.loadAvg1min) for x in stats]
-        load_avg_5 = [float(x.loadAvg5min) for x in stats]
-        load_avg_15 = [float(x.loadAvg15min) for x in stats]
-
-        net_in = [None]
-        net_out = [None]
-        cpu_usage = [0]
-        for i in range(1, len(stats)):
-            if not (hasattr(stats[i], 'CPUTotalJiffies') and
-                    hasattr(stats[i-1], 'CPUTotalJiffies')):
-                cpu_usage.append(None)
-            else:
-                dt = ((long(stats[i].IDLTotalJiffies) +
-                       long(stats[i].CPUTotalJiffies)) -
-                      (long(stats[i-1].IDLTotalJiffies) +
-                       long(stats[i-1].CPUTotalJiffies)))
-                if dt:
-                    ttl = (float(long(stats[i].CPUTotalJiffies) -
-                                 long(stats[i-1].CPUTotalJiffies)) /
-                           dt)
-                else:
-                    ttl = None
-                cpu_usage.append(ttl)
-            if not (hasattr(stats[i], 'receiveBytes') and
-                    hasattr(stats[i-1], 'receiveBytes')):
-                net_in.append(None)
-            else:
-                net_in.append((int(stats[i].receiveBytes) -
-                               int(stats[i-1].receiveBytes)) /
-                              (1024 * (float(stats[i].time) -
-                                       float(stats[i-1].time))))
-
-            if not (hasattr(stats[i], 'transmitBytes') and
-                    hasattr(stats[i-1], 'transmitBytes')):
-                net_out.append(None)
-            else:
-                net_out.append((int(stats[i].transmitBytes) -
-                                int(stats[i-1].transmitBytes))/
-                              (1024 * (float(stats[i].time) -
-                                       float(stats[i-1].time))))
-
-        image_path = gnuplot_scriptpath(self.report_dir,
-                                        '%s_monitor.png' % host)
-        data_path = gnuplot_scriptpath(self.report_dir,
-                                       '%s_monitor.data' % host)
-        gplot_path = str(os.path.join(self.report_dir,
-                                      '%s_monitor.gplot' % host))
-
-        data = [times, cvus_list, cpu_usage, load_avg_1, load_avg_5,
-                load_avg_15, mem_used, swap_used, net_in, net_out ]
-        data = zip(*data)
-        f = open(data_path, 'w')
-        f.write("TIME CUs CPU LOAD1 LOAD5 LOAD15 MEM SWAP NETIN NETOUT\n")
-        for line in data:
-            f.write(' '.join([str(item) for item in line]) + '\n')
-        f.close()
-
-
-        lines = []
-        lines.append('set output "%s"' % image_path)
-        lines.append('set terminal png size 640,768')
-        lines.append('set multiplot layout 4, 1 title "Monitoring %s"' % host)
-        lines.append('set grid back')
-        lines.append('set xdata time')
-        lines.append('set timefmt "%H:%M:%S"')
-        lines.append('set format x "%H:%M"')
-
-        lines.append('set title "Concurrent Users" offset 0, -2')
-        lines.append('set ylabel "CUs"')
-        lines.append('plot "%s" u 1:2 notitle with impulse lw 2 lt 3' % data_path)
-
-        lines.append('set title "Load average"')
-        lines.append('set ylabel "loadavg"')
-        lines.append('plot "%s" u 1:3 t "CPU 1=100%%" w impulse lw 2 lt 1, "" u 1:4 t "Load 1min" w lines lw 2 lt 3, "" u 1:5 t "Load 5min" w lines lw 2 lt 4, "" u 1:6 t "Load 15min" w lines lw 2 lt 5' % data_path)
-
-        lines.append('set title "Network traffic"')
-        lines.append('set ylabel "kB/s"')
-        lines.append('plot "%s" u 1:8 t "In" w lines lw 2 lt 2, "" u 1:9 t "Out" w lines lw 1 lt 1' % data_path)
-
-        lines.append('set title "Memory usage"')
-        lines.append('set ylabel "kB"')
-        lines.append('plot "%s" u 1:7 t "Memory" w lines lw 2 lt 2, "" u 1:8 t "Swap" w lines lw 2 lt 1' % data_path)
-
-        lines.append('unset multiplot')
-        f = open(gplot_path, 'w')
-        f.write('\n'.join(lines) + '\n')
-        f.close()
-        gnuplot(gplot_path)
-        return
+        charts=[]
+        for plugin in Plugins.MONITORS.values():
+            image_path = gnuplot_scriptpath(self.report_dir, '%s_%s.png' % (host, plugin.name))
+            data_path = gnuplot_scriptpath(self.report_dir, '%s_%s.data' % (host, plugin.name))
+            gplot_path = str(os.path.join(self.report_dir, '%s_%s.gplot' % (host, plugin.name)))
+        
+            r=plugin.gnuplot(times, host, image_path, data_path, gplot_path, self.chart_size, stats)
+            if r!=None:
+                gnuplot(gplot_path)
+                charts.append(r)
+        
+        return charts

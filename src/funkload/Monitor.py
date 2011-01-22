@@ -24,113 +24,20 @@ import re
 from time import time, sleep
 from threading import Thread
 from XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
-
-
-# ------------------------------------------------------------
-# monitor readers
-#
-def read_load_info():
-    """Read the current system load from /proc/loadavg."""
-    loadavg = open("/proc/loadavg").readline()
-    loadavg = loadavg[:-1]
-    # Contents are space separated:
-    # 5, 10, 15 min avg. load, running proc/total threads, last pid
-    stats = loadavg.split()
-    running = stats[3].split("/")
-    load_stats = {}
-    load_stats['loadAvg1min'] = stats[0]
-    load_stats['loadAvg5min'] = stats[1]
-    load_stats['loadAvg15min'] = stats[2]
-    load_stats['running'] = running[0]
-    load_stats['tasks'] = running[1]
-    return load_stats
-
-
-def read_cpu_usage():
-    """Read the current system cpu usage from /proc/stat."""
-    lines = open("/proc/stat").readlines()
-    for line in lines:
-        #print "l = %s" % line
-        l = line.split()
-        if len(l) < 5:
-            continue
-        if l[0].startswith('cpu'):
-            # cpu = sum of usr, nice, sys
-            cpu = long(l[1]) + long(l[2]) + long(l[3])
-            idl = long(l[4])
-            return {'CPUTotalJiffies': cpu,
-                    'IDLTotalJiffies': idl,
-                    }
-    return {}
-
-
-def read_mem_info(kernel_rev):
-    """Read the current status of memory from /proc/meminfo."""
-    meminfo_fields = ["MemTotal", "MemFree", "SwapTotal", "SwapFree"]
-    meminfo = open("/proc/meminfo")
-    if kernel_rev <= 2.4:
-        # Kernel 2.4 has extra lines of info, duplicate of later info
-        meminfo.readline()
-        meminfo.readline()
-        meminfo.readline()
-    lines = meminfo.readlines()
-    meminfo.close()
-    meminfo_stats = {}
-    for line in lines:
-        line = line[:-1]
-        stats = line.split()
-        field = stats[0][:-1]
-        if field in meminfo_fields:
-            meminfo_stats[field[0].lower()+field[1:]] = stats[1]
-
-    return meminfo_stats
-
-
-def read_net_info(interface='eth0'):
-    """Read the stats from an interface."""
-    ifaces = open( "/proc/net/dev" )
-    # Skip the information banner
-    ifaces.readline()
-    ifaces.readline()
-    # Read the rest of the lines
-    lines = ifaces.readlines()
-    ifaces.close()
-    # Process the interface lines
-    net_stats = {}
-    for line in lines:
-        # Parse the interface line
-        # Interface is followed by a ':' and then bytes, possibly with
-        # no spaces between : and bytes
-        line = line[:-1]
-        (device, data) = line.split(':')
-
-        # Get rid of leading spaces
-        device = device.lstrip()
-        # get the stats
-        stats = data.split()
-        if device == interface:
-            net_stats['receiveBytes'] = stats[0]
-            net_stats['receivePackets'] = stats[1]
-            net_stats['transmitBytes'] = stats[8]
-            net_stats['transmitPackets'] = stats[9]
-
-    return net_stats
-
+from MonitorPlugins import MonitorPlugins
 
 # ------------------------------------------------------------
 # classes
 #
 class MonitorInfo:
     """A simple class to collect info."""
-    def __init__(self, host, kernel_rev, interface):
+    def __init__(self, host, conf):
         self.time = time()
         self.host = host
-        self.interface = interface
-        for infos in (read_cpu_usage(),
-                      read_load_info(),
-                      read_mem_info(kernel_rev),
-                      read_net_info(interface)):
-            for key, value in infos.items():
+        Plugins=MonitorPlugins(conf)
+        Plugins.registerPlugins()
+        for plugin in (Plugins.MONITORS.values()):
+            for key, value in plugin.getStat().items():
                 setattr(self, key, value)
 
     def __repr__(self, extra_key=None):
@@ -145,19 +52,16 @@ class MonitorInfo:
 
 class MonitorThread(Thread):
     """The monitor thread that collect information."""
-    def __init__(self, records, host=None, interval=None, interface=None):
+    def __init__(self, records, conf, host=None, interval=None):
         Thread.__init__(self)
         self.records = records
         self._recorder_count = 0        # number of recorder
         self._running = False           # boolean running mode
-        self._interface = None          # net interface
         self._interval = None           # interval between monitoring
         self._host = None               # name of the monitored host
+        self._conf = conf               # ConfigParser object
         self.setInterval(interval)
-        self.setInterface(interface)
         self.setHost(host)
-        self._kernel_rev = None
-        self.checkKernelRev()
         # this makes threads endings if main stop with a KeyboardInterupt
         self.setDaemon(1)
 
@@ -165,24 +69,9 @@ class MonitorThread(Thread):
         """Set the interval between monitoring."""
         self._interval = interval
 
-    def setInterface(self, interface):
-        """Set the network interface to monitor."""
-        self._interface = interface
-
     def setHost(self, host):
         """Set the monitored host."""
         self._host = host
-
-    def checkKernelRev(self):
-        """Check the linux kernel revision."""
-        version = open("/proc/version").readline()
-        kernel_rev = float(re.search(r'version (\d+\.\d+)\.\d+',
-                                     version).group(1))
-        if (kernel_rev > 2.6) or (kernel_rev < 2.4):
-            sys.stderr.write(
-                "Sorry, kernel v%0.1f is not supported\n" % kernel_rev)
-            sys.exit(-1)
-        self._kernel_rev = kernel_rev
 
     def run(self):
         """Thread jobs."""
@@ -198,9 +87,7 @@ class MonitorThread(Thread):
 
     def monitor(self):
         """The monitor task."""
-        self.records.append(MonitorInfo(self._host,
-                                        self._kernel_rev,
-                                        self._interface))
+        self.records.append(MonitorInfo(self._host, self._conf))
 
     def startRecord(self):
         """Enable recording."""
@@ -227,20 +114,19 @@ class MonitorServer(XmlRpcBaseServer):
 
     def __init__(self, argv=None):
         self.interval = None
-        self.interface = None
         self.records = []
         self._keys = {}
         XmlRpcBaseServer.__init__(self, argv)
         self._monitor = MonitorThread(self.records,
+                                      self._conf,
                                       self.host,
-                                      self.interval,
-                                      self.interface)
+                                      self.interval)
         self._monitor.start()
 
     def _init_cb(self, conf, options):
         """init callback."""
         self.interval = conf.getfloat('server', 'interval')
-        self.interface = conf.get('server', 'interface')
+        self._conf=conf
 
     def startRecord(self, key):
         """Start to monitor if it is the first key."""

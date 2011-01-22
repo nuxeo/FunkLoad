@@ -22,7 +22,8 @@ $Id$
 
 try:
     # 1/ gnuplot
-    from ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml
+#    from ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml
+    from ReportRenderHtmlGDChart import RenderHtmlGDChart as RenderHtml
 except ImportError:
     try:
         # 2/ gdchart2
@@ -31,4 +32,4 @@ except ImportError:
         # 3/ no charts
         from ReportRenderHtmlBase import RenderHtmlBase as RenderHtml
 
-from ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml
+#from ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml
