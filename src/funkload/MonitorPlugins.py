@@ -24,7 +24,6 @@ class MonitorPlugin(object):
     unit = ""
     ylabel=""
     plots={}
-    labelsIndex = {}
 
     def __init__(self, conf=None):
         if self.name == None:
