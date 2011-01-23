@@ -74,9 +74,9 @@ class MonitorPlugin(object):
             data = [times]
             labels = ["TIME"]
             for p in plot.plots.keys():
-                data.append(parsed[plot.plots[p][1]])
-                labels.append(plot.plots[p][1])
-                li.append(' u 1:%d title "%s" with %s' % (len(data), p, plot.plots[p][0]))
+                data.append(parsed[p])
+                labels.append(p)
+                li.append(' u 1:%d title "%s" with %s' % (len(data), plot.plots[p][1], plot.plots[p][0]))
             lines.append(plot_line+', ""'.join(li))
 
         data = zip(*data)
@@ -107,8 +107,8 @@ class MonitorPlugin(object):
             title_parts=[]
             j=0
             for p in plot.plots.keys():
-                data.append(parsed[plot.plots[p][1]])
-                title_parts.append(" %s (%s)"%(p, gd_colors[j][0]))
+                data.append(parsed[p])
+                title_parts.append(" %s (%s)"%(plot.plots[p][1], gd_colors[j][0]))
                 j+=1
             title+=", ".join(title_parts)
 
