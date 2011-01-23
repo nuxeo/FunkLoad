@@ -31,12 +31,10 @@ from MonitorPlugins import MonitorPlugins
 #
 class MonitorInfo:
     """A simple class to collect info."""
-    def __init__(self, host, conf):
+    def __init__(self, host, plugins):
         self.time = time()
         self.host = host
-        Plugins=MonitorPlugins(conf)
-        Plugins.registerPlugins()
-        for plugin in (Plugins.MONITORS.values()):
+        for plugin in (plugins.MONITORS.values()):
             for key, value in plugin.getStat().items():
                 setattr(self, key, value)
 
@@ -52,14 +50,14 @@ class MonitorInfo:
 
 class MonitorThread(Thread):
     """The monitor thread that collect information."""
-    def __init__(self, records, conf, host=None, interval=None):
+    def __init__(self, records, plugins, host=None, interval=None):
         Thread.__init__(self)
         self.records = records
         self._recorder_count = 0        # number of recorder
         self._running = False           # boolean running mode
         self._interval = None           # interval between monitoring
         self._host = None               # name of the monitored host
-        self._conf = conf               # ConfigParser object
+        self._plugins=plugins           # monitor plugins
         self.setInterval(interval)
         self.setHost(host)
         # this makes threads endings if main stop with a KeyboardInterupt
@@ -87,7 +85,7 @@ class MonitorThread(Thread):
 
     def monitor(self):
         """The monitor task."""
-        self.records.append(MonitorInfo(self._host, self._conf))
+        self.records.append(MonitorInfo(self._host, self._plugins))
 
     def startRecord(self):
         """Enable recording."""
@@ -110,15 +108,17 @@ class MonitorServer(XmlRpcBaseServer):
     """The XML RPC monitor server."""
     server_name = "monitor"
     method_names = XmlRpcBaseServer.method_names + [
-        'startRecord', 'stopRecord', 'getResult', 'getXmlResult']
+        'startRecord', 'stopRecord', 'getResult', 'getXmlResult', 'getMonitorsConfig']
 
     def __init__(self, argv=None):
         self.interval = None
         self.records = []
         self._keys = {}
         XmlRpcBaseServer.__init__(self, argv)
+        self.plugins=MonitorPlugins(self._conf)
+        self.plugins.registerPlugins()
         self._monitor = MonitorThread(self.records,
-                                      self._conf,
+                                      self.plugins,
                                       self.host,
                                       self.interval)
         self._monitor.start()
@@ -151,6 +151,14 @@ class MonitorServer(XmlRpcBaseServer):
         if key not in self._keys.keys():
             return []
         ret = self.records[self._keys[key][0]:self._keys[key][1]]
+        return ret
+
+    def getMonitorsConfig(self):
+        ret={}
+        for plugin in (self.plugins.MONITORS.values()):
+            conf=plugin.getConfig()
+            if conf:
+                ret[plugin.name]=conf
         return ret
 
     def getXmlResult(self, key):

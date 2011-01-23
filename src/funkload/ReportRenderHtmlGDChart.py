@@ -321,6 +321,7 @@ class RenderHtmlGDChart(RenderHtmlBase):
 
         Plugins=MonitorPlugins()
         Plugins.registerPlugins()
+        Plugins.configure(self.monitorconfig[host])
         
         x=gdchart.Line()
         x.bg_color = self.color_bg

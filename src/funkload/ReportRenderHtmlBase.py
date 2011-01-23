@@ -33,8 +33,8 @@ class RenderHtmlBase(RenderRst):
     chart_size = (350, 250)
     big_chart_size = (640, 480)
 
-    def __init__(self, config, stats, error, monitor, options, css_file=None):
-        RenderRst.__init__(self, config, stats, error, monitor, options)
+    def __init__(self, config, stats, error, monitor, monitorconfig, options, css_file=None):
+        RenderRst.__init__(self, config, stats, error, monitor, monitorconfig, options)
         self.css_file = css_file
         self.report_dir = self.css_path = self.rst_path = self.html_path = None
 

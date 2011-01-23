@@ -227,11 +227,12 @@ class RenderRst:
     # number of slowest requests to display
     slowest_items = 5
 
-    def __init__(self, config, stats, error, monitor, options):
+    def __init__(self, config, stats, error, monitor, monitorconfig, options):
         self.config = config
         self.stats = stats
         self.error = error
         self.monitor = monitor
+        self.monitorconfig = monitorconfig
         self.options = options
         self.rst = []
 

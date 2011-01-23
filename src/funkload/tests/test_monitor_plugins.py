@@ -1,5 +1,6 @@
 import unittest
 import time
+import pickle
 from ConfigParser import ConfigParser
 from funkload.MonitorPlugins import MonitorPlugins
 
@@ -35,15 +36,20 @@ class TestMonitorPlugins(unittest.TestCase):
     def test_MonitorInfo(self):
         """ Make sure Monitor.MonitorInfo still works with plugins """
         from funkload.Monitor import MonitorInfo
-        m=MonitorInfo('somehost', None)
+        p=MonitorPlugins()
+        p.registerPlugins()
+        m=MonitorInfo('somehost', p)
         self.assertTrue(m.host=='somehost')
 
     def test_MonitorThread(self):
         """ Make sure Monitor.MonitorThread still works with plugins """
         from funkload.Monitor import MonitorThread
 
+        p=MonitorPlugins()
+        p.registerPlugins()
+
         records=[]
-        monitor = MonitorThread(records, None, 'localhost', 1)
+        monitor = MonitorThread(records, p, 'localhost', 1)
         monitor.start()
         monitor.startRecord()
         time.sleep(3)

@@ -497,6 +497,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
         Plugins=MonitorPlugins()
         Plugins.registerPlugins()
+        Plugins.configure(self.monitorconfig[host])
 
         charts=[]
         for plugin in Plugins.MONITORS.values():

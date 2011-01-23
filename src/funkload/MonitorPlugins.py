@@ -1,4 +1,4 @@
-import pkg_resources, re
+import pkg_resources, re, pickle
 ENTRYPOINT = 'funkload.plugins.monitor'
 
 gd_colors=[['red', 0xff0000],
@@ -17,6 +17,11 @@ class MonitorPlugins():
         for entrypoint in pkg_resources.iter_entry_points(ENTRYPOINT):
             p=entrypoint.load()(self.conf)
             self.MONITORS[p.name]=p
+
+    def configure(self, config):
+        for plugin in self.MONITORS.values():
+            if config.has_key(plugin.name):
+                plugin.setConfig(config[plugin.name])
 
 class Plot:
     def __init__(self, plots, title="", ylabel="", unit=""):
@@ -128,6 +133,13 @@ class MonitorPlugin(object):
             ret.append((plot.title, image_path))
 
         return ret
+
+    def getConfig(self):
+        return pickle.dumps(self.plots).replace("\n", "\\n")
+
+    def setConfig(self, config):
+        config=str(config.replace("\\n", "\n"))
+        self.plots=pickle.loads(config)
 
     def getStat(self):
         """ Read stats from system """
