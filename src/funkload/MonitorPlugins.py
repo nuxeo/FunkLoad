@@ -62,6 +62,8 @@ class MonitorPlugin(object):
         lines.append('set format x "%H:%M"')
         lines.append('set multiplot layout %d, 1' % len(self.plots))
 
+        data = [times]
+        labels = ["TIME"]
         for plot in self.plots:
             ylabel = plot.ylabel
             if plot.unit!="":
@@ -71,8 +73,6 @@ class MonitorPlugin(object):
             plot_line = 'plot "%s"' % data_path
 
             li=[]
-            data = [times]
-            labels = ["TIME"]
             for p in plot.plots.keys():
                 data.append(parsed[p])
                 labels.append(p)
