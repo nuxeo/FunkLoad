@@ -75,9 +75,13 @@ class MonitorThread(Thread):
         """Thread jobs."""
         self._running = True
         while self._running:
-            sleep(self._interval)
+            t1=time()
             if self._recorder_count > 0:
                 self.monitor()
+            t2=time()
+            to_sleep=self._interval-(t2-t1)
+            if to_sleep>0:
+                sleep(to_sleep)
 
     def stop(self):
         """Stop the thread."""
