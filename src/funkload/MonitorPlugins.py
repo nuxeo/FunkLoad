@@ -24,11 +24,13 @@ class MonitorPlugins():
                 plugin.setConfig(config[plugin.name])
 
 class Plot:
-    def __init__(self, plots, title="", ylabel="", unit=""):
+    def __init__(self, plots, title="", ylabel="", unit="", **kwargs):
         self.plots=plots
         self.title=title
         self.ylabel=ylabel
         self.unit=unit
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
 
 class MonitorPlugin(object):
     def __init__(self, conf=None):
