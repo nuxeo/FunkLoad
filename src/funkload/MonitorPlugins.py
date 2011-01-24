@@ -31,12 +31,11 @@ class Plot:
         self.unit=unit
 
 class MonitorPlugin(object):
-    name = None
-    plots=[]
-
     def __init__(self, conf=None):
-        if self.name == None:
+        if not hasattr(self, 'name') or self.name == None:
             self.name=self.__class__.__name__
+        if not hasattr(self, 'plots'):
+            self.plots=[]
         self._conf = conf
 
     def _checkKernelRev(self):

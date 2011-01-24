@@ -18,11 +18,12 @@ commandN = command_name;full_path [args]
 """
 
 class MonitorNagios(MonitorPlugin):
-    commands={}
     def __init__(self, conf=None):
         super(MonitorNagios, self).__init__(conf)
         if conf==None or not conf.has_section('plugins.monitornagios'):
             return
+
+        self.commands={}
         for opt in conf.options('plugins.monitornagios'):
             if re.match(r'^command\d+$', opt):
                 config=conf.get('plugins.monitornagios', opt).split(";")
