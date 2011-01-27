@@ -20,7 +20,7 @@ class MonitorMemFree(MonitorPlugin):
     plots=[Plot(plot1, title="Memory usage", unit="kB")]
 
     def getStat(self):
-        meminfo_fields = ["MemTotal", "MemFree", "SwapTotal", "SwapFree"]
+        meminfo_fields = ["MemTotal", "MemFree", "SwapTotal", "SwapFree", "Buffers", "Cached"]
         meminfo = open("/proc/meminfo")
         kernel_rev = self._checkKernelRev()
         if kernel_rev <= 2.4:
@@ -42,11 +42,13 @@ class MonitorMemFree(MonitorPlugin):
     def parseStats(self, stats):
         if not (hasattr(stats[0], 'memTotal') and
                 hasattr(stats[0], 'memFree') and
+                hasattr(stats[0], 'buffers') and
+                hasattr(stats[0], 'cached') and
                 hasattr(stats[0], 'swapTotal') and
                 hasattr(stats[0], 'swapFree')):
             return None
         mem_total = int(stats[0].memTotal)
-        mem_used = [mem_total - int(x.memFree) for x in stats]
+        mem_used = [mem_total - int(x.memFree) - int(x.buffers) - int(x.cached) for x in stats]
         mem_used_start = mem_used[0]
         mem_used = [x - mem_used_start for x in mem_used]
 
