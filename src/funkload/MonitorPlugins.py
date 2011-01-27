@@ -74,23 +74,18 @@ class MonitorPlugin(object):
         image_path="%s.png" % image_prefix
         data_path="%s.data" % data_prefix
 
-        lines=[]
-        lines.append('set output "%s"' % image_path)
-        lines.append('set terminal png size %d,%d' % (chart_size[0], chart_size[1]*len(self.plots)))
-        lines.append('set grid back')
-        lines.append('set xdata time')
-        lines.append('set timefmt "%H:%M:%S"')
-        lines.append('set format x "%H:%M"')
-        lines.append('set multiplot layout %d, 1' % len(self.plots))
-
         data = [times]
         labels = ["TIME"]
+        plotlines = []
+        plotsno = 0
         for plot in self.plots:
+            if len(plot.plots)==0:
+                continue
             ylabel = plot.ylabel
             if plot.unit!="":
                 ylabel+='[%s]' % plot.unit
-            lines.append('set title "%s"' % plot.title)
-            lines.append('set ylabel "%s"' % ylabel)
+            plotlines.append('set title "%s"' % plot.title)
+            plotlines.append('set ylabel "%s"' % ylabel)
             plot_line = 'plot "%s"' % data_path
 
             li=[]
@@ -98,7 +93,18 @@ class MonitorPlugin(object):
                 data.append(parsed[p])
                 labels.append(p)
                 li.append(' u 1:%d title "%s" with %s' % (len(data), plot.plots[p][1], plot.plots[p][0]))
-            lines.append(plot_line+', ""'.join(li))
+            plotlines.append(plot_line+', ""'.join(li))
+            plotsno+=1
+        
+        lines=[]
+        lines.append('set output "%s"' % image_path)
+        lines.append('set terminal png size %d,%d' % (chart_size[0], chart_size[1]*plotsno))
+        lines.append('set grid back')
+        lines.append('set xdata time')
+        lines.append('set timefmt "%H:%M:%S"')
+        lines.append('set format x "%H:%M"')
+        lines.append('set multiplot layout %d, 1' % plotsno)
+        lines.extend(plotlines)
 
         data = zip(*data)
         f = open(data_path, 'w')
