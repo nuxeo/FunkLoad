@@ -42,6 +42,8 @@ class MonitorMunin(MonitorPlugin):
                     negatives.append(d[2])
                 if d[3]:
                     counters.append(d[0])
+            if len(p)==0:
+                continue
 
             title=cmd
             if data[0]:

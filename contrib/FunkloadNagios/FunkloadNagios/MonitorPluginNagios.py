@@ -34,7 +34,8 @@ class MonitorNagios(MonitorPlugin):
             p={}
             for d in data:
                 p[d[1]]=['lines lw 2', d[0]]
-            self.plots.append(Plot(p, unit=data[0][3], title=cmd))
+            if len(p)!=0:
+                self.plots.append(Plot(p, unit=data[0][3], title=cmd))
 
     def _nameResult(self, cmd, label):
         return "%s_%s_%s" % (self.name, cmd, label)
