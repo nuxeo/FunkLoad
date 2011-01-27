@@ -12,11 +12,26 @@ class MonitorPlugins():
     MONITORS = {}
     def __init__(self, conf=None):
         self.conf = conf
+        self.enabled=None
+        self.disabled=None
+        if conf==None or not conf.has_section('plugins'):
+            return
+        if conf.has_option('plugins', 'monitors_enabled'):
+            self.enabled=re.split(r'\s+', conf.get('plugins', 'monitors_enabled'))
+        if conf.has_option('plugins', 'monitors_disabled'):
+            self.disabled=re.split(r'\s+', conf.get('plugins', 'monitors_disabled'))
 
     def registerPlugins(self):
         for entrypoint in pkg_resources.iter_entry_points(ENTRYPOINT):
             p=entrypoint.load()(self.conf)
-            self.MONITORS[p.name]=p
+            if self.enabled!=None:
+                if p.name in self.enabled:
+                    self.MONITORS[p.name]=p
+            elif self.disabled!=None:
+                if p.name not in self.disabled:
+                    self.MONITORS[p.name]=p
+            else:
+                self.MONITORS[p.name]=p
 
     def configure(self, config):
         for plugin in self.MONITORS.values():
