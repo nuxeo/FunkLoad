@@ -66,7 +66,6 @@ from utils import thread_sleep, trace, red_str, green_str
 from utils import get_version
 from FunkLoadHTTPServer import FunkLoadHTTPRequestHandler
 from FunkLoadHTTPServer import FunkLoadHTTPServer
-from Distributed import DistributionMgr
 
 # ------------------------------------------------------------
 # utils
@@ -618,7 +617,7 @@ def main():
                       "perform certain actions.")
 
     options, args = parser.parse_args()
-    cmd_args = " ".join((k for k in sys.argv[1:] if k.find('--distribute')<0))
+    cmd_args = " ".join([k for k in sys.argv[1:] if k.find('--distribute')<0])
     if len(args) != 2:
         parser.error("incorrect number of arguments")
     if not args[1].count('.'):
@@ -629,6 +628,7 @@ def main():
         options.bench_sleep_time = '0'
     klass, method = args[1].split('.')
     if options.distribute:
+        from Distributed import DistributionMgr
         ret = None
         try:
             distmgr = DistributionMgr( args[0] , klass, method, options, cmd_args )     

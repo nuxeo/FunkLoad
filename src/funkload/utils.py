@@ -31,7 +31,6 @@ import pkg_resources
 import tarfile
 import shutil
 import tempfile
-import hashlib
 
 
 def thread_sleep(seconds=0):
@@ -346,6 +345,7 @@ def package_tests(module_file):
                                     os.path.split(filename)[1] == "lib" 
         
     _path = tempfile.mktemp(suffix='.tar') 
+    import hashlib
     _targetdir = hashlib.md5(os.path.splitext(module_file)[0]).hexdigest()
     _directory = os.path.split(os.path.abspath(module_file))[0]
     _tar = tarfile.TarFile( _path  ,'w')
@@ -353,3 +353,12 @@ def package_tests(module_file):
     
     return _path, _targetdir
 
+def extract_token(text, tag_start, tag_end):
+    """Extract a token from text, using the first occurence of
+    tag_start and ending with tag_end. Return None if tags are not
+    found."""
+    start = text.find(tag_start) + len(tag_start)
+    end = text.find(tag_end, start)
+    if start < 0 or end < 0:
+        return None
+    return text[start:end]
