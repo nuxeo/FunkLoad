@@ -173,6 +173,7 @@ This page is the main FunkLoad_ documentation, there are also:
 
 * CHANGES_ for information about distribution contents.
 * INSTALL_ for requirement and installation.
+* TODO_ for the current task and bug list.
 * API_ documentation generated with epydoc_.
 * SLIDES_ introducing FunkLoad_.
 
@@ -488,7 +489,7 @@ Here are few remarks/advices to obtain workable metrics.
   with `fl-record` on HTTP, and then change the `url` back to `https` in your
   FunkLoad test configuration file.
 
-* Always use description in post/get/xmlrpc, this improves the
+* Always use description in post/get/put/delete/xmlrpc, this improves the
   readability of the report.
 
 
@@ -736,9 +737,10 @@ image twice.
 
 Note that this is an emulation with some limitation:
 
-* It is single threaded (it loads images one after the other)
-* It does not interpret javascript
-* See trac_ tickets that starts with `Browser:` for other limitations
+* It is single threaded, it loads images one after the other.
+* It does not interpret javascript.
+* It does not load background images.
+* It does not load frames.
 
 This method returns a webunit_ HTTPResponse.
 
@@ -1361,8 +1363,8 @@ Return the list of url that ends with doc_id, using catalog search.
 Bug reporting
 =====================
 
-The list of open task and bugs are here:
-http://svn.nuxeo.org/trac/pub/report/12
+The list of open task and bugs is in the TODO_ file. (The trac is now
+deprecated http://svn.nuxeo.org/trac/pub/report/12)
 
 If you want to report a bug or if you think that something is
 missing, send me an email bdelbosc _at_ nuxeo.com.
@@ -1378,6 +1380,7 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 .. _pyUnit: http://pyunit.sourceforge.net/
 .. _INSTALL: INSTALL.html
 .. _CHANGES: CHANGES.html
+.. _TODO: TODO.txt
 .. _contributors: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/THANKS
 .. _API: api/index.html
 .. _Slides: http://blogs.nuxeo.com/sections/blogs/fermigier/2005_11_17_slides-introducing

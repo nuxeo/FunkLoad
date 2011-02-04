@@ -1,11 +1,74 @@
-=============
-FunkLoad Todo
-=============
+#    -*- mode: org -*-
+#+TITLE: FunkLoad to do list
+#+AUTHOR: Benoit Delbosc
 
-See the trac tickets: http://svn.nuxeo.org/trac/pub/report/12
+This todo list replace the deprecated trac
+(http://svn.nuxeo.org/trac/pub/report/12)
 
+If you want to report a bug or if you think that something is
+missing, send me an email bdelbosc _at_ nuxeo.com.
 
-.. Local Variables:
-.. mode: rst
-.. End:
-.. vim: set filetype=rst:
+* Features
+** NEXT Refactor monitoring to use a plugin system
+   https://svn.nuxeo.org/pub/funkload/branches/kadamski-monitor-refactoring 
+   test with munin-plugins-extra, nagios-plugins
+   think about new one: gc.log, generic csv file.
+   - [ ] check or warn on backward compatibility
+** NEXT Switch to sphinx for documentation [4/14]
+  [[./doc/sphinx/source/index.rst][index.rst]]
+  - [X] [[./doc/sphinx/source/intro.rst][intro]]
+  - [ ] [[./doc/sphinx/source/screenshot.rst][screenshot]]
+  - [X] [[./doc/sphinx/source/installation.rst][installation]]
+  - [X] [[./doc/sphinx/source/tutorial.rst][tutorial]]
+  - [ ] [[./doc/sphinx/source/writing-test.rst][writing-test]]
+  - [ ] [[./doc/sphinx/source/benching.rst][benching]]
+  - [X] [[./doc/sphinx/source/recorder.rst][recorder]]
+  - [ ] [[./doc/sphinx/source/monitoring.rst][monitoring]]
+  - [X] usage
+  - [ ] [[./doc/sphinx/source/development.rst][development]]
+  - [ ] [[./doc/sphinx/source/faq.rst][faq]]
+  - [ ] [[./doc/sphinx/source/links.rst][links]]
+  - [X] [[./doc/sphinx/source/glossary.rst][glossary]]
+  - [X] [[./doc/sphinx/source/changes.rst][changes]]
+** NEXT Move source from svn to GitHub
+** TODO Add a param to join to next request action
+   Joining distinct requests into a single page/action:
+   
+   self.get(url, description="foo", join_with_next_req=True)
+   self.get(url2)
+
+   url2 is reported as being on the same page as url, there is no
+   thinktime pause between the 2 requests.
+** TODO Remove CPSTestCase from FunkLoad sources
+   Added: [2010-12-27 lun. 18:28]
+   Mark it as deprecated on 1.14, to be removed on 1.15
+   Keep it as a demo, add link to migrated script on the CPS repo.
+** TODO Remove GDchart support
+   Mark it as deprecated on 1.14, to be removed on 1.15
+** TODO Test and fix distribution mode
+   It works on on binary egg and with a source package but not in
+   src-egg. There is no setup.py in src-egg.
+   -> remove dep on hashlib which requires python2.5
+** TODO Have an option to build report with inline images
+   Enabling a single html file report.
+** TODO Improve report failure section
+   Add an error section with:
+   - http failure:
+     - sort by page|req|code
+     - display a link to the returned page if any
+   - Assertion error:
+     - sort by traceback
+** TODO Look at what can be done with perfbase
+   http://perfbase.tigris.org/
+
+** TODO Add common utils
+   - getRandomLineInFile()
+   - extractToken(buffer, start, stop, maxlen=-1)
+* Bugs
+** TODO Patch cookie lib
+   The cookie lib is too restrictive, try to merge the google refactoring
+   http://svn.nuxeo.org/trac/pub/browser/funkload/branches/google-refactoring
+   Added: [2010-11-18 jeu. 14:23]
+** TODO Produce valid xml test result
+   the root element is missing
+

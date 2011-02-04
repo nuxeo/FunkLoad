@@ -19,7 +19,19 @@ FunkLoad SVN trunk
 
 :Svn: http://svn.nuxeo.org/pub/funkload/trunk
 
-:Target: 1.14.0
+:Target: 1.14.1
+
+
+
+FunkLoad 1.14.0
+------------------
+
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.14.0.tar.gz
+
+:Svn: http://svn.nuxeo.org/pub/funkload/tags/1.14.0
+
+:Released date: 2011-02-04
+
 
 New features
 ~~~~~~~~~~~~~
@@ -33,7 +45,7 @@ New features
   This comes in addition to the existing setUpCycle and tearDownCycle
   hooks that are run before and after each bench cycle.
 
-* Enable to add metadata for a bench using addMetadata(**kw), metadata
+* Enable to add metadata for a bench using addMetadata(kw), metadata
   are stored into the bench result file and are displayed on the bench
   configuration section. 
 
@@ -42,15 +54,24 @@ New features
 
 * Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
 
-* Distributed mode, provided by Ali-Akber Saifee (more description soon).
+* Distributed mode (beta), provided by Ali-Akber Saifee (more
+  description soon).
 
-* Switch to Sphinx for documentation, work in progress, contribution of
-  Ali-Akber Saifee.
+* Switch to Sphinx for documentation, this work is in progress, the
+  draft can be found in
+  http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
 
 * Support of the ``--simple-fetch`` option using the configuration
   file. This can be useful when using benchmaster
   http://pypi.python.org/pypi/benchmaster. Just add ``simple_fetch = 1``
   in the bench section.
+
+* Handling FunkLoad todo list with an org-mode_ file TODO_, replacing 
+  the old trac.
+
+* Mark CPSTestCase as deprecated will be removed in 1.15.
+
+* Mark GDChart support as deprecated, it will be removed in 1.15.
 
 Bug fixes
 ~~~~~~~~~
@@ -844,6 +865,8 @@ See README_ for more information about FunkLoad_.
 .. _README: README.html
 .. _INSTALL: INSTALL.html
 .. _API: api/index.html
+.. _TODO: TODO.txt
+.. _org-mode: http://orgmode.org/
 .. _epydoc: http://epydoc.sourceforge.net/
 .. _cheesecake: http://tracos.org/cheesecake/
 .. _933: http://svn.nuxeo.org/trac/pub/ticket/933
