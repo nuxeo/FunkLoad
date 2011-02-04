@@ -27,6 +27,9 @@ except ImportError:
     try:
         # 2/ gdchart2
         from ReportRenderHtmlGDChart import RenderHtmlGDChart as RenderHtml
+        import warnings
+        warnings.warn('GDChart library is deprecated and will be removed '
+                      'in 1.15, FunkLoad is now using gnuplot > 4.2')
     except:
         # 3/ no charts
         from ReportRenderHtmlBase import RenderHtmlBase as RenderHtml
