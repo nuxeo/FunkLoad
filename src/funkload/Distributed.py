@@ -7,7 +7,7 @@ import threading
 from utils import mmn_encode, set_recording_flag, recording
 from utils import thread_sleep, trace, red_str, green_str
 from utils import get_version
-from utils import make_pkg, package_tests, get_virtualenv_script
+from utils import package_tests, get_virtualenv_script
 from stat import S_ISREG, S_ISDIR, S_ISLNK
 
 def load_unittest(test_module, test_class, test_name, options):
@@ -66,6 +66,8 @@ class SSHDistributor(DistributorBase):
         credentials = {}
         if username and password:
             credentials = {"username":username, "password":password}
+        elif username:
+            credentials = {"username":username}
         try:
             self.connection.connect(host, **credentials)
             self.connected = True
@@ -186,7 +188,6 @@ class DistributionMgr(threading.Thread):
         self.cmd_args += " --is-distributed"
         self.module_name = os.path.basename(os.path.splitext(module_file)[0])
         self.tarred_tests, self.tarred_testsdir =  package_tests(module_file)
-        self.distribution_tar = make_pkg()
         self.remote_res_dir = "/tmp/funkload-bench-sandbox/"
 
 
@@ -230,13 +231,23 @@ class DistributionMgr(threading.Thread):
             os.makedirs(self.distribution_output)
          
         # check if hosts are in options
-        expr = re.compile('((\w+):(\w+)@)*([\w\.]+)')
+        expr = re.compile('((\w+)(:[.*]*)@)*([\w\.]+)')
         workers = []                  # list of (host, port, descr)
         if options.workerlist:
             for h in  options.workerlist.split(","):
-                uname,pwd,host = expr.findall(h)[0][1:]
-                workers.append({"host":host, "password":pwd, "username":uname})
+                cred_host = h.split("@")
+                if len(cred_host)==1:
+                    uname,pwd,host = None,None,cred_host[0]
+                else:
+                    cred = cred_host [0]
+                    host = cred_host [1]
+                    uname_pwd = cred.split(":")
+                    if len(uname_pwd) == 1:
+                        uname, pwd = uname_pwd[0], None
+                    else:
+                        uname, pwd = uname_pwd
 
+                workers.append({"host":host, "password":pwd, "username":uname})
         else:
             for host in test.conf_get('workers', 'hosts', '', quiet=True).split():
                 host = host.strip()
