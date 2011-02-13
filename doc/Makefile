@@ -20,6 +20,7 @@ epydoc:
 	epydoc --name FunkLoad -u ../../ --html --output ./api/  ../src/funkload/
 
 distrib: doc
+	scp ../TODO.txt $(TARGET)/
 	scp -r ${HTML_DOCS} api $(TARGET)/
 
 

@@ -38,17 +38,30 @@ def rst_title(title, level=1):
     rst.append('')
     return '\n'.join(rst)
 
+def get_apdex_label(score):
+    if score < 0.5:
+        return "UNACCEPTABLE"
+    if score < 0.7:
+        return "POOR"
+    if score < 0.85:
+        return "FAIR"
+    if score < 0.94:
+        return "Good"
+    return "Excellent"
+
 
 class BaseRst:
     """Base class for ReST renderer."""
-    fmt_int = "%8d"
-    fmt_float = "%8.3f"
-    fmt_percent = "%6.2f%%"
-    fmt_deco = "========"
+    fmt_int = "%18d"
+    fmt_float = "%18.3f"
+    fmt_str = "%18s"
+    fmt_percent = "%16.2f%%"
+    fmt_deco = "=================="
     headers = []
     indent = 0
     image_names = []
     with_percentiles = False
+    with_apdex = False
 
     def __init__(self, stats):
         self.stats = stats
@@ -76,7 +89,7 @@ class BaseRst:
         if self.with_percentiles:
             self._attach_percentiles_header(headers)
         deco = ' ' + " ".join([self.fmt_deco] * len(headers))
-        header = " " + " ".join([ "%8s" % h for h in headers ])
+        header = " " + " ".join([ "%18s" % h for h in headers ])
         indent = ' ' * self.indent
         ret = []
         if with_chart:
@@ -108,7 +121,11 @@ class BaseRst:
         if self.with_percentiles:
             self._attach_percentiles_header(headers)
         deco = " ".join([self.fmt_deco] * len(headers))
-        return ' ' * (self.indent + 1) + deco
+        footer =  ' ' * (self.indent + 1) + deco
+        footer +=  '\n\n'
+        if self.with_apdex:
+            footer +=  ' ' * (self.indent + 1) + "\* Apdex |APDEXT|"
+        return footer
 
     def render_stat(self):
         """Render rst stat."""
@@ -117,9 +134,10 @@ class BaseRst:
 
 class AllResponseRst(BaseRst):
     """AllResponseStat rendering."""
-    headers = [ "CUs", "RPS", "maxRPS", "TOTAL", "SUCCESS","ERROR",
-        "MIN", "AVG", "MAX" ]
+    headers = [ "CUs", "Apdex*", "Rating*", "RPS", "maxRPS", "TOTAL", "SUCCESS","ERROR",
+        "MIN", "AVG", "MAX"]
     image_names = ['requests_rps', 'requests']
+    with_apdex = True
 
     def render_stat(self):
         """Render rst stat."""
@@ -127,6 +145,9 @@ class AllResponseRst(BaseRst):
         stats = self.stats
         stats.finalize()
         ret.append(self.fmt_int % stats.cvus)
+        if self.with_apdex:
+            ret.append(self.fmt_float % stats.apdex_score)
+            ret.append(self.fmt_str % get_apdex_label(stats.apdex_score))
         ret.append(self.fmt_float % stats.rps)
         ret.append(self.fmt_float % stats.rps_max)
         ret.append(self.fmt_int % stats.count)
@@ -143,15 +164,17 @@ class AllResponseRst(BaseRst):
 
 class PageRst(AllResponseRst):
     """Page rendering."""
-    headers = ["CUs", "SPPS", "maxSPPS", "TOTAL", "SUCCESS",
+    headers = ["CUs", "Apdex*", "Rating*", "SPPS", "maxSPPS", "TOTAL", "SUCCESS",
               "ERROR", "MIN", "AVG", "MAX"]
     image_names = ['pages_spps', 'pages']
+    with_apdex = True
 
 class ResponseRst(BaseRst):
     """Response rendering."""
-    headers = ["CUs", "TOTAL", "SUCCESS", "ERROR", "MIN", "AVG", "MAX"]
+    headers = ["CUs", "Apdex*", "Rating*", "TOTAL", "SUCCESS", "ERROR", "MIN", "AVG", "MAX"]
     indent = 4
     image_names = ['request_']
+    with_apdex = True
 
     def __init__(self, stats):
         BaseRst.__init__(self, stats)
@@ -165,6 +188,8 @@ class ResponseRst(BaseRst):
         stats.finalize()
         ret = [' ' * self.indent]
         ret.append(self.fmt_int % stats.cvus)
+        ret.append(self.fmt_float % stats.apdex_score)
+        ret.append(self.fmt_str % get_apdex_label(stats.apdex_score))
         ret.append(self.fmt_int % stats.count)
         ret.append(self.fmt_int % stats.success)
         ret.append(self.fmt_percent % stats.error_percent)
@@ -251,12 +276,31 @@ class RenderRst:
             cycle_r = self.cycles[0]
         return cycle_r
 
+    def getBestCycle(self):
+        """Return the cycle with the maximum Apdex and SPPS."""
+        stats = self.stats
+        max_spps = -1
+        cycle_r = None
+        for cycle in self.cycles:
+            if not stats[cycle].has_key('page'):
+                continue
+            if stats[cycle]['page'].apdex_score < 0.85:
+                continue
+            spps = stats[cycle]['page'].rps * stats[cycle]['page'].apdex_score
+            if spps > max_spps:
+                max_spps = spps
+                cycle_r = cycle
+        if cycle_r is None and len(self.cycles):
+            # no test ends during a cycle return the first one
+            cycle_r = self.cycles[0]
+        return cycle_r
+
     def append(self, text):
         """Append text to rst output."""
         self.rst.append(text)
 
     def renderConfig(self):
-        """Render bench configuration."""
+        """Render bench configuration and metadata."""
         config = self.config
         self.append(rst_title("FunkLoad_ bench report", 0))
         self.append('')
@@ -272,6 +316,7 @@ class RenderRst:
         self.append(".. _FunkLoad: http://funkload.nuxeo.org/")
         self.append(".. sectnum::    :depth: 2")
         self.append(".. contents:: Table of contents")
+        self.append(".. |APDEXT| replace:: \ :sub:`%.1f`" % self.options.apdex_t)
 
         self.append(rst_title("Bench configuration", 2))
         self.append("* Launched: %s" % date)
@@ -291,8 +336,20 @@ class RenderRst:
                     config['sleep_time'])
         self.append("* Startup delay between thread: %ss" %
                     config['startup_delay'])
+        self.append("* Apdex |APDEXT|")
         self.append("* FunkLoad_ version: %s" % config['version'])
         self.append("")
+        # check for metadata
+        has_meta = False
+        for key in config.keys():
+            if key.startswith("meta:"):
+                if not has_meta:
+                    self.append("Bench metadata:")
+                    self.append('')
+                    has_meta = True
+                self.append("* %s: %s" % (key[5:], config[key]))
+        if has_meta:
+            self.append("")
 
     def renderTestContent(self, test):
         """Render global information about test content."""
@@ -425,7 +482,7 @@ class RenderRst:
         """Render the n slowest requests of the best cycle."""
         stats = self.stats
         self.append(rst_title("%i Slowest requests"% number, 2))
-        cycle = self.getBestStpsCycle()
+        cycle = self.getBestCycle()
         cycle_name = None
         if not (cycle and stats[cycle].has_key('response_step')):
             return
@@ -435,7 +492,8 @@ class RenderRst:
             stat = stats[cycle]['response_step'][step_name]
             stat.finalize()
             items.append((stat.avg, stat.step,
-                          stat.type, stat.url, stat.description))
+                          stat.type, stat.url, stat.description, 
+                          stat.apdex_score))
             if not cycle_name:
                 cycle_name = stat.cvus
 
@@ -444,9 +502,9 @@ class RenderRst:
         self.append('Slowest average response time during the best cycle '
                     'with **%s** CUs:\n' % cycle_name)
         for item in items[:number]:
-            self.append('* In page %s %s: %s took **%.3fs**\n'
+            self.append('* In page %s, Apdex rating: %s, avg response time: %3.2fs, %s: %s\n'
                         '  `%s`' % (
-                item[1], item[2], item[3], item[0], item[4]))
+                item[1], get_apdex_label(item[5]), item[0], item[2], item[3], item[4]))
 
     def renderErrors(self):
         """Render error list."""
@@ -511,6 +569,41 @@ class RenderRst:
                     ' of pages or requests are delivered.')
         self.append('* P95: 95th percentile, response time where 95 percent'
                     ' of pages or requests are delivered.')
+        self.append('''* Apdex: Application Performance Index, 
+  this is a numerical measure of user satisfaction, it is based
+  on three zones of application responsiveness:
+
+    - Satisfied: The user is fully productive. This represents the
+      time value (T seconds) below which users are not impeded by
+      application response time.
+
+    - Tolerating: The user notices performance lagging within
+      responses greater than T, but continues the process.
+
+    - Frustrated: Performance with a response time greater than 4*T
+      seconds is unacceptable, and users may abandon the process.
+
+  By default T is set to 1.5s this means that response time between 0
+  and 1.5s the user is fully productive, between 1.5 and 6s the
+  responsivness is tolerating and above 6s the user is frustrated.
+
+  The Apdex score converts many measurements into one number on a
+  uniform scale of 0-to-1 (0 = no users satisfied, 1 = all users
+  satisfied).
+
+  To ease interpretation the Apdex score is also represented as a rating:
+
+  - U for UNACCEPTABLE represented in gray for a score between 0 and 0.5 
+
+  - P for POOR represented in red for a score between 0.5 and 0.7
+
+  - F for FAIR represented in yellow for a score between 0.7 and 0.85
+
+  - G for Good represented in green for a score between 0.85 and 0.94
+
+  - E for Excellent represented in blue for a score between 0.94 and 1
+
+  visit http://www.apdex.org/ for more information.''')
         self.append('')
         self.append('Report generated with FunkLoad_ ' + get_version() +
                     ', more information available on the '

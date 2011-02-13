@@ -151,27 +151,27 @@ class TestInstall(unittest.TestCase):
 
         test_file = self.test_file
         # listing test
-        output = self.system("fl-run-test %s --list" % test_file)
+        output = self.system("fl-run-test %s --doctest --list" % test_file)
         self.assert_('Dummy.double' in output, 'missing doctest')
 
         # list a test suite
-        output = self.system("fl-run-test %s test_suite --list" % test_file)
+        output = self.system("fl-run-test %s  --doctest test_suite --list" % test_file)
         self.assert_('Dummy.double' not in output,
                      'doctest is not part of the suite')
 
         # list all test in a test case class
-        output = self.system("fl-run-test %s TestDummy1 --list" % test_file)
+        output = self.system("fl-run-test %s --doctest TestDummy1 --list" % test_file)
         self.assert_('Dummy.double' not in output,
                      'doctest is not part of the testcase')
 
         # pure doctest
         doctest_file = self.doctest_file
-        output = self.system("fl-run-test %s --list" % doctest_file)
+        output = self.system("fl-run-test %s --doctest --list" % doctest_file)
         self.assert_(doctest_file.replace('.', '_') in output,
                      'no %s in output %s' % (doctest_file, output))
 
         # match regex
-        output = self.system("fl-run-test %s --list -e dummy1_1" % test_file)
+        output = self.system("fl-run-test %s --doctest --list -e dummy1_1" % test_file)
 
 
     def test_testrunner(self):
@@ -187,7 +187,7 @@ class TestInstall(unittest.TestCase):
         # doctest
         from funkload.TestRunner import g_has_doctest
         if g_has_doctest:
-            output = self.system('fl-run-test %s -e double -v' % test_file)
+            output = self.system('fl-run-test %s --doctest -e double -v' % test_file)
             self.assert_('Ran 0 tests' not in output,
                          'not expected output:"""%s"""' % output)
 

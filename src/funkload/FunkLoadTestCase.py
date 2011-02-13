@@ -78,7 +78,6 @@ class FunkLoadTestCase(unittest.TestCase):
         self._viewing = getattr(options, 'firefox_view', False)
         self._accept_invalid_links = getattr(options, 'accept_invalid_links',
                                              False)
-        self._simple_fetch = getattr(options, 'simple_fetch', False)
         self._bench_label = getattr(options, 'label', None)
         self._stop_on_fail = getattr(options, 'stop_on_fail', False)
         self._pause = getattr(options, 'pause', False)
@@ -120,10 +119,12 @@ class FunkLoadTestCase(unittest.TestCase):
         else:
             section = 'ftest'
         self.setOkCodes( self.conf_getList(section, 'ok_codes',
-                                     [200, 301, 302, 303, 307],
-                                     quiet=True) )
+                                           [200, 301, 302, 303, 307],
+                                           quiet=True) )
         self.sleep_time_min = self.conf_getFloat(section, 'sleep_time_min', 0)
         self.sleep_time_max = self.conf_getFloat(section, 'sleep_time_max', 0)
+        self._simple_fetch = self.conf_getInt(section, 'simple_fetch', 0, 
+                                              quiet=True)
         self.log_to = self.conf_get(section, 'log_to', 'console file')
         self.log_path = self.conf_get(section, 'log_path', 'funkload.log')
         self.result_path = os.path.abspath(
@@ -150,9 +151,9 @@ class FunkLoadTestCase(unittest.TestCase):
         #self.logd('# FunkLoadTestCase._funkload_init done')
     
     
-    def setOkCodes ( self, ok_codes ):
+    def setOkCodes(self, ok_codes):
         """Set ok codes."""
-        self.ok_codes = map (int, ok_codes ) 
+        self.ok_codes = map(int, ok_codes) 
     
     
     def clearContext(self):
@@ -186,7 +187,7 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # browser simulation
     #
-    def _connect(self, url, params, ok_codes, rtype, description,redirect=False):
+    def _connect(self, url, params, ok_codes, rtype, description, redirect=False):
         """Handle fetching, logging, errors and history."""
         if params is None and rtype in ('post','put'):
             # enable empty put/post
@@ -195,7 +196,7 @@ class FunkLoadTestCase(unittest.TestCase):
         try:
             response = self._browser.fetch(url, params, ok_codes=ok_codes,
                                            key_file=self._keyfile_path,
-                                           cert_file=self._certfile_path,method=rtype)
+                                           cert_file=self._certfile_path, method=rtype)
         except:
             etype, value, tback = sys.exc_info()
             t_stop = time.time()
@@ -290,11 +291,11 @@ class FunkLoadTestCase(unittest.TestCase):
                 self.logd('DELETE:%s\n\tPage %i: %s ...' %(url, self.steps,
                                                         description or ''))
         else:
+            url = url_in
             if not self.in_bench_mode:
-                url = url_in
-                self.logd('%s: %s %s\n\tPage %i: %s ...' % (method.upper(), url, str(params),
-                                                              self.steps,
-                                                              description or ''))
+                self.logd('%s: %s %s\n\tPage %i: %s ...' % (
+                        method.upper(), url, str(params),
+                        self.steps, description or ''))
             # Fetching
         response = self._connect(url, params, ok_codes, method, description)
 
@@ -306,10 +307,18 @@ class FunkLoadTestCase(unittest.TestCase):
                 # Figure the location - which may be relative
                 newurl = response.headers['Location']
                 url = urljoin(url_in, newurl)
-                # save the current url as the base for future redirects
+                # Save the current url as the base for future redirects
                 url_in = url
                 self.logd(' Load redirect link: %s' % url)
-                response = self._connect(url, None, ok_codes, rtype=method,description=None,redirect=True)
+                # Use the appropriate method for redirection
+                if response.code in (302, 303):
+                    method = 'get'
+                if response.code == 303:
+                    # 303 is HTTP/1.1, make sure the connection 
+                    # is not in keep alive mode
+                    self.setHeader('Connection', 'close')
+                response = self._connect(url, None, ok_codes, rtype=method,
+                                         description=None, redirect=True)
                 max_redirect_count -= 1
             if not max_redirect_count:
                 self.logd(' WARNING Too many redirects give up.')
@@ -406,7 +415,6 @@ class FunkLoadTestCase(unittest.TestCase):
         if resp.code not in [200, 301, 302, 303, 307]:
             self.logd('Page %s not found.' % url)
             return False
-        
         return True
 
     def xmlrpc(self, url_in, method_name, params=None, description=None):
@@ -673,6 +681,17 @@ class FunkLoadTestCase(unittest.TestCase):
         """Called after a cycle in bench mode."""
         pass
 
+    #------------------------------------------------------------
+    # Extend unittest.TestCase to provide bench setup/teardown hook
+    #
+    def setUpBench(self):
+        """Called before the start of the bench."""
+        pass
+
+    def tearDownBench(self):
+        """Called after a the bench."""
+        pass
+
 
 
     #------------------------------------------------------------
@@ -701,11 +720,20 @@ class FunkLoadTestCase(unittest.TestCase):
 
     def _open_result_log(self, **kw):
         """Open the result log."""
-        xml = ['<funkload version="%s" time="%s">' % (
-            get_version(), datetime.now().isoformat())]
+        self._logr('<funkload version="%s" time="%s">' % (
+                get_version(), datetime.now().isoformat()), force=True)
+        self.addMetadata(ns=None, **kw)
+
+    def addMetadata(self, ns="meta", **kw):
+        """Add metadata info."""
+        xml = []
         for key, value in kw.items():
-            xml.append('<config key="%s" value=%s />' % (
-                key, quoteattr(str(value))))
+            if ns is not None:
+                xml.append('<config key="%s:%s" value=%s />' % (
+                        ns, key, quoteattr(str(value))))
+            else:
+                xml.append('<config key="%s" value=%s />' % (
+                        key, quoteattr(str(value))))
         self._logr('\n'.join(xml), force=True)
 
     def _close_result_log(self):

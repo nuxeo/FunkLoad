@@ -66,7 +66,6 @@ from utils import thread_sleep, trace, red_str, green_str
 from utils import get_version
 from FunkLoadHTTPServer import FunkLoadHTTPRequestHandler
 from FunkLoadHTTPServer import FunkLoadHTTPServer
-from Distributed import DistributionMgr
 
 # ------------------------------------------------------------
 # utils
@@ -260,6 +259,9 @@ class BenchRunner:
         cycle = total_success = total_failures = total_errors = 0
 
         self.logr_open()
+        trace("* setUpBench hook: ...")
+        self.test.setUpBench()
+        trace(' done.\n\n')
         for cvus in self.cycles:
             t_start = time.time()
             reset_cycle_results()
@@ -267,7 +269,9 @@ class BenchRunner:
             trace(text)
             trace('-' * (len(text) - 1) + "\n\n")
             monitor_key = '%s:%s:%s' % (self.method_name, cycle, cvus)
+            trace("* setUpCycle hook: ...")
             self.test.setUpCycle()
+            trace(' done.\n')
             self.startMonitors(monitor_key)
             self.startThreads(cycle, cvus)
             self.logging()
@@ -275,7 +279,9 @@ class BenchRunner:
             self.stopThreads()
             self.stopMonitors(monitor_key)
             cycle += 1
+            trace("* tearDownCycle hook: ...")
             self.test.tearDownCycle()
+            trace(' done.\n')
             t_stop = time.time()
             trace("* End of cycle, %.2fs elapsed.\n" % (t_stop - t_start))
             success, failures, errors = get_cycle_results()
@@ -286,6 +292,9 @@ class BenchRunner:
             total_success += success
             total_failures += failures
             total_errors += errors
+        trace("* tearDownBench hook: ...")
+        self.test.tearDownBench()
+        trace(' done.\n\n')
         self.logr_close()
 
         # display bench result
@@ -579,6 +588,7 @@ def main():
                       help="Do not fail if css/image links are "
                       "not reachable.")
     parser.add_option("", "--simple-fetch", action="store_true",
+                      dest="bench_simple_fetch",
                       help="Don't load additional links like css "
                       "or images when fetching an html page.")
     parser.add_option("-l", "--label", type="string",
@@ -607,7 +617,7 @@ def main():
                       "perform certain actions.")
 
     options, args = parser.parse_args()
-    cmd_args = " ".join((k for k in sys.argv[1:] if k.find('--distribute')<0))
+    cmd_args = " ".join([k for k in sys.argv[1:] if k.find('--distribute')<0])
     if len(args) != 2:
         parser.error("incorrect number of arguments")
     if not args[1].count('.'):
@@ -618,6 +628,7 @@ def main():
         options.bench_sleep_time = '0'
     klass, method = args[1].split('.')
     if options.distribute:
+        from Distributed import DistributionMgr
         ret = None
         try:
             distmgr = DistributionMgr( args[0] , klass, method, options, cmd_args )     

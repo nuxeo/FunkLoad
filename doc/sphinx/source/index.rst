@@ -1,39 +1,38 @@
-========
-Funkload
-========
+.. _contents:
 
-This document describes the usage of the FunkLoad tool. This tool enables to do functional and load testing of web application.
+FunkLoad documentation contents
+=================================
 
+**DRAFT - DRAFT - DRAFT - DRAFT**
 
 .. toctree::
-	:hidden:
+   :maxdepth: 2
 
-	installation
-	development
-	usage
-	 
-Installation
-------------
-refer to :doc:`installation` for more details.
+   intro
+   screenshot
+   installation
+   tutorial
+   writing-test
+   benching
+   recorder
+   monitoring   
 
-Usage
------
-refer to :doc:`usage` for more details.
+   usage
 
-Development
------------
-refer to :doc:`development` for more details.
+   development
+   faq
+   links
+   changes
 
-Bugs
------
-The list of open task and bugs are here: http://svn.nuxeo.org/trac/pub/report/12
-If you want to report a bug or if you think that something is missing, send me an email bdelbosc _at_ nuxeo.com.
 
-Code Documentation
-------------------
-.. toctree::
-   :maxdepth: 1
-   :glob:
-   
-   api/*
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+* glossary_
+
+.. _glossary: glossary.html 
+
    

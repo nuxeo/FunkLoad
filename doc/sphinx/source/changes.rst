@@ -6,7 +6,7 @@ FunkLoad_ CHANGES
 
 :address: bdelbosc _at_ nuxeo.com
 
-:revision: $Id$
+:revision: $Id: CHANGES.txt 54266 2011-01-17 15:50:11Z bdelbosc $
 
 :abstract: This document describes changes between FunkLoad_ versions.
 
@@ -58,7 +58,7 @@ New features
   description soon).
 
 * Switch to Sphinx for documentation, this work is in progress, the
-  draft can be found in
+  draft can be found here it contains up to date information
   http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
 
 * Support of the ``--simple-fetch`` option using the configuration
@@ -270,7 +270,7 @@ Bug fixes
 * Fix regex to check valid resources urls, it was too restrictive.
 
 * Fix cookie support, there was an extra ";" if there was only one cookie,
-  thanks to Daniel Sw‰rd.
+  thanks to Daniel Sw√§rd.
 
 * Fixing filename in mime encoding when uploading a file using an absolute
   path.
@@ -865,7 +865,7 @@ See README_ for more information about FunkLoad_.
 .. _README: README.html
 .. _INSTALL: INSTALL.html
 .. _API: api/index.html
-.. _TODO: TODO.txt
+.. _TODO: TODO.html
 .. _org-mode: http://orgmode.org/
 .. _epydoc: http://epydoc.sourceforge.net/
 .. _cheesecake: http://tracos.org/cheesecake/

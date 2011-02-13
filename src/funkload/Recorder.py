@@ -88,28 +88,27 @@ class Request:
             params = Data(self.headers['content-type'], self.body)
             return params
 
-        for key in keys:
-            if not isinstance(form[key], list):
-                values = [form[key]]
+        for item in form.list:
+            
+            key = item.name
+            value = item.value
+            filename = item.filename
+            
+            if filename is None:
+                params.append([key, value])
             else:
-                values = form[key]
-            for form_value in values:
-                filename = form_value.filename
-                if filename is None:
-                    params.append([key, form_value.value])
-                else:
-                    # got a file upload
-                    filename = filename or ''
-                    params.append([key, 'Upload("%s")' % filename])
-                    if filename:
-                        if os.path.exists(filename):
-                            trace('# Warning: uploaded file: %s already'
-                                  ' exists, keep it.\n' % filename)
-                        else:
-                            trace('# Saving uploaded file: %s\n' % filename)
-                            f = open(filename, 'w')
-                            f.write(str(form_value.value))
-                            f.close()
+                # got a file upload
+                filename = filename or ''
+                params.append([key, 'Upload("%s")' % filename])
+                if filename:
+                    if os.path.exists(filename):
+                        trace('# Warning: uploaded file: %s already'
+                              ' exists, keep it.\n' % filename)
+                    else:
+                        trace('# Saving uploaded file: %s\n' % filename)
+                        f = open(filename, 'w')
+                        f.write(str(value))
+                        f.close()
         return params
 
     def __repr__(self):
@@ -307,6 +306,7 @@ Examples
     def convertToFunkLoad(self, request):
         """return a funkload python instruction."""
         text = []
+        text.append('        # ' + request.file_path)
         if request.host != self.server_url:
             text.append('self.%s("%s"' % (request.method.lower(),
                                           request.url))

@@ -17,7 +17,7 @@ build:
 	python setup.py $(PKGTAG) build
 
 test:
-	cd src/funkload/tests && fl-run-test -v test_Install.py
+	cd src/funkload/tests && fl-run-test -v --doctest test_Install.py
 
 pkg: sdist egg
 
@@ -27,6 +27,7 @@ sdist:
 egg:
 	-python2.4 setup.py $(PKGTAG) bdist_egg
 	-python2.5 setup.py $(PKGTAG) bdist_egg
+	-python2.6 setup.py $(PKGTAG) bdist_egg
 
 
 distrib:
@@ -39,6 +40,7 @@ install:
 register:
 	-python2.4 setup.py register sdist bdist_egg upload
 	-python2.5 setup.py register bdist_egg upload
+	-python2.6 setup.py register bdist_egg upload
 
 
 uninstall:
@@ -46,6 +48,8 @@ uninstall:
 	-rm -rf /usr/lib/python2.3/site-packages/funkload*
 	-rm -rf /usr/lib/python2.4/site-packages/funkload*
 	-rm -rf /usr/lib/python2.5/site-packages/funkload*
+	-rm -rf /usr/lib/python2.6/dist-packages/funkload*
+	-rm -rf /usr/local/lib/python2.6/dist-packages/funkload*
 	-rm -rf /usr/local/funkload/
 	-rm -f /usr/local/bin/fl-*
 	-rm -f /usr/bin/fl-*

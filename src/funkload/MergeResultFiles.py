@@ -89,8 +89,10 @@ class FunkLoadConfigXmlParser:
 
 def replace_all(text, dic):
     for i, j in dic.iteritems():
+        if isinstance(text, str):
+            text = text.decode('utf-8', 'ignore')
         text = text.replace(i, j)
-    return text
+    return text.encode('utf-8')
 
 
 class MergeResultFiles:
