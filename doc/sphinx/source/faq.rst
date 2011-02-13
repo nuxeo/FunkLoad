@@ -30,7 +30,7 @@ During the stagging down the dots are the number of stopped threads::
 How to accept invalid Cookies ?
 ----------------------------------
 
-- ``Error : COOKIE ERROR: Cookie domain “<DOMAINE>” doesn’t start with “.”``
+- ``Error : COOKIE ERROR: Cookie domain "<DOMAINE>" doesn’t start with "."``
 
   Comment the lines in file /usr/lib/python2.6/site-packages/webunit-1.3.8-py2.6.egg/webunit/cookie.py::
 
@@ -38,7 +38,7 @@ How to accept invalid Cookies ?
   #  raise Error, 'Cookie domain "%s" doesn\'t start with "."' % domain
 
 
-- ``Error : COOKIE ERROR: Cookie domain “.”<DOMAINE>” doesn’t match request host “<DOMAINE>”``
+- ``Error : COOKIE ERROR: Cookie domain "."<DOMAINE>" doesn’t match request host "<DOMAINE>"``
 
   Comment the lines in the file /usr/lib/python2.6/site-packages/webunit-1.3.8-py2.6.egg/webunit/cookie.py::
 
@@ -72,13 +72,85 @@ need to use CPU affinity ``taskset -c 0 fl-run-bench`` is always
 faster than ``fl-run-bench``.  Using one bench runner process per CPU
 is a work around to use the full server power.
 
+Use multiple machine to perform the load, see the next section.
+
 
 How to run multiple bencher ?
 -------------------------------
 
-Reports can be merged but how to run multiple bencher ?
+Bench result file can be merged by the ``fl-build-report`` command,
+but how to run multiple bencher ?
+
+There are many ways: 
+
+* Use the new distribute mode (still in beta), it requires paramiko and
+  virtualenv::
+  
+    sudo aptitude install python-paramiko, python-virtualenv
+
+  It adds 2 new command line options:
+
+  - ``--distribute``: to enable distributed mode
+
+  - ``--distribute-workers=uname@host,uname:pwd@host...``: 
+    user:password can be skipped if using pub-key.
+
+  For instance to use 2 workers you can do something like this::
+  
+      $ fl-run-bench -c 1:2:3 -D 5 -f --simple-fetch  test_Simple.py Simple.test_simple --distribute --distribute-workers=node1,node2 -u http://target/
+      ========================================================================
+      Benching Simple.test_simple
+      ========================================================================
+      Access 20 times the main url
+      ------------------------------------------------------------------------
+            
+      Configuration
+      =============
+      
+      * Current time: 2011-02-13T23:15:15.174148
+      * Configuration file: /tmp/funkload-demo/simple/Simple.conf
+      * Distributed output: log-distributed
+      * Server: http://node0/
+      * Cycles: [1, 2, 3]
+      * Cycle duration: 5s
+      * Sleeptime between request: from 0.0s to 0.0s
+      * Sleeptime between test case: 0.0s
+      * Startup delay between thread: 0.01s
+      * Workers :octopussy,simplet
+      
+      * Preparing sandboxes for 2 workers.....
+      * Starting 2 workers..
+      
+      * [node1] returned
+      * [node2] returned
+      * Received bench log from [node1] into log-distributed/node1-simple-bench.xml
+      * Received bench log from [node2] into log-distributed/node2-simple-bench.xml
+      
+      # Now building the report 
+      $ fl-build-report --html log-distributed/node1-simple-bench.xml  log-distributed/node2-simple-bench.xml
+      Merging results files: ..
+      nodes: node1, node2
+      cycles for a node:    [1, 2, 3]
+      cycles for all nodes: [2, 4, 6]
+      Results merged in tmp file: /tmp/fl-mrg-o0MI8L.xml
+      Creating html report: ...done:
+      /tmp/funkload-demo/simple/test_simple-20110213T231543/index.html
+ 
+
+  Note that the version of FunkLoad installed on nodes is defined in
+  the configuration file::
+
+     [distribute]
+     log_path = log-distributed
+     funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.14.0.tar.gz
+
+
+* Using BenchMaster http://pypi.python.org/pypi/benchmaster
+
+* Using Fabric http://tarekziade.wordpress.com/2010/12/09/funkload-fabric-quick-and-dirty-distributed-load-system/
 
 * Old school pssh/Makefile::
+
    # clean all node workspaces 
    parallel-ssh -h hosts.txt rm -rf /tmp/ftests/
    # distribute tests 
@@ -88,27 +160,7 @@ Reports can be merged but how to run multiple bencher ?
    # get the results 
    parallel-slurp -h hosts.txt -o out -L results-date -u ‘+%Y%m%d-%H%M%S’ -r /tmp/ftests/report .
    # build the report with fl-build-report, it supports the results merging
-
-* Using BenchMaster http://pypi.python.org/pypi/benchmaster
-
-* Using Fabric http://tarekziade.wordpress.com/2010/12/09/funkload-fabric-quick-and-dirty-distributed-load-system/
-
-* The new distribute mode (beta), requires paramiko and virtualenv, it
-  adds three new command line options:
-
-  - ``--distributed``: to enable distributed mode
-
-  - ``--distributed-workers=user:password@host1,user:password@host2...``: 
-    user:password can be skipped if using pub-key.
-
-  - ``--is-distributed``: an internal only option to be used so that
-    ‘worker’ nodes don’t for instance, start monitoring the
-    hosts. this can be generally used to signal to a worker node that
-    its only a ‘worker’ :) 
-
-    At the moment it does not work with src-egg package. These feature
-    will be exposed on the next release (1.15).
-
+ 
 
 How to mix different scenarii in a bench ?
 -------------------------------------------

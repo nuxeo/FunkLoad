@@ -101,3 +101,10 @@ result_path = %(test_name)s-bench.xml
 #ok_codes =  200:301:302
 sleep_time_min = 0
 sleep_time_max = 2
+
+# ------------------------------------------------------------
+# Distributed mode
+#
+[distribute]
+log_path = log-distributed
+funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.14.0.tar.gz

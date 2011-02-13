@@ -15,6 +15,7 @@ FunkLoad documentation contents
    writing-test
    benching
    recorder
+   credential
    monitoring   
 
    usage

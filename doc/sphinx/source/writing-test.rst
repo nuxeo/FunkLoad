@@ -6,7 +6,7 @@ Writing test script
 Submiting requests
 -------------------
 
-The FunkLaodTestCase_ API:
+The FunkLoadTestCase_ API:
 
 * get
 * post

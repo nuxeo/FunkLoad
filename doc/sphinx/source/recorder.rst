@@ -2,7 +2,7 @@ Recording a test
 ===============================
 
 You can use ``fl-record`` to record your navigator activity, this
-requires the TCPWatch_ python proxy see :ref:`installation` for
+requires the TCPWatch_ python proxy see installation_ for
 information on how to install TCPWatch_.
 
 1. Start the recorder::
@@ -41,6 +41,7 @@ parameters, performs your requests on the browser then hit
 Ctrl-C. ``fl-record`` will output the code ready to be paste in your
 test case.
 ::
+
     $ fl-record
     HTTP proxy listening on :8090
     Recording to directory /tmp/tmptOl7jh_funkload.
@@ -73,4 +74,4 @@ Note that ``fl-record`` :
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _tutorial: tutorial.html
-
+.. _installation: installation.html

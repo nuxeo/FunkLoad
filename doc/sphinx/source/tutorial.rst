@@ -238,19 +238,22 @@ The process to write a new test is the following:
   files and to grab requests.
 
 * Play the test and display each response in firefox, this will help
-  you to add assertion and check the response
-  ::
+  you to add assertion and check the response::
+
      fl-run-test -dV test_BasicNavigation.py
+
 
 * Implement the dynamic part:
 
   - For each request add an assertion to make sure the page is the one
     you expect. this can be done by checking if a term is present in
     a response::
+
        self.assert_('logout' in self.getBody(), "Login failure")
 
-  - Generates random input, you can use the FunkLoad.Lipsum module
-    ::
+
+  - Generates random input, you can use the FunkLoad.Lipsum module::
+
        from FunkLoad import Lipsum
        ...
        lipsum = Lipsum()
@@ -258,19 +261,21 @@ The process to write a new test is the following:
        title = lipsum.getSubject()
 
 
-  - Extracts a token from a previous response
-    ::
+  - Extracts a token from a previous response::
+
        from FunkLoad.utils import extract_token
        ...
        jsf_state = extract_token(self.getBody(), ' id="javax.faces.ViewState" value="', '"')
+
     	 
   - Uses a credential_ server if you want to make a bench with different users
-    or simply don't want to hard code your login/password
-    ::
+    or simply don't want to hard code your login/password::
+
        from funkload.utils import xmlrpc_get_credential	
        ...
        # get an admin user
        login, pwd = xmlrpc_get_credential(host, port, "admin")
+
 
 * Configure the monitoring_ and automate your benchmark using a Makefile_.
 

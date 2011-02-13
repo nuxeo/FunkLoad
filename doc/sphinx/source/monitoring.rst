@@ -3,9 +3,9 @@ Monitor server
 
 If you want to monitor a linux server health during the bench, you
 have to run a monitor xmlrpc server on the target server, this require
-to install the FunkLoad_ package.
+to install the FunkLoad package.
 
-On the server side you need to install the FunkLoad_ tool then launch
+On the server side you need to install the FunkLoad tool then launch
 the server using a configuration file (example in the demo_/simple
 folder.)::
 
@@ -31,3 +31,5 @@ specific.
 
 A new contribution will be added in 1.15 to extend the monitoring, it
 will comes with Nagios and Munin plugins.
+
+.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/funkload/demo/

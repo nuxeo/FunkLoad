@@ -30,7 +30,7 @@ FunkLoad 1.14.0
 
 :Svn: http://svn.nuxeo.org/pub/funkload/tags/1.14.0
 
-:Released date: 2011-02-04
+:Released date: 2011-02-14
 
 
 New features
@@ -54,11 +54,13 @@ New features
 
 * Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
 
-* Distributed mode (beta), provided by Ali-Akber Saifee.
-
 * Switch to Sphinx for documentation, this work is in progress, the
   draft can be found in
   http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
+
+* Distributed mode (beta), provided by Ali-Akber Saifee, visit the new FAQ
+  http://funkload.nuxeo.org/sphinx/faq.html#how-to-run-multiple-bencher for
+  more information.
 
 * Support of the ``--simple-fetch`` option using the configuration
   file. This can be useful when using benchmaster

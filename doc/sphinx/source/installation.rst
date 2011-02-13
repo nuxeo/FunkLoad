@@ -21,6 +21,11 @@ To install the latest stable release replace the last line with ::
  
   sudo easy_install -U funkload
 
+If you want to test the new beta distributed mode (since 1.14.0) you
+need paramiko and virtualenv::
+  
+  sudo aptitude install python-paramiko, python-virtualenv
+
 That's all.
 
 Unfortunatly the FunkLoad_ Debian package (old 1.6.2-3) does not work properly.

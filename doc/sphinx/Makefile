@@ -90,6 +90,6 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 distrib: 
-	scp -r build/html $(TARGET)/sphinx/
+	scp -r build/html/* $(TARGET)/sphinx/
 
 
