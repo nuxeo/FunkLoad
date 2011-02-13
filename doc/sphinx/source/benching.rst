@@ -104,7 +104,8 @@ change the application configuration will help you to find the right tuning.
 
 
 Tips
------
+~~~~~
+
 Here are few remarks/advices to obtain workable metrics.
 
 * Since it uses significant CPU resources, make sure that performance limits

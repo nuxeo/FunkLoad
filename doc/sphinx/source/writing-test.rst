@@ -6,6 +6,8 @@ Writing test script
 Submiting requests
 -------------------
 
+The FunkLaodTestCase_ API:
+
 * get
 * post
 
@@ -53,4 +55,4 @@ Adding information to the report
 
 
 
- 
+.. _FunkLoadTestCase: http://public.dev.nuxeo.com/~ben/funkload/sphinx/api/core_api.html#module-funkload.FunkLoadTestCase 

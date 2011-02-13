@@ -3,62 +3,130 @@ FAQ
 
 **DRAFT - DRAFT - DRAFT - DRAFT**
 
-How to submit high load ?
----------------------------
+What does all these dots mean ?
+-------------------------------
 
-- GIL limits on multi CPU arch
-  - ``taskset -c 0 fl-run-bench`` is always faster than ``fl-run-bench``
-  - work around using CPU affinity and multiple bench runner
-- High load works fine for IO bound test, not on CPU bould test
-- How to prevent CPU bound tests:
-  - ``--simple-fetch`` + explicit get
-  - limit any html/xml parsing, getDOM, beautiful soup
-  - use find/regexp
-  - prepare your data on setUp hooks
+During a bench cycle the "Starting threads" dots means the number
+running threads::
+
+  Cycle #1 with 10 virtual users
+  ------------------------------
+  
+  * setUpCycle hook: ... done.
+  * Current time: 2011-01-26T23:23:06.234422
+  * Starting threads: ........
+
+During the cycle logging the green dots means a successful test while
+the red 'F' are for test failure::
+
+  * Logging for 10s (until 2011-01-26T23:23:16.360602): ......F......
+
+
+During the stagging down the dots are the number of stopped threads::
+
+  * Waiting end of threads: .........
+
+
+How to accept invalid Cookies ?
+----------------------------------
+
+- ``Error : COOKIE ERROR: Cookie domain “<DOMAINE>” doesn’t start with “.”``
+
+  Comment the lines in file /usr/lib/python2.6/site-packages/webunit-1.3.8-py2.6.egg/webunit/cookie.py::
+
+  #if domain[0] != '.':
+  #  raise Error, 'Cookie domain "%s" doesn\'t start with "."' % domain
+
+
+- ``Error : COOKIE ERROR: Cookie domain “.”<DOMAINE>” doesn’t match request host “<DOMAINE>”``
+
+  Comment the lines in the file /usr/lib/python2.6/site-packages/webunit-1.3.8-py2.6.egg/webunit/cookie.py::
+
+      #if not server.endswith(domain):
+      #  raise Error, 'Cookie domain "%s" doesn\'t match '
+      #  'request host "%s"'%(domain, server)
+
+
+How to submit high load ?
+----------------------------
+
+High load works fine for IO Bound test, not on CPU bound test. The
+test script must be light:
+
+- When possible don't parse html/xml page, using simple find or regexp
+  are much much faster than any html parsing including getDOM, html
+  parser or beautifulsoup. If you start emulating a browser then you
+  will be as slow as a browser.
+
+- Use ``--simple-fetch`` option to prevent parsing html page to
+  retrieve resources use explicit GET in your code.
+
+- Try to generate or prepare the data before the test to minimize the
+  processing during the test.
+
+On 32b OS install psyco, it gives a 50% boost (``aptitude install
+python-psyco`` on Debia/Ubuntu OS).
+
+On multi CPU server, GIL is getting infamous, to get all the power you
+need to use CPU affinity ``taskset -c 0 fl-run-bench`` is always
+faster than ``fl-run-bench``.  Using one bench runner process per CPU
+is a work around to use the full server power.
+
 
 How to run multiple bencher ?
------------------------------
+-------------------------------
 
 Reports can be merged but how to run multiple bencher ?
 
-- The new distribute mode (beta), requires paramiko and virtualenv, it
+* Old school pssh/Makefile::
+   # clean all node workspaces 
+   parallel-ssh -h hosts.txt rm -rf /tmp/ftests/
+   # distribute tests 
+   parallel-scp -h hosts.txt -r ftests /tmp/ftests
+   # launch a bench
+   parallel-ssh -h hosts.txt -t -1 -o bench “(cd /tmp/ftests&& make bench URL=http://target/)”
+   # get the results 
+   parallel-slurp -h hosts.txt -o out -L results-date -u ‘+%Y%m%d-%H%M%S’ -r /tmp/ftests/report .
+   # build the report with fl-build-report, it supports the results merging
+
+* Using BenchMaster http://pypi.python.org/pypi/benchmaster
+
+* Using Fabric http://tarekziade.wordpress.com/2010/12/09/funkload-fabric-quick-and-dirty-distributed-load-system/
+
+* The new distribute mode (beta), requires paramiko and virtualenv, it
   adds three new command line options:
 
-   * ``--distributed``: to enable distributed mode
-   * ``--distributed-workers=user:password@host1,user:password@host2...``
-     (user:password can be skipped if using pub-key)
-   * ``--is-distributed``: an internal only option to be used so that
-     'worker' nodes don't for instance, start monitoring the
-     hosts. this can be generally used to signal to a worker node that
-     its only a 'worker' :)
+  - ``--distributed``: to enable distributed mode
 
-- BenchMaster http://pypi.python.org/pypi/benchmaster
+  - ``--distributed-workers=user:password@host1,user:password@host2...``: 
+    user:password can be skipped if using pub-key.
 
-- Old school pssh/Makefile::
-   # clean all node workspaces
-   parallel-ssh  -h hosts.txt rm -rf /tmp/ftests/
- 
-   # distribute tests
-   parallel-scp -h hosts.txt -r ftests /tmp/ftests
-   
-   # launch a bench
-   parallel-ssh -h hosts.txt -t -1 -o bench "(cd /tmp/ftests&& make bench 
-   URL=http://target/)"
-   
-   # get the results
-   parallel-slurp -h hosts.txt -o out -L results-`date -u '+%Y%m%d-%H%M%S'` 
-   -r /tmp/ftests/report .
-    
-   # build the report with fl-build-report, it supports the results merging 
-   
-- Fabric http://tarekziade.wordpress.com/2010/12/09/funkload-fabric-quick-and-dirty-distributed-load-system/
+  - ``--is-distributed``: an internal only option to be used so that
+    ‘worker’ nodes don’t for instance, start monitoring the
+    hosts. this can be generally used to signal to a worker node that
+    its only a ‘worker’ :) 
+
+    At the moment it does not work with src-egg package. These feature
+    will be exposed on the next release (1.15).
+
 
 How to mix different scenarii in a bench ?
 -------------------------------------------
 
-- example of percent and fixed number of threads
+Simple example with percent of users::
 
-::
+    import random
+    ...
+    def testMixin(self):
+        if random.randint(1, 100) < 30:
+            # 30% writer
+            return self.testWriter()
+        else:
+            # 70% reader
+            return self.testReader()
+
+Example with fixed number of users::
+
     def testMixin(self):
         if self.thread_id < 2:
             # 2 importer threads
@@ -70,25 +138,34 @@ How to mix different scenarii in a bench ?
             # front office users
             return self.testFrontOffice()
 
-- limitation of the details report
+
+Note that when mixing tests the detail report for each page is
+meaningless because you are mixing pages from multiple tests.
 
 How to modify a report ?
 --------------------------
 
-- the report is in reStructuredText
-- gnuplot
+The report is in reStructuredText, the ``index.rst`` can be edited in
+text mode, to build the html version::
+
+    rst2html --stylesheet=funkload.css   index.rst --traceback > index.html
+
+Charts are build with gnuplot the gplot script file are present in the
+report directory to rebuild the pages charts for instance::
+
+    gnuplot pages.gplot
+
 
 How to automate stuff ?
 -----------------------
 
-Makefile usage example
+TODO: Give a Makefile usage example
 
 How to write fluent tests ?
 -----------------------------
 
-- Nuxeo DM example http://hg.nuxeo.org/nuxeo/nuxeo-distribution/file/5b9d9e397beb/nuxeo-distribution-dm/ftest/funkload/README.txt
+Nuxeo DM example http://hg.nuxeo.org/nuxeo/nuxeo-distribution/file/5b9d9e397beb/nuxeo-distribution-dm/ftest/funkload/README.txt::
 
-:: 
      class MySuite(NuxeoTestCase):
           def testMyScenario(self):
               (LoginPage(self)

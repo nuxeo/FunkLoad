@@ -54,8 +54,7 @@ New features
 
 * Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
 
-* Distributed mode (beta), provided by Ali-Akber Saifee (more
-  description soon).
+* Distributed mode (beta), provided by Ali-Akber Saifee.
 
 * Switch to Sphinx for documentation, this work is in progress, the
   draft can be found in
