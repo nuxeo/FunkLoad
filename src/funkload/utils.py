@@ -294,28 +294,6 @@ class Data:
         return "[User data " + self.content_type + "]"
 
 
-
-def make_pkg():
-    """
-    tests whether the funkload package is installed as an egg or whether
-    it is in a dev checkout. based on the circumstance, either copies the 
-    egg to `dst` or creates a tarball of the source tree and returns the 
-    full path.
-    """
-    _pkg = pkg_resources.get_distribution('funkload')
-    _dst = tempfile.gettempdir() 
-    if not os.path.isdir(_pkg.location):
-        _path = os.path.join( _dst, 'funkload.egg')
-        shutil.copy(_pkg.location, _path )
-        return _path
-    else:
-        loc = os.path.split(_pkg.location)[0]
-        _path =  os.path.join ( _dst, 'funkload.tar')
-        _tar = tarfile.TarFile(_path,'w')
-        _tar.add(loc, '.')
-        _tar.close()
-        return _path
-
 def get_virtualenv_script():
     """
     returns the path of the virtualenv.py script that is 
@@ -329,7 +307,7 @@ def get_virtualenv_script():
         return script_path
     else:
         return None
-    
+
 
 def package_tests(module_file):
     """
