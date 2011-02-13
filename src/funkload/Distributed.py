@@ -192,7 +192,7 @@ class DistributionMgr(threading.Thread):
 
         test = load_unittest(self.module_name, class_name,
                              mmn_encode(method_name, 0, 0, 0), options)
-        
+       
         self.config_path = test._config_path
         self.result_path = test.result_path
         self.class_title = test.conf_get('main', 'title')
@@ -209,13 +209,23 @@ class DistributionMgr(threading.Thread):
         self.threads = []  # Contains list of ThreadData objects
         self.last_thread_id = -1
         self.thread_creation_lock = threading.Lock()
+        try:    
+            desc = getattr(test,self.method_name).__doc__.strip()
+        except:
+            desc = ""
         self.test_description = test.conf_get(self.method_name, 'description',
-                                              getattr(test,self.method_name).__doc__.strip())
+                                              desc)
         # make a collection output location
         if test.conf_get('distribute', 'log_path','',quiet=True):
             self.distribution_output = test.conf_get('distribute','log_path')
         else:
             raise UserWarning("log_path isn't defined in section [distribute]")
+        
+        # check if user has overridden the default funkload distro download location
+        # this will be used to download funkload on the worker nodes.
+        self.funkload_location = test.conf_get('distribute','funkload_location','funkload')
+
+        
         if not os.path.isdir(self.distribution_output):
             os.makedirs(self.distribution_output)
          
@@ -293,12 +303,8 @@ class DistributionMgr(threading.Thread):
                                            tarball)
 
             # setup funkload
-            fl_tar = os.path.split( self.distribution_tar) [1]
-            remote_fl_tar = os.path.join(self.remote_res_dir,\
-                    fl_tar)
-            worker.put ( self.distribution_tar ,remote_fl_tar )
-            worker.execute("./bin/easy_install %s" % remote_fl_tar,\
-                           cwdir = virtual_env )
+            worker.execute("./bin/easy_install %s" % self.funkload_location,
+                    cwdir = virtual_env)
             trace(".")
             worker.execute( "python virtualenv.py %s" %\
                     self.remote_res_dir )
