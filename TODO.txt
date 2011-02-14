@@ -2,22 +2,21 @@
 #+TITLE: FunkLoad to do list
 #+AUTHOR: Benoit Delbosc
 
-This todo list replace the deprecated trac
+Since 1.14 this todo list replace the deprecated trac
 (http://svn.nuxeo.org/trac/pub/report/12)
 
 If you want to report a bug or if you think that something is
 missing, send me an email bdelbosc _at_ nuxeo.com.
 
+Current target release is 1.14.0
+
 * Features
-** NEXT Release 1.14.0
-** NEXT Move source from svn to GitHub
-   https://github.com/nuxeo/FunkLoad
-** NEXT Merge monitoring refactoring in 1.15
-   https://svn.nuxeo.org/pub/funkload/branches/kadamski-monitor-refactoring
-   test with munin-plugins-extra, nagios-plugins think about new one:
-   sysstat/sar, gc.log, generic csv file like in logchart.
-   - [ ] check or warn on backward incompatibility
-** NEXT Switch to sphinx for documentation [9/15]
+** STARTED Release 1.14.0 				       :@current:ADM:
+   - [ ] tests
+   - [ ] svn tag
+   - [ ] pypy deploy
+   - [ ] freshmeat announce
+** STARTED Switch to sphinx for documentation [9/15]	       :@current:DOC:
    http://funkload.nuxeo.org/sphinx/
    [[./doc/sphinx/source/index.rst][index.rst]]
    - [X] [[./doc/sphinx/source/intro.rst][intro]]
@@ -35,14 +34,26 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
    - [ ] [[./doc/sphinx/source/links.rst][links]]
    - [X] [[./doc/sphinx/source/glossary.rst][glossary]]
    - [X] [[./doc/sphinx/source/changes.rst][changes]]
-** TODO Add common utils
+** STARTED Move source from svn to GitHub			  :@next:ADM:
+   https://github.com/nuxeo/FunkLoad
+** TODO Merge monitoring refactoring in 1.15			  :@next:ADM:
+   https://svn.nuxeo.org/pub/funkload/branches/kadamski-monitor-refactoring
+   test with munin-plugins-extra, nagios-plugins
+   - [X] check or warn on backward incompatibility
+** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
+** TODO Provide GC.log and csv monitoring plugin		 :@next:CORE:
+   make the same charts than logchart.
+** TODO Generate a shinx documentation PDF			  :@next:DOC:
+   Fix the sphinx documentation PDF export: make latex + pdflatex
+   generate a PDF with errors on the toc.
+** TODO Add common utils					 :@next:CORE:
    - extractToken(buffer, start, stop, maxlen=-1)
    - getRandomLineInFile()
    - assertAndDump() dump getBody on failure
-** TODO Add an org-mode report output
+** TODO Add an org-mode report output			       :@next:REPORT:
    fl-build-report --org-mode 
    with latex directive for images
-** TODO Add a param to join to next request action
+** TODO Add a param to join to next request action		 :@next:CORE:
    Joining distinct requests into a single page/action:
    
    self.get(url, description="foo", join_with_next_req=True)
@@ -50,32 +61,44 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 
    url2 is reported as being on the same page as url, there is no
    thinktime pause between the 2 requests.
-** TODO Remove CPSTestCase from FunkLoad sources
+** TODO Remove CPSTestCase from FunkLoad sources		 :@next:CORE:
    Added: [2010-12-27 lun. 18:28]
    - [X] Mark it as deprecated on 1.14
    - [ ] remove on 1.15
    - [ ] Keep it as a demo, add link to migrated script on the CPS repo.
-** TODO Test and fix distribution mode
-   It works on on binary egg and with a source package but not in
-   src-egg. There is no setup.py in src-egg.
-   - [X] remove dep on hashlib which requires python2.5
-** TODO Remove GDchart support
+** TODO Remove GDchart support					 :@next:CORE:
    - [X] Mark it as deprecated on 1.14
    - [ ] remove on 1.15
-** TODO Improve report failure section
+** TODO Improve report failure section			       :@next:REPORT:
    Add an error section with:
    - http failure:
      - sort by page|req|code
      - display a link to the returned page if any
    - Assertion error:
      - sort by traceback
-** TODO Look at what can be done with perfbase
+** TODO Look at what can be done with perfbase			  :@next:TBD:
    http://perfbase.tigris.org/
 * Bugs
-** TODO Patch cookie lib
+** TODO Patch cookie lib					 :@next:CORE:
    The cookie lib is too restrictive, try to merge the refactoring
    done by Google:
    http://svn.nuxeo.org/trac/pub/browser/funkload/branches/google-refactoring
-   Added: [2010-11-18 jeu. 14:23]
-** TODO Produce valid xml test result
+   Added: [2010-11-18 jeu. 14:23
+** TODO Produce valid xml test result			       :@next:REPORT:
    the root element is missing
+
+* org-mode configuration
+
+
+- TBD :: to be defined
+- TODO :: doable implementation to be done...
+- STARTED :: task started
+- WAITING :: requires information to be processed
+- DONE :: implemented
+
+- @current :: for the current release
+- @next :: post pone to the next release
+
+
+#+TAGS: { @current(c) @next(n) CORE(o) REPORT(r) ADM(a) DOC(d) QA(q) }
+#+SEQ_TODO: TBD(b) TODO(t) STARTED(s) WAITING(w) | DONE(d) CANCELLED(c) DEFERRED(f)   

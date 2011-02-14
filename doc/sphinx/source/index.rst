@@ -17,23 +17,23 @@ FunkLoad documentation contents
    recorder
    credential
    monitoring   
-
    usage
-
-   development
    faq
-   links
-   changes
+   development
+
 
 
 Indices and tables
 ==================
 
+* Changes_
+* Glossary_
+* Links_
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-* glossary_
 
-.. _glossary: glossary.html 
 
-   
+.. _Glossary: glossary.html 
+.. _Changes: changes.html
+.. _Links: links.html

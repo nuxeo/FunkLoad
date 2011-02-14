@@ -1,5 +1,5 @@
-Monitor server
-==============
+The monitor server
+===================
 
 If you want to monitor a linux server health during the bench, you
 have to run a monitor xmlrpc server on the target server, this require

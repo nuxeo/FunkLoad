@@ -3,9 +3,9 @@ Links
 
 **DRAFT - DRAFT - DRAFT - DRAFT**
 
-* Using Apdex http://www.apdex.org/using.html
-
 * Apdex with FunkLoad in french http://www.wikigento.com/tag/funkload/
+
+* Using Apdex http://www.apdex.org/using.html
 
 * How to write funkload test in few minutes http://blog.redturtle.it/redturtle-blog/how-to-write-funkload-test-in-few-minutes
 

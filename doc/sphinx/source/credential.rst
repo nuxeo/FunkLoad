@@ -1,5 +1,5 @@
-Credential server
-==================
+The credential server
+=======================
 
 If you are writing a bench that requires to be logged with different
 users FunkLoad provides an xmlrpc credential server to serve
