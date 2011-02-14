@@ -3,7 +3,8 @@
 FunkLoad documentation contents
 =================================
 
-**DRAFT - DRAFT - DRAFT - DRAFT**
+This document describes the usage of the FunkLoad tool. This tool
+enables to do functional and load testing of web application.
 
 .. toctree::
    :maxdepth: 2

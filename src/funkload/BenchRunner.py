@@ -606,13 +606,13 @@ def main():
                       help="Port at which debug server should run during the test")
     
     parser.add_option("","--distribute", action="store_true", dest="distribute",
-                      help="distributes the CVUs over a group of worker machines "
+                      help="Distributes the CVUs over a group of worker machines "
                       "that are defined in the section [workers]")
     parser.add_option("","--distribute-workers", type="string", dest="workerlist",
-                      help="this parameter will  over-ride the list of workers defined "
+                      help="This parameter will  over-ride the list of workers defined "
                       "in the config file. expected notation is uname@host,uname:pwd@host or just host...") 
     parser.add_option("","--is-distributed", action="store_true", dest="is_distributed",
-                      help="this parameter is for internal use only. it signals to a "
+                      help="This parameter is for internal use only. it signals to a "
                       "worker node that it is in distributed mode and shouldn't "
                       "perform certain actions.")
 

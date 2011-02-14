@@ -83,8 +83,9 @@ Main FunkLoad features are:
   - support normal pyUnit test
   - support doctest from a plain text file or embedded in python docstring
 
-* Turn a functional test into a load test: just by invoking the bench runner
-  you can identify scalability and performance problems.
+* Turn a functional test into a load test: just by invoking the bench
+  runner you can identify scalability and performance problems. If
+  needed the bench can distributed over a group of worker machines.
 
 * Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
   containing:

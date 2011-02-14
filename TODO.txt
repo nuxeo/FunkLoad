@@ -12,11 +12,11 @@ Current target release is 1.14.0
 
 * Features
 ** STARTED Release 1.14.0 				       :@current:ADM:
-   - [ ] tests
+   - [X] tests
    - [ ] svn tag
    - [ ] pypy deploy
    - [ ] freshmeat announce
-** STARTED Switch to sphinx for documentation [9/15]	       :@current:DOC:
+** STARTED Switch to sphinx for documentation [10/15]	       :@current:DOC:
    http://funkload.nuxeo.org/sphinx/
    [[./doc/sphinx/source/index.rst][index.rst]]
    - [X] [[./doc/sphinx/source/intro.rst][intro]]
@@ -24,7 +24,7 @@ Current target release is 1.14.0
    - [X] [[./doc/sphinx/source/installation.rst][installation]]
    - [X] [[./doc/sphinx/source/tutorial.rst][tutorial]]
    - [ ] [[./doc/sphinx/source/writing-test.rst][writing-test]]
-   - [ ] [[./doc/sphinx/source/benching.rst][benching]]
+   - [X] [[./doc/sphinx/source/benching.rst][benching]]
    - [X] [[./doc/sphinx/source/recorder.rst][recorder]]
    - [X] [[./doc/sphinx/source/monitoring.rst][monitoring]]
    - [X] [[./doc/sphinx/source/credential.rst][credential]]

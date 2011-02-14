@@ -26,7 +26,7 @@ Features
 
 Main FunkLoad_ features are:
 
-* FunkLoad_ is free software distributed under the `GNU GPL`_.
+* FunkLoad_ is free software distributed under the `GNU GPL`_ license.
 
 * Functional test are pure Python scripts using the pyUnit_ framework like
   normal unit test. Python enable complex scenarios to handle real world
@@ -59,8 +59,9 @@ Main FunkLoad_ features are:
   - support normal pyUnit_ test
   - support doctest_ from a plain text file or embedded in python docstring
 
-* Turn a functional test into a load test: just by invoking the bench runner
-  you can identify scalability and performance problems.
+* Turn a functional test into a load test: just by invoking the bench
+  runner you can identify scalability and performance problems. If
+  needed the bench can distributed over a group of worker machines.
 
 * Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
   containing:
@@ -72,11 +73,8 @@ Main FunkLoad_ features are:
     usage and network traffic charts.
   - an http error summary list
 
-  View a `report example <http://funkload.nuxeo.org/report-example/test_seam_java6/>`_.
-
 * Differential reports to compare 2 bench reports giving a quick overview of
   scalability and velocity changes.
-  View a `diff report example <http://funkload.nuxeo.org/report-example/diff_seam_java_6_vs_5/>`_.
 
 * Easy test customization using a configuration file or command line options.
 

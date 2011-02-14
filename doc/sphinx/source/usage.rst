@@ -1,6 +1,9 @@
 FunkLoad command line usage
 ============================
 
+All the FunkLoad command starts with ``fl-`` and have a ``--help``
+options.
+
 .. toctree::
    :maxdepth: 2
 

@@ -14,10 +14,10 @@ FunkLoad_ CHANGES
 
 
 
-FunkLoad SVN trunk
-------------------
+FunkLoad GIT master
+--------------------
 
-:Svn: http://svn.nuxeo.org/pub/funkload/trunk
+:git: https://github.com/nuxeo/FunkLoad
 
 :Target: 1.14.1
 
@@ -36,6 +36,22 @@ FunkLoad 1.14.0
 New features
 ~~~~~~~~~~~~~
 
+²w* Switch to Sphinx for documentation, this work is in progress, the
+  draft can be found in
+  http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
+
+* Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
+
+* Distributed mode (beta), provided by Ali-Akber Saifee, visit the new
+  FAQ
+  http://funkload.nuxeo.org/sphinx/faq.html#how-to-run-multiple-bencher
+  for more information.
+
+* Support of the ``--simple-fetch`` option using the configuration
+  file. This can be useful when using benchmaster
+  http://pypi.python.org/pypi/benchmaster. Just add ``simple_fetch = 1``
+  in the bench section.
+
 * Add setUpBench and tearDownBench hooks, they are called only once
   per bench before and after all cycles. 
   
@@ -51,21 +67,6 @@ New features
 
   A typical usage is to add metadata during setUpBench or
   tearDownBench hooks.
-
-* Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
-
-* Switch to Sphinx for documentation, this work is in progress, the
-  draft can be found in
-  http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
-
-* Distributed mode (beta), provided by Ali-Akber Saifee, visit the new FAQ
-  http://funkload.nuxeo.org/sphinx/faq.html#how-to-run-multiple-bencher for
-  more information.
-
-* Support of the ``--simple-fetch`` option using the configuration
-  file. This can be useful when using benchmaster
-  http://pypi.python.org/pypi/benchmaster. Just add ``simple_fetch = 1``
-  in the bench section.
 
 * Handling FunkLoad todo list with an org-mode_ file TODO_, replacing 
   the old trac.

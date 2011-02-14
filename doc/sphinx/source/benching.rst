@@ -1,5 +1,5 @@
-Benchmarking concepts
-======================
+Benchmarks concepts
+=====================
 
 
 The same FunkLaod test can be turned into a load test, just by invoking the
@@ -108,38 +108,41 @@ Tips
 
 Here are few remarks/advices to obtain workable metrics.
 
-* Since it uses significant CPU resources, make sure that performance limits
-  are not hit by FunkLoad_ before your server's limit is reached.
-  Check this by launching a bench from another host.
+* Since it uses significant CPU resources, make sure that performance
+  limits are not hit by FunkLoad_ before your server's limit is
+  reached.  Check this by launching a bench from another host.
 
 * Having a cycle with one user gives a usefull reference.
 
-* A bench is composed of a benching test (or scenario) run many times. A good
-  benching test should not be too long so you have a higher testing rate (that
-  is, more benching tests can come to their end).
+* A bench is composed of a benching test (or scenario) run many
+  times. A good benching test should not be too long so you have a
+  higher testing rate (that is, more benching tests can come to their
+  end).
 
 * The cycle duration for the benching test should be long enough.
-  Around 5 times the duration of a single benching test is a value that is
-  usually a safe bet. You can obtain this duration of a single benching test by
-  running ``fl-run-test myfile.py MyTestCase.testSomething``.
+  Around 5 times the duration of a single benching test is a value
+  that is usually a safe bet. You can obtain this duration of a single
+  benching test by running ``fl-run-test myfile.py
+  MyTestCase.testSomething``.
 
-  Rationale : Normally a cycle duration of a single benching test should be
-  enough. But from the testing platform side if there are more than one
-  concurrent user, there are many threads to start and it takes some time. And on
-  from the tested platform side it is common that a benching test will last
-  longer and longer as the server is used by more and more users.
+  Rationale : Normally a cycle duration of a single benching test
+  should be enough. But from the testing platform side if there are
+  more than one concurrent user, there are many threads to start and
+  it takes some time. And on from the tested platform side it is
+  common that a benching test will last longer and longer as the
+  server is used by more and more users.
 
-* You should use many cycles with the same step interval to produce readable
-  charts (1:10:20:30:40:50:60 vs 1:10:100)
+* You should use many cycles with the same step interval to produce
+  readable charts (1:10:20:30:40:50:60 vs 1:10:100)
 
 * A benching test must have the same number of page and in the same
   order.
 
 * Use a Makefile to make reproductible bench.
 
-* There is no debug option while doing a bench (since this would be illegible
-  with all the threads). So, if a bench fails (that is using `fl-run-bench`),
-  use ``fl-run-test -d`` to debug.
+* There is no debug option while doing a bench (since this would be
+  illegible with all the threads). So, if a bench fails (that is using
+  `fl-run-bench`), use ``fl-run-test -d`` to debug.
 
 
 .. _FunkLoad: http://funkload.nuxeo.org/
