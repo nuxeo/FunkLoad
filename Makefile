@@ -3,7 +3,7 @@
 #
 .PHONY: build pkg sdist egg install clean rpm
 
-TARGET := bertha_:~/public_public_html/funkload
+TARGET := gateway:~/public_public_html/funkload
 
 # use TAG=a for alpha, b for beta, rc for release candidate
 ifdef TAG
@@ -38,9 +38,9 @@ install:
 	python setup.py $(PKGTAG) install
 
 register:
-	-python2.4 setup.py register sdist bdist_egg upload
+	-python2.6 setup.py register sdist bdist_egg upload
+	-python2.4 setup.py register bdist_egg upload
 	-python2.5 setup.py register bdist_egg upload
-	-python2.6 setup.py register bdist_egg upload
 
 
 uninstall:

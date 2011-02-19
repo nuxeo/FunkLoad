@@ -6,7 +6,7 @@ FunkLoad_ CHANGES
 
 :address: bdelbosc _at_ nuxeo.com
 
-:revision: $Id: CHANGES.txt 54289 2011-02-04 23:47:03Z bdelbosc $
+:revision: $Id: CHANGES.txt 54298 2011-02-14 21:21:53Z bdelbosc $
 
 :abstract: This document describes changes between FunkLoad_ versions.
 
@@ -14,13 +14,18 @@ FunkLoad_ CHANGES
 
 
 
-FunkLoad SVN trunk
-------------------
+FunkLoad GIT master
+--------------------
 
-:Svn: http://svn.nuxeo.org/pub/funkload/trunk
+:git: https://github.com/nuxeo/FunkLoad
 
 :Target: 1.14.1
 
+
+New features
+~~~~~~~~~~~~~
+
+* Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
 
 
 FunkLoad 1.14.0
@@ -30,11 +35,27 @@ FunkLoad 1.14.0
 
 :Svn: http://svn.nuxeo.org/pub/funkload/tags/1.14.0
 
-:Released date: 2011-02-04
+:Released date: 2011-02-14
 
 
 New features
 ~~~~~~~~~~~~~
+
+* Switch to Sphinx for documentation, this work is in progress, the
+  draft can be found in
+  http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
+
+* Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
+
+* Distributed mode (beta), provided by Ali-Akber Saifee, visit the new
+  FAQ
+  http://funkload.nuxeo.org/sphinx/faq.html#how-to-run-multiple-bencher
+  for more information.
+
+* Support of the ``--simple-fetch`` option using the configuration
+  file. This can be useful when using benchmaster
+  http://pypi.python.org/pypi/benchmaster. Just add ``simple_fetch = 1``
+  in the bench section.
 
 * Add setUpBench and tearDownBench hooks, they are called only once
   per bench before and after all cycles. 
@@ -51,19 +72,6 @@ New features
 
   A typical usage is to add metadata during setUpBench or
   tearDownBench hooks.
-
-* Support of HTTP PUT and DELETE method, provided by Ali-Akber Saifee.
-
-* Distributed mode (beta), provided by Ali-Akber Saifee.
-
-* Switch to Sphinx for documentation, this work is in progress, the
-  draft can be found in
-  http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
-
-* Support of the ``--simple-fetch`` option using the configuration
-  file. This can be useful when using benchmaster
-  http://pypi.python.org/pypi/benchmaster. Just add ``simple_fetch = 1``
-  in the bench section.
 
 * Handling FunkLoad todo list with an org-mode_ file TODO_, replacing 
   the old trac.
@@ -374,7 +382,7 @@ New features
   using the new ``Data`` class (see above exemple).
 
 * New `test script
-  <http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/seam-booking-1.1.5>`_
+  <https://github.com/nuxeo/FunkLoad/tree/master/src/funkload/demo/seam-booking-1.1.5>`_
   provided with ``fl-install-demo`` to bench the JBoss Seam Booking
   application.
 

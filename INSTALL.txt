@@ -169,17 +169,13 @@ Install the latest development snapshot available::
 Development version
 ~~~~~~~~~~~~~~~~~~~
 
-If you want to try the latest unstable sources from svn ::
+If you want to try the latest unstable sources from git ::
 
-    easy_install -eb /tmp funkload==dev
-
-or::
-
-    svn co http://svn.nuxeo.org/pub/funkload/trunk /tmp/funkload
+    git clone git://github.com/nuxeo/FunkLoad.git
 
 then::
 
-    cd /tmp/funkload/
+    cd /tmp/FunkLoad
     python setup.py build
     sudo python setup.py install
 
@@ -337,7 +333,7 @@ See demo_ folder for other examples.
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _README: README.html
 .. _CHANGES: CHANGES.html
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/
+.. _demo: https://github.com/nuxeo/FunkLoad/tree/master/src/funkload/demo
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall#command-line-options
 .. _ez_setup.py: http://peak.telecommunity.com/dist/ez_setup.py

@@ -11,11 +11,16 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 Current target release is 1.14.0
 
 * Features
-** STARTED Release 1.14.0 				       :@current:ADM:
+** DONE Release 1.14.0					       :@current:ADM:
+   CLOSED: [2011-02-15 mar. 15:55]
    - [X] tests
-   - [ ] svn tag
-   - [ ] pypy deploy
-   - [ ] freshmeat announce
+   - [X] svn tag
+   - [X] pypy deploy
+   - [X] freshmeat announce
+** DONE Move source from svn to GitHub				  :@next:ADM:
+   CLOSED: [2011-02-19 sam. 00:33]
+   https://github.com/nuxeo/FunkLoad
+   http://nvie.com/posts/a-successful-git-branching-model/
 ** STARTED Switch to sphinx for documentation [10/15]	       :@current:DOC:
    http://funkload.nuxeo.org/sphinx/
    [[./doc/sphinx/source/index.rst][index.rst]]
@@ -34,9 +39,7 @@ Current target release is 1.14.0
    - [ ] [[./doc/sphinx/source/links.rst][links]]
    - [X] [[./doc/sphinx/source/glossary.rst][glossary]]
    - [X] [[./doc/sphinx/source/changes.rst][changes]]
-** STARTED Move source from svn to GitHub			  :@next:ADM:
-   https://github.com/nuxeo/FunkLoad
-** TODO Merge monitoring refactoring in 1.15			  :@next:ADM:
+** TODO Merge monitoring refactoring in 1.15 			  :@next:ADM:
    https://svn.nuxeo.org/pub/funkload/branches/kadamski-monitor-refactoring
    test with munin-plugins-extra, nagios-plugins
    - [X] check or warn on backward incompatibility

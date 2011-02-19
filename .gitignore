@@ -1,2 +1,8 @@
+syntax:glob
+
+dist
+build
 *.pyc
+*.swp
+.#*
 src/funkload.egg-info/

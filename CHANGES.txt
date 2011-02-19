@@ -6,8 +6,6 @@ FunkLoad_ CHANGES
 
 :address: bdelbosc _at_ nuxeo.com
 
-:revision: $Id$
-
 :abstract: This document describes changes between FunkLoad_ versions.
 
 .. contents:: Table of Contents
@@ -21,6 +19,11 @@ FunkLoad GIT master
 
 :Target: 1.14.1
 
+
+New features
+~~~~~~~~~~~~~
+
+* Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
 
 
 FunkLoad 1.14.0
@@ -36,7 +39,7 @@ FunkLoad 1.14.0
 New features
 ~~~~~~~~~~~~~
 
-²w* Switch to Sphinx for documentation, this work is in progress, the
+* Switch to Sphinx for documentation, this work is in progress, the
   draft can be found in
   http://funkload.nuxeo.org/sphinx/. Thanks to Ali-Akber Saifee.
 
@@ -377,7 +380,7 @@ New features
   using the new ``Data`` class (see above exemple).
 
 * New `test script
-  <http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/funkload/demo/seam-booking-1.1.5>`_
+  <https://github.com/nuxeo/FunkLoad/tree/master/src/funkload/demo/seam-booking-1.1.5>`_
   provided with ``fl-install-demo`` to bench the JBoss Seam Booking
   application.
 

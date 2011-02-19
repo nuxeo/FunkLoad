@@ -147,11 +147,9 @@ Either:
 
    sudo easy_install -f http://funkload.nuxeo.org/snapshots/ funkload
 
-* Bleeding edge `svn sources`_::
+* Bleeding edge git sources::
 
-   easy_install -eb . funkload==dev
-   # or
-   svn co http://svn.nuxeo.org/pub/funkload/trunk funkload
+  git clone git://github.com/nuxeo/FunkLoad.git
 
 
 See CHANGES_ file for information about distribution contents.
@@ -1369,8 +1367,7 @@ Return the list of url that ends with doc_id, using catalog search.
 Bug reporting
 =====================
 
-The list of open task and bugs is in the TODO_ file. (The trac is now
-deprecated http://svn.nuxeo.org/trac/pub/report/12)
+The list of open task and bugs is in the TODO_ file.
 
 If you want to report a bug or if you think that something is
 missing, send me an email bdelbosc _at_ nuxeo.com.
@@ -1387,7 +1384,7 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 .. _INSTALL: INSTALL.html
 .. _CHANGES: CHANGES.html
 .. _TODO: TODO.txt
-.. _contributors: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/THANKS
+.. _contributors: https://github.com/nuxeo/FunkLoad/blob/master/THANKS
 .. _API: api/index.html
 .. _Slides: http://blogs.nuxeo.com/sections/blogs/fermigier/2005_11_17_slides-introducing
 .. _epydoc: http://epydoc.sourceforge.net/
@@ -1397,11 +1394,9 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 .. _CPS: http://www.cps-project.org/
 .. _`python cheese shop`: http://www.python.org/pypi/funkload/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/funkload/demo/
+.. _demo: https://github.com/nuxeo/FunkLoad/tree/master/src/funkload/demo
 .. _report: http://funkload.nuxeo.org/report-example/
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
-.. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev
-.. _trac: http://svn.nuxeo.org/trac/pub/report/12
 .. _doctest: http://docs.python.org/lib/module-doctest.html
 
 
