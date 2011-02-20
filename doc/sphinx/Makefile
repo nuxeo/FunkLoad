@@ -1,6 +1,6 @@
 # Makefile for Sphinx documentation
 #
-TARGET := bertha_:~/public_public_html/funkload
+TARGET := gateway:/opt/public-dev/funkload
 
 # You can set these variables from the command line.
 SPHINXOPTS    =

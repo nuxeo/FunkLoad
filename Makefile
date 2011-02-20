@@ -3,7 +3,7 @@
 #
 .PHONY: build pkg sdist egg install clean rpm
 
-TARGET := gateway:~/public_public_html/funkload
+TARGET := gateway:/opt/public-dev/funkload
 
 # use TAG=a for alpha, b for beta, rc for release candidate
 ifdef TAG

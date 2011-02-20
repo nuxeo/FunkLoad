@@ -4,7 +4,7 @@
 #
 .PHONY: all epydoc clean distrib
 
-TARGET := bertha_:~/public_public_html/funkload
+TARGET := gateway:/opt/public-dev/funkload
 HTML_DOCS := README.html INSTALL.html CHANGES.html
 CSS_FILE := ../src/funkload/data/funkload.css
 RST2HTML := rst2html -t --stylesheet-path=$(CSS_FILE) --embed-stylesheet
