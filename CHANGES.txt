@@ -25,6 +25,11 @@ New features
 
 * Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
 
+Bug fixes
+~~~~~~~~~
+
+* Do not read content when content-length is null, patch submited by Bertrand
+  Yvain.
 
 FunkLoad 1.14.0
 ------------------

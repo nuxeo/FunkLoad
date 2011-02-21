@@ -371,7 +371,10 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         errcode = r.status
         errmsg = r.reason
         headers = r.msg
-        data = r.read()
+        if headers.has_key('content-length') and headers['content-length'] == "0":
+            data = None
+        else:
+            data = r.read()
         response = HTTPResponse(self.cookies, protocol, server, port, url,
                                 errcode, errmsg, headers, data,
                                 self.error_content)
@@ -379,16 +382,21 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     else:
         # get the body and save it
         errcode, errmsg, headers = h.getreply()
-        f = h.getfile()
-        g = cStringIO.StringIO()
-        d = f.read()
-        while d:
-            g.write(d)
+        if headers.has_key('content-length') and headers['content-length'] == "0":
+            response = HTTPResponse(self.cookies, protocol, server, port, url,
+                                errcode, errmsg, headers, None,
+                                self.error_content)
+        else:
+            f = h.getfile()
+            g = cStringIO.StringIO()
             d = f.read()
-        response = HTTPResponse(self.cookies, protocol, server, port, url,
+            while d:
+                g.write(d)
+                d = f.read()
+            response = HTTPResponse(self.cookies, protocol, server, port, url,
                                 errcode, errmsg, headers, g.getvalue(),
                                 self.error_content)
-        f.close()
+            f.close()
 
     if errcode not in ok_codes:
         if VERBOSE:

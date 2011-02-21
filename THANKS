@@ -28,3 +28,4 @@ Ali-Akber Saifee: Distributed mode impl, PUT/DELETE support, Sphinx
   documentation layout.
 Jan Kotuc: Debugging keep alive problem on http/1.1 303.
 Georges Racinet: Adding metadata on report and setUpBench hook ideas.
+Bertrand Yvain: Patch on null content-lengh.
