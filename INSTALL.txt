@@ -21,7 +21,7 @@ Quick installation guide for Debian Lenny/Ubuntu 8.10, 9.04, 10.04
 
 You can install the latest snapshot this way ::
 
-  sudo aptitude install python-dev python-xml python-setuptools \
+  sudo aptitude install python-dev python-setuptools \
        python-webunit python-docutils gnuplot
   sudo aptitude install tcpwatch-httpproxy --without-recommends
   sudo easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload

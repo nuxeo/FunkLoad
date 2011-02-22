@@ -487,7 +487,7 @@ class FunkLoadTestCase(unittest.TestCase):
             time.sleep(sleep_time)
 
     def setBasicAuth(self, login, password):
-        """Set http basic authentication."""
+        """Set HTTP basic authentication for the following requests."""
         self._browser.setBasicAuth(login, password)
         self._authinfo = '%s:%s@' % (login, password)
 

@@ -28,7 +28,7 @@ New features
 Bug fixes
 ~~~~~~~~~
 
-* Do not read content when content-length is null, patch submited by Bertrand
+* Do not block on read content when content-length is null, patch submited by Bertrand
   Yvain.
 
 FunkLoad 1.14.0

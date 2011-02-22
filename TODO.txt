@@ -11,16 +11,6 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 Current target release is 1.14.0
 
 * Features
-** DONE Release 1.14.0					       :@current:ADM:
-   CLOSED: [2011-02-15 mar. 15:55]
-   - [X] tests
-   - [X] svn tag
-   - [X] pypy deploy
-   - [X] freshmeat announce
-** DONE Move source from svn to GitHub				  :@next:ADM:
-   CLOSED: [2011-02-19 sam. 00:33]
-   https://github.com/nuxeo/FunkLoad
-   http://nvie.com/posts/a-successful-git-branching-model/
 ** STARTED Switch to sphinx for documentation [10/15]	       :@current:DOC:
    http://funkload.nuxeo.org/sphinx/
    [[./doc/sphinx/source/index.rst][index.rst]]
@@ -46,9 +36,6 @@ Current target release is 1.14.0
 ** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
 ** TODO Provide GC.log and csv monitoring plugin		 :@next:CORE:
    make the same charts than logchart.
-** TODO Generate a shinx documentation PDF			  :@next:DOC:
-   Fix the sphinx documentation PDF export: make latex + pdflatex
-   generate a PDF with errors on the toc.
 ** TODO Add common utils					 :@next:CORE:
    - extractToken(buffer, start, stop, maxlen=-1)
    - getRandomLineInFile()
@@ -64,6 +51,9 @@ Current target release is 1.14.0
 
    url2 is reported as being on the same page as url, there is no
    thinktime pause between the 2 requests.
+** TODO Generate a shinx documentation PDF			  :@next:DOC:
+   Fix the sphinx documentation PDF export: make latex + pdflatex
+   generate a PDF with errors on the toc.
 ** TODO Remove CPSTestCase from FunkLoad sources		 :@next:CORE:
    Added: [2010-12-27 lun. 18:28]
    - [X] Mark it as deprecated on 1.14
