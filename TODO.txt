@@ -11,7 +11,9 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 Current target release is 1.14.0
 
 * Features
-** STARTED Switch to sphinx for documentation [10/15]	       :@current:DOC:
+** STARTED Switch to sphinx for documentation [10/16]	       :@current:DOC:
+   - [ ] Remove duplication of the README.txt, INSTALL.txt CHANGES.txt
+     may be link to intro.rst, installation.txt, changes.txt ?
    http://funkload.nuxeo.org/sphinx/
    [[./doc/sphinx/source/index.rst][index.rst]]
    - [X] [[./doc/sphinx/source/intro.rst][intro]]
@@ -30,9 +32,31 @@ Current target release is 1.14.0
    - [X] [[./doc/sphinx/source/glossary.rst][glossary]]
    - [X] [[./doc/sphinx/source/changes.rst][changes]]
 ** TODO Merge monitoring refactoring in 1.15 			  :@next:ADM:
-   https://svn.nuxeo.org/pub/funkload/branches/kadamski-monitor-refactoring
    test with munin-plugins-extra, nagios-plugins
-   - [X] check or warn on backward incompatibility
+*** TODO Fix tb when running fl-build-report on old result file
+    building a report with 1.14.1a:
+#+begin_ascii
+$ fl-build-report --html funkload.xml 
+Creating html report: ...Traceback (most recent call last):
+  File "/usr/local/bin/fl-build-report", line 9, in <module>
+    load_entry_point('funkload==1.14.1', 'console_scripts', 'fl-build-report')()
+  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportBuilder.py", line 272, in main
+    xml_parser.monitorconfig, options)()
+  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlBase.py", line 126, in render
+    self.createRstFile()
+  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlBase.py", line 85, in createRstFile
+    f.write(str(self))
+  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderRst.py", line 641, in __repr__
+    self.renderMonitors()
+  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderRst.py", line 474, in renderMonitors
+    charts=self.createMonitorCharts()
+  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlBase.py", line 157, in createMonitorCharts
+    charts[host]=self.createMonitorChart(host)
+  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlGnuPlot.py", line 500, in createMonitorChart
+    Plugins.configure(self.monitorconfig[host])
+KeyError: u'localhost'
+#+end_ascii
+
 ** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
 ** TODO Provide GC.log and csv monitoring plugin		 :@next:CORE:
    make the same charts than logchart.
