@@ -27,6 +27,9 @@ New features
 
 * New ``--trend`` option to the ``fl-build-report`` command. It creates a 
   trend report to display evolution of the page statistics over time.
+  Here is an example of a trend report:
+  http://funkload.nuxeo.org/report-example/trend-report/
+
 
 Bug fixes
 ~~~~~~~~~
