@@ -6,4 +6,5 @@ doc/*.html
 *.pyc
 *.swp
 .#*
+*~
 src/funkload.egg-info/

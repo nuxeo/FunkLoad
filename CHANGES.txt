@@ -25,6 +25,9 @@ New features
 
 * Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
 
+* New ``--trend`` option to the ``fl-build-report`` command. It creates a 
+  trend report to display evolution of the page statistics over time.
+
 Bug fixes
 ~~~~~~~~~
 

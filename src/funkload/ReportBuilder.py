@@ -40,10 +40,12 @@ Examples
   %prog --html -o /tmp funkload.xml
                         Build an HTML report in /tmp
   %prog --html node1.xml node2.xml node3.xml
-                        Build an HTML report merging test result from 3 nodes.
-  %prog --diff /tmp/test_reader-20080101 /tmp/test_reader-20080102
+                        Build an HTML report merging test results from 3 nodes.
+  %prog --diff /path/to/report-reference /path/to/report-challenger
                         Build a differential report to compare 2 bench reports,
                         requires gnuplot.
+  %prog --trend /path/to/report-dir1 /path/to/report-1 ... /path/to/report-n
+                        Build a trend report using multiple reports.
   %prog -h
                         More options.
 """
@@ -62,6 +64,7 @@ from ReportStats import MonitorStat, ErrorStat
 from ReportRenderRst import RenderRst
 from ReportRenderHtml import RenderHtml
 from ReportRenderDiff import RenderDiff
+from ReportRenderTrend import RenderTrend
 from MergeResultFiles import MergeResultFiles
 from utils import trace, get_version
 
@@ -222,6 +225,9 @@ def main():
     parser.add_option("-d", "--diff", action="store_true",
                       default=False, dest="diffreport",
                       help=("Create differential report."))
+    parser.add_option("-t", "--trend", action="store_true",
+                      default=False, dest="trendreport",
+                      help=("Build a trend reprot."))
     parser.add_option("-o", "--output-directory", type="string",
                       dest="output_dir",
                       help="Parent directory to store reports, the directory"
@@ -244,6 +250,14 @@ def main():
         trace("Creating diff report ... ")
         output_dir = options.output_dir
         html_path = RenderDiff(args[0], args[1], options)
+        trace("done: \n")
+        trace("%s\n" % html_path)
+    elif options.trendreport:
+        if len(args) < 2:
+            parser.error("incorrect number of arguments")
+        trace("Creating trend report ... ")
+        output_dir = options.output_dir
+        html_path = RenderTrend(args, options)
         trace("done: \n")
         trace("%s\n" % html_path)
     else:

@@ -31,7 +31,10 @@ Current target release is 1.14.0
    - [ ] [[./doc/sphinx/source/links.rst][links]]
    - [X] [[./doc/sphinx/source/glossary.rst][glossary]]
    - [X] [[./doc/sphinx/source/changes.rst][changes]]
-** TODO Merge monitoring refactoring in 1.15 			  :@next:ADM:
+** STARTED Trend charts
+   Provide a trend chart for multiple reports
+   giving apdex, pages per second and average response time trends   
+** TODO [#B] Merge monitoring refactoring in 1.15	      :@current:CORE:
    test with munin-plugins-extra, nagios-plugins
 *** TODO Fix tb when running fl-build-report on old result file
     building a report with 1.14.1a:
@@ -60,6 +63,7 @@ KeyError: u'localhost'
 ** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
 ** TODO Provide GC.log and csv monitoring plugin		 :@next:CORE:
    make the same charts than logchart.
+
 ** TODO Add common utils					 :@next:CORE:
    - extractToken(buffer, start, stop, maxlen=-1)
    - getRandomLineInFile()
