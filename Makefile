@@ -7,7 +7,7 @@ TARGET := gateway:/opt/public-dev/funkload
 
 # use TAG=a for alpha, b for beta, rc for release candidate
 ifdef TAG
-	PKGTAG := egg_info --tag-build=$(TAG) --tag-svn-revision
+	PKGTAG := egg_info --tag-build=$(TAG) --tag-date
 else
     PKGTAG :=
 endif

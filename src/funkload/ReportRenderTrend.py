@@ -15,41 +15,119 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-"""Classes that render a trenderential report
+"""Trend report rendering
 
-$Id$
+The trend report uses metadata from a funkload.metadata file if present.
+
+The format of the metadata file is the following:
+label:short label to be displayed in the graph
+anykey:anyvalue
+a multi line description in ReST will be displayed in the listing parts
 """
 import os
 from ReportRenderRst import rst_title
 from ReportRenderHtmlBase import RenderHtmlBase
 from ReportRenderHtmlGnuPlot import gnuplot
+from ReportRenderDiff import getRPath
+
+def extract(report_dir, startswith):
+    """Extract line form the ReST index file."""
+    f = open(os.path.join(report_dir, "index.rst"))
+    line = f.readline()
+    while line:
+        if line.startswith(startswith):
+            f.close()
+            return line[len(startswith):].strip()
+        line = f.readline()
+    f.close()
+    return None
 
 
 def extract_date(report_dir):
     """Extract the bench date form the ReST index file."""
-    f = open(os.path.join(report_dir, "index.rst"))
-    line = f.readline()
-    while line:
-        if line.startswith("* Launched: "):
-            f.close()
-            return line[12:].strip()
-        line = f.readline()
+    tag = "* Launched: "
+    value = extract(report_dir, tag)
+    if value is None:
+        print "ERROR no date found in rst report %s" % report_dir
+        return "NA"
+    return value
+
+
+def extract_max_cus(report_dir):
+    """Extract the maximum concurrent users form the ReST index file."""
+    tag = "* Cycles of concurrent users: "
+    value = extract(report_dir, tag)
+    if value is None:
+        print "ERROR no max CUs found in rst report %s" % report_dir
+        return "NA"
+    return value.split(', ')[-1][:-1]
+
+
+def extract_metadata(report_dir):
+    """Extract the metadata from a funkload.metadata file."""
+    ret = {}
+    try:
+        f = open(os.path.join(report_dir, "funkload.metadata"))
+    except IOError:
+        return ret
+    lines = f.readlines()
     f.close()
-    print "ERROR no date found in rst report %s" % report_dir
-    return "NA"
+    for line in lines:
+        sep = None
+        if line.count(':'):
+            sep = ':'
+        elif line.count('='):
+            sep = '='
+        else:
+            key = 'misc'
+            value = line.strip()
+        if sep is not None:
+            key, value = line.split(sep, 1)
+            ret[key.strip()] = value.strip()
+        elif value:
+            v = ret.setdefault('misc', '')
+            ret['misc'] = v + ' ' + value
+    return ret
 
-
-def getRPath(a, b):
-    """Return a relative path of b from a."""
-    a_path = a.split('/')
-    b_path = b.split('/')
-    for i in range(min(len(a_path), len(b_path))):
-        if a_path[i] != b_path[i]:
+def extract_stat(tag, report_dir):
+    """Extract stat from the ReST index file."""
+    lines = open(os.path.join(report_dir, "index.rst")).readlines()
+    try:
+        idx = lines.index("%s stats\n" % tag)
+    except ValueError:
+        print "ERROR tag %s not found in rst report %s" % (tag, report_dir)
+        return []
+    delim = 0
+    ret =  []
+    header = ""
+    for line in lines[idx:]:
+        if line.startswith(" ====="):
+            delim += 1
+            continue
+        if delim == 1:
+            header = line.strip().split()
+        if delim < 2:
+            continue
+        if delim == 3:
             break
-    return '../' * len(a_path[i:]) + '/'.join(b_path[i:])
+        ret.append([x.replace("%","") for x in line.strip().split()])
+    return header, ret
+
+def get_metadata(metadata):
+    """Format metadata."""
+    ret = []
+    keys = metadata.keys()
+    keys.sort()
+    for key in keys:
+        if key not in ('label', 'misc'):
+            ret.append('%s: %s' % (key, metadata[key]))
+    if metadata.get('misc'):
+        ret.append(metadata['misc'])
+    return ', '.join(ret)
+
 
 class RenderTrend(RenderHtmlBase):
-    """Trenderential report."""
+    """Trend report."""
     report_dir1 = None
     report_dir2 = None
     header = None
@@ -89,9 +167,12 @@ class RenderTrend(RenderHtmlBase):
         reports_name = [os.path.basename(report) for report in reports]
         reports_date = [extract_date(report) for report in reports]
         self.reports_name = reports_name
+        reports_metadata = [extract_metadata(report) for report in reports]
+        self.reports_metadata = reports_metadata
         reports_rpath = [getRPath(self.report_dir, 
                                   os.path.join(report, 'index.html').replace(
                     '\\', '/')) for report in reports]
+        self.max_cus = extract_max_cus(reports[0])
         # TODO: handles case where reports_name are the same
         lines.append(rst_title("FunkLoad_ trend report", level=0))
         lines.append("")
@@ -106,9 +187,11 @@ class RenderTrend(RenderHtmlBase):
         count = 0
         for report in reports_name:
             count += 1
-            lines.append(" * Bench **%d** %s: `%s <%s>`_" % (
+                         
+            lines.append(" * Bench **%d** %s: `%s <%s>`_ %s" % (
                     count, reports_date[count - 1], report, 
-                    reports_rpath[count - 1]))
+                    reports_rpath[count - 1], 
+                    get_metadata(reports_metadata[count - 1])))
             lines.append("")
         lines.append(" .. _FunkLoad: http://funkload.nuxeo.org/")
         lines.append("")
@@ -123,34 +206,11 @@ class RenderTrend(RenderHtmlBase):
     def __repr__(self):
         return self.render()
 
-    def extract_stat(self, tag, report_dir):
-        """Extract stat from the ReST index file."""
-        lines = open(os.path.join(report_dir, "index.rst")).readlines()
-        try:
-            idx = lines.index("%s stats\n" % tag)
-        except ValueError:
-            print "ERROR tag %s not found in rst report %s" % (tag, report_dir)
-            return []
-        delim = 0
-        ret =  []
-        for line in lines[idx:]:
-            if line.startswith(" ====="):
-                delim += 1
-                continue
-            if delim == 1:
-                self.header = line.strip().split()
-            if delim < 2:
-                continue
-            if delim == 3:
-                break
-            ret.append([x.replace("%","") for x in line.strip().split()])
-        return ret
-
     def createGnuplotData(self):
         """Render rst stat."""
 
         def output_stat(tag, count):
-            stat = self.extract_stat(tag, rep)
+            header, stat = extract_stat(tag, rep)
             text = []
             for line in stat:
                 line.insert(0, str(count))
@@ -167,9 +227,16 @@ class RenderTrend(RenderHtmlBase):
             f.write(output_stat('Page', count) + '\n\n')
         f.close()
 
-
     def createGnuplotScript(self):
         """Build gnuplot script"""
+        labels = []
+        count = 0
+        for metadata in self.reports_metadata:
+            count += 1
+            if metadata.get('label'):
+                labels.append('set label "%s" at %d,%d,1 rotate by 45 front' % (
+                        metadata.get('label'), count, int(self.max_cus) + 2))
+        labels = '\n'.join(labels)
         script_file = os.path.join(self.report_dir, 'script.gplot')
         self.script_file = script_file
         f = open(script_file, 'w')
@@ -204,8 +271,9 @@ set view map
 set title "Apdex Trend"
 set xlabel "Bench"
 set ylabel "CUs"
+%s
 splot "trend.dat" using 1:2:3 with linespoints
-
+unset label
 set view
 
 set output "trend_spps.png"
@@ -217,7 +285,6 @@ set palette negative
 set title "Average response time (s)"
 splot "trend.dat" using 1:2:11 with linespoints
 
-''')
-
+''' % labels)
         f.close()
 
