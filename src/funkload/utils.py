@@ -224,7 +224,7 @@ def green_str(text):
 
 def is_html(text):
     """Simple check that return True if the text is an html page."""
-    if '<html' in text[:300].lower():
+    if text is not None and '<html' in text[:300].lower():
         return True
     return False
 
