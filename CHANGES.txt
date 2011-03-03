@@ -23,6 +23,8 @@ FunkLoad GIT master
 New features
 ~~~~~~~~~~~~~
 
+* Credential server can serve a sequence (TODO explain)
+
 * Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
 
 * New ``--trend`` option to the ``fl-build-report`` command. It creates a 

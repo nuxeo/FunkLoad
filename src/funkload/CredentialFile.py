@@ -72,7 +72,7 @@ class CredentialFileServer(XmlRpcBaseServer, CredentialBaseServer):
     """A file credential server."""
     server_name = "file_credential"
     method_names = XmlRpcBaseServer.method_names + [
-        'getCredential', 'listCredentials', 'listGroups']
+        'getCredential', 'listCredentials', 'listGroups', 'getSeq']
 
     credential_sep = ':'                    # login:password
     users_sep = ','                         # group_name:user1, user2
@@ -81,12 +81,14 @@ class CredentialFileServer(XmlRpcBaseServer, CredentialBaseServer):
         self.lofc = 0
         self._groups = {}
         self._passwords = {}
+        self.seq = 0
         XmlRpcBaseServer.__init__(self, argv)
 
     def _init_cb(self, conf, options):
         """init procedure to override in sub classes."""
         credentials_path = conf.get('server', 'credentials_path')
         self.lofc = conf.getint('server', 'loop_on_first_credentials')
+        self.seq = conf.getint('server', 'seq')
         self._loadPasswords(credentials_path)
         try:
             groups_path = conf.get('server', 'groups_path')
@@ -161,6 +163,10 @@ class CredentialFileServer(XmlRpcBaseServer, CredentialBaseServer):
         self.logd("listGroup() return (%s)" % str(ret))
         return ret
 
+    def getSeq(self):
+        """Return a sequence."""
+        self.seq += 1
+        return self.seq
 
 
 # ------------------------------------------------------------
@@ -181,6 +187,8 @@ class CredentialFileController(XmlRpcBaseController):
         for group in server.listGroups():
             self.log("group %s\n" % group)
             self.log("  content: %s\n" % server.listCredentials(group))
+        for i in range(5):
+            self.log("seq : %d" % server.getSeq())
         return 0
 
 # ------------------------------------------------------------
