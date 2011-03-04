@@ -598,7 +598,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
 
         lines.append('set title "Network traffic"')
         lines.append('set ylabel "kB/s"')
-        lines.append('plot "%s" u 1:8 t "In" w lines lw 2 lt 2, "" u 1:9 t "Out" w lines lw 1 lt 1' % data_path)
+        lines.append('plot "%s" u 1:9 t "In" w lines lw 2 lt 2, "" u 1:10 t "Out" w lines lw 1 lt 1' % data_path)
 
         lines.append('set title "Memory usage"')
         lines.append('set ylabel "kB"')
