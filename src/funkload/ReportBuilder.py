@@ -213,6 +213,8 @@ def main():
                           version="FunkLoad %s" % get_version())
     parser.add_option("-H", "--html", action="store_true", default=False,
                       dest="html", help="Produce an html report.")
+    parser.add_option("--org", action="store_true", default=False,
+                      dest="org", help="Org-mode report.")
     parser.add_option("-P", "--with-percentiles", action="store_true",
                       default=True, dest="with_percentiles",
                       help=("Include percentiles in tables, use 10%, 50% and"
@@ -281,6 +283,11 @@ def main():
                                    options)()
             trace("done: \n")
             trace(html_path + "\n")
+        elif options.org:
+            from ReportRenderOrg import RenderOrg
+            print str(RenderOrg(xml_parser.config, xml_parser.stats,
+                                xml_parser.error, xml_parser.monitor,
+                                options))
         else:
             print str(RenderRst(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,

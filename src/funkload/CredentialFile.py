@@ -88,7 +88,10 @@ class CredentialFileServer(XmlRpcBaseServer, CredentialBaseServer):
         """init procedure to override in sub classes."""
         credentials_path = conf.get('server', 'credentials_path')
         self.lofc = conf.getint('server', 'loop_on_first_credentials')
-        self.seq = conf.getint('server', 'seq')
+        try:
+            self.seq = conf.getint('server', 'seq')
+        except NoOptionError:
+            self.seq = 0
         self._loadPasswords(credentials_path)
         try:
             groups_path = conf.get('server', 'groups_path')

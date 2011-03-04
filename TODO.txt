@@ -34,7 +34,7 @@ Current target release is 1.14.0
 ** STARTED Trend charts
    Provide a trend chart for multiple reports
    giving apdex, pages per second and average response time trends   
-** TODO [#B] Merge monitoring refactoring in 1.15	      :@current:CORE:
+** TODO Merge monitoring refactoring in 1.15 		      :@current:CORE:
    test with munin-plugins-extra, nagios-plugins
 *** TODO Fix tb when running fl-build-report on old result file
     building a report with 1.14.1a:
@@ -59,7 +59,6 @@ Creating html report: ...Traceback (most recent call last):
     Plugins.configure(self.monitorconfig[host])
 KeyError: u'localhost'
 #+end_ascii
-
 ** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
 ** TODO Provide GC.log and csv monitoring plugin		 :@next:CORE:
    make the same charts than logchart.
@@ -68,9 +67,6 @@ KeyError: u'localhost'
    - extractToken(buffer, start, stop, maxlen=-1)
    - getRandomLineInFile()
    - assertAndDump() dump getBody on failure
-** TODO Add an org-mode report output			       :@next:REPORT:
-   fl-build-report --org-mode 
-   with latex directive for images
 ** TODO Add a param to join to next request action		 :@next:CORE:
    Joining distinct requests into a single page/action:
    
