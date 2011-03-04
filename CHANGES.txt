@@ -29,10 +29,10 @@ New features
 
   Here is an example of a `PDF
   <http://funkload.nuxeo.org/report-example/test_seam_java6.pdf>`_ and
-  an `org-mode reports
+  an `org-mode report
   <http://funkload.nuxeo.org/report-example/test_seam_java6.org>`_.
 
-  The org file requires to build the html reports first::
+  The org file requires to build the html report first::
   
     fl-build-report --html funkload.xml
     Creating html report: ...done: 
@@ -65,6 +65,8 @@ Bug fixes
 
 * Do not block on read content when content-length is null, patch submited by Bertrand
   Yvain.
+
+* Fix monitoring network monitoring charts.
 
 FunkLoad 1.14.0
 ------------------
