@@ -6,8 +6,6 @@ FunkLoad_ CHANGES
 
 :address: bdelbosc _at_ nuxeo.com
 
-:revision: $Id: CHANGES.txt 54298 2011-02-14 21:21:53Z bdelbosc $
-
 :abstract: This document describes changes between FunkLoad_ versions.
 
 .. contents:: Table of Contents
@@ -25,8 +23,50 @@ FunkLoad GIT master
 New features
 ~~~~~~~~~~~~~
 
+* Now supporting emacs org-mode_ text format as report output. This
+  enable to edit a report as plain text and produce professional PDF
+  reports througth the org-mode_ LaTeX export.
+
+  Here is an example of a `PDF
+  <http://funkload.nuxeo.org/report-example/test_seam_java6.pdf>`_ and
+  an `org-mode report
+  <http://funkload.nuxeo.org/report-example/test_seam_java6.org>`_.
+
+  The org file requires to build the html report first::
+  
+    fl-build-report --html funkload.xml
+    Creating html report: ...done: 
+    /tmp/test_foo-20110304T160328/index.html
+    # then create the org file
+    fl-build-report --org funkload.xml > /tmp/test_foo-20110304T160328/index.org
+    emacs /tmp/test_foo-20110304T160328/index.org
+    # then export as PDF C-c C-e d 
+    # refer to the org-mode site for 
+
+
+* Credential server can serve a sequence, using ``xmlrpc_get_seq`` tests
+  can share a sequence::
+
+    from funkload.utils import xmlrpc_get_seq
+    ...
+    seq = xmlrpc_get_seq()
+
+
 * Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
 
+* New ``--trend`` option to the ``fl-build-report`` command. It creates a 
+  trend report to display evolution of the page statistics over time.
+  Here is an example of a trend report:
+  http://funkload.nuxeo.org/report-example/trend-report/
+
+
+Bug fixes
+~~~~~~~~~
+
+* Do not block on read content when content-length is null, patch submited by Bertrand
+  Yvain.
+
+* Fix monitoring network monitoring charts.
 
 FunkLoad 1.14.0
 ------------------
@@ -908,6 +948,7 @@ See README_ for more information about FunkLoad_.
 .. _1837: http://svn.nuxeo.org/trac/pub/ticket/1837
 .. _1838: http://svn.nuxeo.org/trac/pub/ticket/1837
 .. _Plone: http://plone.org/
+.. _org-mode: http://orgmode.org/
 
 .. Local Variables:
 .. mode: rst

@@ -2,34 +2,43 @@ The monitor server
 ===================
 
 If you want to monitor a linux server health during the bench, you
-have to run a monitor xmlrpc server on the target server, this require
-to install the FunkLoad package.
+have to run a monitor xmlrpc server on the target server, this requires
+to install a minimal FunkLoad package, on Debian/Ubunutu ::
 
-On the server side you need to install the FunkLoad tool then launch
-the server using a configuration file (example in the demo_/simple
-folder.)::
+    sudo aptitude install python-dev python-setuptools \
+       python-webunit python-docutils
+    sudo easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
+
+Then create a configuration file ``monitor.conf``::
+  
+  [server]
+  host = <IP or FQDN>
+  port = 8008
+  interval = .5
+  interface = eth0
+  [client]
+  host = <IP or FQDN>
+  port = 8008
+
+And start the monitor server::
 
   fl-monitor-ctl monitor.conf start
 
-  # more info
-  fl-monitor-ctl --help
 
-
-On the bench host side setup your test configuration like this::
+On the bench server add to your test configuration file the following section::
 
   [monitor]
-  hosts = server.to.test.com
+  hosts = <IP or FQDN>
 
-  [server.to.test.com]
-  description = The web server
+  [<IP or FQDN>]
+  description = The application server
   port = 8008
+
 
 Then run the bench, the report will include server stats.
 
 Note that you can monitor multiple hosts and that the monitor is linux
 specific.
 
-A new contribution will be added in 1.15 to extend the monitoring, it
-will comes with Nagios and Munin plugins.
-
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/funkload/demo/
+A new contribution will be added in 1.16 to extend the monitoring, it
+will enable to use Nagios or Munin plugins.

@@ -11,30 +11,31 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 Current target release is 1.14.0
 
 * Features
-** STARTED Switch to sphinx for documentation [10/16]	       :@current:DOC:
+** STARTED Switch to sphinx for documentation [15/16]	       :@current:DOC:
    - [ ] Remove duplication of the README.txt, INSTALL.txt CHANGES.txt
      may be link to intro.rst, installation.txt, changes.txt ?
    http://funkload.nuxeo.org/sphinx/
    [[./doc/sphinx/source/index.rst][index.rst]]
    - [X] [[./doc/sphinx/source/intro.rst][intro]]
-   - [ ] [[./doc/sphinx/source/screenshot.rst][screenshot]]
+   - [X] [[./doc/sphinx/source/screenshot.rst][screenshot]]
    - [X] [[./doc/sphinx/source/installation.rst][installation]]
    - [X] [[./doc/sphinx/source/tutorial.rst][tutorial]]
-   - [ ] [[./doc/sphinx/source/writing-test.rst][writing-test]]
+   - [X] [[./doc/sphinx/source/writing-test.rst][writing-test]]
    - [X] [[./doc/sphinx/source/benching.rst][benching]]
    - [X] [[./doc/sphinx/source/recorder.rst][recorder]]
    - [X] [[./doc/sphinx/source/monitoring.rst][monitoring]]
    - [X] [[./doc/sphinx/source/credential.rst][credential]]
    - [X] usage
-   - [ ] [[./doc/sphinx/source/development.rst][development]]
-   - [ ] [[./doc/sphinx/source/faq.rst][faq]]
-   - [ ] [[./doc/sphinx/source/links.rst][links]]
+   - [X] [[./doc/sphinx/source/development.rst][development]]
+   - [X] [[./doc/sphinx/source/faq.rst][faq]]
+   - [X] [[./doc/sphinx/source/links.rst][links]]
    - [X] [[./doc/sphinx/source/glossary.rst][glossary]]
    - [X] [[./doc/sphinx/source/changes.rst][changes]]
 ** STARTED Trend charts
    Provide a trend chart for multiple reports
    giving apdex, pages per second and average response time trends   
-** TODO Merge monitoring refactoring in 1.15 		      :@current:CORE:
+** TODO Release 1.15
+** TODO Merge monitoring refactoring in 1.16			 :@next:CORE:
    test with munin-plugins-extra, nagios-plugins
 *** TODO Fix tb when running fl-build-report on old result file
     building a report with 1.14.1a:
@@ -59,6 +60,15 @@ Creating html report: ...Traceback (most recent call last):
     Plugins.configure(self.monitorconfig[host])
 KeyError: u'localhost'
 #+end_ascii
+** TODO Finish funkload.metadata impl				   :@current:
+   fl-buil-report should render the funkload.metadata file if present
+** TODO Produce gplot script with commented extended options
+   - explain how to have small label on trend reports
+     export GDFONTPATH=/usr/share/fonts/truetype/freefont
+     set label "Some comment" at 2,51,1 rotate by 45 front font 'FreeSans,6'
+   - ex of eps output
+** TODO Add unit test on request
+   using simple file req/resp as tcpwatch + minimal fake web server.
 ** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
 ** TODO Provide GC.log and csv monitoring plugin		 :@next:CORE:
    make the same charts than logchart.

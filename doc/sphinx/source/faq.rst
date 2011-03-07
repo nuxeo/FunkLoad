@@ -1,8 +1,6 @@
 FAQ
 ====
 
-**DRAFT - DRAFT - DRAFT - DRAFT**
-
 What does all these dots mean ?
 -------------------------------
 
@@ -58,7 +56,7 @@ test script must be light:
   parser or beautifulsoup. If you start emulating a browser then you
   will be as slow as a browser.
 
-- Use ``--simple-fetch`` option to prevent parsing html page to
+- Always use ``--simple-fetch`` option to prevent parsing html page to
   retrieve resources use explicit GET in your code.
 
 - Try to generate or prepare the data before the test to minimize the
@@ -207,16 +205,77 @@ report directory to rebuild the pages charts for instance::
 
     gnuplot pages.gplot
 
+Since FunkLoad 1.15 you can also use an org-mode_ output to edit or
+extend the report before exporting it as a PDF.
+
 
 How to automate stuff ?
 -----------------------
 
-TODO: Give a Makefile usage example
+Here is a sample Makefile
+
+::
+
+    CREDCTL := fl-credential-ctl credential.conf
+    MONCTL := fl-monitor-ctl monitor.conf
+    LOG_HOME := ./log
+    
+    ifdef URL
+    	FLOPS = -u $(URL) $(EXT)
+    else
+    	FLOPS = $(EXT)
+    endif
+    
+    ifdef REPORT_HOME
+    	REPORT = $(REPORT_HOME)
+    else
+    	REPORT = report
+    endif
+    
+    all: test
+    
+    test: start test-app stop
+    
+    bench: start bench-app stop
+    
+    start:
+    	-mkdir -p $(REPORT) $(LOG_HOME)
+    	-$(MONCTL) restart
+    	-$(CREDCTL) restart
+    
+    stop:
+    	-$(MONCTL) stop
+    	-$(CREDCTL) stop
+    
+    test-app:
+    	fl-run-test -d --debug-level=3 --simple-fetch test_app.py App.test_app $(FLOPS)
+    
+    bench-app:
+    	-fl-run-bench --simple-fetch test_app.py App.test_app -c 1:5:10:15:20:30:40:50 -D 45 -m 0.1 -M .5 -s 1 $(FLOPS)
+    	-fl-build-report $(LOG_HOME)/app-bench.xml --html -o $(REPORT)
+    
+    clean:
+    	-find . "(" -name "*~" -or  -name ".#*" -or  -name "*.pyc" ")" -print0 | xargs -0 rm -f
+
+
+It can be used like this::
+   
+   make test
+   make test URL=http://override-url/
+   # add extra parameters to the FunkLoad command
+   make test EXT="-V"
+   make bench
+
 
 How to write fluent tests ?
 -----------------------------
 
-Nuxeo DM example http://hg.nuxeo.org/nuxeo/nuxeo-distribution/file/5b9d9e397beb/nuxeo-distribution-dm/ftest/funkload/README.txt::
+You can use the `PageObject 
+<http://code.google.com/p/webdriver/wiki/PageObjects>`_ and `fluent
+interface <http://www.martinfowler.com/bliki/FluentInterface.html>`_
+patterns as in the `Nuxeo DM tests 
+<http://hg.nuxeo.org/nuxeo/nuxeo-distribution/file/57fbd264dd17/nuxeo-distribution-dm/ftest/funkload/README.txt>`_
+to write test like this::
 
      class MySuite(NuxeoTestCase):
           def testMyScenario(self):
@@ -232,3 +291,4 @@ Nuxeo DM example http://hg.nuxeo.org/nuxeo/nuxeo-distribution/file/5b9d9e397beb/
                .logout())
      
 
+.. _org-mode: http://orgmode.org/

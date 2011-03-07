@@ -39,9 +39,11 @@ To start the credential server::
 You can find more option in the usage_ page.
 
 In your test case to get a credential::
+
        from funkload.utils import xmlrpc_get_credential	
        ...
        login, pwd = xmlrpc_get_credential(host, port, "group2")
+
 
 .. _usage: usage-fl-credential-ctl.html
 

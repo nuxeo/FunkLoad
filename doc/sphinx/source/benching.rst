@@ -12,6 +12,7 @@ A page is an http get/post request with associated sub requests like
 redirects, images or links (css, js files). This is what users see as a
 single page.
 
+Note that an xmlrpc call or a put/delete is also taken in account as a page.
 
 Test
 ~~~~
@@ -108,11 +109,13 @@ Tips
 
 Here are few remarks/advices to obtain workable metrics.
 
-* Since it uses significant CPU resources, make sure that performance
-  limits are not hit by FunkLoad_ before your server's limit is
-  reached.  Check this by launching a bench from another host.
+* Since it may use significant CPU resources, make sure that
+  performance limits are not hit by FunkLoad before your server's
+  limit is reached. Check this by launching a bench from another host.
 
-* Having a cycle with one user gives a usefull reference.
+* Having a cycle with one user gives a usefull reference. 
+
+* Run multiple cycles for a bench.
 
 * A bench is composed of a benching test (or scenario) run many
   times. A good benching test should not be too long so you have a
