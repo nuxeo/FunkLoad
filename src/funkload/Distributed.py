@@ -69,10 +69,13 @@ class SSHDistributor(DistributorBase):
         elif username:
             credentials = {"username":username}
         try:
-            self.connection.connect(host, **credentials)
+            self.connection.connect(host, timeout=5, **credentials)
             self.connected = True
         except socket.gaierror, error:
             self.error = error
+        except socket.timeout, error:
+            self.error = error
+
 
 
     @requiresconnection
