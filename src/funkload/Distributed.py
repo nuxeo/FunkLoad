@@ -312,6 +312,7 @@ class DistributionMgr(threading.Thread):
             worker.execute( "python virtualenv.py %s" %\
                     self.tarred_testsdir,
                     cwdir = self.remote_res_dir )
+
             tarball = os.path.split(self.tarred_tests)[1]
             remote_tarball = os.path.join( self.remote_res_dir,\
                                            tarball)
@@ -319,9 +320,7 @@ class DistributionMgr(threading.Thread):
             # setup funkload
             worker.execute("./bin/easy_install %s" % self.funkload_location,
                     cwdir = virtual_env)
-            trace(".")
-            worker.execute( "python virtualenv.py %s" %\
-                    self.remote_res_dir )
+            
             #unpackage tests.
             worker.put( self.tarred_tests, os.path.join(self.remote_res_dir , tarball))
             worker.execute( "tar -xvf %s" %(tarball), cwdir = self.remote_res_dir)
