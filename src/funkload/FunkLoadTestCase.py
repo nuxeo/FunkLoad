@@ -1,4 +1,4 @@
-# (C) Copyright 2005-2010 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2011 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 # Contributors: Tom Lazar
 #
@@ -795,9 +795,10 @@ class FunkLoadTestCase(unittest.TestCase):
         else:
             response_start = response_start + '>\n  <headers>'
             header_xml = []
-            for key, value in response.headers.items():
-                header_xml.append('    <header name="%s" value=%s />' % (
-                    key, quoteattr(value)))
+            if response.headers is not None:
+                for key, value in response.headers.items():
+                    header_xml.append('    <header name="%s" value=%s />' % (
+                            key, quoteattr(value)))
             headers = '\n'.join(header_xml) + '\n  </headers>'
             message = '\n'.join([
                 response_start,
