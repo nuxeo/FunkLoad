@@ -1,9 +1,7 @@
 Introduction
 ==============
 
-This is the documentation for the FunkLoad tool. 
-
-FunkLoad is a functional and load web tester, written in Python, whose
+FunkLoad_ is a functional and load web tester, written in Python, whose
 main use cases are:
 
 * Functional testing of web projects, and thus regression testing as well.
@@ -118,24 +116,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _pyUnit: http://pyunit.sourceforge.net/
-.. _INSTALL: INSTALL.html
-.. _CHANGES: CHANGES.html
-.. _TODO: TODO.txt
-.. _contributors: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/THANKS
 .. _API: api/index.html
-.. _Slides: http://blogs.nuxeo.com/sections/blogs/fermigier/2005_11_17_slides-introducing
-.. _epydoc: http://epydoc.sourceforge.net/
-.. _Zope: http://www.zope.org/
-.. _Cmf: http://www.zope.org/Products/CMF/
 .. _Nuxeo: http://www.nuxeo.com/
-.. _CPS: http://www.cps-project.org/
 .. _`python cheese shop`: http://www.python.org/pypi/funkload/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/funkload/demo/
-.. _report: http://funkload.nuxeo.org/report-example/
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
-.. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev
-.. _trac: http://svn.nuxeo.org/trac/pub/report/12
 .. _doctest: http://docs.python.org/lib/module-doctest.html
 
 
