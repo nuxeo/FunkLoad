@@ -28,6 +28,7 @@ enables to do functional and load testing of web application.
 Indices and tables
 ==================
 
+* `PDF version of the documentation <./funkload.pdf>`_
 * Changes_
 * Glossary_
 * Links_
