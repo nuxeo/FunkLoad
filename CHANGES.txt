@@ -63,6 +63,9 @@ New features
 Bug fixes
 ~~~~~~~~~
 
+* Fix #3: FunkLoad Failures Fail on Python 2.7
+  https://github.com/nuxeo/FunkLoad/issues#issue/3
+
 * Do not block on read content when content-length is null, patch submited by Bertrand
   Yvain.
 
