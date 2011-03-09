@@ -1,4 +1,4 @@
-# (C) Copyright 2005-2010 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2011 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 # Contributors: Tom Lazar
 #
@@ -97,6 +97,9 @@ class FunkLoadTestCase(unittest.TestCase):
             self._loop_number = options.loop_number
             self._loop_recording = False
             self._loop_records = []
+        if sys.version_info >= (2, 5):
+            self.__exc_info = sys.exc_info
+
 
     def _funkload_init(self):
         """Initialize a funkload test case using a configuration file."""
@@ -792,9 +795,10 @@ class FunkLoadTestCase(unittest.TestCase):
         else:
             response_start = response_start + '>\n  <headers>'
             header_xml = []
-            for key, value in response.headers.items():
-                header_xml.append('    <header name="%s" value=%s />' % (
-                    key, quoteattr(value)))
+            if response.headers is not None:
+                for key, value in response.headers.items():
+                    header_xml.append('    <header name="%s" value=%s />' % (
+                            key, quoteattr(value)))
             headers = '\n'.join(header_xml) + '\n  </headers>'
             message = '\n'.join([
                 response_start,
@@ -911,10 +915,7 @@ class FunkLoadTestCase(unittest.TestCase):
             except KeyboardInterrupt:
                 raise
             except:
-                if sys.version_info >= (2, 5):
-                    result.addError(self, self._exc_info())
-                else:
-                    result.addError(self, self._TestCase__exc_info())
+                result.addError(self, self.__exc_info())
                 self.test_status = 'Error'
                 self._log_result(t_start, time.time())
                 return
@@ -922,28 +923,19 @@ class FunkLoadTestCase(unittest.TestCase):
                 testMethod()
                 ok = True
             except self.failureException:
-                if sys.version_info >= (2, 5):
-                    result.addFailure(self, self._exc_info())
-                else:
-                    result.addFailure(self, self._TestCase__exc_info())
+                result.addFailure(self, self.__exc_info())
                 self.test_status = 'Failure'
             except KeyboardInterrupt:
                 raise
             except:
-                if sys.version_info >= (2, 5):
-                    result.addFailure(self, self._exc_info())
-                else:
-                    result.addError(self, self._TestCase__exc_info())
+                result.addFailure(self, self.__exc_info())
                 self.test_status = 'Error'
             try:
                 self.tearDown()
             except KeyboardInterrupt:
                 raise
             except:
-                if sys.version_info >= (2, 5):
-                    result.addFailure(self, self._exc_info())
-                else:
-                    result.addError(self, self._TestCase__exc_info())
+                result.addFailure(self, self.__exc_info())
                 self.test_status = 'Error'
                 ok = False
             if ok:

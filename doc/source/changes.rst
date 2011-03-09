@@ -17,7 +17,7 @@ FunkLoad GIT master
 
 :git: https://github.com/nuxeo/FunkLoad
 
-:Target: 1.14.1
+:Target: 1.15.0
 
 
 New features
@@ -51,17 +51,21 @@ New features
     ...
     seq = xmlrpc_get_seq()
 
-
-* Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
-
 * New ``--trend`` option to the ``fl-build-report`` command. It creates a 
   trend report to display evolution of the page statistics over time.
   Here is an example of a trend report:
   http://funkload.nuxeo.org/report-example/trend-report/
 
+* Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
+
+* Documentation migrated to sphinx http://funkload.nuxeo.org/
+
 
 Bug fixes
 ~~~~~~~~~
+
+* Fix #3: FunkLoad Failures Fail on Python 2.7
+  https://github.com/nuxeo/FunkLoad/issues#issue/3
 
 * Do not block on read content when content-length is null, patch submited by Bertrand
   Yvain.
@@ -952,3 +956,5 @@ See README_ for more information about FunkLoad_.
 
 .. Local Variables:
 .. mode: rst
+.. End:
+.. vim: set filetype=rst:

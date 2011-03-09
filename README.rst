@@ -1,1 +1,1 @@
-README.txt
+doc/source/intro.rst

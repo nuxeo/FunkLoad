@@ -11,26 +11,6 @@ missing, send me an email bdelbosc _at_ nuxeo.com.
 Current target release is 1.14.0
 
 * Features
-** STARTED Switch to sphinx for documentation [15/16]	       :@current:DOC:
-   - [ ] Remove duplication of the README.txt, INSTALL.txt CHANGES.txt
-     may be link to intro.rst, installation.txt, changes.txt ?
-   http://funkload.nuxeo.org/sphinx/
-   [[./doc/sphinx/source/index.rst][index.rst]]
-   - [X] [[./doc/sphinx/source/intro.rst][intro]]
-   - [X] [[./doc/sphinx/source/screenshot.rst][screenshot]]
-   - [X] [[./doc/sphinx/source/installation.rst][installation]]
-   - [X] [[./doc/sphinx/source/tutorial.rst][tutorial]]
-   - [X] [[./doc/sphinx/source/writing-test.rst][writing-test]]
-   - [X] [[./doc/sphinx/source/benching.rst][benching]]
-   - [X] [[./doc/sphinx/source/recorder.rst][recorder]]
-   - [X] [[./doc/sphinx/source/monitoring.rst][monitoring]]
-   - [X] [[./doc/sphinx/source/credential.rst][credential]]
-   - [X] usage
-   - [X] [[./doc/sphinx/source/development.rst][development]]
-   - [X] [[./doc/sphinx/source/faq.rst][faq]]
-   - [X] [[./doc/sphinx/source/links.rst][links]]
-   - [X] [[./doc/sphinx/source/glossary.rst][glossary]]
-   - [X] [[./doc/sphinx/source/changes.rst][changes]]
 ** STARTED Trend charts
    Provide a trend chart for multiple reports
    giving apdex, pages per second and average response time trends   

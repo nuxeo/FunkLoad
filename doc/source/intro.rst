@@ -1,9 +1,7 @@
 Introduction
 ==============
 
-This is the documentation for the FunkLoad tool. 
-
-FunkLoad is a functional and load web tester, written in Python, whose
+FunkLoad_ is a functional and load web tester, written in Python, whose
 main use cases are:
 
 * Functional testing of web projects, and thus regression testing as well.
@@ -25,8 +23,6 @@ Features
 ---------
 
 Main FunkLoad_ features are:
-
-* FunkLoad_ is free software distributed under the `GNU GPL`_ license.
 
 * Functional test are pure Python scripts using the pyUnit_ framework like
   normal unit test. Python enable complex scenarios to handle real world
@@ -93,29 +89,38 @@ Main FunkLoad_ features are:
 * Successfully tested with dozen of differents web servers: PHP,
   python, Java...
 
+License
+----------
+
+FunkLoad_ is free software distributed under the `GNU GPL`_ license.
+
+\(C) Copyright 2005-2011 Nuxeo SAS (http://nuxeo.com).
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.
+
 
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _pyUnit: http://pyunit.sourceforge.net/
-.. _INSTALL: INSTALL.html
-.. _CHANGES: CHANGES.html
-.. _TODO: TODO.txt
-.. _contributors: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/THANKS
 .. _API: api/index.html
-.. _Slides: http://blogs.nuxeo.com/sections/blogs/fermigier/2005_11_17_slides-introducing
-.. _epydoc: http://epydoc.sourceforge.net/
-.. _Zope: http://www.zope.org/
-.. _Cmf: http://www.zope.org/Products/CMF/
 .. _Nuxeo: http://www.nuxeo.com/
-.. _CPS: http://www.cps-project.org/
 .. _`python cheese shop`: http://www.python.org/pypi/funkload/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
-.. _demo: http://svn.nuxeo.org/trac/pub/browser/funkload/trunk/src/funkload/demo/
-.. _report: http://funkload.nuxeo.org/report-example/
 .. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
-.. _`svn sources`: http://svn.nuxeo.org/pub/funkload/trunk/#egg=funkload-dev
-.. _trac: http://svn.nuxeo.org/trac/pub/report/12
 .. _doctest: http://docs.python.org/lib/module-doctest.html
 
 
