@@ -26,7 +26,7 @@ Current target release is 1.14.0
    - [X] [[./doc/sphinx/source/monitoring.rst][monitoring]]
    - [X] [[./doc/sphinx/source/credential.rst][credential]]
    - [X] usage
-   - [X] [[./doc/sphinx/source/development.rst][development]]
+   - [X] [[./doc/sphinx/source/development.rst][development]] Explain how to use github issue tracker
    - [X] [[./doc/sphinx/source/faq.rst][faq]]
    - [X] [[./doc/sphinx/source/links.rst][links]]
    - [X] [[./doc/sphinx/source/glossary.rst][glossary]]

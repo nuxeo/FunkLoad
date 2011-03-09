@@ -195,8 +195,9 @@ meaningless because you are mixing pages from multiple tests.
 How to modify a report ?
 --------------------------
 
-The report is in reStructuredText, the ``index.rst`` can be edited in
-text mode, to build the html version::
+The report is in `reStructuredText 
+<http://docutils.sourceforge.net/rst.html>`_, the ``index.rst`` can be
+edited in text mode, to rebuild the html version::
 
     rst2html --stylesheet=funkload.css   index.rst --traceback > index.html
 

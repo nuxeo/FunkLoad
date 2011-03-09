@@ -122,10 +122,14 @@ __________________
 Installing without sudo power
 ______________________________
 
-This can be done using buildout::
+Get the FunkLoad package from pypi:
+http://pypi.python.org/pypi/funkload/ or a snapshot from:
+http://funkload.nuxeo.org/snapshots/
 
-  tar zxf funkload-1.13.0.tar.gz
-  cd funkload-1.13.0
+Then use the buildout::
+
+  tar zxf funkload-1.14.0.tar.gz
+  cd funkload-1.14.0
   python bootstrap.py
   bin/buildout
 
@@ -142,7 +146,7 @@ directory::
   cd /tmp/fl
   wget -r -l1 -nd http://funkload.nuxeo.org/3dparty/
   
-Transfer the latest FunkLoad package.
+Transfer the latest FunkLoad package
 ::
  
   # get setuptools package and untar
