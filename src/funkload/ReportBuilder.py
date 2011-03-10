@@ -17,7 +17,7 @@
 #
 """Create an ReST or HTML report with charts from a FunkLoad bench xml result.
 
-Producing html and png chart require python-docutils and python-gdchart
+Producing html and png chart require python-docutils and gnuplot
 
 $Id: ReportBuilder.py 24737 2005-08-31 09:00:16Z bdelbosc $
 """
@@ -222,7 +222,7 @@ def main():
     parser.add_option("--no-percentiles", action="store_false",
                       dest="with_percentiles",
                       help=("No percentiles in tables display min, "
-                            "avg and max in charts (gdchart only)."))
+                            "avg and max in charts."))
     cur_path = os.path.abspath(os.path.curdir)
     parser.add_option("-d", "--diff", action="store_true",
                       default=False, dest="diffreport",

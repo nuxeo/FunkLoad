@@ -2,18 +2,12 @@
 #+TITLE: FunkLoad to do list
 #+AUTHOR: Benoit Delbosc
 
-Since 1.14 this todo list replace the deprecated trac
-(http://svn.nuxeo.org/trac/pub/report/12)
-
 If you want to report a bug or if you think that something is
-missing, send me an email bdelbosc _at_ nuxeo.com.
+missing, See the [[http://funkload.nuxeo.org/reporting.html][reporting section]].
 
-Current target release is 1.14.0
+Current target release is 1.15.0
 
 * Features
-** STARTED Trend charts
-   Provide a trend chart for multiple reports
-   giving apdex, pages per second and average response time trends   
 ** TODO Release 1.15
 ** TODO Merge monitoring refactoring in 1.16			 :@next:CORE:
    test with munin-plugins-extra, nagios-plugins
@@ -40,20 +34,20 @@ Creating html report: ...Traceback (most recent call last):
     Plugins.configure(self.monitorconfig[host])
 KeyError: u'localhost'
 #+end_ascii
-** TODO Finish funkload.metadata impl				   :@current:
+** TODO Matplotlib integration				       :@next:REPORT:
+** TODO Finish funkload.metadata impl				   :@next:
    fl-buil-report should render the funkload.metadata file if present
-** TODO Produce gplot script with commented extended options
+** TODO Produce gplot script with commented extended options   :@next:REPORT:
    - explain how to have small label on trend reports
      export GDFONTPATH=/usr/share/fonts/truetype/freefont
      set label "Some comment" at 2,51,1 rotate by 45 front font 'FreeSans,6'
    - ex of eps output
-** TODO Add unit test on request
+** TODO Add unit test on request				   :@next:QA:
    using simple file req/resp as tcpwatch + minimal fake web server.
 ** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
-** TODO Provide GC.log and csv monitoring plugin		 :@next:CORE:
-   make the same charts than logchart.
-
-** TODO Add common utils					 :@next:CORE:
+** TODO Provide csv monitoring plugin 				 :@next:CORE:
+   make the same charts than in [[http://public.dev.nuxeo.com/~ben/logchart/monitor.html][logchart]]
+** TODO Add common utils 					 :@next:CORE:
    - extractToken(buffer, start, stop, maxlen=-1)
    - getRandomLineInFile()
    - assertAndDump() dump getBody on failure

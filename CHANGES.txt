@@ -43,6 +43,10 @@ New features
     # then export as PDF C-c C-e d 
     # refer to the org-mode site for 
 
+* New ``--trend`` option to the ``fl-build-report`` command. It creates a 
+  trend report to display evolution of the page statistics over time.
+  Here is an example of a trend report:
+  http://funkload.nuxeo.org/report-example/trend-report/
 
 * Credential server can serve a sequence, using ``xmlrpc_get_seq`` tests
   can share a sequence::
@@ -51,14 +55,14 @@ New features
     ...
     seq = xmlrpc_get_seq()
 
-* New ``--trend`` option to the ``fl-build-report`` command. It creates a 
-  trend report to display evolution of the page statistics over time.
-  Here is an example of a trend report:
-  http://funkload.nuxeo.org/report-example/trend-report/
-
 * Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
 
 * Documentation migrated to sphinx http://funkload.nuxeo.org/
+
+* CPSTestCase and ZopeTestCase have been moved to the demo folder.
+
+* Removing deprecated gdchart support, now relying only on gnuplot. Note that
+  a mathplotlib support is on the TODO_ list.
 
 
 Bug fixes
@@ -904,19 +908,15 @@ FunkLoad 1.0.0
 
 ---------------------------------------------
 
-See the INSTALL_ file for requirement and installation.
-
-See README_ for more information about FunkLoad_.
+More information on the FunkLoad_ site.
 
 
 
 .. _FunkLoad: http://funkload.nuxeo.org/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
-.. _README: README.html
-.. _INSTALL: INSTALL.html
 .. _API: api/index.html
-.. _TODO: TODO.txt
+.. _TODO: https://github.com/nuxeo/FunkLoad/blob/master/TODO.txt
 .. _org-mode: http://orgmode.org/
 .. _epydoc: http://epydoc.sourceforge.net/
 .. _cheesecake: http://tracos.org/cheesecake/

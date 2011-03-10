@@ -30,96 +30,7 @@ setup(
     name="funkload",
     version=__version__,
     description="Functional and load web tester.",
-    long_description="""\
-FunkLoad is a functional and load web tester, written in Python, whose
-main use cases are:
-
-* Functional testing of web projects, and thus regression testing as well.
-
-* Performance testing: by loading the web application and monitoring
-  your servers it helps you to pinpoint bottlenecks, giving a detailed
-  report of performance measurement.
-
-* Load testing tool to expose bugs that do not surface in cursory testing,
-  like volume testing or longevity testing.
-
-* Stress testing tool to overwhelm the web application resources and test
-  the application recoverability.
-
-* Writing web agents by scripting any web repetitive task, like checking if
-  a site is alive.
-
-
-Main FunkLoad features are:
-
-* FunkLoad is free software distributed under the `GNU GPL`_.
-
-* Functional test are pure Python scripts using the pyUnit framework like
-  normal unit test. Python enable complex scenarios to handle real world
-  applications.
-
-* Truly emulates a web browser (single-threaded) using Richard Jones'
-  webunit_:
-
-  - basic authentication support
-  - cookies support
-  - referrer support
-  - fetching css, javascript and images
-  - emulating a browser cache
-  - file upload and multipart/form-data submission
-  - post any kind of content type like ``application/xml``
-  - https support
-  - http_proxy support
-
-* Advanced test runner with many command-line options:
-
-  - set the target server url
-  - display the fetched page in real time in your browser
-  - debug mode
-  - check performance of a single page (or set of pages) inside a test
-  - green/red color mode
-  - select or exclude tests cases using a regex
-  - support normal pyUnit test
-  - support doctest from a plain text file or embedded in python docstring
-
-* Turn a functional test into a load test: just by invoking the bench
-  runner you can identify scalability and performance problems. If
-  needed the bench can distributed over a group of worker machines.
-
-* Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
-  containing:
-
-  - the bench configuration
-  - tests, pages, requests stats and charts.
-  - the 5 slowest requests.
-  - monitoring one or many servers cpu usage, load average, memory/swap
-    usage and network traffic charts.
-  - an http error summary list
-
-  View a `report example <http://funkload.nuxeo.org/report-example/test_seam_java6/>`.
-
-* Differential reports to compare 2 bench reports giving a quick overview of
-  scalability and velocity changes.
-  View a `diff report example <http://funkload.nuxeo.org/report-example/diff_seam_java_6_vs_5/>`.
-
-* Easy test customization using a configuration file or command line options.
-
-* Easy test creation using embeded TCPWatch as proxy recorder, so you can
-  use your web browser and produce a FunkLoad test automatically, including
-  file upload or any ajax call.
-
-* Provides web assertion helpers to check expected results in responses.
-
-* Provides helpers to retrieve contents in responses page using DOM.
-
-* Provides a funkload.CPSTestCase to ease Zope and Nuxeo CPS testing.
-
-* Easy to install (EasyInstall_) and use, see examples in the demo folder.
-
-* Works fine with CPS or any Zope application, CherryPy, Nuxeo EP or any
-  JBoss Seam JSF MyFaces applications ...
-
-""",
+    long_description=''.join(open('README.txt').readlines()),
     author="Benoit Delbosc",
     author_email="bdelbosc@nuxeo.com",
     url="http://funkload.nuxeo.org/",
@@ -155,7 +66,7 @@ Main FunkLoad features are:
     zip_safe=True,
     package_data={'funkload': ['data/*',
                                'demo/simple/*', 'demo/zope/*',
-                               'demo/cmf/*', 'demo/xmlrpc/*',
+                               'demo/cmf/*', 'demo/xmlrpc/*', 'demo/cps/*',
                                'demo/seam-booking-1.1.5/*', 'demo/*.txt',
                                'tests/*',]},
     entry_points = {

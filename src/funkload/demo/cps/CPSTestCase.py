@@ -20,7 +20,3 @@
 $Id: CPSTestCase.py 24728 2005-08-31 08:13:54Z bdelbosc $
 """
 from CPS340TestCase import CPSTestCase
-import warnings
-warnings.warn('CPSTestCase is deprecated and will be removed '
-              'in 1.15, The test case is going to move to the CPS source '
-              'more information soon on the http://cps-cms.org/ CPS site')
