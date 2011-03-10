@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2011 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
 # Contributors: Tom Lazar, Ross Patterson
 #
@@ -24,7 +24,7 @@
 import ez_setup
 ez_setup.use_setuptools()
 from setuptools import setup, find_packages
-__version__ = '1.14.1'
+__version__ = '1.15.0'
 
 setup(
     name="funkload",
