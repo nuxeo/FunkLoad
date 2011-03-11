@@ -16,20 +16,19 @@ main use cases are:
 * Stress testing tool to overwhelm the web application resources and test
   the application recoverability.
 
-* Writing web agents by scripting any web repetitive task, like checking if
-  a site is alive.
+* Writing web agents by scripting any web repetitive task.
 
 Features
 ---------
 
 Main FunkLoad_ features are:
 
-* Functional test are pure Python scripts using the pyUnit_ framework like
-  normal unit test. Python enable complex scenarios to handle real world
-  applications.
+* Functional test are pure Python scripts using the pyUnit_ framework
+  like normal unit test. Python enable complex scenarios to handle
+  real world applications.
 
-* Truly emulates a web browser (single-threaded) using an enhanced Richard
-  Jones' webunit_:
+* Truly emulates a web browser (single-threaded) using an enhanced
+  Richard Jones' webunit_:
 
   - get/post/put/delete support
   - post any kind of content type like ``application/xml``
@@ -53,30 +52,35 @@ Main FunkLoad_ features are:
   - green/red color mode
   - select or exclude tests cases using a regex
   - support normal pyUnit_ test
-  - support doctest_ from a plain text file or embedded in python docstring
+  - support doctest_ from a plain text file or embedded in python
+    docstring
 
 * Turn a functional test into a load test: just by invoking the bench
   runner you can identify scalability and performance problems. If
   needed the bench can distributed over a group of worker machines.
 
-* Detailed bench reports in ReST or HTML (and PDF via ps2pdf)
-  containing:
+* Detailed bench reports in ReST, HTML, Org-mode_, PDF (using
+  LaTeX/PDF Org-mode export) containing:
 
   - the bench configuration
-  - tests, pages, requests stats and charts.
-  - the requets that took the most time.
-  - monitoring one or many servers cpu usage, load average, memory/swap
-    usage and network traffic charts.
+  - tests, pages, requests stats and charts
+  - the requets that took the most time
+  - monitoring one or many servers cpu usage, load average,
+    memory/swap usage and network traffic charts
   - an http error summary list
 
-* Differential reports to compare 2 bench reports giving a quick overview of
-  scalability and velocity changes.
+* Differential reports to compare 2 bench reports giving a quick
+  overview of scalability and velocity changes.
 
-* Easy test customization using a configuration file or command line options.
+* Trend reports to view the performance evolution with multiple
+  reports.
 
-* Easy test creation using embeded TCPWatch_ as proxy recorder, so you can
-  use your web browser and produce a FunkLoad_ test automatically, including
-  file upload or any ajax call.
+* Easy test customization using a configuration file or command line
+  options.
+
+* Easy test creation using embeded TCPWatch_ as proxy recorder, so you
+  can use your web browser and produce a FunkLoad_ test automatically,
+  including file upload or any ajax call.
 
 * Provides web assertion helpers to check expected results in responses.
 
@@ -113,6 +117,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 
 .. _FunkLoad: http://funkload.nuxeo.org/
+.. _Org-mode: http://orgmode.org/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _webunit: http://mechanicalcat.net/tech/webunit/
 .. _pyUnit: http://pyunit.sourceforge.net/
@@ -120,7 +125,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 .. _Nuxeo: http://www.nuxeo.com/
 .. _`python cheese shop`: http://www.python.org/pypi/funkload/
 .. _EasyInstall: http://peak.telecommunity.com/DevCenter/EasyInstall
-.. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html
+.. _`GNU GPL`: http://www.gnu.org/licenses/licenses.html#GPL
 .. _doctest: http://docs.python.org/lib/module-doctest.html
 .. _demo: https://github.com/nuxeo/FunkLoad/tree/master/src/funkload/demo/
 

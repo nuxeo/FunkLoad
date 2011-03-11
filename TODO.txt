@@ -8,7 +8,6 @@ missing, See the [[http://funkload.nuxeo.org/reporting.html][reporting section]]
 Current target release is 1.15.0
 
 * Features
-** TODO Release 1.15
 ** TODO Merge monitoring refactoring in 1.16			 :@next:CORE:
    test with munin-plugins-extra, nagios-plugins
 *** TODO Fix tb when running fl-build-report on old result file
@@ -35,7 +34,15 @@ Creating html report: ...Traceback (most recent call last):
 KeyError: u'localhost'
 #+end_ascii
 ** TODO Matplotlib integration				       :@next:REPORT:
-** TODO Finish funkload.metadata impl				   :@next:
+** TODO Add a param to join to next request action		 :@next:CORE:
+   Joining distinct requests into a single page/action:
+   
+   self.get(url, description="foo", join_with_next_req=True)
+   self.get(url2)
+
+   url2 is reported as being on the same page as url, there is no
+   thinktime pause between the 2 requests.
+** TODO Finish funkload.metadata impl				      :@next:
    fl-buil-report should render the funkload.metadata file if present
 ** TODO Produce gplot script with commented extended options   :@next:REPORT:
    - explain how to have small label on trend reports
@@ -51,25 +58,6 @@ KeyError: u'localhost'
    - extractToken(buffer, start, stop, maxlen=-1)
    - getRandomLineInFile()
    - assertAndDump() dump getBody on failure
-** TODO Add a param to join to next request action		 :@next:CORE:
-   Joining distinct requests into a single page/action:
-   
-   self.get(url, description="foo", join_with_next_req=True)
-   self.get(url2)
-
-   url2 is reported as being on the same page as url, there is no
-   thinktime pause between the 2 requests.
-** TODO Generate a shinx documentation PDF			  :@next:DOC:
-   Fix the sphinx documentation PDF export: make latex + pdflatex
-   generate a PDF with errors on the toc.
-** TODO Remove CPSTestCase from FunkLoad sources		 :@next:CORE:
-   Added: [2010-12-27 lun. 18:28]
-   - [X] Mark it as deprecated on 1.14
-   - [ ] remove on 1.15
-   - [ ] Keep it as a demo, add link to migrated script on the CPS repo.
-** TODO Remove GDchart support					 :@next:CORE:
-   - [X] Mark it as deprecated on 1.14
-   - [ ] remove on 1.15
 ** TODO Improve report failure section			       :@next:REPORT:
    Add an error section with:
    - http failure:
@@ -87,7 +75,6 @@ KeyError: u'localhost'
    Added: [2010-11-18 jeu. 14:23
 ** TODO Produce valid xml test result			       :@next:REPORT:
    the root element is missing
-
 * org-mode configuration
 
 

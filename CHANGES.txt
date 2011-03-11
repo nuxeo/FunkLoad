@@ -17,22 +17,32 @@ FunkLoad GIT master
 
 :git: https://github.com/nuxeo/FunkLoad
 
-:Target: 1.15.0
+:Target: 1.16.0
+
+
+FunkLoad 1.15.0
+------------------
+
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.15.0.tar.gz
+
+:github: https://github.com/nuxeo/FunkLoad/tree/1.15.0
+
+:Released date: 2011-03-11
 
 
 New features
 ~~~~~~~~~~~~~
 
-* Now supporting emacs org-mode_ text format as report output. This
-  enable to edit a report as plain text and produce professional PDF
-  reports througth the org-mode_ LaTeX export.
+* Now supporting emacs Org-mode_ text format as report output. This
+  enable to edit a report as plain text and to produce professional
+  PDF reports througth the Org-mode_ LaTeX export.
 
-  Here is an example of a `PDF
+  Here is an example of a `PDF 
   <http://funkload.nuxeo.org/report-example/test_seam_java6.pdf>`_ and
-  an `org-mode report
+  an `Org-mode report 
   <http://funkload.nuxeo.org/report-example/test_seam_java6.org>`_.
 
-  The org file requires to build the html report first::
+  You need to build the HTML report first::
   
     fl-build-report --html funkload.xml
     Creating html report: ...done: 
@@ -41,23 +51,27 @@ New features
     fl-build-report --org funkload.xml > /tmp/test_foo-20110304T160328/index.org
     emacs /tmp/test_foo-20110304T160328/index.org
     # then export as PDF C-c C-e d 
-    # refer to the org-mode site for 
+    # refer to the org-mode site for latex exports requirements
 
-* New ``--trend`` option to the ``fl-build-report`` command. It creates a 
-  trend report to display evolution of the page statistics over time.
-  Here is an example of a trend report:
-  http://funkload.nuxeo.org/report-example/trend-report/
+* New `trend report
+  <http://funkload.nuxeo.org/report-example/trend-report/>`_ to
+  display evolution of performances over time. Just use the
+  ``--trend`` option of the ``fl-build-report`` command.
 
-* Credential server can serve a sequence, using ``xmlrpc_get_seq`` tests
-  can share a sequence::
+* The credential server can serve a sequence. Using ``xmlrpc_get_seq``
+  threads can share a sequence::
 
     from funkload.utils import xmlrpc_get_seq
     ...
     seq = xmlrpc_get_seq()
 
-* Source migrated to git in gigthub https://github.com/nuxeo/FunkLoad
+* Source migrated from svn to git, hosted in gigthub
+  https://github.com/nuxeo/FunkLoad
 
-* Documentation migrated to sphinx http://funkload.nuxeo.org/
+* But tracker moving to github:
+  https://github.com/nuxeo/FunkLoad/issues
+
+* New site and documentation using sphinx: http://funkload.nuxeo.org/
 
 * CPSTestCase and ZopeTestCase have been moved to the demo folder.
 
@@ -71,8 +85,8 @@ Bug fixes
 * Fix #3: FunkLoad Failures Fail on Python 2.7
   https://github.com/nuxeo/FunkLoad/issues#issue/3
 
-* Do not block on read content when content-length is null, patch submited by Bertrand
-  Yvain.
+* Do not block on read content when content-length is null, patch
+  submited by Bertrand Yvain.
 
 * Fix monitoring network monitoring charts.
 
@@ -121,7 +135,7 @@ New features
   A typical usage is to add metadata during setUpBench or
   tearDownBench hooks.
 
-* Handling FunkLoad todo list with an org-mode_ file TODO_, replacing 
+* Handling FunkLoad todo list with an Org-mode_ file TODO_, replacing 
   the old trac.
 
 * Mark CPSTestCase as deprecated will be removed in 1.15.
@@ -917,7 +931,7 @@ More information on the FunkLoad_ site.
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
 .. _API: api/index.html
 .. _TODO: https://github.com/nuxeo/FunkLoad/blob/master/TODO.txt
-.. _org-mode: http://orgmode.org/
+.. _Org-mode: http://orgmode.org/
 .. _epydoc: http://epydoc.sourceforge.net/
 .. _cheesecake: http://tracos.org/cheesecake/
 .. _933: http://svn.nuxeo.org/trac/pub/ticket/933
@@ -952,7 +966,6 @@ More information on the FunkLoad_ site.
 .. _1837: http://svn.nuxeo.org/trac/pub/ticket/1837
 .. _1838: http://svn.nuxeo.org/trac/pub/ticket/1837
 .. _Plone: http://plone.org/
-.. _org-mode: http://orgmode.org/
 
 .. Local Variables:
 .. mode: rst
