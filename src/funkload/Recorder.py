@@ -144,7 +144,7 @@ class Response:
 
 class RecorderProgram:
     """A tcpwatch to funkload recorder."""
-    tcpwatch_cmd = ['tcpwatch-httpproxy', 'tcpwatch.py']
+    tcpwatch_cmd = ['tcpwatch-httpproxy', 'tcpwatch.py', 'tcpwatch']
     MYFACES_STATE = 'org.apache.myfaces.trinidad.faces.STATE'
     MYFACES_FORM = 'org.apache.myfaces.trinidad.faces.FORM'
     USAGE = """%prog [options] [test_name]
