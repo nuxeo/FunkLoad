@@ -23,7 +23,9 @@ New Features
 ~~~~~~~~~~~~~~
 
 * GH-5: ``fl-record`` now checks for ``tcpwatch`` command in addition to
-  ``tcpwatch.py`` and ``tcpwatch-httpproxy``
+  ``tcpwatch.py`` and ``tcpwatch-httpproxy``.
+
+* GH-6: Filter out .swfs when building funkload tests with ``fl-record``.
 
 FunkLoad 1.15.0
 ------------------

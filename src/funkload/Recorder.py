@@ -274,8 +274,8 @@ Examples
     def extractRequests(self, files):
         """Filter and extract request from tcpwatch files."""
         last_code = None
-        filter_ctypes = ('image', 'css', 'javascript')
-        filter_url = ('.jpg', '.png', '.gif', '.css', '.js')
+        filter_ctypes = ('image', 'css', 'javascript', 'x-shockwave-flash')
+        filter_url = ('.jpg', '.png', '.gif', '.css', '.js', '.swf')
         requests = []
         for request_path, response_path in files:
             response = Response(response_path)
