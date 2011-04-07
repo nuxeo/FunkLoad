@@ -24,7 +24,7 @@
 import ez_setup
 ez_setup.use_setuptools()
 from setuptools import setup, find_packages
-__version__ = '1.15.0'
+__version__ = '1.16.0'
 
 setup(
     name="funkload",
