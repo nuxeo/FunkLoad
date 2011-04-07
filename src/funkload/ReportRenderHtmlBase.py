@@ -22,7 +22,7 @@ $Id$
 """
 import os
 from shutil import copyfile
-from ReportRenderRst import RenderRst
+from ReportRenderRst import RenderRst, rst_title
 
 
 class RenderHtmlBase(RenderRst):
@@ -33,8 +33,8 @@ class RenderHtmlBase(RenderRst):
     chart_size = (350, 250)
     big_chart_size = (640, 480)
 
-    def __init__(self, config, stats, error, monitor, options, css_file=None):
-        RenderRst.__init__(self, config, stats, error, monitor, options)
+    def __init__(self, config, stats, error, monitor, monitorconfig, options, css_file=None):
+        RenderRst.__init__(self, config, stats, error, monitor, monitorconfig, options)
         self.css_file = css_file
         self.report_dir = self.css_path = self.rst_path = self.html_path = None
 
@@ -140,12 +140,22 @@ class RenderHtmlBase(RenderRst):
 
     def createCharts(self):
         """Create all charts."""
-        self.createMonitorCharts()
         self.createTestChart()
         self.createPageChart()
         self.createAllResponseChart()
         for step_name in self.steps:
             self.createResponseChart(step_name)
+
+    # monitoring charts
+    def createMonitorCharts(self):
+        """Create all montirored server charts."""
+        if not self.monitor or not self.with_chart:
+            return
+        self.append(rst_title("Monitored hosts", 2))
+        charts={}
+        for host in self.monitor.keys():
+            charts[host]=self.createMonitorChart(host)
+        return charts
 
     def createTestChart(self):
         """Create the test chart."""
@@ -158,9 +168,6 @@ class RenderHtmlBase(RenderRst):
 
     def createResponseChart(self, step):
         """Create responses chart."""
-
-    def createMonitorCharts(self):
-        """Create all montirored server charts."""
 
     def createMonitorChart(self, host):
         """Create monitrored server charts."""

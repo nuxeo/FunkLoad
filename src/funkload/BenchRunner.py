@@ -57,7 +57,7 @@ import traceback
 import threading
 from socket import error as SocketError
 from thread import error as ThreadError
-from xmlrpclib import ServerProxy
+from xmlrpclib import ServerProxy, Fault
 import unittest
 from optparse import OptionParser, TitledHelpFormatter
 
@@ -262,6 +262,7 @@ class BenchRunner:
         trace("* setUpBench hook: ...")
         self.test.setUpBench()
         trace(' done.\n\n')
+        self.getMonitorsConfig()
         for cvus in self.cycles:
             t_start = time.time()
             reset_cycle_results()
@@ -447,6 +448,30 @@ class BenchRunner:
             trace('-' * 72 + '\n')
             trace(stack + '\n')
 
+    def getMonitorsConfig(self):
+        """ Get monitors configuration from hosts """
+        if not self.monitor_hosts:
+            return
+        monitor_hosts = []
+        for (host, port, desc) in self.monitor_hosts:
+            trace("* Getting monitoring config from %s: ..." % host)
+            server = ServerProxy("http://%s:%s" % (host, port))
+            try:
+                config=server.getMonitorsConfig()
+                data=[]
+                for key in config.keys():
+                    xml='<monitorconfig host="%s" key="%s" value="%s" />' % (host, key, config[key])
+                    data.append(xml)
+                self.logr("\n".join(data))
+            except Fault:
+                trace(' not supported.\n')
+                monitor_hosts.append((host, port, desc))
+            except SocketError:
+                trace(' failed, server is down.\n')
+            else:
+                trace(' done.\n')
+                monitor_hosts.append((host, port, desc))
+        self.monitor_hosts = monitor_hosts
 
     def startMonitors(self, monitor_key):
         """Start monitoring on hosts list."""

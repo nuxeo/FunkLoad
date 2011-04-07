@@ -8,31 +8,6 @@ missing, See the [[http://funkload.nuxeo.org/reporting.html][reporting section]]
 Current target release is 1.15.0
 
 * Features
-** TODO Merge monitoring refactoring in 1.16			 :@next:CORE:
-   test with munin-plugins-extra, nagios-plugins
-*** TODO Fix tb when running fl-build-report on old result file
-    building a report with 1.14.1a:
-#+begin_ascii
-$ fl-build-report --html funkload.xml 
-Creating html report: ...Traceback (most recent call last):
-  File "/usr/local/bin/fl-build-report", line 9, in <module>
-    load_entry_point('funkload==1.14.1', 'console_scripts', 'fl-build-report')()
-  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportBuilder.py", line 272, in main
-    xml_parser.monitorconfig, options)()
-  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlBase.py", line 126, in render
-    self.createRstFile()
-  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlBase.py", line 85, in createRstFile
-    f.write(str(self))
-  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderRst.py", line 641, in __repr__
-    self.renderMonitors()
-  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderRst.py", line 474, in renderMonitors
-    charts=self.createMonitorCharts()
-  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlBase.py", line 157, in createMonitorCharts
-    charts[host]=self.createMonitorChart(host)
-  File "/usr/local/lib/python2.6/dist-packages/funkload-1.14.1-py2.6.egg/funkload/ReportRenderHtmlGnuPlot.py", line 500, in createMonitorChart
-    Plugins.configure(self.monitorconfig[host])
-KeyError: u'localhost'
-#+end_ascii
 ** TODO Matplotlib integration				       :@next:REPORT:
 ** TODO Add a param to join to next request action		 :@next:CORE:
    Joining distinct requests into a single page/action:

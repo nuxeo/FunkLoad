@@ -77,7 +77,15 @@ setup(
             'fl-run-test = funkload.TestRunner:main',
             'fl-build-report = funkload.ReportBuilder:main',
             'fl-install-demo = funkload.DemoInstaller:main',
-            'fl-record = funkload.Recorder:main']},
+            'fl-record = funkload.Recorder:main'],
+        'funkload.plugins.monitor' : [
+            'CUs = funkload.MonitorPluginsDefault:MonitorCUs',
+            'MemFree = funkload.MonitorPluginsDefault:MonitorMemFree',
+            'CPU = funkload.MonitorPluginsDefault:MonitorCPU',
+            'Network = funkload.MonitorPluginsDefault:MonitorNetwork',
+        ]
+    },
+
     # this test suite works only on an installed version :(
     # test_suite = "funkload.tests.test_Install.test_suite",
     )

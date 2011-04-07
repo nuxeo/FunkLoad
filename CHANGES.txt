@@ -22,6 +22,8 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* New monitoring plugins contirbution from Krzysztof A. Adamski.
+
 * GH-5: ``fl-record`` now checks for ``tcpwatch`` command in addition to
   ``tcpwatch.py`` and ``tcpwatch-httpproxy``.
 

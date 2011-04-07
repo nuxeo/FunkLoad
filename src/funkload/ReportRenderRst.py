@@ -229,11 +229,12 @@ class RenderRst:
     # number of slowest requests to display
     slowest_items = 5
 
-    def __init__(self, config, stats, error, monitor, options):
+    def __init__(self, config, stats, error, monitor, monitorconfig, options):
         self.config = config
         self.stats = stats
         self.error = error
         self.monitor = monitor
+        self.monitorconfig = monitorconfig
         self.options = options
         self.rst = []
 
@@ -471,21 +472,28 @@ class RenderRst:
             self.append('')
             self.renderCyclesStepStat(step_name)
 
+
+    def createMonitorCharts(self):
+        pass
+
     def renderMonitors(self):
         """Render all monitored hosts."""
         if not self.monitor or not self.with_chart:
             return
-        self.append(rst_title("Monitored hosts", 2))
-        for host in self.monitor.keys():
-            self.renderMonitor(host)
+        charts=self.createMonitorCharts()
+        if charts == None:
+            return
+        for host in charts.keys():
+            self.renderMonitor(host, charts[host])
 
-    def renderMonitor(self, host):
+
+    def renderMonitor(self, host, charts):
         """Render a monitored host."""
         description = self.config.get(host, '')
-        self.append(rst_title("%s: %s" % (host, description), 3))
-        self.append("**Load average**\n\n.. image:: %s_load.png\n" % host)
-        self.append("**Memory usage**\n\n.. image:: %s_mem.png\n" % host)
-        self.append("**Network traffic**\n\n.. image:: %s_net.png\n" % host)
+        if len(charts)>0:
+            self.append(rst_title("%s: %s" % (host, description), 3))
+        for chart in charts:
+            self.append("**%s**\n\n.. image:: %s\n" % (chart[0], chart[1]))
 
     def renderSlowestRequests(self, number):
         """Render the n slowest requests of the best cycle."""

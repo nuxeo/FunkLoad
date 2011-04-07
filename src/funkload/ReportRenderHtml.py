@@ -17,7 +17,7 @@
 #
 """Choose the best html rendering
 
-$Id$
+$Id: ReportRenderHtml.py 53544 2009-03-09 16:28:58Z tlazar $
 """
 
 try:

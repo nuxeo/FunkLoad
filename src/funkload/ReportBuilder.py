@@ -92,6 +92,7 @@ class FunkLoadXmlParser:
         self.cycle_duration = 0
         self.stats = {}                 # cycle stats
         self.monitor = {}               # monitoring stats
+        self.monitorconfig = {}         # monitoring config
         self.config = {}
         self.error = {}
 
@@ -182,6 +183,10 @@ class FunkLoadXmlParser:
             host = attrs.get('host')
             stats = self.monitor.setdefault(host, [])
             stats.append(MonitorStat(attrs))
+        elif name =='monitorconfig':
+            host = attrs.get('host')
+            config = self.monitorconfig.setdefault(host, {})
+            config[attrs.get('key')]=attrs.get('value')
 
 
     def handleStartCdataSection(self):
@@ -280,7 +285,7 @@ def main():
             trace("Creating html report: ...")
             html_path = RenderHtml(xml_parser.config, xml_parser.stats,
                                    xml_parser.error, xml_parser.monitor,
-                                   options)()
+                                   xml_parser.monitorconfig, options)()
             trace("done: \n")
             trace(html_path + "\n")
         elif options.org:
@@ -291,7 +296,7 @@ def main():
         else:
             print str(RenderRst(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
-                                options))
+                                xml_parser.monitorconfig, options))
 
 
 if __name__ == '__main__':
