@@ -68,7 +68,7 @@ New features
 * Source migrated from svn to git, hosted in gigthub
   https://github.com/nuxeo/FunkLoad
 
-* But tracker moving to github:
+* Bug tracker moving to github:
   https://github.com/nuxeo/FunkLoad/issues
 
 * New site and documentation using sphinx: http://funkload.nuxeo.org/

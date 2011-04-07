@@ -290,6 +290,15 @@ to write test like this::
                .createFile('My file', 'Test file', 'foo.pdf')
                .getRootWorkspaces().deleteItem("My workspace")
                .logout())
-     
+
+
+How to receive release announcement ?
+---------------------------------------
+
+Subscribe to the freshmeat project:
+http://freshmeat.net/projects/funkload
+
+
+
 
 .. _org-mode: http://orgmode.org/
