@@ -353,9 +353,11 @@ class DistributionMgr(threading.Thread):
 
         threads = []
         trace("* Preparing sandboxes for %d workers." % len(self._workers))
+        print self.python_bin
         for worker in list(self._workers):
             if not worker.connected:
                 if allow_errors:
+                    trace("%s is not connected, removing from pool.\n" % worker.host)
                     self._workers.remove(worker)
                     continue
                 else:
@@ -373,6 +375,8 @@ class DistributionMgr(threading.Thread):
                     args=(worker,)
                 ))
             elif allow_errors:
+                trace("Cannot find Python binary at path `%s` on %s, removing from pool" %
+                    (self.python_bin, worker.host))
                 self._workers.remove(worker)
             else:
                 raise RuntimeError("%s is not contactable with error %s" % (
