@@ -218,7 +218,11 @@ class DistributionMgr(threading.Thread):
         self.threads = []  # Contains list of ThreadData objects
         self.last_thread_id = -1
         self.thread_creation_lock = threading.Lock()
-        self.python_bin = test.conf_get('distribute', 'python_bin', 'python')
+
+        if options.python_bin:
+            self.python_bin = options.python_bin
+        else:
+            self.python_bin = test.conf_get('distribute', 'python_bin', 'python')
 
         try:
             desc = getattr(test, self.method_name).__doc__.strip()

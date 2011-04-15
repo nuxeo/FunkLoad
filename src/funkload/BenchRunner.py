@@ -636,6 +636,9 @@ def main():
     parser.add_option("","--distribute-workers", type="string", dest="workerlist",
                       help="This parameter will  over-ride the list of workers defined "
                       "in the config file. expected notation is uname@host,uname:pwd@host or just host...") 
+    parser.add_option("--distribute-python", type="string", dest="python_bin",
+                      help="When running in distributed mode, this Python "
+                           "binary will be used across all hosts.")
     parser.add_option("","--is-distributed", action="store_true", dest="is_distributed",
                       help="This parameter is for internal use only. it signals to a "
                       "worker node that it is in distributed mode and shouldn't "
