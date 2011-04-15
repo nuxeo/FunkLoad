@@ -213,6 +213,7 @@ class DistributionMgr(threading.Thread):
         self.threads = []  # Contains list of ThreadData objects
         self.last_thread_id = -1
         self.thread_creation_lock = threading.Lock()
+        self.python_bin = test.conf_get('distribute', 'python_bin', 'python')
         try:    
             desc = getattr(test,self.method_name).__doc__.strip()
         except:
@@ -298,49 +299,60 @@ class DistributionMgr(threading.Thread):
         """
         # right, lets figure out if funkload can be setup on each host
         
-        def local_prep_worker ( worker ):
-            virtual_env = os.path.join( self.remote_res_dir , self.tarred_testsdir )
+        def local_prep_worker(worker):
+            virtual_env = os.path.join(
+                self.remote_res_dir , self.tarred_testsdir)
+
+            if worker.isdir(virtual_env):
+                worker.execute("rmdir -rf %s" % virtual_env)
             
-            if worker.isdir(  virtual_env ):
-                worker.execute ( "rmdir -rf %s" % virtual_env )
-            
-            worker.execute ( "mkdir -p %s" % virtual_env )
-            worker.put ( get_virtualenv_script(),
-                         os.path.join( self.remote_res_dir,
-                         "virtualenv.py") )
+            worker.execute("mkdir -p %s" % virtual_env)
+            worker.put(
+                get_virtualenv_script(),
+                os.path.join(self.remote_res_dir, "virtualenv.py"))
+
             trace(".")
-            worker.execute( "python virtualenv.py %s" %\
-                    self.tarred_testsdir,
-                    cwdir = self.remote_res_dir )
+            worker.execute(
+                "%s virtualenv.py %s" % (self.python_bin, self.tarred_testsdir),
+                cwdir=self.remote_res_dir)
 
             tarball = os.path.split(self.tarred_tests)[1]
-            remote_tarball = os.path.join( self.remote_res_dir,\
-                                           tarball)
+            remote_tarball = os.path.join(self.remote_res_dir, tarball)
 
             # setup funkload
-            worker.execute("./bin/easy_install %s" % self.funkload_location,
-                    cwdir = virtual_env)
+            print worker.execute(
+                    "./bin/easy_install setuptools ez_setup %s" % self.funkload_location,
+                    cwdir=virtual_env)
             
             #unpackage tests.
-            worker.put( self.tarred_tests, os.path.join(self.remote_res_dir , tarball))
-            worker.execute( "tar -xvf %s" %(tarball), cwdir = self.remote_res_dir)
+            worker.put(
+                self.tarred_tests, os.path.join(self.remote_res_dir , tarball))
+            worker.execute(
+                "tar -xvf %s" % tarball,
+                cwdir = self.remote_res_dir)
             worker.execute("rm %s" % remote_tarball)
 
 
         threads = []
         trace ("* Preparing sandboxes for %d workers." % len(self._workers))
         for worker in list(self._workers):
-            if worker.connected:
-                which_python = worker.execute ( "which python")
-                if not which_python and not allow_errors:
-                    raise RuntimeError("%s doesn't have python" % worker.host)
-                elif not which_python:
-                    self._workers.remove( worker )
+            if not worker.connected:
+                if allow_errors:
+                    self._workers.remove(worker)
+                    continue
                 else:
-                    # python was found lets see if we need to install funkload
-                    
-                    threads.append ( threading.Thread( target=local_prep_worker,
-                                 args = (worker,)) ) 
+                    raise RuntimeError(
+                        "%s is not contactable with error %s" % (worker.host, worker.error))
+
+            # Verify that the Python binary is available
+            which_python = "test -x `which %s 2>&1 > /dev/null` && echo true" % (self.python_bin)
+            out, err = worker.execute(which_python)
+
+            if out.strip() == "true":
+                threads.append(threading.Thread(
+                    target=local_prep_worker,
+                    args=(worker,)
+                ))
             elif allow_errors:
                 self._workers.remove( worker )
             else:
@@ -362,9 +374,10 @@ class DistributionMgr(threading.Thread):
         threads = []
         trace ("* Starting %d workers" % len(self._workers))
         for worker in self._workers:
-            venv = os.path.join( self.remote_res_dir, self.tarred_testsdir )
-            obj = worker.threaded_execute('./bin/fl-run-bench %s' %\
-                    self.cmd_args , cwdir = venv )
+            venv = os.path.join(self.remote_res_dir, self.tarred_testsdir)
+            obj = worker.threaded_execute(
+                'bin/fl-run-bench %s' % self.cmd_args,
+                cwdir=venv)
             trace(".")
             threads.append ( obj )
         trace("\n")
