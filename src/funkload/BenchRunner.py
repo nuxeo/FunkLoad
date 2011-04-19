@@ -22,6 +22,26 @@
 
 $Id: BenchRunner.py 24746 2005-08-31 09:59:27Z bdelbosc $
 """
+import logging
+import os
+import platform
+import sys
+import threading
+import time
+import traceback
+import unittest
+from datetime import datetime
+from optparse import OptionParser, TitledHelpFormatter
+from socket import error as SocketError
+from thread import error as ThreadError
+from xmlrpclib import ServerProxy, Fault
+
+from FunkLoadHTTPServer import FunkLoadHTTPServer
+from utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
+                  trace, red_str, green_str, get_version
+
+
+log = logging.getLogger(__name__)
 
 USAGE = """%prog [options] file class.method
 
@@ -48,24 +68,7 @@ try:
     psyco.full()
 except ImportError:
     pass
-import os
-import sys
-import platform
-import time
-from datetime import datetime
-import traceback
-import threading
-from socket import error as SocketError
-from thread import error as ThreadError
-from xmlrpclib import ServerProxy, Fault
-import unittest
-from optparse import OptionParser, TitledHelpFormatter
 
-from utils import mmn_encode, set_recording_flag, recording
-from utils import thread_sleep, trace, red_str, green_str
-from utils import get_version
-from FunkLoadHTTPServer import FunkLoadHTTPRequestHandler
-from FunkLoadHTTPServer import FunkLoadHTTPServer
 
 # ------------------------------------------------------------
 # utils
@@ -73,6 +76,7 @@ from FunkLoadHTTPServer import FunkLoadHTTPServer
 g_failures = 0                      # result of the bench
 g_errors = 0                        # result of the bench
 g_success = 0
+
 
 def add_cycle_result(status):
     """Count number of result."""
@@ -86,10 +90,12 @@ def add_cycle_result(status):
     else:
         g_failures += 1
 
+
 def get_cycle_results():
     """Return counters."""
     global g_success, g_failures, g_errors
     return g_success, g_failures, g_errors
+
 
 def get_status(success, failures, errors, color=False):
     """Return a status and an exit code."""
@@ -125,7 +131,9 @@ def load_unittest(test_module, test_class, test_name, options):
 
 
 class ThreadSignaller:
-    """A simple class to signal whether a thread should continue running or stop."""
+    """
+    A simple class to signal whether a thread should continue running or stop.
+    """
     def __init__(self):
         self.keep_running = True
 
@@ -134,6 +142,7 @@ class ThreadSignaller:
 
     def set_running(self, val):
         self.keep_running = val
+
 
 class ThreadData:
     """Container for thread related data."""
@@ -163,7 +172,6 @@ class LoopTestRunner(threading.Thread):
         self.thread_signaller = thread_signaller
         # this makes threads endings if main stop with a KeyboardInterupt
         self.setDaemon(1)
-
 
     def run(self):
         """Run a test in loop."""
@@ -201,10 +209,6 @@ class LoopTestRunner(threading.Thread):
             thread_sleep(self.sleep_time)
 
 
-
-# ------------------------------------------------------------
-#
-#
 class BenchRunner:
     """Run a unit test in bench mode."""
 
@@ -239,7 +243,8 @@ class BenchRunner:
         # setup monitoring
         monitor_hosts = []                  # list of (host, port, descr)
         if not options.is_distributed:
-            for host in test.conf_get('monitor', 'hosts', '', quiet=True).split():
+            hosts = test.conf_Get('monitor', 'hosts', '', quiet=True).split()
+            for host in hosts:
                 host = host.strip()
                 monitor_hosts.append((host, test.conf_getInt(host, 'port'),
                                       test.conf_get(host, 'description', '')))
@@ -247,7 +252,6 @@ class BenchRunner:
         # keep the test to use the result logger for monitoring
         # and call setUp/tearDown Cycle
         self.test = test
-
 
     def run(self):
         """Run all the cycles.
@@ -437,9 +441,11 @@ class BenchRunner:
         for thread_id, frame in frames.iteritems():
             stack = ''.join(traceback.format_stack(frame))
             stacks[stack] = stacks.setdefault(stack, []) + [thread_id]
+
         def sort_stack(x, y):
             """sort stack by number of thread."""
             return cmp(len(x[1]), len(y[1]))
+
         stacks = stacks.items()
         stacks.sort(sort_stack)
         for stack, thread_ids in stacks:
@@ -457,10 +463,11 @@ class BenchRunner:
             trace("* Getting monitoring config from %s: ..." % host)
             server = ServerProxy("http://%s:%s" % (host, port))
             try:
-                config=server.getMonitorsConfig()
-                data=[]
+                config = server.getMonitorsConfig()
+                data = []
                 for key in config.keys():
-                    xml='<monitorconfig host="%s" key="%s" value="%s" />' % (host, key, config[key])
+                    xml = '<monitorconfig host="%s" key="%s" value="%s" />' % (
+                                                        host, key, config[key])
                     data.append(xml)
                 self.logr("\n".join(data))
             except Fault:
@@ -490,7 +497,6 @@ class BenchRunner:
                 monitor_hosts.append((host, port, desc))
         self.monitor_hosts = monitor_hosts
 
-
     def stopMonitors(self, monitor_key):
         """Stop monitoring and save xml result."""
         if not self.monitor_hosts:
@@ -506,7 +512,6 @@ class BenchRunner:
             else:
                 trace(' done.\n')
                 self.logr(xml)
-
 
     def logr(self, message):
         """Log to the test result file."""
@@ -569,12 +574,6 @@ class BenchRunner:
         return '\n'.join(text)
 
 
-
-
-
-# ------------------------------------------------------------
-# main
-#
 def main():
     """Default main."""
     # enable to load module in the current path
@@ -583,95 +582,133 @@ def main():
 
     parser = OptionParser(USAGE, formatter=TitledHelpFormatter(),
                           version="FunkLoad %s" % get_version())
-    parser.add_option("-u", "--url", type="string", dest="main_url",
+    parser.add_option("-u", "--url",
+                      type="string",
+                      dest="main_url",
                       help="Base URL to bench.")
-    parser.add_option("-c", "--cycles", type="string", dest="bench_cycles",
+    parser.add_option("-c", "--cycles",
+                      type="string",
+                      dest="bench_cycles",
                       help="Cycles to bench, this is a list of number of "
-                      "virtual concurrent users, "
-                      "to run a bench with 3 cycles with 5, 10 and 20 "
-                      "users use: -c 2:10:20")
-    parser.add_option("-D", "--duration", type="string", dest="bench_duration",
+                           "virtual concurrent users, to run a bench with 3"
+                           "cycles with 5, 10 and 20 users use: -c 2:10:20")
+    parser.add_option("-D", "--duration",
+                      type="string",
+                      dest="bench_duration",
                       help="Duration of a cycle in seconds.")
-    parser.add_option("-m", "--sleep-time-min", type="string",
+    parser.add_option("-m", "--sleep-time-min",
+                      type="string",
                       dest="bench_sleep_time_min",
                       help="Minimum sleep time between requests.")
-    parser.add_option("-M", "--sleep-time-max", type="string",
+    parser.add_option("-M", "--sleep-time-max",
+                      type="string",
                       dest="bench_sleep_time_max",
                       help="Maximum sleep time between requests.")
-    parser.add_option("-t", "--test-sleep-time", type="string",
+    parser.add_option("-t", "--test-sleep-time",
+                      type="string",
                       dest="bench_sleep_time",
                       help="Sleep time between tests.")
-    parser.add_option("-s", "--startup-delay", type="string",
+    parser.add_option("-s", "--startup-delay",
+                      type="string",
                       dest="bench_startup_delay",
                       help="Startup delay between thread.")
-    parser.add_option("-f", "--as-fast-as-possible", action="store_true",
-                      help="Remove sleep times between requests and"
-                      " between tests, shortcut for -m0 -M0 -t0")
-    parser.add_option("", "--no-color", action="store_true",
+    parser.add_option("-f", "--as-fast-as-possible",
+                      action="store_true",
+                      help="Remove sleep times between requests and between "
+                           "tests, shortcut for -m0 -M0 -t0")
+    parser.add_option("", "--no-color",
+                      action="store_true",
                       help="Monochrome output.")
-    parser.add_option("", "--accept-invalid-links", action="store_true",
-                      help="Do not fail if css/image links are "
-                      "not reachable.")
-    parser.add_option("", "--simple-fetch", action="store_true",
+    parser.add_option("", "--accept-invalid-links",
+                      action="store_true",
+                      help="Do not fail if css/image links are not reachable.")
+    parser.add_option("", "--simple-fetch",
+                      action="store_true",
                       dest="bench_simple_fetch",
-                      help="Don't load additional links like css "
-                      "or images when fetching an html page.")
-    parser.add_option("-l", "--label", type="string",
-                      help="Add a label to this bench run "
-                      "for easier identification (it will be appended to the directory name "
-                      "for reports generated from it).")
-    parser.add_option("", "--enable-debug-server", action="store_true", dest="debugserver",
+                      help="Don't load additional links like css or images "
+                           "when fetching an html page.")
+    parser.add_option("-l", "--label",
+                      type="string",
+                      help="Add a label to this bench run for easier "
+                           "identification (it will be appended to the "
+                           "directory name for reports generated from it).")
+    parser.add_option("--enable-debug-server",
+                      action="store_true",
+                      dest="debugserver",
                       help="Instantiates a debug HTTP server which exposes an "
-                      "interface using which parameters can be modified at "
-                      "run-time. Currently supported parameters: "
-                      "/cvu?inc=<integer> to increase the number of CVUs, "
-                      "/cvu?dec=<integer> to decrease the number of CVUs, "
-                      "/getcvu returns number of CVUs ")
-    parser.add_option("", "--debug-server-port", type="string", dest="debugport",
-                      help="Port at which debug server should run during the test")
-    
-    parser.add_option("","--distribute", action="store_true", dest="distribute",
-                      help="Distributes the CVUs over a group of worker machines "
-                      "that are defined in the section [workers]")
-    parser.add_option("","--distribute-workers", type="string", dest="workerlist",
-                      help="This parameter will  over-ride the list of workers defined "
-                      "in the config file. expected notation is uname@host,uname:pwd@host or just host...") 
-    parser.add_option("--distribute-python", type="string", dest="python_bin",
+                           "interface using which parameters can be modified "
+                           "at run-time. Currently supported parameters: "
+                           "/cvu?inc=<integer> to increase the number of "
+                           "CVUs, /cvu?dec=<integer> to decrease the number "
+                           "of CVUs, /getcvu returns number of CVUs ")
+    parser.add_option("--debug-server-port",
+                      type="string",
+                      dest="debugport",
+                      help="Port at which debug server should run during the "
+                           "test")
+    parser.add_option("--distribute",
+                      action="store_true",
+                      dest="distribute",
+                      help="Distributes the CVUs over a group of worker "
+                           "machines that are defined in the workers section")
+    parser.add_option("--distribute-workers",
+                      type="string",
+                      dest="workerlist",
+                      help="This parameter will  over-ride the list of "
+                           "workers defined in the config file. expected "
+                           "notation is uname@host,uname:pwd@host or just "
+                           "host...")
+    parser.add_option("--distribute-python",
+                      type="string",
+                      dest="python_bin",
                       help="When running in distributed mode, this Python "
                            "binary will be used across all hosts.")
-    parser.add_option("","--is-distributed", action="store_true", dest="is_distributed",
-                      help="This parameter is for internal use only. it signals to a "
-                      "worker node that it is in distributed mode and shouldn't "
-                      "perform certain actions.")
+    parser.add_option("--is-distributed",
+                      action="store_true",
+                      dest="is_distributed",
+                      help="This parameter is for internal use only. it "
+                           "signals to a worker node that it is in "
+                           "distributed mode and shouldn't perform certain "
+                           "actions.")
 
     options, args = parser.parse_args()
-    cmd_args = " ".join([k for k in sys.argv[1:] if k.find('--distribute')<0])
+    # XXX What exactly is this checking for here??
+    cmd_args = " ".join([k for k in sys.argv[1:]
+                           if k.find('--distribute') < 0])
+
     if len(args) != 2:
         parser.error("incorrect number of arguments")
+
     if not args[1].count('.'):
-        parser.error("invalid argument should be class.method")
+        parser.error("invalid argument; should be [class].[method]")
+
     if options.as_fast_as_possible:
         options.bench_sleep_time_min = '0'
         options.bench_sleep_time_max = '0'
         options.bench_sleep_time = '0'
+
     klass, method = args[1].split('.')
     if options.distribute:
         from Distributed import DistributionMgr
         ret = None
         try:
-            distmgr = DistributionMgr( args[0] , klass, method, options, cmd_args )     
-            try:
-                distmgr.prepare_workers(allow_errors = True)
-                ret = distmgr.run()
-                distmgr.final_collect()
-            except KeyboardInterrupt:
-                trace("* ^C received *")
-                distmgr.abort()
-        except UserWarning,error:
+            distmgr = DistributionMgr(
+                args[0], klass, method, options, cmd_args)
+        except UserWarning, error:
             trace(red_str("Distribution failed with:%s \n" % (error)))
+
+        try:
+            distmgr.prepare_workers(allow_errors=True)
+            ret = distmgr.run()
+            distmgr.final_collect()
+        except KeyboardInterrupt:
+            trace("* ^C received *")
+            distmgr.abort()
+
         sys.exit(ret)
     else:
         bench = BenchRunner(args[0], klass, method, options)
+
         # Start a HTTP server optionally
         if options.debugserver == True:
             http_server_thread = FunkLoadHTTPServer(bench, options.debugport)

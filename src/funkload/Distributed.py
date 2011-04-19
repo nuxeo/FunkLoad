@@ -154,7 +154,7 @@ class SSHDistributor(DistributorBase):
             sftp = self.connection.open_sftp()
             st = sftp.stat(remote_path)
             return S_ISDIR(st.st_mode)
-        except Exception, e:
+        except Exception:
             return False
 
     @requiresconnection
@@ -165,9 +165,9 @@ class SSHDistributor(DistributorBase):
         """
         try:
             sftp = self.connection.open_sftp()
-            st = ftp.stat(remote_path)
+            st = sftp.stat(remote_path)
             return S_ISREG(st.st_mode)
-        except Exception, e:
+        except Exception:
             return False
 
     def die(self):
@@ -222,7 +222,8 @@ class DistributionMgr(threading.Thread):
         if options.python_bin:
             self.python_bin = options.python_bin
         else:
-            self.python_bin = test.conf_get('distribute', 'python_bin', 'python')
+            self.python_bin = test.conf_get(
+                'distribute', 'python_bin', 'python')
 
         try:
             desc = getattr(test, self.method_name).__doc__.strip()
@@ -245,7 +246,6 @@ class DistributionMgr(threading.Thread):
             os.makedirs(self.distribution_output)
 
         # check if hosts are in options
-        expr = re.compile('((\w+)(:[.*]*)@)*([\w\.]+)')
         workers = []                  # list of (host, port, descr)
         if options.workerlist:
             for h in  options.workerlist.split(","):
@@ -264,8 +264,7 @@ class DistributionMgr(threading.Thread):
                 workers.append({
                     "host": host,
                     "password": pwd,
-                    "username": uname
-                })
+                    "username": uname})
         else:
             hosts = test.conf_get('workers', 'hosts', '', quiet=True).split()
             for host in hosts:
@@ -353,11 +352,11 @@ class DistributionMgr(threading.Thread):
 
         threads = []
         trace("* Preparing sandboxes for %d workers." % len(self._workers))
-        print self.python_bin
         for worker in list(self._workers):
             if not worker.connected:
                 if allow_errors:
-                    trace("%s is not connected, removing from pool.\n" % worker.host)
+                    trace("%s is not connected, removing from pool.\n" % \
+                                                                 worker.host)
                     self._workers.remove(worker)
                     continue
                 else:
@@ -366,17 +365,17 @@ class DistributionMgr(threading.Thread):
                             worker.host, worker.error))
 
             # Verify that the Python binary is available
-            which_python = "test -x `which %s 2>&1 > /dev/null` && echo true" % (self.python_bin)
+            which_python = "test -x `which %s 2>&1 > /dev/null` && echo true" \
+                    % (self.python_bin)
             out, err = worker.execute(which_python)
 
             if out.strip() == "true":
                 threads.append(threading.Thread(
                     target=local_prep_worker,
-                    args=(worker,)
-                ))
+                    args=(worker,)))
             elif allow_errors:
-                trace("Cannot find Python binary at path `%s` on %s, removing from pool" %
-                    (self.python_bin, worker.host))
+                trace("Cannot find Python binary at path `%s` on %s, " + \
+                      "removing from pool" % (self.python_bin, worker.host))
                 self._workers.remove(worker)
             else:
                 raise RuntimeError("%s is not contactable with error %s" % (
@@ -407,13 +406,15 @@ class DistributionMgr(threading.Thread):
         trace("\n")
         [t.join() for t in threads]
         trace("\n")
+
         for thread, worker in zip(threads, self._workers):
             self._worker_results[worker] = thread.output.read()
             trace("* [%s] returned\n" % worker.host)
             err_string = thread.err.read()
             if err_string:
-                trace("\n".join("[%s]:%s" % (worker.host, k) for k \
-                        in err_string.split("\n")))
+                trace("\n".join("  [%s]: %s" % (worker.host, k) for k \
+                        in err_string.split("\n") if k.strip()))
+            trace("\n")
 
     def final_collect(self):
         expr = re.compile("Log\s+xml:\s+(.*?)\n")
