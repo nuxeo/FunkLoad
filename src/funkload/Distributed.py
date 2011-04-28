@@ -225,6 +225,12 @@ class DistributionMgr(threading.Thread):
             self.python_bin = test.conf_get(
                 'distribute', 'python_bin', 'python')
 
+        if options.distributed_packages:
+            self.distributed_packages = options.distributed_packages
+        else:
+            self.distributed_packages = test.conf_get(
+                                                'distribute', 'packages', '')
+
         try:
             desc = getattr(test, self.method_name).__doc__.strip()
         except:
@@ -337,10 +343,12 @@ class DistributionMgr(threading.Thread):
             remote_tarball = os.path.join(self.remote_res_dir, tarball)
 
             # setup funkload
-            worker.execute(
-                    "./bin/easy_install setuptools ez_setup %s" % \
-                        self.funkload_location,
-                    cwdir=virtual_env)
+            cmd = "./bin/easy_install setuptools ez_setup {funkload}"
+
+            if self.distributed_packages:
+                cmd += " %s" % self.distributed_packages
+
+            worker.execute(cmd, cwdir=virtual_env)
 
             #unpackage tests.
             worker.put(

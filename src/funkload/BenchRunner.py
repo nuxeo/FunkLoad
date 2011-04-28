@@ -670,6 +670,12 @@ def main():
                            "signals to a worker node that it is in "
                            "distributed mode and shouldn't perform certain "
                            "actions.")
+    parser.add_option("--distributed-packages",
+                      type="string",
+                      dest="distributed_packages",
+                      help="Additional packages to be passed to easy_install "
+                           "on remote machines when being run in distributed "
+                           "mode.")
 
     options, args = parser.parse_args()
     # XXX What exactly is this checking for here??
