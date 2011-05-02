@@ -22,7 +22,19 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
-* New monitoring plugins contirbution from Krzysztof A. Adamski.
+* New monitoring plugins contribution from Krzysztof A. Adamski. You
+  can add extend the monitoring by adding new plugins checkout the
+  `Munin
+  <https://github.com/nuxeo/FunkLoad/tree/master/contrib/FunkloadMunin>`_
+  and `Nagios
+  <https://github.com/nuxeo/FunkLoad/tree/master/contrib/FunkloadNagios>`_
+  examples.
+
+* New options for distributed mode, you can specify the Python binary
+  to use with ``--distribute-python=PYTHON_BIN`` option and
+  additional packages to install on nodes with the
+  ``--distributed-packages=DISTRIBUTED_PACKAGES`` option.
+  Contribution from Adrew McFague.
 
 * GH-5: ``fl-record`` now checks for ``tcpwatch`` command in addition to
   ``tcpwatch.py`` and ``tcpwatch-httpproxy``.

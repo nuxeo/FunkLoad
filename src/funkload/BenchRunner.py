@@ -3,6 +3,7 @@
 # Author: bdelbosc@nuxeo.com
 # Contributors: Tom Lazar
 #               Goutham Bhat
+#               Andrew McFague
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -22,7 +23,6 @@
 
 $Id: BenchRunner.py 24746 2005-08-31 09:59:27Z bdelbosc $
 """
-import logging
 import os
 import platform
 import sys
@@ -40,8 +40,6 @@ from FunkLoadHTTPServer import FunkLoadHTTPServer
 from utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
                   trace, red_str, green_str, get_version
 
-
-log = logging.getLogger(__name__)
 
 USAGE = """%prog [options] file class.method
 
@@ -243,7 +241,7 @@ class BenchRunner:
         # setup monitoring
         monitor_hosts = []                  # list of (host, port, descr)
         if not options.is_distributed:
-            hosts = test.conf_Get('monitor', 'hosts', '', quiet=True).split()
+            hosts = test.conf_get('monitor', 'hosts', '', quiet=True).split()
             for host in hosts:
                 host = host.strip()
                 monitor_hosts.append((host, test.conf_getInt(host, 'port'),
@@ -265,8 +263,9 @@ class BenchRunner:
         self.logr_open()
         trace("* setUpBench hook: ...")
         self.test.setUpBench()
-        trace(' done.\n\n')
+        trace(' done.\n')
         self.getMonitorsConfig()
+        trace('\n')
         for cvus in self.cycles:
             t_start = time.time()
             reset_cycle_results()

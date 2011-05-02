@@ -30,3 +30,5 @@ Jan Kotuc: Debugging keep alive problem on http/1.1 303.
 Georges Racinet: Adding metadata on report and setUpBench hook ideas.
 Bertrand Yvain: Patch on null content-lengh, fix on network monitoring charts.
 Krzysztof A. Adamski: Plugin monitors framework.
+Andrew McFague: Specify a custom Python binary configuration option for 
+  distributed nodes, pep8 fixes for the funkload.Distributed module.
