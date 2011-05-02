@@ -29,7 +29,7 @@ New Features
 
 * GH-6: Filter out .swfs when building funkload tests with ``fl-record``.
 
-* Support of python2.7.
+* GH-10: Support of python2.7.
 
 
 Bug fixes
