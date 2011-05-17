@@ -338,7 +338,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 # TODO: check for expires (max-age is working)
                 # hard coded value that application can use to work
                 # around expires
-                if sendcookie.coded_value in ('"deleted"', "null"):
+                if sendcookie.coded_value in ('"deleted"', "null", "deleted"):
                     continue
                 cookie_list.append("%s=%s;"%(sendcookie.key,
                                             sendcookie.coded_value))

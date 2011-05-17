@@ -69,6 +69,8 @@ New Features
 Bug fixes
 ~~~~~~~~~~~
 
+* GH-11: Handling of deleted cookies
+
 * GH-7: data and demo directory missing
 
 * GH-8: funkload 1.15.0 package doesn't include ez_setup.py
