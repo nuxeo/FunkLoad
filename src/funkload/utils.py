@@ -302,7 +302,7 @@ class Data:
         return diff
 
     def __repr__(self):
-        return "[User data " + self.content_type + "]"
+        return "[User data " + str(self.content_type) + "]"
 
 
 def get_virtualenv_script():

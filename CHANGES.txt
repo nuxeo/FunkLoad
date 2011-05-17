@@ -42,7 +42,7 @@ New Features
    <D:lockscope><D:exclusive/></D:lockscope>
    <D:locktype><D:write/></D:locktype>
    <D:owner>
-   <D:href>http://www.apple.com/webdav_fs/</D:href>
+   <D:href>http://www.webdav.org/webdav_fs/</D:href>
    </D:owner>
    </D:lockinfo>""")
    self.method("LOCK", server_url + "/somedocpath", params=data, description="lock")
