@@ -30,6 +30,24 @@ New Features
   <https://github.com/nuxeo/FunkLoad/tree/master/contrib/FunkloadNagios>`_
   examples.
 
+* Extends HTTP methods with HEAD and OPTIONS, enable to send any
+  methods using the new ``method`` api, adding PROPFIND DAV exemple ::
+
+   # requests for options
+   self.options(server_url, description="options")
+   self.propfind(server_url + '/dav/foo', depth=1, description="propfind")
+   # put a lock using the new method api
+   data = Data('text/xml', """<?xml version="1.0" encoding="utf-8"?>
+   <D:lockinfo xmlns:D="DAV:">
+   <D:lockscope><D:exclusive/></D:lockscope>
+   <D:locktype><D:write/></D:locktype>
+   <D:owner>
+   <D:href>http://www.apple.com/webdav_fs/</D:href>
+   </D:owner>
+   </D:lockinfo>""")
+   self.method("LOCK", server_url + "/somedocpath", params=data, description="lock")
+
+
 * GH-9: New options for distributed mode: you can specify the Python binary
   to use with ``--distribute-python=PYTHON_BIN`` option and additional
   packages to install on slaves with the

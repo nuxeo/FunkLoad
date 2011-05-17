@@ -278,7 +278,8 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
             if isinstance(postdata, Data):
                 # User data and content_type
                 params = postdata.data
-                headers.append(('Content-type', postdata.content_type))
+                if postdata.content_type:
+                    headers.append(('Content-type', postdata.content_type))
             else:
                 # Check for File upload
                 is_multipart = False

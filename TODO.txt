@@ -8,8 +8,8 @@ missing, See the [[http://funkload.nuxeo.org/reporting.html][reporting section]]
 Current target release is 1.15.0
 
 * Features
-** TODO Matplotlib integration				       :@next:REPORT:
-** TODO Add a param to join to next request action		 :@next:CORE:
+** TODO Matplotlib integration                                 :@next:REPORT:
+** TODO Add a param to join to next request action               :@next:CORE:
    Joining distinct requests into a single page/action:
    
    self.get(url, description="foo", join_with_next_req=True)
@@ -17,38 +17,38 @@ Current target release is 1.15.0
 
    url2 is reported as being on the same page as url, there is no
    thinktime pause between the 2 requests.
-** TODO Finish funkload.metadata impl				      :@next:
+** TODO Finish funkload.metadata impl                                 :@next:
    fl-buil-report should render the funkload.metadata file if present
 ** TODO Produce gplot script with commented extended options   :@next:REPORT:
    - explain how to have small label on trend reports
      export GDFONTPATH=/usr/share/fonts/truetype/freefont
      set label "Some comment" at 2,51,1 rotate by 45 front font 'FreeSans,6'
    - ex of eps output
-** TODO Add unit test on request				   :@next:QA:
+** TODO Add unit test on request                                   :@next:QA:
    using simple file req/resp as tcpwatch + minimal fake web server.
-** TODO Provide new sysstat monitoring plugin			 :@next:CORE:
-** TODO Provide csv monitoring plugin 				 :@next:CORE:
+** TODO Provide new sysstat monitoring plugin                    :@next:CORE:
+** TODO Provide csv monitoring plugin                            :@next:CORE:
    make the same charts than in [[http://public.dev.nuxeo.com/~ben/logchart/monitor.html][logchart]]
-** TODO Add common utils 					 :@next:CORE:
+** TODO Add common utils                                         :@next:CORE:
    - extractToken(buffer, start, stop, maxlen=-1)
    - getRandomLineInFile()
    - assertAndDump() dump getBody on failure
-** TODO Improve report failure section			       :@next:REPORT:
+** TODO Improve report failure section                         :@next:REPORT:
    Add an error section with:
    - http failure:
      - sort by page|req|code
      - display a link to the returned page if any
    - Assertion error:
      - sort by traceback
-** TODO Look at what can be done with perfbase			  :@next:TBD:
+** TODO Look at what can be done with perfbase                    :@next:TBD:
    http://perfbase.tigris.org/
 * Bugs
-** TODO Patch cookie lib					 :@next:CORE:
+** TODO Patch cookie lib                                         :@next:CORE:
    The cookie lib is too restrictive, try to merge the refactoring
    done by Google:
    http://svn.nuxeo.org/trac/pub/browser/funkload/branches/google-refactoring
    Added: [2010-11-18 jeu. 14:23
-** TODO Produce valid xml test result			       :@next:REPORT:
+** TODO Produce valid xml test result                          :@next:REPORT:
    the root element is missing
 * org-mode configuration
 

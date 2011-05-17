@@ -70,7 +70,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self.suite_name = self.__class__.__name__
         unittest.TestCase.__init__(self, methodName=self.test_name)
         self._response = None
-        self.options = options
+        self._options = options
         self.debug_level = getattr(options, 'debug_level', 0)
         self._funkload_init()
         self._dump_dir = getattr(options, 'dump_dir', None)
@@ -226,11 +226,11 @@ class FunkLoadTestCase(unittest.TestCase):
         self.total_time += t_delta
         if redirect:
             self.total_redirects += 1
-        elif rtype in ('post', 'get', 'put', 'delete'):
+        elif rtype != 'link':
             self.total_pages += 1
-        elif rtype == 'link':
+        else:
             self.total_links += 1
-        
+
         if rtype in ('put','post', 'get', 'delete'):
             # this is a valid referer for the next request
             self.setHeader('Referer', url)
@@ -289,10 +289,6 @@ class FunkLoadTestCase(unittest.TestCase):
             if not self.in_bench_mode:
                 self.logd('GET: %s\n\tPage %i: %s ...' % (url, self.steps,
                                                           description or ''))
-        elif method == 'delete':
-            if not self.in_bench_mode:
-                self.logd('DELETE:%s\n\tPage %i: %s ...' %(url, self.steps,
-                                                        description or ''))
         else:
             url = url_in
             if not self.in_bench_mode:
@@ -372,7 +368,7 @@ class FunkLoadTestCase(unittest.TestCase):
             text = ('End of loop: %d pages rendered in %.3fs, '
                     'avg of %.3fs per page, '
                     '%.3f SPPS without concurrency.' % (count, t_delta,
-                                                        t_delta/count,
+                                                        t_delta / count,
                                                         count/t_delta))
             self.logi(text)
             trace(text + '\n')
@@ -394,23 +390,48 @@ class FunkLoadTestCase(unittest.TestCase):
         response = self._browse(url, params, description, ok_codes,
                                 method="get")
         return response
-    
-    def put(self, url, params=None, description=None, ok_codes=None):
-        """PUT method on url with params."""
+
+    def method(self, method, url, params=None, description=None,
+               ok_codes=None):
+        """Generic method request can be used to submit MOVE, MKCOL or
+        whatever method name request."""
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
-                                method="put")
+                                method=method)
         return response
-    
+
+    def put(self, url, params=None, description=None, ok_codes=None):
+        """PUT method."""
+        return self.method('put', url, params, description, ok_codes)
+
     def delete(self, url, description=None, ok_codes=None):
         """DELETE method on url."""
-        self.steps += 1
-        self.page_responses = 0
-        response = self._browse(url, None, description, ok_codes,
-                                method="delete")
-        return response
-    
+        return self.method('delete', url, None, description, ok_codes)
+
+    def head(self, url, description=None, ok_codes=None):
+        """HEAD method on url adding params."""
+        return self.method('head', url, None, description, ok_codes)
+
+    def options(self, url, description=None, ok_codes=None):
+        """OPTIONS method on url."""
+        return self.method('options', url, None, description, ok_codes)
+
+    def propfind(self, url, params=None, depth=None, description=None,
+                 ok_codes=None):
+        """DAV PROPFIND method."""
+        if ok_codes is None:
+            codes = [207, ]
+        else:
+            codes = ok_codes
+        if depth is not None:
+            self.setHeader('depth', str(depth))
+        ret = self.method('PROPFIND', url, params=params,
+                          description=description, ok_codes=codes)
+        if depth is not None:
+            self.delHeader('depth')
+        return ret
+
     def exists(self, url, params=None, description="Checking existence"):
         """Try a GET on URL return True if the page exists or False."""
         resp = self.get(url, params, description=description,
@@ -634,7 +655,7 @@ class FunkLoadTestCase(unittest.TestCase):
         """Return an entry from the options or configuration file."""
         # check for a command line options
         opt_key = '%s_%s' % (section, key)
-        opt_val = getattr(self.options, opt_key, None)
+        opt_val = getattr(self._options, opt_key, None)
         if opt_val:
             #print('[%s] %s = %s from options.' % (section, key, opt_val))
             return opt_val
