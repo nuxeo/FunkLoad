@@ -34,11 +34,11 @@ setup(
     author="Benoit Delbosc",
     author_email="bdelbosc@nuxeo.com",
     url="http://funkload.nuxeo.org/",
-    download_url="http://funkload.nuxeo.org/funkload-%s.tar.gz"%__version__,
+    download_url="http://funkload.nuxeo.org/funkload-%s.tar.gz" % __version__,
     license='GPL',
     keywords='testing benching load performance functional monitoring',
-    packages= find_packages('src'),
-    package_dir = {'': 'src'},
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     scripts=['scripts/fl-monitor-ctl', 'scripts/fl-credential-ctl',
              'scripts/fl-run-bench', 'scripts/fl-run-test',
              'scripts/fl-build-report',
@@ -68,7 +68,7 @@ setup(
                                'demo/simple/*', 'demo/zope/*',
                                'demo/cmf/*', 'demo/xmlrpc/*', 'demo/cps/*',
                                'demo/seam-booking-1.1.5/*', 'demo/*.txt',
-                               'tests/*',]},
+                               'tests/*', ]},
     entry_points = {
         'console_scripts': [
             'fl-monitor-ctl = funkload.Monitor:main',
@@ -78,7 +78,7 @@ setup(
             'fl-build-report = funkload.ReportBuilder:main',
             'fl-install-demo = funkload.DemoInstaller:main',
             'fl-record = funkload.Recorder:main'],
-        'funkload.plugins.monitor' : [
+        'funkload.plugins.monitor': [
             'CUs = funkload.MonitorPluginsDefault:MonitorCUs',
             'MemFree = funkload.MonitorPluginsDefault:MonitorMemFree',
             'CPU = funkload.MonitorPluginsDefault:MonitorCPU',

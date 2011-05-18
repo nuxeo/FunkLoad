@@ -493,7 +493,8 @@ class RenderRst:
         if len(charts)>0:
             self.append(rst_title("%s: %s" % (host, description), 3))
         for chart in charts:
-            self.append("**%s**\n\n.. image:: %s\n" % (chart[0], chart[1]))
+            self.append("**%s**\n\n.. image:: %s\n" % (
+                    chart[0], os.path.basename(chart[1])))
 
     def renderSlowestRequests(self, number):
         """Render the n slowest requests of the best cycle."""
