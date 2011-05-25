@@ -292,7 +292,7 @@ def main():
             from ReportRenderOrg import RenderOrg
             print str(RenderOrg(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
-                                options))
+                                xml_parser.monitorconfig, options))
         else:
             print str(RenderRst(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,

@@ -74,9 +74,9 @@ class RenderOrg(RenderRst):
     # number of slowest requests to display
     slowest_items = 5
 
-    def __init__(self, config, stats, error, monitor, options):
+    def __init__(self, config, stats, error, monitor, monitorconfig, options):
         options.html = True
-        RenderRst.__init__(self, config, stats, error, monitor, options)
+        RenderRst.__init__(self, config, stats, error, monitor, monitorconfig, options)
 
     def renderHeader(self):
         config = self.config
