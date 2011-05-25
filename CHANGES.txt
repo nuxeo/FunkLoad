@@ -69,6 +69,9 @@ New Features
 Bug fixes
 ~~~~~~~~~~~
 
+* GH-14: Fix report creation when having error message with non-us characters.
+  Patch from Krzysztof A. Adamski.
+
 * GH-11: Handling of deleted cookies
 
 * GH-7: data and demo directory missing

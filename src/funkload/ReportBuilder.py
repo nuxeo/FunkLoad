@@ -1,5 +1,7 @@
-# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2011 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
+# Contributors:
+#   Krzysztof A. Adamski
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -290,13 +292,13 @@ def main():
             trace(html_path + "\n")
         elif options.org:
             from ReportRenderOrg import RenderOrg
-            print str(RenderOrg(xml_parser.config, xml_parser.stats,
+            print unicode(RenderOrg(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
-                                xml_parser.monitorconfig, options))
+                                xml_parser.monitorconfig, options)).encode("utf-8")
         else:
-            print str(RenderRst(xml_parser.config, xml_parser.stats,
+            print unicode(RenderRst(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
-                                xml_parser.monitorconfig, options))
+                                xml_parser.monitorconfig, options)).encode("utf-8")
 
 
 if __name__ == '__main__':

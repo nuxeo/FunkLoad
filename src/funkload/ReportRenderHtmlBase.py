@@ -1,6 +1,8 @@
-# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2011 Nuxeo SAS <http://nuxeo.com>
 # Author: bdelbosc@nuxeo.com
-# Contributors: Tom Lazar
+# Contributors:
+#   Tom Lazar
+#   Krzysztof A. Adamski
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -82,7 +84,7 @@ class RenderHtmlBase(RenderRst):
         """Create the ReST file."""
         rst_path = os.path.join(self.report_dir, 'index.rst')
         f = open(rst_path, 'w')
-        f.write(str(self))
+        f.write(unicode(self).encode("utf-8"))
         f.close()
         self.rst_path = rst_path
 
