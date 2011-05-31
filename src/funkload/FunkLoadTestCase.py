@@ -375,35 +375,37 @@ class FunkLoadTestCase(unittest.TestCase):
 
         return response
 
-    def post(self, url, params=None, description=None, ok_codes=None):
+    def post(self, url, params=None, description=None, ok_codes=None, load_auto_links=True):
         """POST method on url with params."""
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
-                                method="post")
+                                method="post", load_auto_links=load_auto_links)
         return response
 
-    def get(self, url, params=None, description=None, ok_codes=None):
+    def get(self, url, params=None, description=None, ok_codes=None, load_auto_links=True):
         """GET method on url adding params."""
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
-                                method="get")
+                                method="get", load_auto_links=load_auto_links)
         return response
 
     def method(self, method, url, params=None, description=None,
-               ok_codes=None):
+               ok_codes=None, load_auto_links=True):
         """Generic method request can be used to submit MOVE, MKCOL or
         whatever method name request."""
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
-                                method=method)
+                                method=method, load_auto_links=load_auto_links)
         return response
 
-    def put(self, url, params=None, description=None, ok_codes=None):
+    def put(self, url, params=None, description=None, ok_codes=None,
+            load_auto_links=True):
         """PUT method."""
-        return self.method('put', url, params, description, ok_codes)
+        return self.method('put', url, params, description, ok_codes, 
+                load_auto_links=load_auto_links)
 
     def delete(self, url, description=None, ok_codes=None):
         """DELETE method on url."""
@@ -435,7 +437,7 @@ class FunkLoadTestCase(unittest.TestCase):
     def exists(self, url, params=None, description="Checking existence"):
         """Try a GET on URL return True if the page exists or False."""
         resp = self.get(url, params, description=description,
-                        ok_codes=[200, 301, 302, 303, 307, 404, 503])
+                        ok_codes=[200, 301, 302, 303, 307, 404, 503], load_auto_links=False)
         if resp.code not in [200, 301, 302, 303, 307]:
             self.logd('Page %s not found.' % url)
             return False
