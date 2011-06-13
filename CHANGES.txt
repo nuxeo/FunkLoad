@@ -48,9 +48,9 @@ New Features
    self.method("LOCK", server_url + "/somedocpath", params=data, description="lock")
 
 
-* GH-9: New options for distributed mode: you can specify the Python binary
-  to use with ``--distribute-python=PYTHON_BIN`` option and additional
-  packages to install on slaves with the
+* GH-9: New options for distributed mode: you can specify the Python
+  binary to use with ``--distribute-python=PYTHON_BIN`` option and
+  additional packages to install on slaves with the
   ``--distributed-packages=DISTRIBUTED_PACKAGES`` option.
   Contribution from Adrew McFague.
 
@@ -58,12 +58,18 @@ New Features
   monitoring will also retroactively match up the concurrent users for
   graphing purposes. Contribution from Adrew McFague.
 
-* GH-5: ``fl-record`` now checks for ``tcpwatch`` command in addition to
-  ``tcpwatch.py`` and ``tcpwatch-httpproxy``.
+* GH-5: ``fl-record`` now checks for ``tcpwatch`` command in addition
+  to ``tcpwatch.py`` and ``tcpwatch-httpproxy``.
 
-* GH-6: Filter out .swfs when building funkload tests with ``fl-record``.
+* GH-6: Filter out .swfs when building funkload tests with
+  ``fl-record``.
 
 * GH-10: Support of python2.7.
+
+* GH-15: Exposed the load_auto_links parameter to the
+  get/put/post/method methods so that the option to not parse the
+  payload is available when writing a test. Provided by Ali-Akber
+  Saifee.
 
 
 Bug fixes

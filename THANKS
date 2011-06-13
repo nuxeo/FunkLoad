@@ -25,7 +25,7 @@ Arshavski Alexander, Ethan Winn: Bug report and patch for OS X.
 Gareth Davidson: Cookies patch, improve win support.
 Martin Aspeli: Patch on recorder/report generation.
 Ali-Akber Saifee: Distributed mode impl, PUT/DELETE support, Sphinx 
-  documentation layout.
+  documentation layout and more.
 Jan Kotuc: Debugging keep alive problem on http/1.1 303.
 Georges Racinet: Adding metadata on report and setUpBench hook ideas.
 Bertrand Yvain: Patch on null content-lengh, fix on network monitoring charts.
