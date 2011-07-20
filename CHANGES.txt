@@ -75,6 +75,8 @@ New Features
 Bug fixes
 ~~~~~~~~~~~
 
+* Fix org-mode output for Org 7.5, adding missing monitoring section. 
+
 * GH-14: Fix report creation when having error message with non-us characters.
   Patch from Krzysztof A. Adamski.
 

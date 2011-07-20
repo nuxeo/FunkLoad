@@ -22,6 +22,7 @@ $Id$
 import os
 from shutil import copyfile
 from utils import get_version
+from MonitorPluginsDefault import MonitorCPU, MonitorMemFree, MonitorNetwork, MonitorCUs
 
 LI = '*'
 # ------------------------------------------------------------
@@ -480,7 +481,7 @@ class RenderRst:
         """Render all monitored hosts."""
         if not self.monitor or not self.with_chart:
             return
-        charts=self.createMonitorCharts()
+        charts = self.createMonitorCharts()
         if charts == None:
             return
         for host in charts.keys():
@@ -659,5 +660,12 @@ class RenderRst:
         self.renderHook()
         return '\n'.join(self.rst)
 
-
+    def getMonitorConfig(self, host):
+        """Return the host config or a default for backward compat"""
+        if host in self.monitorconfig:
+            return self.monitorconfig[host]
+        return {'MonitorCPU': MonitorCPU().getConfig(),
+                'MonitorMemFree': MonitorMemFree().getConfig(),
+                'MonitorNetwork': MonitorNetwork(None).getConfig(),
+                'MonitorCUs': MonitorCUs().getConfig()}
 

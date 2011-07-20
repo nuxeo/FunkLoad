@@ -18,22 +18,27 @@
 """Classes that render statistics in emacs org-mode format.
 """
 import os
-import sys
 import re
 from ReportRenderRst import RenderRst
 from ReportRenderRst import BaseRst
 import ReportRenderRst
+from MonitorPlugins import MonitorPlugins
 
 FL_SITE = "http://funkload.nuxeo.org"
 
+
 def org_title(title, level=1, newpage=True):
     """Return an org section."""
-    org = ["#+BEGIN_LaTeX"]
+    org = []
     if newpage:
+        org.append("")
+        org.append("")
+        org.append("#+BEGIN_LaTeX")
         org.append("\\newpage")
-    org.append('#+END_LaTeX')
-    org.append('*' * (level-1) + ' ' + title + '\n')
+        org.append('#+END_LaTeX')
+    org.append('*' * (level - 1) + ' ' + title + '\n')
     return '\n'.join(org)
+
 
 def org_image(self):
     org = ["#+BEGIN_LaTeX"]
@@ -44,6 +49,7 @@ def org_image(self):
     org.append('#+END_LaTeX')
     return '\n'.join(org) + '\n'
 
+
 def org_header(self, with_chart=False):
     headers = self.headers[:]
     if self.with_percentiles:
@@ -52,11 +58,12 @@ def org_header(self, with_chart=False):
     org.append("#+BEGIN_LaTeX")
     org.append("\\tiny")
     org.append('#+END_LaTeX')
-    org.append('|' + '|'.join(headers) + '|\n|-')
+    org.append(' |' + '|'.join(headers) + '|\n |-')
     return '\n'.join(org)
 
+
 def org_footer(self):
-    org = ['|-']
+    org = [' |-']
     org.append("#+BEGIN_LaTeX")
     org.append("\\normalsize")
     org.append('#+END_LaTeX')
@@ -69,10 +76,12 @@ BaseRst.render_footer = org_footer
 BaseRst.render_image = org_image
 BaseRst.sep = '|'
 
+
 class RenderOrg(RenderRst):
     """Render stats in ReST format."""
     # number of slowest requests to display
     slowest_items = 5
+    with_chart = True
 
     def __init__(self, config, stats, error, monitor, monitorconfig, options):
         options.html = True
@@ -98,21 +107,22 @@ class RenderOrg(RenderRst):
         description += ["Bench result of ``%s.%s``: " % (config['class'],
                                                        config['method'])]
         description += [config['description']]
-   
+
         self.append('#+TEXT: Bench result of =%s.%s=: %s' % (
                 config['class'], config['method'], ' '.join(description)))
         self.append('#+OPTIONS: toc:1')
         self.append('')
 
-    def renderMonitor(self, host):
+    def renderMonitor(self, host, charts):
         """Render a monitored host."""
         description = self.config.get(host, '')
         self.append(org_title("%s: %s" % (host, description), 3))
-        self.append('#+BEGIN_LaTeX')
-        self.append('\\begin{center}')
-        self.append("\includegraphics[scale=0.5]{{./%s_monitor}.png}" % host)
-        self.append('\\end{center}')
-        self.append('#+END_LaTeX')
+        for chart in charts:
+            self.append('#+BEGIN_LaTeX')
+            self.append('\\begin{center}')
+            self.append("\includegraphics[scale=0.5]{{./%s}.png}" % chart[1])
+            self.append('\\end{center}')
+            self.append('#+END_LaTeX')
 
     def renderHook(self):
         self.rst = [line.replace('``', '=') for line in self.rst]
@@ -122,18 +132,39 @@ class RenderOrg(RenderRst):
         link = re.compile("\`([^\<]+)\<([^\>]+)\>\`\_")
         ret = []
         for line in self.rst:
-            line = re.sub(kv, lambda m: "%s :: %s" % (m.group(1), m.group(2)),
-                          line)
+            line = re.sub(kv, lambda m: "%s :: %s\n\n" % (
+                    m.group(1), m.group(2)), line)
             line = re.sub(bold, lambda m: "*%s*" % (m.group(1)),
                           line)
-            line = re.sub(link, lambda m: "[[%s][%s]]" % (m.group(2), 
+            line = re.sub(link, lambda m: "[[%s][%s]]" % (m.group(2),
                                                           m.group(1).strip()),
                           line)
             line = line.replace('|APDEXT|', lapdex)
             line = line.replace('Apdex*', lapdex)
             line = line.replace('Apdex T', 'Apdex_{T}')
-            line = line.replace('FunkLoad_', 
+            line = line.replace('FunkLoad_',
                                 '[[%s][FunkLoad]]' % FL_SITE)
             ret.append(line)
         self.rst = ret
 
+    def createMonitorCharts(self):
+        """Create all montirored server charts."""
+        if not self.monitor or not self.with_chart:
+            return
+        self.append(org_title("Monitored hosts", 2))
+        charts = {}
+        for host in self.monitor.keys():
+            charts[host] = self.createMonitorChart(host)
+        return charts
+
+    def createMonitorChart(self, host):
+        """Create monitrored server charts."""
+        charts = []
+        Plugins = MonitorPlugins()
+        Plugins.registerPlugins()
+        Plugins.configure(self.getMonitorConfig(host))
+
+        for plugin in Plugins.MONITORS.values():
+            image_path = ('%s_%s' % (host, plugin.name)).replace("\\", "/")
+            charts.append((plugin.name, image_path))
+        return charts

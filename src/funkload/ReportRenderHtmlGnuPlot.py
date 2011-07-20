@@ -485,15 +485,6 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         gnuplot(gplot_path)
         return
 
-    def getMonitorConfig(self, host):
-        """Return the host config or a default for backward compat"""
-        if self.monitorconfig.has_key(host):
-            return self.monitorconfig[host]
-        return { 'MonitorCPU': MonitorCPU().getConfig(),
-                 'MonitorMemFree': MonitorMemFree().getConfig(),
-                 'MonitorNetwork': MonitorNetwork(None).getConfig(),
-                 'MonitorCUs': MonitorCUs().getConfig() }
-
     def createMonitorChart(self, host):
         """Create monitrored server charts."""
         stats = self.monitor[host]
