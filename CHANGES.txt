@@ -17,13 +17,25 @@ FunkLoad GIT master
 
 :git: https://github.com/nuxeo/FunkLoad
 
-:Target: 1.16.0
+:Target: 1.16.1
+
+
+
+FunkLoad 1.16.0
+------------------
+
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.16.0.tar.gz
+
+:github: https://github.com/nuxeo/FunkLoad/tree/1.16.0
+
+:Released date: 2011-07-21
+
 
 New Features
 ~~~~~~~~~~~~~~
 
 * New monitoring plugins contribution from Krzysztof A. Adamski. You
-  can add extend the monitoring by adding new plugins checkout the
+  can extend the monitoring by adding new plugins checkout the
   `Munin
   <https://github.com/nuxeo/FunkLoad/tree/master/contrib/FunkloadMunin>`_
   and `Nagios
