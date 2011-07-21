@@ -32,6 +32,7 @@ Main FunkLoad_ features are:
 
   - get/post/put/delete support
   - post any kind of content type like ``application/xml``
+  - DAV support
   - basic authentication support
   - file upload and multipart/form-data submission
   - cookies support
