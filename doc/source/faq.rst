@@ -140,7 +140,7 @@ There are many ways:
 
      [distribute]
      log_path = log-distributed
-     funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.14.0.tar.gz
+     funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.16.1.tar.gz
 
 
 * Using BenchMaster http://pypi.python.org/pypi/benchmaster
