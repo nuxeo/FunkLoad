@@ -19,6 +19,10 @@ FunkLoad GIT master
 
 :Target: 1.16.1
 
+Bug Fixes
+~~~~~~~~~~
+
+* Distributed mode (GH-23, GH-24, GH-25)
 
 
 FunkLoad 1.16.0
