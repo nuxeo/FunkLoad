@@ -382,7 +382,8 @@ class DistributionMgr(threading.Thread):
             remote_tarball = os.path.join(self.remote_res_dir, tarball)
 
             # setup funkload
-            cmd = "./bin/easy_install setuptools ez_setup {funkload}"
+            cmd = "./bin/easy_install setuptools ez_setup {funkload}".format(
+                funkload=self.funkload_location)
 
             if self.distributed_packages:
                 cmd += " %s" % self.distributed_packages
@@ -464,9 +465,6 @@ class DistributionMgr(threading.Thread):
                 trace("\n".join("  [%s]: %s" % (worker.host, k) for k \
                         in err_string.split("\n") if k.strip()))
             trace("\n")
-
-        self.stopMonitors()
-        self.logr_close()
 
         self.stopMonitors()
         self.correlate_statistics()
@@ -586,6 +584,8 @@ class DistributionMgr(threading.Thread):
 
     def correlate_statistics(self):
         result_path = None
+        if not self.monitor_hosts:
+            return
         for worker, results in self._worker_results.items():
             files = glob("%s/%s-*.xml" % (self.distribution_output,
                                           worker.host))
