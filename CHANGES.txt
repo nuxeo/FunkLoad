@@ -11,18 +11,28 @@ FunkLoad_ CHANGES
 .. contents:: Table of Contents
 
 
-
 FunkLoad GIT master
 --------------------
 
 :git: https://github.com/nuxeo/FunkLoad
 
-:Target: 1.16.1
+:Target: 1.16.2
+
+
+FunkLoad 1.16.1
+------------------
+
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.16.1.tar.gz
+
+:github: https://github.com/nuxeo/FunkLoad/tree/1.16.1
+
+:Released date: 2011-07-28
+
 
 Bug Fixes
 ~~~~~~~~~~
 
-* Distributed mode (GH-23, GH-24, GH-25)
+* GH-2[345]: Fixing distributed mode
 
 
 FunkLoad 1.16.0
