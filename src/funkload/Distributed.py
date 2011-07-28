@@ -26,8 +26,6 @@ from datetime import datetime
 from socket import error as SocketError
 from stat import S_ISREG, S_ISDIR
 from glob import glob
-from socket import error as SocketError
-from stat import S_ISREG, S_ISDIR
 from xml.etree.ElementTree import ElementTree
 from xmlrpclib import ServerProxy
 
@@ -365,7 +363,7 @@ class DistributionMgr(threading.Thread):
                 self.remote_res_dir, self.tarred_testsdir)
 
             if worker.isdir(virtual_env):
-                worker.execute("rmdir -rf %s" % virtual_env)
+                worker.execute("rm -rf %s" % virtual_env)
 
             worker.execute("mkdir -p %s" % virtual_env)
             worker.put(
