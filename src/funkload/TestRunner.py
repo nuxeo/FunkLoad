@@ -316,6 +316,7 @@ Examples
         self.testNames = None
         self.verbosity = 1
         self.color = True
+        self.profile = False
         self.defaultTest = defaultTest
         self.testLoader = testLoader
         self.progName = os.path.basename(argv[0])
@@ -421,6 +422,8 @@ Examples
         parser.add_option("--pause", action="store_true",
                           help="Pause between request, "
                           "press ENTER to continue.")
+        parser.add_option("--profile", action="store_true",
+                          help="Run test under the Python profiler.")
 
         options, args = parser.parse_args()
         if self.module is None:
@@ -452,6 +455,7 @@ Examples
         self.color = not options.no_color
         self.test_name_pattern = options.regex
         self.list_tests = options.list
+        self.profile = options.profile
 
         # set testloader options
         self.testLoader.options = options
@@ -470,7 +474,19 @@ Examples
             else:
                 self.testRunner = unittest.TextTestRunner(
                     verbosity=self.verbosity)
-        result = self.testRunner.run(self.test)
+        if self.profile:
+            import profile, pstats
+            pr = profile.Profile()
+            d = {'self': self}
+            pr.runctx('result = self.testRunner.run(self.test)', {}, d)
+            result = d['result']
+            pr.dump_stats('profiledata')
+            ps = pstats.Stats('profiledata')
+            ps.strip_dirs()
+            ps.sort_stats('cumulative')
+            ps.print_stats()                        
+        else:    
+            result = self.testRunner.run(self.test)
         sys.exit(not result.wasSuccessful())
 
 
