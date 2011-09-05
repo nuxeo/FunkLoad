@@ -323,7 +323,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     cookie_list = []
     for domain, cookies in self.cookies.items():
         # check cookie domain
-        if not server.endswith(domain):
+        if not server.endswith(domain) and domain[1:] != server:
             continue
         for path, cookies in cookies.items():
             # check that the path matches
