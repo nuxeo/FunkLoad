@@ -33,3 +33,4 @@ Krzysztof A. Adamski: Plugin monitors framework.
 Andrew McFague: Specify a custom Python binary configuration option for 
   distributed nodes, pep8 fixes for the funkload.Distributed module.
 Thibault Soulcié: logo.
+Benito Jorge Bastida: Misc bug fixes.

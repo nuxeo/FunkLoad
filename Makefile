@@ -39,7 +39,7 @@ install:
 
 register:
 	-python2.6 setup.py register sdist bdist_egg upload
-	-python2.4 setup.py register bdist_egg upload
+	-python2.7 setup.py register bdist_egg upload
 	-python2.5 setup.py register bdist_egg upload
 
 

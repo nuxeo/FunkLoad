@@ -18,6 +18,13 @@ FunkLoad GIT master
 
 :Target: 1.16.2
 
+Bug Fixes
+~~~~~~~~~~
+
+* GH-32: Fix Funkload WF_fetch patch to handle cookies correctly. Submitted by jorgebastida.
+
+* GH-33: Cookies with a leading '.' in the domain are being ignored. Submitted by jorgebastida.
+
 
 FunkLoad 1.16.1
 ------------------
@@ -32,7 +39,7 @@ FunkLoad 1.16.1
 Bug Fixes
 ~~~~~~~~~~
 
-* GH-2[345]: Fixing distributed mode
+* GH-2[345]: Fixing distributed mode regression on 1.6.0
 
 
 FunkLoad 1.16.0
