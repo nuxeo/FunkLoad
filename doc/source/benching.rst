@@ -2,7 +2,7 @@ Benchmarks concepts
 =====================
 
 
-The same FunkLaod test can be turned into a load test, just by invoking the
+The same FunkLoad test can be turned into a load test, just by invoking the
 bench runner ``fl-run-bench``.
 
 Page

@@ -547,6 +547,7 @@ class BenchRunner:
     def logr_close(self):
         """Stop logging tag."""
         self.test._close_result_log()
+        self.test.logger_result.handlers = []
 
     def __repr__(self):
         """Display bench information."""
@@ -573,7 +574,7 @@ class BenchRunner:
         return '\n'.join(text)
 
 
-def main():
+def main(args):
     """Default main."""
     # enable to load module in the current path
     cur_path = os.path.abspath(os.path.curdir)
@@ -676,10 +677,11 @@ def main():
                            "on remote machines when being run in distributed "
                            "mode.")
 
-    options, args = parser.parse_args()
     # XXX What exactly is this checking for here??
-    cmd_args = " ".join([k for k in sys.argv[1:]
+    cmd_args = " ".join([k for k in args
                            if k.find('--distribute') < 0])
+
+    options, args = parser.parse_args(args)
 
     if len(args) != 2:
         parser.error("incorrect number of arguments")
@@ -710,12 +712,12 @@ def main():
             trace("* ^C received *")
             distmgr.abort()
 
-        sys.exit(ret)
+        return ret
     else:
         bench = BenchRunner(args[0], klass, method, options)
 
         # Start a HTTP server optionally
-        if options.debugserver == True:
+        if options.debugserver:
             http_server_thread = FunkLoadHTTPServer(bench, options.debugport)
             http_server_thread.start()
 
@@ -724,7 +726,8 @@ def main():
             ret = bench.run()
         except KeyboardInterrupt:
             trace("* ^C received *")
-        sys.exit(ret)
+        return ret
 
 if __name__ == '__main__':
-    main()
+    ret = main(sys.argv[1:])
+    sys.exit(ret)
