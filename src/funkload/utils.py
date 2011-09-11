@@ -29,7 +29,6 @@ from socket import error as SocketError
 from xmlrpclib import ServerProxy
 import pkg_resources
 import tarfile
-import shutil
 import tempfile
 
 

@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-import pkg_resources, re, pickle
+import pkg_resources, re, pickle, sys
 ENTRYPOINT = 'funkload.plugins.monitor'
 
 gd_colors=[['red', 0xff0000],

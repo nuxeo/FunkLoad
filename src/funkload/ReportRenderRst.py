@@ -20,7 +20,6 @@
 $Id$
 """
 import os
-from shutil import copyfile
 from utils import get_version
 from MonitorPluginsDefault import MonitorCPU, MonitorMemFree, MonitorNetwork, MonitorCUs
 

@@ -20,7 +20,6 @@
 """A Linux monitor server/controller.
 """
 import sys
-import re
 from time import time, sleep
 from threading import Thread
 from XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController

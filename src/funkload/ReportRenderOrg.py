@@ -17,7 +17,6 @@
 #
 """Classes that render statistics in emacs org-mode format.
 """
-import os
 import re
 from ReportRenderRst import RenderRst
 from ReportRenderRst import BaseRst

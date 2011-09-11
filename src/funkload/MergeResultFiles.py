@@ -17,7 +17,6 @@
 #
 """Merge FunkLoad result files to produce a report for distributed bench
 reports."""
-import os
 import xml.parsers.expat
 from utils import trace
 

@@ -1,6 +1,5 @@
 import unittest
 import time
-import pickle
 from ConfigParser import ConfigParser
 from funkload.MonitorPlugins import MonitorPlugins
 

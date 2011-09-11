@@ -20,7 +20,6 @@
 $Id$
 """
 import unittest
-from random import random
 from funkload.ZopeTestCase import ZopeTestCase
 from funkload.Lipsum import Lipsum
 

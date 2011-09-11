@@ -26,9 +26,7 @@ simple doctest in a docstring:
   2
 
 """
-import os
 import unittest
-import commands
 
 class TestDummy1(unittest.TestCase):
     """Dummy test case."""
