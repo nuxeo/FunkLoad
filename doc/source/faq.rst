@@ -1,11 +1,11 @@
 FAQ
 ====
 
-What does all these dots mean ?
+What do all these dots mean ?
 -------------------------------
 
-During a bench cycle the "Starting threads" dots means the number
-running threads::
+During a bench cycle each "Starting threads" dots represents a
+running thread::
 
   Cycle #1 with 10 virtual users
   ------------------------------
@@ -14,13 +14,13 @@ running threads::
   * Current time: 2011-01-26T23:23:06.234422
   * Starting threads: ........
 
-During the cycle logging the green dots means a successful test while
-the red 'F' are for test failure::
+During the cycle logging each green dot means a successful test while
+each red 'F' is for a test failure::
 
   * Logging for 10s (until 2011-01-26T23:23:16.360602): ......F......
 
 
-During the stagging down the dots are the number of stopped threads::
+During the stagging down each dot represents a stopped thread::
 
   * Waiting end of threads: .........
 
@@ -73,11 +73,11 @@ is a work around to use the full server power.
 Use multiple machine to perform the load, see the next section.
 
 
-How to run multiple bencher ?
+How to run multiple benchers ?
 -------------------------------
 
 Bench result file can be merged by the ``fl-build-report`` command,
-but how to run multiple bencher ?
+but how do you run multiple benchers ?
 
 There are many ways: 
 
