@@ -484,8 +484,8 @@ Examples
             ps = pstats.Stats('profiledata')
             ps.strip_dirs()
             ps.sort_stats('cumulative')
-            ps.print_stats()                        
-        else:    
+            ps.print_stats()
+        else:
             result = self.testRunner.run(self.test)
         sys.exit(not result.wasSuccessful())
 

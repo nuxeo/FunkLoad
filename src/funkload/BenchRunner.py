@@ -574,7 +574,7 @@ class BenchRunner:
         return '\n'.join(text)
 
 
-def main(args):
+def main(args=sys.argv[1:]):
     """Default main."""
     # enable to load module in the current path
     cur_path = os.path.abspath(os.path.curdir)
@@ -729,5 +729,5 @@ def main(args):
         return ret
 
 if __name__ == '__main__':
-    ret = main(sys.argv[1:])
+    ret = main()
     sys.exit(ret)
