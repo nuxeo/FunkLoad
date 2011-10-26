@@ -16,7 +16,19 @@ FunkLoad GIT master
 
 :git: https://github.com/nuxeo/FunkLoad
 
-:Target: 1.16.2
+:Target: 1.17.0
+
+
+New Features
+~~~~~~~~~~~~~~
+
+* Support for gzip compression, you need to add the standard header::
+
+     self.setHeader('Accept-encoding', 'gzip')
+     response = self.get(...)
+
+  Then the `response.body` will be uncompressed when needed.
+
 
 Bug Fixes
 ~~~~~~~~~~

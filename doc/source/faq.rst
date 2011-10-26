@@ -158,7 +158,15 @@ There are many ways:
    # get the results 
    parallel-slurp -h hosts.txt -o out -L results-date -u ‘+%Y%m%d-%H%M%S’ -r /tmp/ftests/report .
    # build the report with fl-build-report, it supports the results merging
- 
+
+
+How to accept gzip content encoding ?
+---------------------------------------
+
+You just need to add the appropriate header::
+
+     self.setHeader('Accept-encoding', 'gzip')
+
 
 How to mix different scenarii in a bench ?
 -------------------------------------------
@@ -222,15 +230,15 @@ Here is a sample Makefile
     LOG_HOME := ./log
     
     ifdef URL
-    	FLOPS = -u $(URL) $(EXT)
+        FLOPS = -u $(URL) $(EXT)
     else
-    	FLOPS = $(EXT)
+        FLOPS = $(EXT)
     endif
     
     ifdef REPORT_HOME
-    	REPORT = $(REPORT_HOME)
+        REPORT = $(REPORT_HOME)
     else
-    	REPORT = report
+        REPORT = report
     endif
     
     all: test
@@ -240,23 +248,23 @@ Here is a sample Makefile
     bench: start bench-app stop
     
     start:
-    	-mkdir -p $(REPORT) $(LOG_HOME)
-    	-$(MONCTL) restart
-    	-$(CREDCTL) restart
+        -mkdir -p $(REPORT) $(LOG_HOME)
+        -$(MONCTL) restart
+        -$(CREDCTL) restart
     
     stop:
-    	-$(MONCTL) stop
-    	-$(CREDCTL) stop
+        -$(MONCTL) stop
+        -$(CREDCTL) stop
     
     test-app:
-    	fl-run-test -d --debug-level=3 --simple-fetch test_app.py App.test_app $(FLOPS)
+        fl-run-test -d --debug-level=3 --simple-fetch test_app.py App.test_app $(FLOPS)
     
     bench-app:
-    	-fl-run-bench --simple-fetch test_app.py App.test_app -c 1:5:10:15:20:30:40:50 -D 45 -m 0.1 -M .5 -s 1 $(FLOPS)
-    	-fl-build-report $(LOG_HOME)/app-bench.xml --html -o $(REPORT)
+        -fl-run-bench --simple-fetch test_app.py App.test_app -c 1:5:10:15:20:30:40:50 -D 45 -m 0.1 -M .5 -s 1 $(FLOPS)
+        -fl-build-report $(LOG_HOME)/app-bench.xml --html -o $(REPORT)
     
     clean:
-    	-find . "(" -name "*~" -or  -name ".#*" -or  -name "*.pyc" ")" -print0 | xargs -0 rm -f
+        -find . "(" -name "*~" -or  -name ".#*" -or  -name "*.pyc" ")" -print0 | xargs -0 rm -f
 
 
 It can be used like this::

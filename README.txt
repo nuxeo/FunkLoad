@@ -37,6 +37,7 @@ Main FunkLoad_ features are:
   - file upload and multipart/form-data submission
   - cookies support
   - referrer support
+  - accept gzip content encoding
   - https support
   - https with ssl/tls by providing a private key and certificate (PEM
     formatted)

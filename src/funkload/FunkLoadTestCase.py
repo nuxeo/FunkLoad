@@ -25,6 +25,8 @@ import sys
 import time
 import re
 import logging
+import gzip
+from StringIO import StringIO
 from warnings import warn
 from socket import error as SocketError
 from types import DictType, ListType, TupleType
@@ -83,6 +85,7 @@ class FunkLoadTestCase(unittest.TestCase):
         self._pause = getattr(options, 'pause', False)
         self._keyfile_path = None
         self._certfile_path = None
+        self._accept_gzip = False
         if self._viewing and not self._dumping:
             # viewing requires dumping contents
             self._dumping = True
@@ -231,11 +234,15 @@ class FunkLoadTestCase(unittest.TestCase):
         else:
             self.total_links += 1
 
-        if rtype in ('put','post', 'get', 'delete'):
+        if rtype in ('put', 'post', 'get', 'delete'):
             # this is a valid referer for the next request
             self.setHeader('Referer', url)
         self._browser.history.append((rtype, url))
         self.logd(' Done in %.3fs' % t_delta)
+        if self._accept_gzip:
+            if response.headers is not None and response.headers.get('Content-Encoding') == 'gzip':
+                buf = StringIO(response.body)
+                response.body = gzip.GzipFile(fileobj=buf).read()
         self._log_response(response, rtype, description, t_start, t_stop)
         if self._dumping:
             self._dump_content(response)
@@ -541,6 +548,11 @@ class FunkLoadTestCase(unittest.TestCase):
         else:
             if value is not None:
                 headers.append((key, value))
+        if key.lower() == 'accept-encoding':
+            if value and value.lower() == 'gzip':
+                self._accept_gzip = True
+            else:
+                self._accept_gzip = False
 
     def delHeader(self, key):
         """Remove an http header key."""
@@ -597,7 +609,6 @@ class FunkLoadTestCase(unittest.TestCase):
         """
         self._keyfile_path = None
         self._certfile_path = None
-
 
     #------------------------------------------------------------
     # Assertion helpers
