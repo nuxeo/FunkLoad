@@ -45,6 +45,23 @@ How to accept invalid Cookies ?
       #  'request host "%s"'%(domain, server)
 
 
+
+
+How to set a timeout on request ?
+-----------------------------------
+
+FunkLoad uses (a patched) webunit, which uses httplib for the actual
+requests. It does not explicitly set a timeout, so httplib uses the
+global default from socket. By default, the global default is None,
+meaning "wait forever". Setting it to a value will cause HTTP requests
+made by FunkLoad to time out if the server does not respond in time.
+::
+
+  import socket
+  socket.setdefaulttimeout(SECONDS)
+
+where SECONDS is, of course, your preferred timeout in seconds.
+
 How to submit high load ?
 ----------------------------
 
