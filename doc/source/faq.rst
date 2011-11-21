@@ -45,6 +45,16 @@ How to accept invalid Cookies ?
       #  'request host "%s"'%(domain, server)
 
 
+How to share a counter between concurrent users ?
+--------------------------------------------------
+
+* The credential server can serve a sequence. Using ``xmlrpc_get_seq``
+  threads can share a sequence::
+
+    from funkload.utils import xmlrpc_get_seq
+    ...
+    seq = xmlrpc_get_seq()
+
 
 
 How to set a timeout on request ?
