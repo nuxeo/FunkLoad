@@ -48,8 +48,8 @@ How to accept invalid Cookies ?
 How to share a counter between concurrent users ?
 --------------------------------------------------
 
-* The credential server can serve a sequence. Using ``xmlrpc_get_seq``
-  threads can share a sequence::
+The credential server can serve a sequence. Using ``xmlrpc_get_seq``
+threads can share a sequence::
 
     from funkload.utils import xmlrpc_get_seq
     ...

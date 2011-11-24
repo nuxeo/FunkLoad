@@ -26,6 +26,7 @@ import time
 import re
 import logging
 import gzip
+import threading
 from StringIO import StringIO
 from warnings import warn
 from socket import error as SocketError
@@ -193,7 +194,7 @@ class FunkLoadTestCase(unittest.TestCase):
     #------------------------------------------------------------
     # browser simulation
     #
-    def _connect(self, url, params, ok_codes, rtype, description, redirect=False):
+    def _connect(self, url, params, ok_codes, rtype, description, redirect=False, consumer=None):
         """Handle fetching, logging, errors and history."""
         if params is None and rtype in ('post','put'):
             # enable empty put/post
@@ -202,7 +203,7 @@ class FunkLoadTestCase(unittest.TestCase):
         try:
             response = self._browser.fetch(url, params, ok_codes=ok_codes,
                                            key_file=self._keyfile_path,
-                                           cert_file=self._certfile_path, method=rtype)
+                                           cert_file=self._certfile_path, method=rtype, consumer=consumer)
         except:
             etype, value, tback = sys.exc_info()
             t_stop = time.time()
@@ -518,6 +519,21 @@ class FunkLoadTestCase(unittest.TestCase):
             else:
                 return
             time.sleep(sleep_time)
+
+    def comet(self, url, consumer, description=None):
+        """Initiate a comet request and process the input in a separate thread.
+        This call is async and return a thread object.
+
+        The consumer method takes as parameter an input string, it can
+        close the comet connection by returning 0."""
+        self.steps += 1
+        self.page_responses = 0
+        thread = threading.Thread(target=self._cometFetcher, args=(url, consumer, description))
+        thread.start()
+        return thread
+
+    def _cometFetcher(self, url, consumer, description):
+        self._connect(url, None, self.ok_codes, 'GET', description, consumer=consumer)
 
     def setBasicAuth(self, login, password):
         """Set HTTP basic authentication for the following requests."""
