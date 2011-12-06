@@ -53,6 +53,7 @@ See http://funkload.nuxeo.org/ for more information.
 Examples
 ========
   %prog myFile.py MyTestCase.testSomething
+  %prog my_module MyTestCase.testSomething
                         Bench MyTestCase.testSomething using MyTestCase.conf.
   %prog -u http://localhost:8080 -c 10:20 -D 30 myFile.py \\
       MyTestCase.testSomething
@@ -121,9 +122,18 @@ def reset_cycle_results():
     g_success = g_failures = g_errors = 0
 
 
+def load_module(test_module):
+    module = __import__(test_module)
+    parts = test_module.split('.')[1:]
+    while parts:
+        part = parts.pop()
+        module = getattr(module, part)
+    return module
+
+
 def load_unittest(test_module, test_class, test_name, options):
     """instantiate a unittest."""
-    module = __import__(test_module)
+    module = load_module(test_module)
     klass = getattr(module, test_class)
     return klass(test_name, options)
 
@@ -210,8 +220,8 @@ class LoopTestRunner(threading.Thread):
 class BenchRunner:
     """Run a unit test in bench mode."""
 
-    def __init__(self, module_file, class_name, method_name, options):
-        self.module_name = os.path.basename(os.path.splitext(module_file)[0])
+    def __init__(self, module_name, class_name, method_name, options):
+        self.module_name = module_name
         self.class_name = class_name
         self.method_name = method_name
         self.options = options
@@ -694,13 +704,20 @@ def main(args=sys.argv[1:]):
         options.bench_sleep_time_max = '0'
         options.bench_sleep_time = '0'
 
+    if os.path.exists(args[0]):
+        # We were passed a file for the first argument
+        module_name = os.path.basename(os.path.splitext(args[0])[0])
+    else:
+        # We were passed a module name
+        module_name = args[0]
+
     klass, method = args[1].split('.')
     if options.distribute:
         from Distributed import DistributionMgr
         ret = None
         try:
             distmgr = DistributionMgr(
-                args[0], klass, method, options, cmd_args)
+                module_name, klass, method, options, cmd_args)
         except UserWarning, error:
             trace(red_str("Distribution failed with:%s \n" % (error)))
 
@@ -714,7 +731,7 @@ def main(args=sys.argv[1:]):
 
         return ret
     else:
-        bench = BenchRunner(args[0], klass, method, options)
+        bench = BenchRunner(module_name, klass, method, options)
 
         # Start a HTTP server optionally
         if options.debugserver:
