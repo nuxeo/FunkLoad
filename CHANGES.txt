@@ -22,6 +22,14 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* Display the description in the URL when rendering the page in
+  Firefox (-V option)
+
+* GH-41: Allow fl-run-bench to take modules in addition to filenames
+  (joeshwaw)::
+
+    fl-run-bench project.submodule.loadtests MyTestCase.test_something
+
 * Support for gzip compression, you need to add the standard header::
 
      self.setHeader('Accept-encoding', 'gzip')
@@ -29,8 +37,8 @@ New Features
 
   Then the `response.body` will be uncompressed when needed.
 
-* Experimental comet request support, handle stream request in a separate
-  thread, the server input is send to a consumer method::
+* Experimental comet request support, handle stream request in a
+  separate thread, the server input is send to a consumer method::
 
       # async request
       thread = self.comet(server_url + "/comet?t=1234&c=1",
@@ -41,8 +49,8 @@ New Features
       self.stop_consumer = True
       thread.join()
 
-   The consumer get the server input character by character and stop the
-   can stop the connection by returning 0 value::
+   The consumer get the server input character by character and can
+   stop the the connection by returning 0 value::
 
        def consumer(self, string):
            trace(string)

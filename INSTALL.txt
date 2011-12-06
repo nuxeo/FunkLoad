@@ -33,6 +33,11 @@ installed this way::
 
   sudo aptitude install python-webunit funkload
 
+Installing on Mac
+--------------------
+
+See http://pyfunc.blogspot.com/2011/12/installing-funkload-on-mac.html.
+
 
 Other OS
 ----------

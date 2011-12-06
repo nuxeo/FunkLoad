@@ -17,3 +17,4 @@ Links
 
 * Apdex with FunkLoad (in french) http://www.wikigento.com/tag/funkload/
 
+* Installing FunkLoad on Mac http://pyfunc.blogspot.com/2011/12/installing-funkload-on-mac.html
