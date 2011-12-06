@@ -216,7 +216,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 self._log_response(value.response, rtype, description,
                                    t_start, t_stop, log_body=True)
                 if self._dumping:
-                    self._dump_content(value.response)
+                    self._dump_content(value.response, description)
                 raise self.failureException, str(value.response)
             else:
                 self._log_response_error(url, rtype, description, t_start,
@@ -246,7 +246,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 response.body = gzip.GzipFile(fileobj=buf).read()
         self._log_response(response, rtype, description, t_start, t_stop)
         if self._dumping:
-            self._dump_content(response)
+            self._dump_content(response, description)
         return response
 
     def _browse(self, url_in, params_in=None,
@@ -907,7 +907,7 @@ class FunkLoadTestCase(unittest.TestCase):
         text = '''<testResult cycle="%(cycle).3i" cvus="%(cvus).3i" thread="%(thread_id).3i" suite="%(suite_name)s" name="%(test_name)s"  time="%(time_start)s" result="%(result)s" steps="%(steps)s" duration="%(duration)s" connection_duration="%(connection_duration)s" requests="%(requests)s" pages="%(pages)s" xmlrpc="%(xmlrpc)s" redirects="%(redirects)s" images="%(images)s" links="%(links)s" %(traceback)s/>''' % info
         self._logr(text)
 
-    def _dump_content(self, response):
+    def _dump_content(self, response, description):
         """Dump the html content in a file.
 
         Use firefox to render the content if we are in rt viewing mode."""
@@ -933,12 +933,12 @@ class FunkLoadTestCase(unittest.TestCase):
         f.write(response.body)
         f.close()
         if self._viewing:
-            cmd = 'firefox -remote  "openfile(file://%s,new-tab)"' % file_path
+            cmd = 'firefox -remote  "openfile(file://%s#%s,new-tab)"' % (
+                file_path, description)
             ret = os.system(cmd)
             if ret != 0:
                 self.logi('Failed to remote control firefox: %s' % cmd)
                 self._viewing = False
-
 
     #------------------------------------------------------------
     # Overriding unittest.TestCase
