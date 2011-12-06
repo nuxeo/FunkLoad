@@ -35,9 +35,18 @@ from utils import mmn_encode, trace, package_tests, get_virtualenv_script, \
                   get_version
 
 
+def load_module(test_module):
+    module = __import__(test_module)
+    parts = test_module.split('.')[1:]
+    while parts:
+        part = parts.pop()
+        module = getattr(module, part)
+    return module
+
+
 def load_unittest(test_module, test_class, test_name, options):
     """instantiate a unittest."""
-    module = __import__(test_module)
+    module = load_module(test_module)
     klass = getattr(module, test_class)
     return klass(test_name, options)
 
@@ -207,21 +216,24 @@ class DistributionMgr(threading.Thread):
     Interface for use by :mod:`funkload.TestRunner` to distribute
     the bench over multiple machines.
     """
-    def __init__(self, module_file, class_name, method_name, options,
+    def __init__(self, module_name, class_name, method_name, options,
                                                                 cmd_args):
         """
         mirrors the initialization of :class:`funkload.BenchRunner.BenchRunner`
         """
         # store the args. these can be passed to BenchRunner later.
-        self.module_file = module_file
+        self.module_name = module_name
         self.class_name = class_name
         self.method_name = method_name
         self.options = options
         self.cmd_args = cmd_args
 
         self.cmd_args += " --is-distributed"
-        self.module_name = os.path.basename(os.path.splitext(module_file)[0])
+
+        module = load_module(module_name)
+        module_file = module.__file__
         self.tarred_tests, self.tarred_testsdir = package_tests(module_file)
+
         self.remote_res_dir = "/tmp/funkload-bench-sandbox/"
 
         test = load_unittest(self.module_name, class_name,
