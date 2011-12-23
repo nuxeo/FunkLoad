@@ -102,8 +102,14 @@ class SSHDistributor(DistributorBase):
             credentials = {"username": username, "password": password}
         elif username:
             credentials = {"username": username}
+        host_port = host.split(':')
+        if len(host_port) > 1:
+            host = host_port[0]
+            port = int(host_port[1])
+        else:
+            port = 22
         try:
-            self.connection.connect(host, timeout=5, **credentials)
+            self.connection.connect(host, timeout=5, port=port, **credentials)
             self.connected = True
         except socket.gaierror, error:
             self.error = error
@@ -313,7 +319,7 @@ class DistributionMgr(threading.Thread):
             for host in hosts:
                 host = host.strip()
                 workers.append({
-                    "host": host,
+                    "host": test.conf_get(host, "host",host),
                     "password": test.conf_get(host, 'password', ''),
                     "username": test.conf_get(host, 'username', '')})
 
