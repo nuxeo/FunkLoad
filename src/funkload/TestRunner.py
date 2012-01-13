@@ -371,6 +371,8 @@ Examples
         global g_doctest_verbose
         parser = OptionParser(self.USAGE, formatter=TitledHelpFormatter(),
                               version="FunkLoad %s" % get_version())
+        parser.add_option("", "--config", type="string", dest="config", metavar='CONFIG',
+                          help="Path to alternative config file.")
         parser.add_option("-q", "--quiet", action="store_true",
                           help="Minimal output.")
         parser.add_option("-v", "--verbose", action="store_true",

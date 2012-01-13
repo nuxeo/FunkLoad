@@ -14,6 +14,8 @@ Examples
 --------
   fl-run-bench myFile.py MyTestCase.testSomething
                         Bench MyTestCase.testSomething using MyTestCase.conf.
+  fl-run-bench --config ~/test.conf myFile.py MyTestCase.testSomething
+                        Bench MyTestCase.testSomething using test.conf located in home directory.
   fl-run-bench -u http://localhost:8080 -c 10:20 -D 30 myFile.py \
       MyTestCase.testSomething
                         Bench MyTestCase.testSomething on localhost:8080
@@ -27,6 +29,10 @@ Options
 
 --version               show program's version number and exit
 --help, -h              show this help message and exit
+--config=CONFIG
+                        Path to alternative config location. Otherwise the configuration file is
+                        expected to be named after test case class, located either next to test module or path
+                        defined by environment variable ``FL_CONF_PATH``
 --url=MAIN_URL, -u MAIN_URL
                         Base URL to bench.
 --cycles=BENCH_CYCLES, -c BENCH_CYCLES

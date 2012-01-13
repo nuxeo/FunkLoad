@@ -108,10 +108,12 @@ class FunkLoadTestCase(unittest.TestCase):
     def _funkload_init(self):
         """Initialize a funkload test case using a configuration file."""
         # look into configuration file
-        config_directory = os.getenv('FL_CONF_PATH', '.')
-        config_path = os.path.join(config_directory,
-                                   self.__class__.__name__ + '.conf')
-        config_path = os.path.abspath(config_path)
+        config_path = getattr(self._options, 'config', None)
+        if not config_path:
+          config_directory = os.getenv('FL_CONF_PATH', '.')
+          config_path = os.path.join(config_directory,
+                                     self.__class__.__name__ + '.conf')
+        config_path = os.path.abspath(os.path.expanduser(config_path))
         if not os.path.exists(config_path):
             config_path = "Missing: "+ config_path
         config = ConfigParser()
