@@ -49,6 +49,10 @@ Options
 ---------
 --version               show program's version number and exit
 --help, -h              show this help message and exit
+--config=CONFIG
+                        Path to alternative config location. Otherwise the configuration file is
+                        expected to be named after test case class, located either next to test module or path
+                        defined by environment variable ``FL_CONF_PATH``
 --quiet, -q             Minimal output.
 --verbose, -v           Verbose output.
 --debug, -d             FunkLoad and doctest debug output.
