@@ -593,6 +593,11 @@ def main(args=sys.argv[1:]):
 
     parser = OptionParser(USAGE, formatter=TitledHelpFormatter(),
                           version="FunkLoad %s" % get_version())
+    parser.add_option("", "--config",
+                      type="string",
+                      dest="config",
+                      metavar='CONFIG',
+                      help="Path to alternative config file")
     parser.add_option("-u", "--url",
                       type="string",
                       dest="main_url",

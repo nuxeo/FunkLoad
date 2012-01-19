@@ -22,6 +22,9 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* Added support for providing the test configuration file with --config
+  (Juha Mustonen)
+
 * Display the description in the URL when rendering the page in
   Firefox (-V option)
 

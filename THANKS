@@ -35,3 +35,4 @@ Andrew McFague: Specify a custom Python binary configuration option for
 Thibault Soulcié: logo.
 Benito Jorge Bastida: Misc bug fixes.
 Joe Shaw: Allow fl-run-bench to take modules in addition to filenames.
+Juha Mustonen: Adding a --config option.
