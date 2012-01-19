@@ -169,6 +169,42 @@ There are many ways:
      log_path = log-distributed
      funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.16.1.tar.gz
 
+  You can multiple benchers per server by defining many workers with the same host
+  name in your configuration file. Add a workers section to your configuration file::
+
+      [workers]
+      hosts = host1cpu1 host1cpu2 host2cpu1 host2cpu2
+
+  And then define these workers::
+
+      [host1cpu1]
+      host = host1
+      username = user
+      password = password
+
+      [host1cpu2]
+      host = host2
+      username = user
+      password = password
+
+      [host2cpu1]
+      host = host2
+      username = user
+      password = password
+
+      [host2cpu2]
+      host = host2
+      username = user
+      password = password
+
+  Then run adding just the --distribute option::
+
+      $ fl-run-bench -c 1:2:3 -D 5 -f --simple-fetch  test_Simple.py Simple.test_simple --distribute -u http://target/
+
+  If your node uses a non standard ssh port (for instance you are using ssh tunneling) you can use::
+
+      [host1]
+      host = host1:port
 
 * Using BenchMaster http://pypi.python.org/pypi/benchmaster
 

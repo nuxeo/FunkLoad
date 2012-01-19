@@ -168,6 +168,7 @@ def WTC_log(self, message, content):
     pass
 WebTestCase.log = WTC_log
 
+
 # use fl img sucker
 def WTC_pageImages(self, url, page, testcase=None):
     '''Given the HTML page that was loaded from url, grab all the images.

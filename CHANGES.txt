@@ -61,6 +61,9 @@ New Features
                self.logd('Stop consumer')
                return 0
 
+* Ability to configure multiple benchers per server in distribute mode (Dylan Jay)
+
+* Ability to configure multiple monitors per server (useful if you have to use ssh tunnels instead of read hostnames). (Dylan Jay)
 
 Bug Fixes
 ~~~~~~~~~~
