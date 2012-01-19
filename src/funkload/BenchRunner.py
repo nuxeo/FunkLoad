@@ -253,9 +253,10 @@ class BenchRunner:
         if not options.is_distributed:
             hosts = test.conf_get('monitor', 'hosts', '', quiet=True).split()
             for host in hosts:
-                host = host.strip()
-                monitor_hosts.append((host, test.conf_getInt(host, 'port'),
-                                      test.conf_get(host, 'description', '')))
+                name = host
+                host = test.conf_get(host,'host',host.strip())
+                monitor_hosts.append((name, host, test.conf_getInt(name, 'port'),
+                                      test.conf_get(name, 'description', '')))
         self.monitor_hosts = monitor_hosts
         # keep the test to use the result logger for monitoring
         # and call setUp/tearDown Cycle
@@ -468,25 +469,25 @@ class BenchRunner:
         if not self.monitor_hosts:
             return
         monitor_hosts = []
-        for (host, port, desc) in self.monitor_hosts:
-            trace("* Getting monitoring config from %s: ..." % host)
+        for (name, host, port, desc) in self.monitor_hosts:
+            trace("* Getting monitoring config from %s: ..." % name)
             server = ServerProxy("http://%s:%s" % (host, port))
             try:
                 config = server.getMonitorsConfig()
                 data = []
                 for key in config.keys():
                     xml = '<monitorconfig host="%s" key="%s" value="%s" />' % (
-                                                        host, key, config[key])
+                                                        name, key, config[key])
                     data.append(xml)
                 self.logr("\n".join(data))
             except Fault:
                 trace(' not supported.\n')
-                monitor_hosts.append((host, port, desc))
+                monitor_hosts.append((name, host, port, desc))
             except SocketError:
                 trace(' failed, server is down.\n')
             else:
                 trace(' done.\n')
-                monitor_hosts.append((host, port, desc))
+                monitor_hosts.append((name, host, port, desc))
         self.monitor_hosts = monitor_hosts
 
     def startMonitors(self, monitor_key):
@@ -494,8 +495,8 @@ class BenchRunner:
         if not self.monitor_hosts:
             return
         monitor_hosts = []
-        for (host, port, desc) in self.monitor_hosts:
-            trace("* Start monitoring %s: ..." % host)
+        for (name, host, port, desc) in self.monitor_hosts:
+            trace("* Start monitoring %s: ..." % name)
             server = ServerProxy("http://%s:%s" % (host, port))
             try:
                 server.startRecord(monitor_key)
@@ -503,15 +504,15 @@ class BenchRunner:
                 trace(' failed, server is down.\n')
             else:
                 trace(' done.\n')
-                monitor_hosts.append((host, port, desc))
+                monitor_hosts.append((name, host, port, desc))
         self.monitor_hosts = monitor_hosts
 
     def stopMonitors(self, monitor_key):
         """Stop monitoring and save xml result."""
         if not self.monitor_hosts:
             return
-        for (host, port, desc) in self.monitor_hosts:
-            trace('* Stop monitoring %s: ' % host)
+        for (name, host, port, desc) in self.monitor_hosts:
+            trace('* Stop monitoring %s: ' % name)
             server = ServerProxy("http://%s:%s" % (host, port))
             try:
                 server.stopRecord(monitor_key)
@@ -550,8 +551,8 @@ class BenchRunner:
         if self.options.label:
             config['label'] = self.options.label
 
-        for (host, port, desc) in self.monitor_hosts:
-            config[host] = desc
+        for (name, host, port, desc) in self.monitor_hosts:
+            config[name] = desc
         self.test._open_result_log(**config)
 
     def logr_close(self):
