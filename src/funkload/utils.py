@@ -329,8 +329,12 @@ def package_tests(module_file):
     exclude_func = lambda filename: filename.find(".log")>=0 or\
                                     filename.find(".bak")>=0 or\
                                     filename.find(".pyc")>=0 or\
+                                    filename.find(".gplot")>=0 or\
+                                    filename.find(".png")>=0 or\
+                                    filename.find(".data")>=0 or\
+                                    filename.find(".xml")>=0 or\
                                     os.path.split(filename)[1] == "bin" or\
-                                    os.path.split(filename)[1] == "lib" 
+                                    os.path.split(filename)[1] == "lib"
         
     _path = tempfile.mktemp(suffix='.tar') 
     import hashlib
