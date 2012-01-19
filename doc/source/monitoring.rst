@@ -34,6 +34,15 @@ On the bench server add to your test configuration file the following section::
   description = The application server
   port = 8008
 
+or if you need to have multiple ports for the same IP, for instance if you are using ssh tunneling
+
+  [monitor]
+  hosts = monitor1
+
+  [monitor1]
+  host = <IP or FQDN>
+  description = The application server
+  port = 8008
 
 Then run the bench, the report will include server stats.
 
