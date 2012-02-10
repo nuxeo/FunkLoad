@@ -351,9 +351,9 @@ class DistributionMgr(threading.Thread):
 
     def prepare_workers(self, allow_errors=False):
         """
-        initialized the sandboxes in each worker node to prepare for a
-        bench run. the additional parameter `allow_errors` essentially
-        will make the distinction between ignoring unresponsive/inappropriate
+        Initialize the sandboxes in each worker node to prepare for a
+        bench run. The additional parameter `allow_errors` will essentially
+        make the distinction between ignoring unresponsive/inappropriate
         nodes - or raising an error and failing the entire bench.
         """
         # right, lets figure out if funkload can be setup on each host
