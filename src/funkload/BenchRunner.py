@@ -605,9 +605,9 @@ def main(args=sys.argv[1:]):
     parser.add_option("-c", "--cycles",
                       type="string",
                       dest="bench_cycles",
-                      help="Cycles to bench, this is a list of number of "
-                           "virtual concurrent users, to run a bench with 3"
-                           "cycles with 5, 10 and 20 users use: -c 2:10:20")
+                      help="Cycles to bench, colon-separated list of "
+                           "virtual concurrent users. To run a bench with 3 "
+                           "cycles of 5, 10 and 20 users, use: -c 5:10:20")
     parser.add_option("-D", "--duration",
                       type="string",
                       dest="bench_duration",
