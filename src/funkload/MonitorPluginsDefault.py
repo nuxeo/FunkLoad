@@ -1,4 +1,4 @@
-# (C) 2011 Nuxeo SAS <http://nuxeo.com>
+# (C) 2012 Nuxeo SAS <http://nuxeo.com>
 # Authors: Krzysztof A. Adamski
 #          bdelbosc@nuxeo.com
 #
@@ -18,6 +18,7 @@
 #
 from  MonitorPlugins import MonitorPlugin, Plot
 
+
 class MonitorCUs(MonitorPlugin):
     plot1 = {'CUs': ['impulse', 'CUs']}
     plots = [Plot(plot1, title="Concurent users", ylabel="CUs")]
@@ -31,6 +32,7 @@ class MonitorCUs(MonitorPlugin):
         cus = [int(x.cvus) for x in stats]
 
         return {'CUs': cus}
+
 
 class MonitorMemFree(MonitorPlugin):
     plot1 = {'MEM': ['lines lw 2', 'Memory'],
@@ -54,7 +56,7 @@ class MonitorMemFree(MonitorPlugin):
             stats = line.split()
             field = stats[0][:-1]
             if field in meminfo_fields:
-                meminfo_stats[field[0].lower()+field[1:]] = stats[1]
+                meminfo_stats[field[0].lower() + field[1:]] = stats[1]
         return meminfo_stats
 
     def parseStats(self, stats):
@@ -68,7 +70,7 @@ class MonitorMemFree(MonitorPlugin):
             mem_used = [mem_total - int(x.memFree) - int(x.buffers) - int(x.cached) for x in stats]
         else:
             # old monitoring does not have cached or buffers info
-            mem_used = [mem_total - int(x.memFree) for x in stats]           
+            mem_used = [mem_total - int(x.memFree) for x in stats]
         mem_used_start = mem_used[0]
         mem_used = [x - mem_used_start for x in mem_used]
         swap_total = int(stats[0].swapTotal)
@@ -77,9 +79,10 @@ class MonitorMemFree(MonitorPlugin):
         swap_used = [x - swap_used_start for x in swap_used]
         return {'MEM': mem_used, 'SWAP': swap_used}
 
+
 class MonitorCPU(MonitorPlugin):
     plot1 = {'CPU': ['impulse lw 2', 'CPU 1=100%%'],
-            'LOAD1': ['lines lw 2','Load 1min'],
+            'LOAD1': ['lines lw 2', 'Load 1min'],
             'LOAD5': ['lines lw 2', 'Load 5min'],
             'LOAD15': ['lines lw 2', 'Load 15min']}
     plots = [Plot(plot1, title="Load average", ylabel="loadavg")]
@@ -128,16 +131,16 @@ class MonitorCPU(MonitorPlugin):
         cpu_usage = [0]
         for i in range(1, len(stats)):
             if not (hasattr(stats[i], 'CPUTotalJiffies') and
-                    hasattr(stats[i-1], 'CPUTotalJiffies')):
+                    hasattr(stats[i - 1], 'CPUTotalJiffies')):
                 cpu_usage.append(None)
             else:
                 dt = ((long(stats[i].IDLTotalJiffies) +
                        long(stats[i].CPUTotalJiffies)) -
-                      (long(stats[i-1].IDLTotalJiffies) +
-                       long(stats[i-1].CPUTotalJiffies)))
+                      (long(stats[i - 1].IDLTotalJiffies) +
+                       long(stats[i - 1].CPUTotalJiffies)))
                 if dt:
                     ttl = (float(long(stats[i].CPUTotalJiffies) -
-                                 long(stats[i-1].CPUTotalJiffies)) /
+                                 long(stats[i - 1].CPUTotalJiffies)) /
                            dt)
                 else:
                     ttl = None
@@ -146,26 +149,26 @@ class MonitorCPU(MonitorPlugin):
         load_avg_1 = [float(x.loadAvg1min) for x in stats]
         load_avg_5 = [float(x.loadAvg5min) for x in stats]
         load_avg_15 = [float(x.loadAvg15min) for x in stats]
-        return {'LOAD1': load_avg_1, 
-                'LOAD5': load_avg_5, 
+        return {'LOAD1': load_avg_1,
+                'LOAD5': load_avg_5,
                 'LOAD15': load_avg_15,
                 'CPU': cpu_usage}
 
 
 class MonitorNetwork(MonitorPlugin):
-    interface='eth0'
-    plot1={'NETIN': ['lines lw 2', 'In'],
-           'NETOUT': ['lines lw 2','Out']}
-    plots=[Plot(plot1, title="Network traffic", ylabel="", unit = "kB")]
+    interface = 'eth0'
+    plot1 = {'NETIN': ['lines lw 2', 'In'],
+            'NETOUT': ['lines lw 2', 'Out']}
+    plots = [Plot(plot1, title="Network traffic", ylabel="", unit="kB")]
 
     def __init__(self, conf):
         super(MonitorNetwork, self).__init__(conf)
-        if conf!=None:
+        if conf != None:
             self.interface = conf.get('server', 'interface')
 
     def getStat(self):
         """Read the stats from an interface."""
-        ifaces = open( "/proc/net/dev" )
+        ifaces = open("/proc/net/dev")
         # Skip the information banner
         ifaces.readline()
         ifaces.readline()
@@ -200,21 +203,20 @@ class MonitorNetwork(MonitorPlugin):
         net_out = [None]
         for i in range(1, len(stats)):
             if not (hasattr(stats[i], 'receiveBytes') and
-                    hasattr(stats[i-1], 'receiveBytes')):
+                    hasattr(stats[i - 1], 'receiveBytes')):
                 net_in.append(None)
             else:
                 net_in.append((int(stats[i].receiveBytes) -
-                               int(stats[i-1].receiveBytes)) /
+                               int(stats[i - 1].receiveBytes)) /
                               (1024 * (float(stats[i].time) -
-                                       float(stats[i-1].time))))
+                                       float(stats[i - 1].time))))
 
             if not (hasattr(stats[i], 'transmitBytes') and
-                    hasattr(stats[i-1], 'transmitBytes')):
+                    hasattr(stats[i - 1], 'transmitBytes')):
                 net_out.append(None)
             else:
                 net_out.append((int(stats[i].transmitBytes) -
-                                int(stats[i-1].transmitBytes))/
+                                int(stats[i - 1].transmitBytes)) /
                               (1024 * (float(stats[i].time) -
-                                       float(stats[i-1].time))))
+                                       float(stats[i - 1].time))))
         return {'NETIN': net_in, 'NETOUT': net_out}
-
