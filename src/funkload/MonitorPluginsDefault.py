@@ -42,7 +42,7 @@ class MonitorMemFree(MonitorPlugin):
     def getStat(self):
         meminfo_fields = ["MemTotal", "MemFree", "SwapTotal", "SwapFree", "Buffers", "Cached"]
         meminfo = open("/proc/meminfo")
-        kernel_rev = self._checkKernelRev()
+        kernel_rev = self._getKernelRev()
         if kernel_rev <= 2.4:
             # Kernel 2.4 has extra lines of info, duplicate of later info
             meminfo.readline()

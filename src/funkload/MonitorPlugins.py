@@ -1,4 +1,4 @@
-# (C) 2011 Nuxeo SAS <http://nuxeo.com>
+# (C) 2011-2012 Nuxeo SAS <http://nuxeo.com>
 # Author: Krzysztof A. Adamski
 #
 # This program is free software; you can redistribute it and/or modify
@@ -80,11 +80,16 @@ class MonitorPlugin(object):
             self.plots = []
         self._conf = conf
 
-    def _checkKernelRev(self):
-        """Check the linux kernel revision."""
+    def _getKernelRev(self):
+        """Get the kernel version."""
         version = open("/proc/version").readline()
         kernel_rev = float(re.search(r'version (\d+\.\d+)\.\d+',
                                      version).group(1))
+        return kernel_rev
+
+    def _checkKernelRev(self):
+        """Check the linux kernel revision."""
+        kernel_rev = self._getKernelRev()
         if (kernel_rev > 2.6) or (kernel_rev < 2.4):
             sys.stderr.write(
                 "Sorry, kernel v%0.1f is not supported\n" % kernel_rev)

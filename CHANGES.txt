@@ -72,6 +72,8 @@ Bug Fixes
 
 * GH-33: Cookies with a leading '.' in the domain are being ignored. Submitted by jorgebastida.
 
+* GH-50: Fix monitoring to support kernel 3.0.
+
 
 FunkLoad 1.16.1
 ------------------
