@@ -348,8 +348,8 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
                 print "Exception: {0}".format(e)
             finally:
                 f.close
-        print "max rps: {0}".format(max_rps)
-        print "time range: {0}-{1}".format(start_timeline, end_timeline)
+        #print "max rps: {0}".format(max_rps)
+        #print "time range: {0}-{1}".format(start_timeline, end_timeline)
 
         max_rps = int(max_rps * 1.25)
 
