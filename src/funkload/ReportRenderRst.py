@@ -138,7 +138,7 @@ class AllResponseRst(BaseRst):
     """AllResponseStat rendering."""
     headers = [ "CUs", "Apdex*", "Rating*", "RPS", "maxRPS", "TOTAL", "SUCCESS","ERROR",
         "MIN", "AVG", "MAX"]
-    image_names = ['requests_rps', 'requests']
+    image_names = ['requests_rps', 'requests', 'time_rps']
     with_apdex = True
 
     def render_stat(self):
