@@ -154,7 +154,7 @@ a FunkLoad script or generates a FunkLoad unit test if test_name is specified.
 
 The default proxy port is 8090.
 
-Note that tcpwatch.py executable must be accessible from your env.
+Note that tcpwatch-httpproxy or tcpwatch.py executable must be accessible from your env.
 
 See http://funkload.nuxeo.org/ for more information.
 
