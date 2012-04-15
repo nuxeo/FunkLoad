@@ -356,13 +356,16 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         f = open(plot_path, "w")
 
         lines = []
-        lines.append('set output "{0}"\n'.format(img_path))
-        lines.append('set title "New Request Per Second"\n')
-        lines.append('set xlabel "Time line"\n')
-        lines.append('set ylabel "RPS"\n')
-        lines.append('set grid\n')
-        lines.append('set xrange [{0}:{1}]\n'.format(0, end_timeline - start_timeline))
-        lines.append('set yrange [{0}:{1}]\n'.format(min_rps, max_rps))
+        lines.append('set output "{0}"'.format(img_path))
+        lines.append('set title "Request Per Second over time"')
+        lines.append('set xlabel "Time line"')
+	lines.append('set timefmt "%H:%M:%S"')
+	lines.append('set xdata time')
+        lines.append('set ylabel "RPS"')
+        lines.append('set grid')
+        #lines.append('set xrange [{0}:{1}]'.format(0, end_timeline - start_timeline))
+        lines.append('set xrange [{0}:{1}]'.format(start_timeline, end_timeline))
+        lines.append('set yrange [{0}:{1}]'.format(min_rps, max_rps))
         # I don't know why self.getChartSizeTmp() accept cvus which is not used currently.
         cvus = []
         lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
@@ -392,13 +395,15 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
                                        'time_rps-{0}.data'.format(cycle))
             #lines.append('set size 1,1\n')
             #lines.append('set origin 0,0\n')
-            plot_line += '"' + dpath + '" u ($1 - {0}):($2)'.format(start_timeline)
+            #plot_line += '"' + dpath + '" u ($1 - {0}):($2)'.format(start_timeline)
+            plot_line += '"' + dpath + '" u ($1):($2)'
             plot_line += ' w linespoints smooth sbezier lw 1 lt 2 lc ' + \
                          'rgbcolor "#696969" notitle'
             plot_line += ', \\\n'
-            plot_line += '"' + dpath + '" u ($1 - {0}):($2)'.format(start_timeline)
+            #plot_line += '"' + dpath + '" u ($1 - {0}):($2)'.format(start_timeline)
+            plot_line += '"' + dpath + '" u ($1):($2)'
             plot_line += ' w linespoints lw 1 lt 2 lc ' + \
-                         'rgbcolor "#{0}" t "Concurrent-{1}"'.format(colors[i % len(colors)],
+                         'rgbcolor "#{0}" t "{1} CUs"'.format(colors[i % len(colors)],
                                                                      stats[cycle]['response'].cvus)
             if cycle != last_cycle:
                 plot_line += ', \\\n'
