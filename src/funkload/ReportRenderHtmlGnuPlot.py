@@ -314,8 +314,112 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         f.close()
         gnuplot(gplot_path)
 
+    def createRPSTimeChart(self):
+        """Create a RPS chart where X-axis represent the time in seconds."""
+        img_path = gnuplot_scriptpath(self.report_dir, 'time_rps.png')
+        plot_path = gnuplot_scriptpath(self.report_dir, 'time_rps.gplot')
+        
+        stats = self.stats
+
+        start_timeline = sys.maxint
+        end_timeline = -1
+        max_rps = 0
+        min_rps = 0
+        
+        for cycle in self.cycles:
+            dpath = gnuplot_scriptpath(self.report_dir,
+                                       'time_rps-{0}.data'.format(cycle))
+            f = open(dpath, 'w')
+            f.write('Timeline RPS\n')
+
+            try:
+                st = stats[cycle]['response']
+                for k in sorted(st.per_second.iterkeys()):
+                    if k < start_timeline:
+                        start_timeline = k
+                    if k > end_timeline:
+                        end_timeline = k
+
+                    if st.per_second[k] > max_rps:
+                        max_rps = st.per_second[k]
+                        
+                    f.write('{0} {1}\n'.format(k, st.per_second[k]))
+            except Exception as e:
+                print "Exception: {0}".format(e)
+            finally:
+                f.close
+        #print "max rps: {0}".format(max_rps)
+        #print "time range: {0}-{1}".format(start_timeline, end_timeline)
+
+        max_rps = int(max_rps * 1.25)
+
+        f = open(plot_path, "w")
+
+        lines = []
+        lines.append('set output "{0}"'.format(img_path))
+        lines.append('set title "Request Per Second over time"')
+        lines.append('set xlabel "Time line"')
+	lines.append('set timefmt "%H:%M:%S"')
+	lines.append('set xdata time')
+        lines.append('set ylabel "RPS"')
+        lines.append('set grid')
+        #lines.append('set xrange [{0}:{1}]'.format(0, end_timeline - start_timeline))
+        lines.append('set xrange [{0}:{1}]'.format(start_timeline, end_timeline))
+        lines.append('set yrange [{0}:{1}]'.format(min_rps, max_rps))
+        # I don't know why self.getChartSizeTmp() accept cvus which is not used currently.
+        cvus = []
+        lines.append('set terminal png size ' + self.getChartSizeTmp(cvus))
+
+        plot_line = 'plot '
+        colors = [
+            # This RGB value used for the line color for each cycle.
+            # TODO: use more pretty color?
+            "000000",
+            "0000FF",
+            "00FA9A",
+            "191970",
+            "8B008B",
+            "FF00FF",
+            "FFD700",
+            "0000CD",
+            "00BFFF",
+            "00FF00",
+            "7FFF00",
+            "FF0000",
+            "FF8C00",
+                   ];
+        i = 0
+        last_cycle = self.cycles[-1]
+        for cycle in self.cycles:
+            dpath = gnuplot_scriptpath(self.report_dir,
+                                       'time_rps-{0}.data'.format(cycle))
+            #lines.append('set size 1,1\n')
+            #lines.append('set origin 0,0\n')
+            #plot_line += '"' + dpath + '" u ($1 - {0}):($2)'.format(start_timeline)
+            plot_line += '"' + dpath + '" u ($1):($2)'
+            plot_line += ' w linespoints smooth sbezier lw 1 lt 2 lc ' + \
+                         'rgbcolor "#696969" notitle'
+            plot_line += ', \\\n'
+            #plot_line += '"' + dpath + '" u ($1 - {0}):($2)'.format(start_timeline)
+            plot_line += '"' + dpath + '" u ($1):($2)'
+            plot_line += ' w linespoints lw 1 lt 2 lc ' + \
+                         'rgbcolor "#{0}" t "{1} CUs"'.format(colors[i % len(colors)],
+                                                                     stats[cycle]['response'].cvus)
+            if cycle != last_cycle:
+                plot_line += ', \\\n'
+            i += 1
+        lines.append(plot_line)
+        #lines.append('unset multiplot\n')
+        lines = self.fixXLabels('\n'.join(lines) + '\n')
+        f.write(lines)
+        f.close()
+        gnuplot(plot_path)
+        return
+
     def createAllResponseChart(self):
         """Create global responses chart."""
+        self.createRPSTimeChart()
+        
         image_path = gnuplot_scriptpath(self.report_dir, 'requests_rps.png')
         image2_path = gnuplot_scriptpath(self.report_dir, 'requests.png')
         gplot_path = str(os.path.join(self.report_dir, 'requests.gplot'))
