@@ -365,7 +365,6 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines.append('set ylabel "RPS"')
         lines.append('set grid')
         #lines.append('set xrange [{0}:{1}]'.format(0, end_timeline - start_timeline))
-        lines.append('set xrange [{0}:{1}]'.format(start_timeline, end_timeline))
         lines.append('set yrange [{0}:{1}]'.format(min_rps, max_rps))
         # I don't know why self.getChartSizeTmp() accept cvus which is not used currently.
         cvus = []
