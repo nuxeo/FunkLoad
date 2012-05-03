@@ -22,6 +22,9 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* Added one more RPS chart in Section 5, where the X-axis represents
+  time(in second) and the Y-axis represents RPS. (Seong-Kook Shin)
+
 * Added support for providing the test configuration file with --config
   (Juha Mustonen)
 
