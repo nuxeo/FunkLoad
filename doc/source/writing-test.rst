@@ -268,7 +268,7 @@ Adding information to the report
     def setUpBench(self):
        ret = self.get(self.server_url + "/getVersion", 
                       description="Get the server version")
-       self.addMetadata('Application version', ret.getBody()) 
+       self.addMetadata(**{'Application version': ret.getBody()}) 
 
 * At runtime from the command line using the ``--label`` option of the
   bench runner.
