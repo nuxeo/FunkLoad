@@ -283,4 +283,4 @@ The process to write a new test is the following:
 .. _recorder: recorder.html
 .. _credential: credential.html
 .. _monitoring: monitoring.html
-.. _Makefile: makefile.html
+.. _Makefile: faq.html#how-to-automate-stuff
