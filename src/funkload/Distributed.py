@@ -86,7 +86,8 @@ class SSHDistributor(DistributorBase):
     used by :class:`~DistributionMgr`.
 
     """
-    def __init__(self, name, host, username=None, password=None):
+    def __init__(self, name, host, username=None, password=None,
+                                            channel_timeout=None):
         """
         performs authentication and tries to connect to the
         `host`.
@@ -98,6 +99,7 @@ class SSHDistributor(DistributorBase):
         self.connection.set_missing_host_key_policy(paramiko.WarningPolicy())
         self.error = ""
         self.name = name #So we can have multiples tests per host
+        self.channel_timeout = channel_timeout
         credentials = {}
         if username and password:
             credentials = {"username": username, "password": password}
@@ -192,7 +194,8 @@ class SSHDistributor(DistributorBase):
                     exec_str += "; popd;"
                 #trace("DEBUG: %s\n" %exec_str)
                 self_.input, self_.output, self_.err = \
-                    self_.exec_command(self.connection, exec_str, bufsize=1, timeout=250)
+                    self_.exec_command(self.connection, exec_str, bufsize=1, 
+                                                timeout=self.channel_timeout)
 
             def exec_command(self, connection, command, bufsize=-1, timeout=None):
                 # Override to set timeout properly see http://mohangk.org/blog/2011/07/paramiko-sshclient-exec_command-timeout-workaround/
@@ -282,6 +285,11 @@ class DistributionMgr(threading.Thread):
         self.sleep_time = test.conf_getFloat('bench', 'sleep_time')
         self.sleep_time_min = test.conf_getFloat('bench', 'sleep_time_min')
         self.sleep_time_max = test.conf_getFloat('bench', 'sleep_time_max')
+        if test.conf_get('distribute', 'channel_timeout', '', quiet=True):
+            self.channel_timeout = test.conf_getFloat(
+                                        'distribute', 'channel_timeout')  
+        else:
+            self.channel_timeout = None
         self.threads = []  # Contains list of ThreadData objects
         self.last_thread_id = -1
         self.thread_creation_lock = threading.Lock()
@@ -338,7 +346,8 @@ class DistributionMgr(threading.Thread):
                     "name": host,
                     "host": host,
                     "password": pwd,
-                    "username": uname})
+                    "username": uname,
+                    "channel_timeout": self.channel_timeout})
         else:
             hosts = test.conf_get('workers', 'hosts', '', quiet=True).split()
             for host in hosts:
@@ -347,7 +356,8 @@ class DistributionMgr(threading.Thread):
                     "name": host,
                     "host": test.conf_get(host, "host",host),
                     "password": test.conf_get(host, 'password', ''),
-                    "username": test.conf_get(host, 'username', '')})
+                    "username": test.conf_get(host, 'username', ''),
+                    "channel_timeout": self.channel_timeout})
 
         self._workers = []
         [self._workers.append(SSHDistributor(**w)) for w in workers]
@@ -392,6 +402,8 @@ class DistributionMgr(threading.Thread):
         text.append("* Sleeptime between test case: %ss" % self.sleep_time)
         text.append("* Startup delay between thread: %ss" %
                     self.startup_delay)
+        text.append("* Channel timeout: %s%s" % (
+            self.channel_timeout, "s" if self.channel_timeout else ""))
         text.append("* Workers :%s\n\n" % ",".join(
                                                 w.name for w in self._workers))
         return '\n'.join(text)

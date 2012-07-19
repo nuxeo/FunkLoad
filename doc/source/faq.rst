@@ -141,6 +141,7 @@ There are many ways:
       * Sleeptime between request: from 0.0s to 0.0s
       * Sleeptime between test case: 0.0s
       * Startup delay between thread: 0.01s
+      * Channel timeout: None
       * Workers :octopussy,simplet
       
       * Preparing sandboxes for 2 workers.....
@@ -205,6 +206,13 @@ There are many ways:
 
       [host1]
       host = host1:port
+
+  By default, the timeout on the ssh channel with the workers is set to None (ie timeouts are disabled).  
+  To configure the number of seconds to wait for a pending read/write operation before raising socket.timeout 
+  you can use::
+
+       [distribute]
+       channel_timeout = 250
 
 * Using BenchMaster http://pypi.python.org/pypi/benchmaster
 
