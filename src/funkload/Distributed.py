@@ -194,7 +194,7 @@ class SSHDistributor(DistributorBase):
                     exec_str += "; popd;"
                 #trace("DEBUG: %s\n" %exec_str)
                 self_.input, self_.output, self_.err = \
-                    self_.exec_command(self.connection, exec_str, bufsize=1, 
+                    self_.exec_command(self.connection, exec_str, bufsize=1,
                                                 timeout=self.channel_timeout)
 
             def exec_command(self, connection, command, bufsize=-1, timeout=None):
@@ -287,7 +287,7 @@ class DistributionMgr(threading.Thread):
         self.sleep_time_max = test.conf_getFloat('bench', 'sleep_time_max')
         if test.conf_get('distribute', 'channel_timeout', '', quiet=True):
             self.channel_timeout = test.conf_getFloat(
-                                        'distribute', 'channel_timeout')  
+                                        'distribute', 'channel_timeout')
         else:
             self.channel_timeout = None
         self.threads = []  # Contains list of ThreadData objects
@@ -313,7 +313,9 @@ class DistributionMgr(threading.Thread):
         self.test_description = test.conf_get(self.method_name, 'description',
                                               desc)
         # make a collection output location
-        if test.conf_get('distribute', 'log_path', '', quiet=True):
+        if options.distributed_log_path:
+            self.distribution_output = options.distributed_log_path
+        elif test.conf_get('distribute', 'log_path', '', quiet=True):
             self.distribution_output = test.conf_get('distribute', 'log_path')
         else:
             raise UserWarning("log_path isn't defined in section [distribute]")
