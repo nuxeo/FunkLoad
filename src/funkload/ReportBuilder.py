@@ -262,8 +262,8 @@ def main():
             parser.error("incorrect number of arguments")
         trace("Creating diff report ... ")
         output_dir = options.output_dir
-        html_path = RenderDiff(args[0], args[1], css_file=options.css_file,
-                               options)
+        html_path = RenderDiff(args[0], args[1], options,
+                               css_file=options.css_file)
         trace("done: \n")
         trace("%s\n" % html_path)
     elif options.trendreport:
@@ -271,7 +271,7 @@ def main():
             parser.error("incorrect number of arguments")
         trace("Creating trend report ... ")
         output_dir = options.output_dir
-        html_path = RenderTrend(args, css_file=options.css_file, options)
+        html_path = RenderTrend(args, options, css_file=options.css_file)
         trace("done: \n")
         trace("%s\n" % html_path)
     else:
@@ -293,8 +293,8 @@ def main():
             html_path = RenderHtml(xml_parser.config, xml_parser.stats,
                                    xml_parser.error, xml_parser.monitor,
                                    xml_parser.monitorconfig,
-                                   css_file=options.css_file,
-                                   options)()
+                                   options,
+                                   css_file=options.css_file)()
             trace("done: \n")
             trace(html_path + "\n")
         elif options.org:
