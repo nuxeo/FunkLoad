@@ -255,6 +255,9 @@ def main():
                       dest="css_file",
                       help="Custom CSS file to use for the HTML reports",
                       default=None)
+    parser.add_option("", "--skip-definitions", action="store_true",
+                      default=False, dest="skip_definitions",
+                      help="If True, will skip the definitions")
 
     options, args = parser.parse_args()
     if options.diffreport:
