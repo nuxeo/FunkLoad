@@ -249,7 +249,6 @@ class RenderRst:
             self.with_chart = False
         self.date = config['time'][:19].replace('T', ' ')
 
-
     def getRepresentativeCycleStat(self):
         """Return the cycle stat with the maximum number of steps."""
         stats = self.stats
