@@ -306,13 +306,13 @@ class Data:
 
 def get_virtualenv_script():
     """
-    returns the path of the virtualenv.py script that is 
+    returns the path of the virtualenv.py script that is
     installed in the system. if it doesn't exist returns
     None.
     """
     pkg = pkg_resources.get_distribution('virtualenv')
     script_path =  os.path.join( pkg.location, 'virtualenv.py')
-    
+
     if os.path.isfile( script_path ):
         return script_path
     else:
@@ -335,14 +335,14 @@ def package_tests(module_file):
                                     filename.find(".xml")>=0 or\
                                     os.path.split(filename)[1] == "bin" or\
                                     os.path.split(filename)[1] == "lib"
-        
-    _path = tempfile.mktemp(suffix='.tar') 
+
+    _path = tempfile.mktemp(suffix='.tar')
     import hashlib
     _targetdir = hashlib.md5(os.path.splitext(module_file)[0]).hexdigest()
     _directory = os.path.split(os.path.abspath(module_file))[0]
     _tar = tarfile.TarFile( _path  ,'w')
     _tar.add ( _directory, _targetdir , exclude = exclude_func )
-    
+
     return _path, _targetdir
 
 def extract_token(text, tag_start, tag_end):

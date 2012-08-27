@@ -161,7 +161,7 @@ class FunkLoadXmlParser:
             stats['response'] = stat
 
             stat = stats.setdefault(
-                'page', PageStat(cycle, self.cycle_duration, attrs['cvus'], 
+                'page', PageStat(cycle, self.cycle_duration, attrs['cvus'],
                                  self.apdex_t))
             stat.add(attrs['thread'], attrs['step'], attrs['time'],
                      attrs['result'], attrs['duration'], attrs['type'])
@@ -251,6 +251,13 @@ def main():
                       help="Apdex T constant in second, default is set to 1.5s. "
                       "Visit http://www.apdex.org/ for more information.",
                       default=1.5)
+    parser.add_option("-x", "--css", type="string",
+                      dest="css_file",
+                      help="Custom CSS file to use for the HTML reports",
+                      default=None)
+    parser.add_option("", "--skip-definitions", action="store_true",
+                      default=False, dest="skip_definitions",
+                      help="If True, will skip the definitions")
 
     options, args = parser.parse_args()
     if options.diffreport:
@@ -258,7 +265,8 @@ def main():
             parser.error("incorrect number of arguments")
         trace("Creating diff report ... ")
         output_dir = options.output_dir
-        html_path = RenderDiff(args[0], args[1], options)
+        html_path = RenderDiff(args[0], args[1], options,
+                               css_file=options.css_file)
         trace("done: \n")
         trace("%s\n" % html_path)
     elif options.trendreport:
@@ -266,7 +274,7 @@ def main():
             parser.error("incorrect number of arguments")
         trace("Creating trend report ... ")
         output_dir = options.output_dir
-        html_path = RenderTrend(args, options)
+        html_path = RenderTrend(args, options, css_file=options.css_file)
         trace("done: \n")
         trace("%s\n" % html_path)
     else:
@@ -287,7 +295,9 @@ def main():
             trace("Creating html report: ...")
             html_path = RenderHtml(xml_parser.config, xml_parser.stats,
                                    xml_parser.error, xml_parser.monitor,
-                                   xml_parser.monitorconfig, options)()
+                                   xml_parser.monitorconfig,
+                                   options,
+                                   css_file=options.css_file)()
             trace("done: \n")
             trace(html_path + "\n")
         elif options.org:

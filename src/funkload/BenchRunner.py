@@ -733,11 +733,14 @@ def main(args=sys.argv[1:]):
             trace(red_str("Distribution failed with:%s \n" % (error)))
 
         try:
-            distmgr.prepare_workers(allow_errors=True)
-            ret = distmgr.run()
-            distmgr.final_collect()
-        except KeyboardInterrupt:
-            trace("* ^C received *")
+            try:
+                distmgr.prepare_workers(allow_errors=True)
+                ret = distmgr.run()
+                distmgr.final_collect()
+            except KeyboardInterrupt:
+                trace("* ^C received *")
+        finally:
+            # in any case we want to stop the workers at the end
             distmgr.abort()
 
         return ret

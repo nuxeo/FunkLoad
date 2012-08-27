@@ -249,7 +249,6 @@ class RenderRst:
             self.with_chart = False
         self.date = config['time'][:19].replace('T', ' ')
 
-
     def getRepresentativeCycleStat(self):
         """Return the cycle stat with the maximum number of steps."""
         stats = self.stats
@@ -360,7 +359,7 @@ class RenderRst:
 
     def renderTestContent(self, test):
         """Render global information about test content."""
-        self.append(rst_title("Bench content", 2)) 
+        self.append(rst_title("Bench content", 2))
         config = self.config
         self.append('The test ``%s.%s`` contains: ' % (config['class'],
                                                        config['method']))
@@ -510,7 +509,7 @@ class RenderRst:
             stat = stats[cycle]['response_step'][step_name]
             stat.finalize()
             items.append((stat.avg, stat.step,
-                          stat.type, stat.url, stat.description, 
+                          stat.type, stat.url, stat.description,
                           stat.apdex_score))
             if not cycle_name:
                 cycle_name = stat.cvus
@@ -587,7 +586,7 @@ class RenderRst:
                     ' of pages or requests are delivered.')
         self.append(LI + ' P95: 95th percentile, response time where 95 percent'
                     ' of pages or requests are delivered.')
-        self.append(LI + ''' Apdex T: Application Performance Index, 
+        self.append(LI + ''' Apdex T: Application Performance Index,
   this is a numerical measure of user satisfaction, it is based
   on three zones of application responsiveness:
 
@@ -613,7 +612,7 @@ class RenderRst:
         self.append(LI + ''' Rating: To ease interpretation the Apdex
   score is also represented as a rating:
 
-  - U for UNACCEPTABLE represented in gray for a score between 0 and 0.5 
+  - U for UNACCEPTABLE represented in gray for a score between 0 and 0.5
 
   - P for POOR represented in red for a score between 0.5 and 0.7
 
@@ -655,7 +654,8 @@ class RenderRst:
         self.renderMonitors()
         self.renderPageDetail(cycle_r)
         self.renderErrors()
-        self.renderDefinitions()
+        if not self.options.skip_definitions:
+            self.renderDefinitions()
         self.renderHook()
         return '\n'.join(self.rst)
 

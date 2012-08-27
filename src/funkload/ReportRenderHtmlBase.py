@@ -92,7 +92,8 @@ class RenderHtmlBase(RenderRst):
         """Copy the css to the report dir."""
         css_file = self.css_file
         if css_file is not None:
-            css_dest_path = os.path.join(self.report_dir, css_file)
+            css_filename = os.path.split(css_file)[-1]
+            css_dest_path = os.path.join(self.report_dir, css_filename)
             copyfile(css_file, css_dest_path)
         else:
             # use the one in our package_data
