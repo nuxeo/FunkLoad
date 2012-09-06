@@ -35,6 +35,7 @@ from optparse import OptionParser, TitledHelpFormatter
 from socket import error as SocketError
 from thread import error as ThreadError
 from xmlrpclib import ServerProxy, Fault
+import signal
 
 from FunkLoadHTTPServer import FunkLoadHTTPServer
 from utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
@@ -585,6 +586,16 @@ class BenchRunner:
         return '\n'.join(text)
 
 
+_manager = None
+
+def shutdown(*args):
+    trace('Aborting run...')
+    if _manager is not None:
+        _manager.abort()
+    trace('Aborted')
+    sys.exit(0)
+
+
 def main(args=sys.argv[1:]):
     """Default main."""
     # enable to load module in the current path
@@ -722,13 +733,21 @@ def main(args=sys.argv[1:]):
         # We were passed a module name
         module_name = args[0]
 
+    # registering signals
+    signal.signal(signal.SIGTERM, shutdown)
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGQUIT, shutdown)
+
     klass, method = args[1].split('.')
     if options.distribute:
         from Distributed import DistributionMgr
         ret = None
+        global _manager
+
         try:
             distmgr = DistributionMgr(
                 module_name, klass, method, options, cmd_args)
+            _manager = distmgr
         except UserWarning, error:
             trace(red_str("Distribution failed with:%s \n" % (error)))
 
@@ -743,6 +762,7 @@ def main(args=sys.argv[1:]):
             # in any case we want to stop the workers at the end
             distmgr.abort()
 
+        _manager = None
         return ret
     else:
         bench = BenchRunner(module_name, klass, method, options)
