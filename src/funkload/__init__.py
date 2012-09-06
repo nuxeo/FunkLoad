@@ -20,3 +20,10 @@
 
 $Id: __init__.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
+
+# if gevent is present, patch the stdlib so we speed things up
+try:
+    from gevent.monkey import patch_all
+    patch_all()
+except ImportError:
+    pass
