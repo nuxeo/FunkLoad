@@ -208,7 +208,7 @@ class PageStat(AllResponseStat):
         """Add a new response to stat."""
         thread = self.threads.setdefault(thread, {'count': 0,
                                                   'pages': {}})
-        if str(rtype) in ('post', 'get', 'xmlrpc'):
+        if str(rtype) in ('post', 'get', 'xmlrpc', 'put', 'delete', 'head'):
             new_page = True
         else:
             new_page = False
