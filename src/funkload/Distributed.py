@@ -34,6 +34,12 @@ import paramiko
 from utils import mmn_encode, trace, package_tests, get_virtualenv_script, \
                   get_version
 
+try:
+    from funkload.rtfeedback import FeedbackPublisher
+    LIVE_FEEDBACK = True
+except ImportError:
+    LIVE_FEEDBACK = False
+
 
 def load_module(test_module):
     module = __import__(test_module)
@@ -201,6 +207,7 @@ class SSHDistributor(DistributorBase):
                 # Override to set timeout properly see http://mohangk.org/blog/2011/07/paramiko-sshclient-exec_command-timeout-workaround/
                 chan = connection._transport.open_session()
                 chan.settimeout(timeout)
+                print command
                 chan.exec_command(command)
                 stdin = chan.makefile('wb', bufsize)
                 stdout = chan.makefile('rb', bufsize)
@@ -379,6 +386,13 @@ class DistributionMgr(threading.Thread):
         # keep the test to use the result logger for monitoring
         # and call setUp/tearDown Cycle
         self.test = test
+
+        # start the feedback receiver
+        if LIVE_FEEDBACK:
+            self.feedback = FeedbackPublisher()
+            self.feedback.run()
+        else:
+            self.feedback = None
 
     def __repr__(self):
         """Display distributed bench information."""
@@ -585,6 +599,8 @@ class DistributionMgr(threading.Thread):
                 trace(' done.\n')
 
         self.write_statistics(successful_results)
+        if self.feedback is not None:
+            self.feedback.close()
 
     def write_statistics(self, successful_results):
         """ Write the distributed stats to a file in the output dir """
