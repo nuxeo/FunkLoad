@@ -118,6 +118,7 @@ class SSHDistributor(DistributorBase):
             self.error = error
         except socket.timeout, error:
             self.error = error
+        self.killed = False
 
     @requiresconnection
     def get(self, remote_path, local_path):
@@ -157,6 +158,8 @@ class SSHDistributor(DistributorBase):
         out = ""
         err = ""
         while True:
+            if self.killed:
+                break
             e = obj.err.read(1)
             err += e
             #trace(e)
@@ -193,9 +196,13 @@ class SSHDistributor(DistributorBase):
                 if self_.cwdir:
                     exec_str += "; popd;"
                 #trace("DEBUG: %s\n" %exec_str)
-                self_.input, self_.output, self_.err = \
-                    self_.exec_command(self.connection, exec_str, bufsize=1,
+                try:
+                    self_.input, self_.output, self_.err = \
+                        self_.exec_command(self.connection, exec_str, bufsize=1,
                                                 timeout=self.channel_timeout)
+                except Exception, e:
+                    if not self.killed:
+                        raise
 
             def exec_command(self, connection, command, bufsize=-1, timeout=None):
                 # Override to set timeout properly see http://mohangk.org/blog/2011/07/paramiko-sshclient-exec_command-timeout-workaround/
@@ -242,6 +249,7 @@ class SSHDistributor(DistributorBase):
         kills the ssh connection
         """
         self.connection.close()
+        self.killed = True
 
 
 class DistributionMgr(threading.Thread):
