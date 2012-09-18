@@ -467,6 +467,10 @@ class DistributionMgr(threading.Thread):
                 cwdir=remote_res_dir)
             worker.execute("rm %s" % remote_tarball)
 
+            # workaround for https://github.com/pypa/virtualenv/issues/330
+            worker.execute("rm lib64", cwdir=virtual_env)
+            worker.execute("ln -s lib lib64", cwdir=virtual_env)
+
         threads = []
         trace("* Preparing sandboxes for %d workers." % len(self._workers))
         for worker in list(self._workers):
