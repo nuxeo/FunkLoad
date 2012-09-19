@@ -272,6 +272,9 @@ class DistributionMgr(threading.Thread):
 
         self.cmd_args += " --is-distributed"
 
+        if options.feedback:
+            self.cmd_args += " --feedback'
+
         module = load_module(module_name)
         module_file = module.__file__
         self.tarred_tests, self.tarred_testsdir = package_tests(module_file)
@@ -390,7 +393,7 @@ class DistributionMgr(threading.Thread):
         self.test = test
 
         # start the feedback receiver
-        if LIVE_FEEDBACK:
+        if LIVE_FEEDBACK and options.feedback:
             trace("* Starting the Feedback Publisher\n")
             self.feedback = FeedbackPublisher(
                     endpoint=options.feedback_endpoint or DEFAULT_ENDPOINT,

@@ -294,7 +294,7 @@ class BenchRunner:
         self.test = test
 
         # set up the feedback sender
-        if LIVE_FEEDBACK and options.is_distributed:
+        if LIVE_FEEDBACK and options.is_distributed and options.feedback:
             trace("* Creating Feedback sender")
             self.feedback = FeedbackSender(endpoint=options.feedback_endpoint or
                                            DEFAULT_ENDPOINT.)
@@ -748,7 +748,10 @@ def main(args=sys.argv[1:]):
                       dest="feedback_pubsub_endpoint",
                       help="Path where all the logs will be stored when "
                            "running a distributed test")
-
+    parser.add_option("--feedback",
+                      action="store_true",
+                      dest="feedback",
+                      help="Activates the realtime feedback")
 
 
     # XXX What exactly is this checking for here??
