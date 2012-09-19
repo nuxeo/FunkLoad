@@ -238,8 +238,9 @@ class LoopTestRunner(threading.Thread):
                         trace("ERROR %s: %s" % (str(test), str(error)))
                     for (test, error) in test_result.failures:
                         trace("FAILURE %s: %s" % (str(test), str(error)))
-                if self.feedback is not None:
-                    self.feedback.test_done(feedback)
+
+            if self.feedback is not None:
+                self.feedback.test_done(feedback)
 
             thread_sleep(self.sleep_time)
 
@@ -292,6 +293,7 @@ class BenchRunner:
 
         # set up the feedback sender
         if LIVE_FEEDBACK:
+            trace("* Creating Feedback sender")
             self.feedback = FeedbackSender()
         else:
             self.feedback = None
@@ -760,10 +762,10 @@ def main(args=sys.argv[1:]):
 
     klass, method = args[1].split('.')
     if options.distribute:
-        from RTDistributed import RealTimeDistributionMgr
+        from funkload.Distributed import DistributionMgr
         ret = None
         try:
-            distmgr = RealTimeDistributionMgr(
+            distmgr = DistributionMgr(
                 module_name, klass, method, options, cmd_args)
         except UserWarning, error:
             trace(red_str("Distribution failed with:%s \n" % (error)))
@@ -781,9 +783,7 @@ def main(args=sys.argv[1:]):
 
         return ret
     else:
-        from funkload.RTDistributed import RealTimeBenchRunner
-
-        bench =RealTimeBenchRunner(module_name, klass, method, options)
+        bench = BenchRunner(module_name, klass, method, options)
 
         # Start a HTTP server optionally
         if options.debugserver:

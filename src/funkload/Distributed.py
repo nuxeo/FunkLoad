@@ -389,8 +389,9 @@ class DistributionMgr(threading.Thread):
 
         # start the feedback receiver
         if LIVE_FEEDBACK:
+            trace("* Starting the Feedback Publisher\n")
             self.feedback = FeedbackPublisher()
-            self.feedback.run()
+            self.feedback.start()
         else:
             self.feedback = None
 
