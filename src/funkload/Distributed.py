@@ -35,10 +35,12 @@ from utils import mmn_encode, trace, package_tests, get_virtualenv_script, \
                   get_version
 
 try:
-    from funkload.rtfeedback import FeedbackPublisher
+    from funkload.rtfeedback import (FeedbackPublisher,
+                                     DEFAULT_ENDPOINT, DEFAULT_PUBSUB)
     LIVE_FEEDBACK = True
 except ImportError:
     LIVE_FEEDBACK = False
+    DEFAULT_PUBSUB = DEFAULT_ENDPOINT = None
 
 
 def load_module(test_module):
@@ -390,7 +392,11 @@ class DistributionMgr(threading.Thread):
         # start the feedback receiver
         if LIVE_FEEDBACK:
             trace("* Starting the Feedback Publisher\n")
-            self.feedback = FeedbackPublisher()
+            self.feedback = FeedbackPublisher(
+                    endpoint=options.feedback_endpoint or DEFAULT_ENDPOINT,
+                    pubsub_endpoint=options.feedback_pubsub_endpoint or
+                    DEFAULT_PUBSUB
+                    )
             self.feedback.start()
         else:
             self.feedback = None

@@ -1,5 +1,5 @@
 import json
-
+import socket
 try:
     import gevent
     import zmq.green as zmq
@@ -45,10 +45,12 @@ class FeedbackPublisher(threading.Thread):
 class FeedbackSender(object):
     """Sends feedback
     """
-    def __init__(self, endpoint=DEFAULT_ENDPOINT, server='', context=None):
+    def __init__(self, endpoint=DEFAULT_ENDPOINT, server=None, context=None):
         self.context = context or zmq.Context.instance()
         self.sock = self.context.socket(zmq.PUSH)
         self.sock.connect(endpoint)
+        if server is None:
+            server = socket.gethostname()
         self.server = server
 
     def test_done(self, data):

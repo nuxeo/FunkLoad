@@ -40,10 +40,12 @@ from FunkLoadHTTPServer import FunkLoadHTTPServer
 from utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
                   trace, red_str, green_str, get_version
 try:
-    from funkload.rtfeedback import FeedbackSender
+    from funkload.rtfeedback import (FeedbackSender, DEFAULT_ENDPOINT,
+                                     DEFAULT_PUBSUB)
     LIVE_FEEDBACK = True
 except ImportError:
     LIVE_FEEDBACK = False
+    DEFAULT_PUBSUB = DEFAULT_ENDPOINT = None
 
 
 USAGE = """%prog [options] file class.method
@@ -292,9 +294,10 @@ class BenchRunner:
         self.test = test
 
         # set up the feedback sender
-        if LIVE_FEEDBACK:
+        if LIVE_FEEDBACK and options.is_distributed:
             trace("* Creating Feedback sender")
-            self.feedback = FeedbackSender()
+            self.feedback = FeedbackSender(endpoint=options.feedback_endpoint or
+                                           DEFAULT_ENDPOINT.)
         else:
             self.feedback = None
 
@@ -735,6 +738,18 @@ def main(args=sys.argv[1:]):
                       dest="distributed_log_path",
                       help="Path where all the logs will be stored when "
                            "running a distributed test")
+    parser.add_option("--feedback-endpoint",
+                      type="string",
+                      dest="feedback_endpoint",
+                      help="Path where all the logs will be stored when "
+                           "running a distributed test")
+    parser.add_option("--feedback-pubsub-endpoint",
+                      type="string",
+                      dest="feedback_pubsub_endpoint",
+                      help="Path where all the logs will be stored when "
+                           "running a distributed test")
+
+
 
     # XXX What exactly is this checking for here??
     cmd_args = " ".join([k for k in args
