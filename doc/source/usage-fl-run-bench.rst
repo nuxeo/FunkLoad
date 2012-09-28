@@ -38,7 +38,7 @@ Options
 --cycles=BENCH_CYCLES, -c BENCH_CYCLES
                         Cycles to bench, this is a list of number of virtual
                         concurrent users, to run a bench with 3 cycles with 5,
-                        10 and 20 users use: -c 2:10:20
+                        10 and 20 users use: -c 5:10:20
 --duration=BENCH_DURATION, -D BENCH_DURATION
                         Duration of a cycle in seconds.
 --sleep-time-min=BENCH_SLEEP_TIME_MIN, -m BENCH_SLEEP_TIME_MIN
