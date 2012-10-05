@@ -40,6 +40,13 @@ import signal
 from FunkLoadHTTPServer import FunkLoadHTTPServer
 from utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
                   trace, red_str, green_str, get_version
+try:
+    from funkload.rtfeedback import (FeedbackSender, DEFAULT_ENDPOINT,
+                                     DEFAULT_PUBSUB)
+    LIVE_FEEDBACK = True
+except ImportError:
+    LIVE_FEEDBACK = False
+    DEFAULT_PUBSUB = DEFAULT_ENDPOINT = None
 
 
 USAGE = """%prog [options] file class.method
@@ -89,6 +96,8 @@ def add_cycle_result(status):
         g_errors += 1
     else:
         g_failures += 1
+
+    return g_success, g_errors, g_failures
 
 
 def get_cycle_results():
@@ -169,7 +178,7 @@ class LoopTestRunner(threading.Thread):
 
     def __init__(self, test_module, test_class, test_name, options,
                  cycle, cvus, thread_id, thread_signaller, sleep_time,
-                 debug=False):
+                 debug=False, feedback=None):
         meta_method_name = mmn_encode(test_name, cycle, cvus, thread_id)
         threading.Thread.__init__(self, target=self.run, name=meta_method_name,
                                   args=())
@@ -181,6 +190,7 @@ class LoopTestRunner(threading.Thread):
         self.thread_signaller = thread_signaller
         # this makes threads endings if main stop with a KeyboardInterupt
         self.setDaemon(1)
+        self.feedback = feedback
 
     def run(self):
         """Run a test in loop."""
@@ -188,34 +198,55 @@ class LoopTestRunner(threading.Thread):
             test_result = unittest.TestResult()
             self.test.clearContext()
             self.test(test_result)
+            feedback = {}
+
             if test_result.wasSuccessful():
                 if recording():
-                    add_cycle_result('success')
-                    if self.color:
-                        trace(green_str('.'))
-                    else:
-                        trace('.')
+                    feedback['count'] = add_cycle_result('success')
+
+                if self.color:
+                    trace(green_str('.'))
+                else:
+                    trace('.')
+
+                feedback['result'] = 'success'
             else:
                 if len(test_result.errors):
                     if recording():
-                        add_cycle_result('error')
+                        feedback['count'] = add_cycle_result('error')
+
                     if self.color:
                         trace(red_str('E'))
                     else:
                         trace('E')
+
+                    feedback['result'] = 'error'
+
                 else:
                     if recording():
-                        add_cycle_result('failure')
+                        feedback['count'] = add_cycle_result('failure')
+
                     if self.color:
                         trace(red_str('F'))
                     else:
                         trace('F')
+
+                    feedback['result'] = 'failure'
+
                 if self.debug:
+                    feedback['errors'] = test_result.errors
+                    feedback['failures'] = test_result.failures
+
                     for (test, error) in test_result.errors:
                         trace("ERROR %s: %s" % (str(test), str(error)))
                     for (test, error) in test_result.failures:
                         trace("FAILURE %s: %s" % (str(test), str(error)))
+
+            if self.feedback is not None:
+                self.feedback.test_done(feedback)
+
             thread_sleep(self.sleep_time)
+
 
 
 class BenchRunner:
@@ -263,10 +294,19 @@ class BenchRunner:
         # and call setUp/tearDown Cycle
         self.test = test
 
+        # set up the feedback sender
+        if LIVE_FEEDBACK and options.is_distributed and options.feedback:
+            trace("* Creating Feedback sender")
+            self.feedback = FeedbackSender(endpoint=options.feedback_endpoint or
+                                           DEFAULT_ENDPOINT.)
+        else:
+            self.feedback = None
+
     def run(self):
         """Run all the cycles.
 
         return 0 on success, 1 if there were some failures and -1 on errors."""
+
         trace(str(self))
         trace("Benching\n")
         trace("========\n\n")
@@ -368,7 +408,8 @@ class BenchRunner:
                                     self.method_name, self.options,
                                     cycle, number_of_threads,
                                     thread_id, thread_signaller,
-                                    self.sleep_time)
+                                    self.sleep_time,
+                                    feedback=self.feedback)
             trace(".")
             try:
                 thread.start()
@@ -708,6 +749,21 @@ def main(args=sys.argv[1:]):
                       dest="distributed_log_path",
                       help="Path where all the logs will be stored when "
                            "running a distributed test")
+    parser.add_option("--feedback-endpoint",
+                      type="string",
+                      dest="feedback_endpoint",
+                      help="Path where all the logs will be stored when "
+                           "running a distributed test")
+    parser.add_option("--feedback-pubsub-endpoint",
+                      type="string",
+                      dest="feedback_pubsub_endpoint",
+                      help="Path where all the logs will be stored when "
+                           "running a distributed test")
+    parser.add_option("--feedback",
+                      action="store_true",
+                      dest="feedback",
+                      help="Activates the realtime feedback")
+
 
     # XXX What exactly is this checking for here??
     cmd_args = " ".join([k for k in args
@@ -740,7 +796,7 @@ def main(args=sys.argv[1:]):
 
     klass, method = args[1].split('.')
     if options.distribute:
-        from Distributed import DistributionMgr
+        from funkload.Distributed import DistributionMgr
         ret = None
         global _manager
 
