@@ -298,7 +298,7 @@ class BenchRunner:
         if LIVE_FEEDBACK and options.is_distributed and options.feedback:
             trace("* Creating Feedback sender")
             self.feedback = FeedbackSender(endpoint=options.feedback_endpoint or
-                                           DEFAULT_ENDPOINT.)
+                                           DEFAULT_ENDPOINT)
         else:
             self.feedback = None
 

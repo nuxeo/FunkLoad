@@ -22,6 +22,11 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* GH-71: zeromq-based publisher that will let each node publish in
+  realtime the tests results (Tarek Ziade)
+
+* GH-68: Use lightweight threads (greenlets) if available. (Tarek Ziade)
+
 * Added one more RPS chart in Section 5, where the X-axis represents
   time(in second) and the Y-axis represents RPS. (Seong-Kook Shin)
 
@@ -70,6 +75,9 @@ New Features
 
 Bug Fixes
 ~~~~~~~~~~
+
+
+* GH-69: Cleanly abort on SIGTERM (Tarek Ziade)
 
 * GH-32: Fix Funkload WF_fetch patch to handle cookies correctly. Submitted by jorgebastida.
 
