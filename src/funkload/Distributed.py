@@ -281,7 +281,7 @@ class DistributionMgr(threading.Thread):
         self.cmd_args += " --is-distributed"
 
         if options.feedback:
-            self.cmd_args += " --feedback'
+            self.cmd_args += " --feedback"
 
         module = load_module(module_name)
         module_file = module.__file__
