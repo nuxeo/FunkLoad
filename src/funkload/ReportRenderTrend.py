@@ -143,6 +143,7 @@ class RenderTrend(RenderHtmlBase):
         self.args = [os.path.abspath(arg).replace('\\', '/') for arg in args]
         self.options = options
         self.css_file = css_file
+        self.quiet = options.quiet
 
     def generateReportDirectory(self, output_dir):
         """Generate a directory name for a report."""

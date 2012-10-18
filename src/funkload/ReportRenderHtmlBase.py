@@ -38,6 +38,7 @@ class RenderHtmlBase(RenderRst):
     def __init__(self, config, stats, error, monitor, monitorconfig, options, css_file=None):
         RenderRst.__init__(self, config, stats, error, monitor, monitorconfig, options)
         self.css_file = css_file
+        self.quiet = options.quiet
         self.report_dir = self.css_path = self.rst_path = self.html_path = None
 
     def getChartSize(self, cvus):
@@ -118,10 +119,11 @@ class RenderHtmlBase(RenderRst):
         cmdline = "-t --stylesheet-path=%s %s %s" % (self.css_path,
                                                      self.rst_path,
                                                      html_path)
+        if self.quiet:
+            cmdline = "-q " + cmdline
         cmd_argv = cmdline.split(' ')
         publish_cmdline(writer_name='html', argv=cmd_argv)
         self.html_path = html_path
-
 
     def render(self):
         """Create the html report."""

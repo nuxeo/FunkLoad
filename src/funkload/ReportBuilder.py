@@ -258,6 +258,10 @@ def main():
     parser.add_option("", "--skip-definitions", action="store_true",
                       default=False, dest="skip_definitions",
                       help="If True, will skip the definitions")
+    parser.add_option("-q", "--quiet", action="store_true",
+                      default=False, dest="quiet",
+                      help=("Report no system messages when generating"
+                            " html from rst."))
 
     options, args = parser.parse_args()
     if options.diffreport:

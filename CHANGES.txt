@@ -22,6 +22,9 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* Add --quiet option to fl-build-report to remove warning in rst to 
+  html convertion
+ 
 * GH-71: zeromq-based publisher that will let each node publish in
   realtime the tests results (Tarek Ziade)
 
