@@ -342,7 +342,7 @@ def package_tests(module_file):
     _directory = os.path.split(os.path.abspath(module_file))[0]
     _tar = tarfile.TarFile( _path  ,'w')
     _tar.add ( _directory, _targetdir , exclude = exclude_func )
-
+    _tar.close()
     return _path, _targetdir
 
 def extract_token(text, tag_start, tag_end):
