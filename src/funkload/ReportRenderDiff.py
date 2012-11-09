@@ -74,6 +74,7 @@ class RenderDiff(RenderHtmlBase):
         self.report_dir2 = os.path.abspath(report_dir2).replace('\\', '/')
         self.options = options
         self.css_file = css_file
+        self.quiet = options.quiet
 
     def generateReportDirectory(self, output_dir):
         """Generate a directory name for a report."""
