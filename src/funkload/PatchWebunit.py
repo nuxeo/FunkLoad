@@ -487,7 +487,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     if self.accept_cookies:
         try:
             # decode the cookies and update the cookies store
-            cookie.decodeCookies(url, server, headers, self.cookies)
+            decodeCookies(url, server, headers, self.cookies)
         except:
             if VERBOSE:
                 sys.stdout.write('c')
