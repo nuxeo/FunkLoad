@@ -40,6 +40,8 @@ from urllib import urlencode
 import httplib
 import cStringIO
 from mimetypes import guess_type
+import datetime
+import Cookie
 
 from webunit import cookie
 from webunit.IMGSucker import IMGSucker
@@ -167,6 +169,70 @@ def WTC_log(self, message, content):
     """Remove webunit logging."""
     pass
 WebTestCase.log = WTC_log
+
+def decodeCookies(url, server, headers, cookies):
+    """Decode cookies into the supplied cookies dictionary,
+    according to RFC 6265.
+
+    Relevant specs:
+    http://www.ietf.org/rfc/rfc2109.txt (obsolete)
+    http://www.ietf.org/rfc/rfc2965.txt (obsolete)
+    http://www.ietf.org/rfc/rfc6265.txt (proposed standard)
+    """
+    # see rfc 6265, section 5.1.4
+    # empty path => '/'
+    # path must begin with '/', so we only weed out the rightmost '/'
+    request_path = urlparse.urlparse(url)[2]
+    if len(request_path) > 2 and request_path[-1] == '/':
+        request_path = request_path[:-1]
+    else:
+        request_path = '/'
+
+    # XXX - tried slurping all the set-cookie and joining them on
+    # '\n', some cookies were not parsed. This below worked flawlessly.
+    for ch in headers.getallmatchingheaders('set-cookie'):
+        cookie = Cookie.SimpleCookie(ch.strip()).values()[0]
+
+        # see rfc 6265, section 5.3, step 7
+        path = cookie['path'] or request_path
+
+        # see rfc 6265, section 5.3, step 4 to 6
+        # XXX - we don't bother with cookie persistence
+        # XXX - we don't check for public suffixes
+        if cookie['domain']:
+            domain = cookie['domain']
+            # see rfc6265, section 5.2.3
+            if domain[0] == '.':
+               domain = domain[1:]
+            if not server.endswith(domain):
+               continue
+        else:
+            domain = server
+
+        # all date handling is done is UTC
+        # XXX - need reviewing by someone familiar with python datetime objects
+        now = datetime.datetime.utcnow()
+        expire = datetime.datetime.min
+        maxage = cookie['max-age']
+        # see rfc 6265, section 5.3, step 3
+        if maxage != '':
+            timedelta = int(maxage)
+            if timedelta > 0:
+                expire = now + timedelta
+        else:
+            if cookie['expires'] == '':
+                expire = datetime.datetime.max
+            else:
+                expire = datetime.datetime.strptime(cookie['expires'],"%a, %d-%b-%Y %H:%M:%S %Z")
+
+        cookie['expires'] = expire
+        bydom = cookies.setdefault(domain, {})
+        bypath = bydom.setdefault(path, {})
+
+        if expire > now:
+            bypath[cookie.key] = cookie
+        elif cookie.key in bypath:
+            del bypath[cookie.key]
 
 
 # use fl img sucker
