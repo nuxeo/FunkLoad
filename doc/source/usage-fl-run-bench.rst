@@ -52,6 +52,8 @@ Options
 --as-fast-as-possible, -f
                         Remove sleep times between requests and between tests,
                         shortcut for -m0 -M0 -t0
+--runner-class=BENCH_RUNNER_CLASS, -r BENCH_RUNNER_CLASS
+                        Python dotted import path to BenchRunner class to use.
 --no-color              Monochrome output.
 --accept-invalid-links  Do not fail if css/image links are not reachable.
 --simple-fetch          Don't load additional links like css or images when

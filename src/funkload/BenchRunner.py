@@ -636,6 +636,15 @@ def shutdown(*args):
     trace('Aborted')
     sys.exit(0)
 
+def get_runner_class(class_path):
+    try:
+        module_path, class_name = class_path.rsplit('.', 1)
+    except ValueError:
+        raise Exception('Invalid class path {0}'.format(class_path))
+
+    _module = __import__(module_path, globals(), locals(), class_name, -1)
+    return getattr(_module, class_name)
+
 
 def main(args=sys.argv[1:]):
     """Default main."""
@@ -684,6 +693,11 @@ def main(args=sys.argv[1:]):
                       action="store_true",
                       help="Remove sleep times between requests and between "
                            "tests, shortcut for -m0 -M0 -t0")
+    parser.add_option("-r", "--runner-class",
+                      type="string",
+                      dest="bench_runner_class",
+                      default="funkload.BenchRunner.BenchRunner",
+                      help="Python dotted import path to BenchRunner class to use.")
     parser.add_option("", "--no-color",
                       action="store_true",
                       help="Monochrome output.")
@@ -821,7 +835,8 @@ def main(args=sys.argv[1:]):
         _manager = None
         return ret
     else:
-        bench = BenchRunner(module_name, klass, method, options)
+        RunnerClass = get_runner_class(options.bench_runner_class)
+        bench = RunnerClass(module_name, klass, method, options)
 
         # Start a HTTP server optionally
         if options.debugserver:
