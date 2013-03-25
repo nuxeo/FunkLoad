@@ -158,7 +158,7 @@ Using the configuration file
 ---------------------------------
 
 You can get information from the configuration file, using the
-approriate ``self.conf_get*(section, key)`` methods::
+appropriate ``self.conf_get*(section, key)`` methods::
 
    # Getting value from the main section
    value = self.get_conf('main', 'key', 'default')
