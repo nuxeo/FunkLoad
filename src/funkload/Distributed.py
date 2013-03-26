@@ -95,7 +95,7 @@ class SSHDistributor(DistributorBase):
 
     """
     def __init__(self, name, host, username=None, password=None,
-                                            channel_timeout=None):
+                 key_filename=None, channel_timeout=None):
         """
         performs authentication and tries to connect to the
         `host`.
@@ -111,6 +111,8 @@ class SSHDistributor(DistributorBase):
         credentials = {}
         if username and password:
             credentials = {"username": username, "password": password}
+        if username and key_filename:
+            credentials = {"username": username, "key_filename": key_filename}
         elif username:
             credentials = {"username": username}
         host_port = host.split(':')
@@ -376,9 +378,10 @@ class DistributionMgr(threading.Thread):
                 host = host.strip()
                 workers.append({
                     "name": host,
-                    "host": test.conf_get(host, "host",host),
+                    "host": test.conf_get(host, "host", host),
                     "password": test.conf_get(host, 'password', ''),
                     "username": test.conf_get(host, 'username', ''),
+                    "key_filename": test.conf_get(host, 'ssh_key', ''),
                     "channel_timeout": self.channel_timeout})
 
         self._workers = []
