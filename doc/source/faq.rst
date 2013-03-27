@@ -198,6 +198,14 @@ There are many ways:
       username = user
       password = password
 
+  When defining workers in the conf file you can alternatively specify a path to a private key file
+  instead of using a password::
+
+      [worker1]
+      host = worker1
+      username = user
+      ssh_key = /path/to/my_key_name.pub
+
   Then run adding just the --distribute option::
 
       $ fl-run-bench -c 1:2:3 -D 5 -f --simple-fetch  test_Simple.py Simple.test_simple --distribute -u http://target/
