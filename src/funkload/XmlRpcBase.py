@@ -224,7 +224,8 @@ Execute action on the XML/RPC server.
         self.conf_path = conf_path
         self.port = conf.getint('server', 'port')
         self.url = 'http://%s:%s/' % (self.host, self.port)
-        self.verbose = not options.quiet
+        self.quiet = options.quiet
+        self.verbose = options.verbose
         self.server = ServerProxy(self.url)
 
 
@@ -233,7 +234,9 @@ Execute action on the XML/RPC server.
         parser = OptionParser(self.usage, formatter=TitledHelpFormatter(),
                               version="FunkLoad %s" % get_version())
         parser.add_option("-q", "--quiet", action="store_true",
-                          help="Verbose output")
+                          help="Suppress console output")
+        parser.add_option("-v", "--verbose", action="store_true",
+                          help="Verbose mode (log-level debug)")
         options, args = parser.parse_args(argv)
         if len(args) != 3:
             parser.error("Missing argument")
@@ -241,7 +244,7 @@ Execute action on the XML/RPC server.
 
     def log(self, message, force=False):
         """Log a message."""
-        if force or self.verbose:
+        if force or not self.quiet:
             trace(str(message))
 
     def startServer(self, debug=False):
@@ -249,6 +252,8 @@ Execute action on the XML/RPC server.
         argv = ['cmd', self.conf_path]
         if debug:
             argv.append('-dv')
+        elif self.verbose:
+            argv.append('-v')
         daemon = self.server_class(argv)
         daemon.run()
 
