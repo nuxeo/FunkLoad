@@ -662,6 +662,9 @@ class DistributionMgr(threading.Thread):
             fd.write("</funkload>\n")
 
     def _calculate_time_skew(self, results, stats):
+        if not results or not stats:
+            return 1
+
         def min_time(vals):
             keyfunc = lambda elem: float(elem.attrib['time'])
             return keyfunc(min(vals, key=keyfunc))
