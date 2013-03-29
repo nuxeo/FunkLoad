@@ -247,8 +247,6 @@ class LoopTestRunner(threading.Thread):
 
             thread_sleep(self.sleep_time)
 
-
-
 class BenchRunner:
     """Run a unit test in bench mode."""
 
