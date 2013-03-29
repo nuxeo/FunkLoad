@@ -19,6 +19,8 @@
 
 $Id: ReportStats.py 24737 2005-08-31 09:00:16Z bdelbosc $
 """
+
+
 class MonitorStat:
     """Collect system monitor info."""
     def __init__(self, attrs):
@@ -41,7 +43,7 @@ class ErrorStat:
 class Percentiles:
     """ Calculate Percentiles with the given stepsize. """
 
-    def __init__(self, stepsize=10, name ="UNKNOWN", results=None):
+    def __init__(self, stepsize=10, name="UNKNOWN", results=None):
         self.stepsize = stepsize
         self.name = name
         if results is None:
@@ -80,13 +82,14 @@ class Percentiles:
         return "Percentiles(stepsize=%r, name=%r, results=%r)" % (
             self.stepsize, self.name, self.results)
 
+
 class ApdexStat:
     def __init__(self, apdex_t):
         self.apdex_satisfied = 0
         self.apdex_tolerating = 0
         self.apdex_frustrating = 0
         self.apdex_satisfied_t = apdex_t
-        self.apdex_tolerating_t = 4*apdex_t 
+        self.apdex_tolerating_t = 4 * apdex_t
         self.apdex_t = apdex_t
         self.count = 0
 
@@ -102,7 +105,8 @@ class ApdexStat:
     def getScore(self):
         score = 0
         if self.count:
-            score = (self.apdex_satisfied + (self.apdex_tolerating/2.0)) / self.count
+            score = (self.apdex_satisfied + (self.apdex_tolerating / 2.0)
+                     ) / self.count
         return score
 
 
@@ -125,14 +129,14 @@ class AllResponseStat:
         self.rps_min = 0
         self.rps_max = 0
         self.finalized = False
-        self.percentiles = Percentiles(stepsize = 5, name = cycle)
+        self.percentiles = Percentiles(stepsize=5, name=cycle)
         self.apdex = ApdexStat(apdex_t)
         self.apdex_score = None
 
     def add(self, date, result, duration):
         """Add a new response to stat."""
         date_s = int(float(date))
-        self.per_second [date_s] = self.per_second.setdefault(
+        self.per_second[date_s] = self.per_second.setdefault(
             int(date_s), 0) + 1
         self.count += 1
         if result == 'Successful':
@@ -198,6 +202,7 @@ class SinglePageStat:
         return 'page %s %s %ss' % (self.step,
                                    self.result, self.duration)
 
+
 class PageStat(AllResponseStat):
     """Collect stat for asked pages in a cycle."""
     def __init__(self, cycle, cycle_duration, cvus, apdex_t):
@@ -249,6 +254,7 @@ class PageStat(AllResponseStat):
             self.rps = self.success / float(self.cycle_duration)
         self.percentiles.calcPercentiles()
         self.finalized = True
+
 
 class ResponseStat:
     """Collect stat a specific response in a cycle."""
@@ -302,6 +308,7 @@ class ResponseStat:
         self.percentiles.calcPercentiles()
         self.apdex_score = self.apdex.getScore()
         self.finalized = True
+
 
 class TestStat:
     """Collect test stat for a cycle.
