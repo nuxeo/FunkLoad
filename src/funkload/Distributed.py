@@ -366,22 +366,31 @@ class DistributionMgr(threading.Thread):
                     else:
                         uname, pwd = uname_pwd
 
-                workers.append({
-                    "name": host,
-                    "host": host,
-                    "password": pwd,
-                    "username": uname,
-                    "channel_timeout": self.channel_timeout})
+                worker = {"name": host,
+                          "host": host,
+                          "password": pwd,
+                          "username": uname,
+                          "channel_timeout": self.channel_timeout}
+
+                if options.distributed_key_filename:
+                    worker['key_filename'] = options.distributed_key_filename
+
+                workers.append(worker)
         else:
             hosts = test.conf_get('workers', 'hosts', '', quiet=True).split()
             for host in hosts:
                 host = host.strip()
+                if options.distributed_key_filename:
+                    key_filename = options.distributed_key_filename
+                else:
+                    key_filename = test.conf_get(host, 'ssh_key', '')
+
                 workers.append({
                     "name": host,
                     "host": test.conf_get(host, "host", host),
                     "password": test.conf_get(host, 'password', ''),
                     "username": test.conf_get(host, 'username', ''),
-                    "key_filename": test.conf_get(host, 'ssh_key', ''),
+                    "key_filename": key_filename,
                     "channel_timeout": self.channel_timeout})
 
         self._workers = []

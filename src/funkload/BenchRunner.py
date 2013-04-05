@@ -763,6 +763,11 @@ def main(args=sys.argv[1:]):
                       dest="distributed_log_path",
                       help="Path where all the logs will be stored when "
                            "running a distributed test")
+    parser.add_option("--distributed-key-filename",
+                      type="string",
+                      dest="distributed_key_filename",
+                      help=("Path of the SSH key to use when running a "
+                            "distributed test"))
     parser.add_option("--feedback-endpoint",
                       type="string",
                       dest="feedback_endpoint",
@@ -777,7 +782,6 @@ def main(args=sys.argv[1:]):
                       action="store_true",
                       dest="feedback",
                       help="Activates the realtime feedback")
-
 
     # XXX What exactly is this checking for here??
     cmd_args = " ".join([k for k in args
