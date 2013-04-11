@@ -6,7 +6,7 @@ try:
 except ImportError:
     import zmq
 
-import threading
+from multiprocessing import Process
 from zmq.eventloop import ioloop, zmqstream
 
 
@@ -14,21 +14,27 @@ DEFAULT_ENDPOINT = 'tcp://127.0.0.1:9999'
 DEFAULT_PUBSUB = 'tcp://127.0.0.1:9998'
 
 
-class FeedbackPublisher(threading.Thread):
+class FeedbackPublisher(Process):
     """Publishes all the feedback received from the various nodes.
     """
     def __init__(self, endpoint=DEFAULT_ENDPOINT,
-                 pubsub_endpoint=DEFAULT_PUBSUB, context=None):
-        threading.Thread.__init__(self)
-        self.context = context or zmq.Context.instance()
+                 pubsub_endpoint=DEFAULT_PUBSUB,
+                 context=None, handler=None):
+        Process.__init__(self)
+        self.context = context
         self.endpoint = endpoint
         self.pubsub_endpoint = pubsub_endpoint
         self.daemon = True
+        self.handler = handler
 
     def _handler(self, msg):
+        if self.handler is not None:
+            self.handler(msg)
         self.pub_sock.send_multipart(['feedback', msg[0]])
 
     def run(self):
+        print 'publisher running in a thread'
+        self.context = self.context or zmq.Context.instance()
         self.sock = self.context.socket(zmq.PULL)
         self.sock.bind(self.endpoint)
         self.pub_sock = self.context.socket(zmq.PUB)
@@ -58,16 +64,17 @@ class FeedbackSender(object):
         self.sock.send(json.dumps(data))
 
 
-class FeedbackSubscriber(threading.Thread):
+class FeedbackSubscriber(Process):
     """Subscribes to a published feedback.
     """
     def __init__(self, pubsub_endpoint=DEFAULT_PUBSUB, handler=None,
-                 context=None):
-        threading.Thread.__init__(self)
+                 context=None, **kw):
+        Process.__init__(self)
         self.handler = handler
-        self.context = context or zmq.Context.instance()
+        self.context = context
         self.pubsub_endpoint = pubsub_endpoint
         self.daemon = True
+        self.kw = kw
 
     def _handler(self, msg):
         topic, msg = msg
@@ -75,9 +82,10 @@ class FeedbackSubscriber(threading.Thread):
         if self.handler is None:
             print msg
         else:
-            self.handler(msg)
+            self.handler(msg, **self.kw)
 
     def run(self):
+        self.context = self.context or zmq.Context.instance()
         self.pub_sock = self.context.socket(zmq.SUB)
         self.pub_sock.connect(self.pubsub_endpoint)
         self.pub_sock.setsockopt(zmq.SUBSCRIBE, b'')
