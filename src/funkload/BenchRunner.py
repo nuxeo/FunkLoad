@@ -771,13 +771,12 @@ def main(args=sys.argv[1:]):
     parser.add_option("--feedback-endpoint",
                       type="string",
                       dest="feedback_endpoint",
-                      help="Path where all the logs will be stored when "
-                           "running a distributed test")
+                      help=("ZMQ push/pull socket used between the master and "
+                            "the node to send feedback."))
     parser.add_option("--feedback-pubsub-endpoint",
                       type="string",
                       dest="feedback_pubsub_endpoint",
-                      help="Path where all the logs will be stored when "
-                           "running a distributed test")
+                      help="ZMQ pub/sub socket use to publish feedback.")
     parser.add_option("--feedback",
                       action="store_true",
                       dest="feedback",
