@@ -44,7 +44,7 @@ def gnuplot(script_path):
                                os.path.abspath(script_path))
 
     else:
-        cmd = 'cd ' + path + '; gnuplot ' + os.path.abspath(script_path)
+        cmd = 'cd "' + path + '"; gnuplot "' + os.path.abspath(script_path) + '"'
         ret, output = getstatusoutput(cmd)
         if ret != 0:
             raise RuntimeError("Failed to run gnuplot cmd: " + cmd +
