@@ -116,13 +116,12 @@ class RenderHtmlBase(RenderRst):
         """Ask docutils to convert our rst file into html."""
         from docutils.core import publish_cmdline
         html_path = os.path.join(self.report_dir, 'index.html')
-        cmdline = "-t --stylesheet-path=%s %s %s" % (self.css_path,
-                                                     self.rst_path,
-                                                     html_path)
+        cmdline = []
         if self.quiet:
-            cmdline = "-q " + cmdline
-        cmd_argv = cmdline.split(' ')
-        publish_cmdline(writer_name='html', argv=cmd_argv)
+            cmdline.append('-q')
+        cmdline.extend(['-t', '--stylesheet-path="%s"' % self.css_path,
+                        self.rst_path, html_path])
+        publish_cmdline(writer_name='html', argv=cmdline)
         self.html_path = html_path
 
     def render(self):
