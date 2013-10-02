@@ -802,9 +802,10 @@ def main(args=sys.argv[1:]):
         module_name = args[0]
 
     # registering signals
-    signal.signal(signal.SIGTERM, shutdown)
-    signal.signal(signal.SIGINT, shutdown)
-    signal.signal(signal.SIGQUIT, shutdown)
+    if not sys.platform.lower().startswith('win'):
+        signal.signal(signal.SIGTERM, shutdown)
+        signal.signal(signal.SIGINT, shutdown)
+        signal.signal(signal.SIGQUIT, shutdown)
 
     klass, method = args[1].split('.')
     if options.distribute:
