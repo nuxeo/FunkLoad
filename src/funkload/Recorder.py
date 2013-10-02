@@ -206,6 +206,9 @@ Examples
                           help="Verbose output")
         parser.add_option("-p", "--port", type="string", dest="port",
                           default=self.port, help="The proxy port.")
+        parser.add_option("-L", type="string", dest="forward",
+                          default=None,
+                          help="Forwarded connection <listen_port>:<dest_host>:<dest_port>.")
         parser.add_option("-i", "--tcp-watch-input", type="string",
                           dest="tcpwatch_path", default=None,
                           help="Path to an existing tcpwatch capture.")
@@ -222,6 +225,7 @@ Examples
         self.verbose = options.verbose
         self.tcpwatch_path = options.tcpwatch_path
         self.port = options.port
+        self.forward = options.forward
         if not test_name and not self.tcpwatch_path:
             self.loop = options.loop
         if test_name:
@@ -236,8 +240,12 @@ Examples
     def startProxy(self):
         """Start a tcpwatch session."""
         self.tcpwatch_path = mkdtemp('_funkload')
-        cmd = self.getTcpWatchCmd() + ' -p %s -s -r %s' % (self.port,
-                                                           self.tcpwatch_path)
+        if self.forward is not None:
+            cmd = self.getTcpWatchCmd() + ' -L %s -s -r %s' % (self.forward,
+                                                               self.tcpwatch_path)
+        else:
+            cmd = self.getTcpWatchCmd() + ' -p %s -s -r %s' % (self.port,
+                                                               self.tcpwatch_path)
         if os.name == 'posix':
             if self.verbose:
                 cmd += ' | grep "T http"'
