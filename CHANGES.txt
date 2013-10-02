@@ -22,6 +22,9 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* Add -L options to fl-record to enable tcpwatch forwarded mode
+  which is usefull if you have an http_proxy to pass.
+  
 * Add --quiet option to fl-build-report to remove warning in rst to 
   html convertion
  
