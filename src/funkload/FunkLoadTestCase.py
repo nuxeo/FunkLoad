@@ -938,7 +938,7 @@ class FunkLoadTestCase(unittest.TestCase):
             cmd = 'firefox -remote  "openfile(file://%s#%s,new-tab)"' % (
                 file_path, description)
             ret = os.system(cmd)
-            if ret != 0:
+            if ret != 0 and not sys.platform.lower().startswith('win'):
                 self.logi('Failed to remote control firefox: %s' % cmd)
                 self._viewing = False
 
