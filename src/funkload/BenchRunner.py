@@ -184,7 +184,10 @@ class LoopTestRunner(threading.Thread):
                                   args=())
         self.test = load_unittest(test_module, test_class, meta_method_name,
                                   options)
-        self.color = not options.no_color
+        if sys.platform.lower().startswith('win'):
+            self.color = False
+        else:
+            self.color = not options.no_color
         self.sleep_time = sleep_time
         self.debug = debug
         self.thread_signaller = thread_signaller

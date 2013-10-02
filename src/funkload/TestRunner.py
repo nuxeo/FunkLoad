@@ -454,7 +454,10 @@ Examples
             options.ftest_log_to = 'file'
         if options.debug_level:
             options.ftest_debug_level = int(options.debug_level)
-        self.color = not options.no_color
+        if sys.platform.lower().startswith('win'):
+            self.color = False
+        else:
+            self.color = not options.no_color
         self.test_name_pattern = options.regex
         self.list_tests = options.list
         self.profile = options.profile
