@@ -33,6 +33,20 @@ installed this way::
 
   sudo aptitude install python-webunit funkload
 
+Quick installation guide for CentOS
+------------------------------------
+
+As root ::
+
+  yum install python-setuptools python-docutils gnuplot python-devel make
+  wget http://funkload.nuxeo.org/3dparty/tcpwatch-1.3.tar.gz
+  tar xzvf tcpwatch-1.3.tar.gz
+  cd tcpwatch
+  python setup.py install
+  easy_install webunit
+  easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
+
+
 Installing on Mac
 --------------------
 
@@ -55,7 +69,7 @@ also rename the scripts with a ``.py`` extension.
 Required packages
 ~~~~~~~~~~~~~~~~~~~
 
-* libexpat1
+* libexpat1 (should not be required on recent OS)
 
 * funkload 1.14.0 requires python >= 2.5
 
