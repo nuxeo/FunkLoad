@@ -254,7 +254,7 @@ The process to write a new test is the following:
 
   - Generates random input, you can use the FunkLoad.Lipsum module::
 
-       from FunkLoad import Lipsum
+       from funkload import Lipsum
        ...
        lipsum = Lipsum()
        # Get a random title
@@ -263,7 +263,7 @@ The process to write a new test is the following:
 
   - Extracts a token from a previous response::
 
-       from FunkLoad.utils import extract_token
+       from funkload.utils import extract_token
        ...
        jsf_state = extract_token(self.getBody(), ' id="javax.faces.ViewState" value="', '"')
 

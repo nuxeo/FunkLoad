@@ -99,7 +99,7 @@ redirected::
                params=[['user_name', 'scott'],
                        ['user_password', 'tiger']],
                description="Login as scott")
-     self.assert_('dashboard' in self.getLastURL(), "Login failure")
+     self.assert_('dashboard' in self.getLastUrl(), "Login failure")
 
 
 Basic Authentication
@@ -135,7 +135,7 @@ you to submit hight load.
 
 FunkLoad comes with a simple extract_token working with string finds::
 
-    from FunkLoad.utils import extract_token
+    from funkload.utils import extract_token
     ...
     token = extract_token(self.getBody(), 'id="mytoken" value="', '"')
 
