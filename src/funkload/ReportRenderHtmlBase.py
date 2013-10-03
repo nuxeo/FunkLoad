@@ -119,7 +119,7 @@ class RenderHtmlBase(RenderRst):
         cmdline = []
         if self.quiet:
             cmdline.append('-q')
-        cmdline.extend(['-t', '--stylesheet-path="%s"' % self.css_path,
+        cmdline.extend(['-t', '--stylesheet-path', self.css_path,
                         self.rst_path, html_path])
         publish_cmdline(writer_name='html', argv=cmdline)
         self.html_path = html_path
