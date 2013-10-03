@@ -28,6 +28,8 @@ from stat import S_ISREG, S_ISDIR
 from glob import glob
 from xml.etree.ElementTree import ElementTree
 from xmlrpclib import ServerProxy
+import json
+import sys
 
 import paramiko
 
@@ -57,6 +59,15 @@ def load_unittest(test_module, test_class, test_name, options):
     module = load_module(test_module)
     klass = getattr(module, test_class)
     return klass(test_name, options)
+
+
+def _print_rt(msg):
+    msg = json.loads(msg[0])
+    if msg['result'] == 'failure':
+        sys.stdout.write('F')
+    else:
+        sys.stdout.write('.')
+    sys.stdout.flush()
 
 
 class DistributorBase(object):
@@ -366,22 +377,31 @@ class DistributionMgr(threading.Thread):
                     else:
                         uname, pwd = uname_pwd
 
-                workers.append({
-                    "name": host,
-                    "host": host,
-                    "password": pwd,
-                    "username": uname,
-                    "channel_timeout": self.channel_timeout})
+                worker = {"name": host,
+                          "host": host,
+                          "password": pwd,
+                          "username": uname,
+                          "channel_timeout": self.channel_timeout}
+
+                if options.distributed_key_filename:
+                    worker['key_filename'] = options.distributed_key_filename
+
+                workers.append(worker)
         else:
             hosts = test.conf_get('workers', 'hosts', '', quiet=True).split()
             for host in hosts:
                 host = host.strip()
+                if options.distributed_key_filename:
+                    key_filename = options.distributed_key_filename
+                else:
+                    key_filename = test.conf_get(host, 'ssh_key', '')
+
                 workers.append({
                     "name": host,
                     "host": test.conf_get(host, "host", host),
                     "password": test.conf_get(host, 'password', ''),
                     "username": test.conf_get(host, 'username', ''),
-                    "key_filename": test.conf_get(host, 'ssh_key', ''),
+                    "key_filename": key_filename,
                     "channel_timeout": self.channel_timeout})
 
         self._workers = []
@@ -409,7 +429,8 @@ class DistributionMgr(threading.Thread):
             self.feedback = FeedbackPublisher(
                     endpoint=options.feedback_endpoint or DEFAULT_ENDPOINT,
                     pubsub_endpoint=options.feedback_pubsub_endpoint or
-                    DEFAULT_PUBSUB
+                    DEFAULT_PUBSUB,
+                    handler=_print_rt
                     )
             self.feedback.start()
         else:
@@ -554,8 +575,15 @@ class DistributionMgr(threading.Thread):
                 cwdir=venv)
             trace(".")
             threads.append(obj)
+
         trace("\n")
-        [t.join() for t in threads]
+
+        while True:
+            if all([not thread.is_alive() for thread in threads]):
+                # we're done
+                break
+            time.sleep(5.)
+
         trace("\n")
 
         for thread, worker in zip(threads, self._workers):
