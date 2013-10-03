@@ -580,6 +580,8 @@ class DistributionMgr(threading.Thread):
                 local_file = os.path.join(
                     self.distribution_output, "%s-%s" % (
                         worker.name, filename))
+                if os.access(local_file, os.F_OK):
+                    os.rename(local_file, local_file + '.bak-' + str(int(time.time())))
                 worker.get(remote_file, local_file)
                 trace("* Received bench log from [%s] into %s\n" % (
                     worker.name, local_file))
@@ -626,6 +628,8 @@ class DistributionMgr(threading.Thread):
     def write_statistics(self, successful_results):
         """ Write the distributed stats to a file in the output dir """
         path = os.path.join(self.distribution_output, "stats.xml")
+        if os.access(path, os.F_OK):
+            os.rename(path, path + '.bak-' + str(int(time.time())))
         config = {'id': self.test_id,
                   'description': self.test_description,
                   'class_title': self.class_title,
