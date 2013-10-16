@@ -36,11 +36,13 @@ from cgi import FieldStorage
 from urlparse import urlsplit
 from utils import truncate, trace, get_version, Data
 
+
 def get_null_file():
     if sys.platform.lower().startswith('win'):
         return "NUL"
     else:
         return "/dev/null"
+
 
 class Request:
     """Store a tcpwatch request."""
@@ -48,10 +50,11 @@ class Request:
         """Load a tcpwatch request file."""
         self.file_path = file_path
         f = open(file_path, 'rb')
-        line = f.readline().split(None, 2)
+        line = f.readline().replace('\r\r', '\r').split(None, 2)
+        print line
         if not line:
             trace('# Warning: empty first line on %s\n' % self.file_path)
-            line = f.readline().split(None, 2)
+            line = f.readline().replace('\r\r', '\r').split(None, 2)
         self.method = line[0]
         url = line[1]
         scheme, host, path, query, fragment = urlsplit(url)
@@ -61,7 +64,8 @@ class Request:
         self.path = path
         self.version = line[2].strip()
         self.headers = dict(rfc822.Message(f).items())
-        self.body = f.read()
+        self.body = f.read().replace('\r\r\n', '', 1)
+        print self.body
         f.close()
 
     def extractParam(self):
@@ -89,11 +93,10 @@ class Request:
             return params
 
         for item in form.list:
-            
             key = item.name
             value = item.value
             filename = item.filename
-            
+
             if filename is None:
                 params.append([key, value])
             else:
@@ -132,7 +135,7 @@ class Response:
             self.status_message = line[2].strip()
         else:
             self.status_message = ''
-        self.headers =  dict(rfc822.Message(f).items())
+        self.headers = dict(rfc822.Message(f).items())
         self.body = f.read()
         f.close()
 
