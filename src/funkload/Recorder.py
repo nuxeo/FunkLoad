@@ -51,7 +51,6 @@ class Request:
         self.file_path = file_path
         f = open(file_path, 'rb')
         line = f.readline().replace('\r\r', '\r').split(None, 2)
-        print line
         if not line:
             trace('# Warning: empty first line on %s\n' % self.file_path)
             line = f.readline().replace('\r\r', '\r').split(None, 2)
@@ -64,7 +63,7 @@ class Request:
         self.path = path
         self.version = line[2].strip()
         self.headers = dict(rfc822.Message(f).items())
-        self.body = f.read().replace('\r\r\n', '', 1)
+        self.body = f.read().replace('\r\r\n','', 1).replace('\r\r', '\r')
         print self.body
         f.close()
 
