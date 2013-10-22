@@ -63,8 +63,7 @@ class Request:
         self.path = path
         self.version = line[2].strip()
         self.headers = dict(rfc822.Message(f).items())
-        self.body = f.read().replace('\r\r\n','', 1).replace('\r\r', '\r')
-        print self.body
+        self.body = f.read().replace('\r\r\n','', 1).replace('\r\r', '\r').replace('\r\n', '\n')
         f.close()
 
     def extractParam(self):
