@@ -250,6 +250,7 @@ class LoopTestRunner(threading.Thread):
 
             thread_sleep(self.sleep_time)
 
+
 class BenchRunner:
     """Run a unit test in bench mode."""
 
@@ -429,9 +430,13 @@ class BenchRunner:
         """Log activity during duration."""
         duration = self.duration
         end_time = time.time() + duration
+        mid_time = time.time() + duration / 2
         trace("* Logging for %ds (until %s): " % (
             duration, datetime.fromtimestamp(end_time).isoformat()))
         set_recording_flag(True)
+        while time.time() < mid_time:
+            time.sleep(1)
+        self.test.midCycle()
         while time.time() < end_time:
             # wait
             time.sleep(1)

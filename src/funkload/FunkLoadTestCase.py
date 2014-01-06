@@ -678,7 +678,6 @@ class FunkLoadTestCase(unittest.TestCase):
                 return base[0].href
         return ''
 
-
     #------------------------------------------------------------
     # configuration file utils
     #
@@ -723,13 +722,15 @@ class FunkLoadTestCase(unittest.TestCase):
             return value.split(separator)
         return [value]
 
-
-
     #------------------------------------------------------------
     # Extend unittest.TestCase to provide bench cycle hook
     #
     def setUpCycle(self):
         """Called on bench mode before a cycle start."""
+        pass
+
+    def midCycle(self):
+        """Called in the middle of the cycle."""
         pass
 
     def tearDownCycle(self):
@@ -746,8 +747,6 @@ class FunkLoadTestCase(unittest.TestCase):
     def tearDownBench(self):
         """Called after a the bench."""
         pass
-
-
 
     #------------------------------------------------------------
     # logging
