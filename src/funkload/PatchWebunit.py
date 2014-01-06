@@ -320,9 +320,19 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
             #raise ValueError, "Can't fetch HTTPS: M2Crypto not installed"
 
         # FL Patch -------------------------
+        try:
+            proxystring = os.environ["https_proxy"].replace("http://", "").replace("https://", "")
+            webproxy['host'] = proxystring.split(":")[0]
+            webproxy['port'] = int(proxystring.split(":")[1])
+        except (KeyError, IndexError, ValueError):
+            webproxy = False
 
         # patched to use the given key and cert file
-        h = httplib.HTTPS(server, int(port), key_file, cert_file)
+        if webproxy:
+            h = httplib.HTTPSConnection(webproxy['host'], webproxy['port'],
+                                        key_file, cert_file)
+        else:
+            h = httplib.HTTPS(server, int(port), key_file, cert_file)
 
         # FL Patch end  -------------------------
 
@@ -337,7 +347,8 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     params = None
     if postdata is not None:
         if webproxy:
-            h.putrequest(method.upper(), "http://%s%s" % (host_header, url))
+            h.putrequest(method.upper(), "%s://%s%s" % (protocol,
+                                                        host_header, url))
         else:
             # Normal post
             h.putrequest(method.upper(), url)
@@ -365,7 +376,8 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
             headers.append(('Content-length', str(len(params))))
     else:
         if webproxy:
-            h.putrequest(method.upper(), "http://%s%s" % (host_header, url))
+            h.putrequest(method.upper(), "%s://%s%s" % (protocol,
+                                                        host_header, url))
         else:
             h.putrequest(method.upper(), url)
 
