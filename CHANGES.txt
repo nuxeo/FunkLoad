@@ -22,6 +22,8 @@ FunkLoad GIT master
 New Features
 ~~~~~~~~~~~~~~
 
+* Support https proxy (http proxy was already supported)
+
 * Add a midCycle hook to execute an action in the middle of a cycle
 
 * Add -L options to fl-record to enable tcpwatch forwarded mode

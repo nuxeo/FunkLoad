@@ -332,7 +332,7 @@ class BenchRunner:
             trace(' done.\n')
             self.startMonitors(monitor_key)
             self.startThreads(cycle, cvus)
-            self.logging()
+            self.logging(cycle, cvus)
             #self.dumpThreads()
             self.stopThreads()
             self.stopMonitors(monitor_key)
@@ -426,7 +426,7 @@ class BenchRunner:
         trace(' done.\n')
         return threads
 
-    def logging(self):
+    def logging(self, cycle, cvus):
         """Log activity during duration."""
         duration = self.duration
         end_time = time.time() + duration
@@ -436,7 +436,7 @@ class BenchRunner:
         set_recording_flag(True)
         while time.time() < mid_time:
             time.sleep(1)
-        self.test.midCycle()
+        self.test.midCycle(cycle, cvus)
         while time.time() < end_time:
             # wait
             time.sleep(1)

@@ -729,8 +729,8 @@ class FunkLoadTestCase(unittest.TestCase):
         """Called on bench mode before a cycle start."""
         pass
 
-    def midCycle(self):
-        """Called in the middle of the cycle."""
+    def midCycle(self, cycle, cvus):
+        """Called in the middle of a bench cycle."""
         pass
 
     def tearDownCycle(self):
