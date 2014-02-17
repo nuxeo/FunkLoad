@@ -2,7 +2,7 @@ First Steps with FunkLoad
 ==========================
 
 A FunkLoad test is made of a typical unittest and a configuration
-file. Let's look at a simple test script that is comming with the
+file. Let's look at a simple test script included in the
 FunkLoad examples.
 
 To get the demo examples you just need to run::
@@ -30,30 +30,30 @@ Here is an extract of the simple demo test case ``test_Simple.py``::
       def test_simple(self):
           # The description should be set in the configuration file
           server_url = self.server_url
-          # begin of test ---------------------------------------------
+          # begin test ---------------------------------------------
           nb_time = self.conf_getInt('test_simple', 'nb_time')
           for i in range(nb_time):
-              self.get(server_url, description='Get url')
-          # end of test -----------------------------------------------
+              self.get(server_url, description='Get URL')
+          # end test -----------------------------------------------
     
   if __name__ in ('main', '__main__'):
       unittest.main()
 
-The Simple test case extend ``FunkLoadTestCase`` and implement a test
-case named test_simple. this test case loop on a get request.  
+The Simple test case extends ``FunkLoadTestCase`` and implements a test
+case named test_simple. This test case loop on a get request.  
 
-The ``FunkLoadTestCase`` extends the ``unittest.TestCase`` to add methods:
+The ``FunkLoadTestCase`` extends the ``unittest.TestCase``, adding methods:
 
-* to send HTTP request (get, post, put, delete or xmlrpc)
-* to help building assertion with the response (getBody, getLastUrl, ...)
+* to send HTTP requests (get, post, put, delete or xmlrpc)
+* to help build assertions with the response (getBody, getLastUrl, ...)
 * to customize the test by accessing a configuration file (conf_getInt)
 * ...
 
-The target url, the number of requests are defined in the
+The target URL and the number of requests are defined in the
 configuration files.
 
-By convention the name of the configuration file is the name of the
-test case class with ".conf" extension in our case: ``Simple.conf``.
+By convention, the name of the configuration file is the name of the
+test case class and a ".conf" extension. In our case: ``Simple.conf``.
   
 The configuration file
 ----------------------------
@@ -68,7 +68,8 @@ It is a plain text file with sections::
 
   # a section for each test 
   [test_simple]
-  description=Access %(nb_time)s times the main url
+  description=Access the main URL %(nb_time)s times
+
   nb_time=20
   
   <<snip>>
@@ -96,13 +97,13 @@ It is a plain text file with sections::
 Runing the test
 ------------------
 
-Check that the url present in the ``main`` section is reachable, then
-invoking ``fl-run-test`` will run all the tests present in the
+Check that the URL shown in the ``main`` section is reachable, then
+invoke ``fl-run-test``. It will run all the tests present in the
 test_Simple module::
 
   $ fl-run-test -dv test_Simple.py
   test_simple (test_Simple.Simple) ... test_simple: Starting -----------------------------------
-          Access 20 times the main url
+          Access the main URL 20 times
   test_simple: GET: http://localhost/index.html
           Page 1: Get url ...
   test_simple:  Done in 0.006s
@@ -125,15 +126,17 @@ test_Simple module::
 Runing a benchmark
 --------------------
 
-To run a benchmark you invoke ``fl-run-bench`` instead of the test
-runner, you also need to select which test case to run.
+To run a benchmark, you invoke ``fl-run-bench`` instead of the test
+runner. You also need to select which test case to run (the name of
+the method in ``test_Simple.py``)
 
-The result of the bench will be saved in a single xml file
-``simple-bench.xml``, the name of this result file is set in the
+The result of the bench will be saved in a single XML file
+``simple-bench.xml``. The name of this result file is set in the
 configuration file in the ``bench`` section.
 
-You can override the configuration file using command line option,
-here we ask for 3 cycles with 1, 10 and 20 concurrents users (CUs).
+You can override the configuration file using command line options.
+Here we use ``-c`` to specify 3 cycles with 1, 10 and 20 concurrent
+users (CUs).
 
 ::
 
@@ -141,7 +144,7 @@ here we ask for 3 cycles with 1, 10 and 20 concurrents users (CUs).
   ========================================================================
   Benching Simple.test_simple
   ========================================================================
-  Access 20 times the main url
+  Access the main URL 20 times
   ------------------------------------------------------------------------
   
   Configuration
@@ -217,16 +220,16 @@ here we ask for 3 cycles with 1, 10 and 20 concurrents users (CUs).
 Generating a report
 --------------------
 
-The xml result file can be turn into an html report this way::
+The XML result file can be turned into an HTML report::
 
   $ fl-build-report --html simple-bench.xml
   Creating html report: ...done: 
   /tmp/funkload-demo/simple/test_simple-20110126T232251/index.html
 
-It should generate something like this: 
+It should generate something like this:
    http://funkload.nuxeo.org/report-example/test_simple-20110126T232251/
 
-Note that there were no monitoring in our simple benchmark.
+Note that there was no monitoring in our simple benchmark.
 
 
 Write your own test
@@ -237,22 +240,22 @@ The process to write a new test is the following:
 * Use the recorder_ to initialize the test case and the configuration
   files and to grab requests.
 
-* Play the test and display each response in firefox, this will help
-  you to add assertion and check the response::
+* Play the test and display each response in Firefox, this will help
+  you to add assertions and check the response::
 
      fl-run-test -dV test_BasicNavigation.py
 
 
-* Implement the dynamic part:
+* Implement the dynamic parts:
 
-  - For each request add an assertion to make sure the page is the one
+  - For each request, add an assertion to make sure the page is the one
     you expect. this can be done by checking if a term is present in
     a response::
 
        self.assert_('logout' in self.getBody(), "Login failure")
 
 
-  - Generates random input, you can use the FunkLoad.Lipsum module::
+  - To Generate random input, you can use the FunkLoad.Lipsum module::
 
        from funkload import Lipsum
        ...
@@ -261,15 +264,15 @@ The process to write a new test is the following:
        title = lipsum.getSubject()
 
 
-  - Extracts a token from a previous response::
+  - To Extract a token from a previous response::
 
        from funkload.utils import extract_token
        ...
        jsf_state = extract_token(self.getBody(), ' id="javax.faces.ViewState" value="', '"')
 
-    	 
-  - Uses a credential_ server if you want to make a bench with different users
-    or simply don't want to hard code your login/password::
+
+  - To Use a credential_ server if you want to make a bench with different users
+    or simply don't want to hard-code your login/password::
 
        from funkload.utils import xmlrpc_get_credential	
        ...
