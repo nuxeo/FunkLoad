@@ -17,11 +17,11 @@ class Simple(FunkLoadTestCase):
     def test_simple(self):
         # The description should be set in the configuration file
         server_url = self.server_url
-        # begin of test ---------------------------------------------
+        # begin test ---------------------------------------------
         nb_time = self.conf_getInt('test_simple', 'nb_time')
         for i in range(nb_time):
-            self.get(server_url, description='Get url')
-        # end of test -----------------------------------------------
+            self.get(server_url, description='Get URL')
+        # end test -----------------------------------------------
 
 
 if __name__ in ('main', '__main__'):
