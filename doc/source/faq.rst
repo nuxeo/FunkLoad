@@ -4,28 +4,28 @@ FAQ
 What do all these dots mean ?
 -------------------------------
 
-During a bench cycle each "Starting threads" dots represents a
+During a bench cycle each "Starting threads" dot represents a
 running thread::
 
   Cycle #1 with 10 virtual users
   ------------------------------
-  
+
   * setUpCycle hook: ... done.
   * Current time: 2011-01-26T23:23:06.234422
   * Starting threads: ........
 
-During the cycle logging each green dot means a successful test while
-each red 'F' is for a test failure::
+During the cycle logging each green dot represents a successful test while
+each red 'F' represents a test failure::
 
   * Logging for 10s (until 2011-01-26T23:23:16.360602): ......F......
 
 
-During the stagging down each dot represents a stopped thread::
+During the tear-down each dot represents a stopped thread::
 
   * Waiting end of threads: .........
 
 
-How to accept invalid Cookies ?
+How can I accept invalid Cookies ?
 ----------------------------------
 
 - ``Error : COOKIE ERROR: Cookie domain "<DOMAINE>" doesn’t start with "."``
@@ -45,7 +45,7 @@ How to accept invalid Cookies ?
       #  'request host "%s"'%(domain, server)
 
 
-How to share a counter between concurrent users ?
+How can I share a counter between concurrent users ?
 --------------------------------------------------
 
 The credential server can serve a sequence. Using ``xmlrpc_get_seq``
@@ -57,7 +57,7 @@ threads can share a sequence::
 
 
 
-How to set a timeout on request ?
+How can I set a timeout on request ?
 -----------------------------------
 
 FunkLoad uses (a patched) webunit, which uses httplib for the actual
@@ -72,45 +72,46 @@ made by FunkLoad to time out if the server does not respond in time.
 
 where SECONDS is, of course, your preferred timeout in seconds.
 
-How to submit high load ?
+How can I submit high load ?
 ----------------------------
 
-High load works fine for IO Bound test, not on CPU bound test. The
+High load works fine for IO Bound tests, not on CPU bound tests. The
 test script must be light:
 
-- When possible don't parse html/xml page, using simple find or regexp
-  are much much faster than any html parsing including getDOM, html
-  parser or beautifulsoup. If you start emulating a browser then you
-  will be as slow as a browser.
+- When possible don't parse HTML/xml pages, use string find methods
+  or regular expressions - they are much much faster than any HTML
+  parsing including getDOM and BeautifulSoup. If you start emulating
+  a browser, you will be as slow as a browser.
 
-- Always use ``--simple-fetch`` option to prevent parsing html page to
-  retrieve resources use explicit GET in your code.
+- Always use the ``--simple-fetch`` option to prevent parsing HTML
+  pages and retrieving resources.
 
 - Try to generate or prepare the data before the test to minimize the
   processing during the test.
 
-On 32b OS install psyco, it gives a 50% boost (``aptitude install
-python-psyco`` on Debia/Ubuntu OS).
+On 32-bit Operating Systems, install psyco, it gives a 50%
+boost (``aptitude install python-psyco`` on Debian/Ubuntu OS).
 
-On multi CPU server, GIL is getting infamous, to get all the power you
-need to use CPU affinity ``taskset -c 0 fl-run-bench`` is always
-faster than ``fl-run-bench``.  Using one bench runner process per CPU
-is a work around to use the full server power.
+On multi-CPU servers, the Python GIL is getting infamous.
+To maximize FunkLoad's CPU usage, you need to set the CPU affinity.
+``taskset -c 0 fl-run-bench`` is always faster than ``fl-run-bench``.
+Using one bench runner process per CPU is a work around to use the
+full server power.
 
-Use multiple machine to perform the load, see the next section.
+Use multiple machines to perform the load test, see the next section.
 
 
-How to run multiple benchers ?
+How can I run multiple benchers ?
 -------------------------------
 
-Bench result file can be merged by the ``fl-build-report`` command,
-but how do you run multiple benchers ?
+Bench result files can be merged by the ``fl-build-report`` command,
+but how do you run multiple benchers?
 
 There are many ways: 
 
-* Use the new distribute mode (still in beta), it requires paramiko and
+* Use the new "distribute" mode (still in beta), it requires paramiko and
   virtualenv::
-  
+
     sudo aptitude install python-paramiko, python-virtualenv
 
   It adds 2 new command line options:
@@ -121,17 +122,17 @@ There are many ways:
     user:password can be skipped if using pub-key.
 
   For instance to use 2 workers you can do something like this::
-  
+
       $ fl-run-bench -c 1:2:3 -D 5 -f --simple-fetch  test_Simple.py Simple.test_simple --distribute --distribute-workers=node1,node2 -u http://target/
       ========================================================================
       Benching Simple.test_simple
       ========================================================================
       Access 20 times the main url
       ------------------------------------------------------------------------
-            
+
       Configuration
       =============
-      
+
       * Current time: 2011-02-13T23:15:15.174148
       * Configuration file: /tmp/funkload-demo/simple/Simple.conf
       * Distributed output: log-distributed
@@ -143,15 +144,15 @@ There are many ways:
       * Startup delay between thread: 0.01s
       * Channel timeout: None
       * Workers :octopussy,simplet
-      
+
       * Preparing sandboxes for 2 workers.....
       * Starting 2 workers..
-      
+
       * [node1] returned
       * [node2] returned
       * Received bench log from [node1] into log-distributed/node1-simple-bench.xml
       * Received bench log from [node2] into log-distributed/node2-simple-bench.xml
-      
+
       # Now building the report 
       $ fl-build-report --html log-distributed/node1-simple-bench.xml  log-distributed/node2-simple-bench.xml
       Merging results files: ..
@@ -161,7 +162,7 @@ There are many ways:
       Results merged in tmp file: /tmp/fl-mrg-o0MI8L.xml
       Creating html report: ...done:
       /tmp/funkload-demo/simple/test_simple-20110213T231543/index.html
- 
+
 
   Note that the version of FunkLoad installed on nodes is defined in
   the configuration file::
@@ -170,8 +171,9 @@ There are many ways:
      log_path = log-distributed
      funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.16.1.tar.gz
 
-  You can multiple benchers per server by defining many workers with the same host
-  name in your configuration file. Add a workers section to your configuration file::
+  You can multiple benchers per server by defining many workers with
+  the same host name in your configuration file. Add a workers section
+  to your configuration file::
 
       [workers]
       hosts = host1cpu1 host1cpu2 host2cpu1 host2cpu2
@@ -198,8 +200,8 @@ There are many ways:
       username = user
       password = password
 
-  When defining workers in the conf file you can alternatively specify a path to a private key file
-  instead of using a password::
+  When defining workers in the conf file you can alternatively specify a
+  path to a private key file instead of writing your passwords in cleartext::
 
       [worker1]
       host = worker1
@@ -210,13 +212,15 @@ There are many ways:
 
       $ fl-run-bench -c 1:2:3 -D 5 -f --simple-fetch  test_Simple.py Simple.test_simple --distribute -u http://target/
 
-  If your node uses a non standard ssh port (for instance you are using ssh tunneling) you can use::
+  If your node uses a non standard ssh port (for instance, if you are using
+  ssh tunneling) you can use::
 
       [host1]
       host = host1:port
 
-  By default, the timeout on the ssh channel with the workers is set to None (ie timeouts are disabled).  
-  To configure the number of seconds to wait for a pending read/write operation before raising socket.timeout 
+  By default, the timeout on the ssh channel with the workers is set to
+  None (ie timeouts are disabled). To configure the number of seconds to
+  wait for a pending read/write operation before raising socket.timeout
   you can use::
 
        [distribute]
@@ -239,7 +243,7 @@ There are many ways:
    # build the report with fl-build-report, it supports the results merging
 
 
-How to accept gzip content encoding ?
+How can I accept gzip content encoding ?
 ---------------------------------------
 
 You just need to add the appropriate header::
@@ -247,7 +251,7 @@ You just need to add the appropriate header::
      self.setHeader('Accept-encoding', 'gzip')
 
 
-How to mix different scenarii in a bench ?
+How can I mix different scenarios in a bench ?
 -------------------------------------------
 
 Simple example with percent of users::
@@ -279,17 +283,17 @@ Example with fixed number of users::
 Note that when mixing tests the detail report for each page is
 meaningless because you are mixing pages from multiple tests.
 
-How to modify a report ?
+How can I modify a report ?
 --------------------------
 
 The report is in `reStructuredText 
 <http://docutils.sourceforge.net/rst.html>`_, the ``index.rst`` can be
-edited in text mode, to rebuild the html version::
+edited by hand. The HTML version can then be rebuilt::
 
     rst2html --stylesheet=funkload.css   index.rst --traceback > index.html
 
-Charts are build with gnuplot the gplot script file are present in the
-report directory to rebuild the pages charts for instance::
+Charts are built with gnuplot. The gplot script files are present in the
+report directory. To rebuild the pages charts, for instance::
 
     gnuplot pages.gplot
 
@@ -297,7 +301,7 @@ Since FunkLoad 1.15 you can also use an org-mode_ output to edit or
 extend the report before exporting it as a PDF.
 
 
-How to automate stuff ?
+How can I automate stuff ?
 -----------------------
 
 Here is a sample Makefile
@@ -341,13 +345,13 @@ Here is a sample Makefile
     bench-app:
         -fl-run-bench --simple-fetch test_app.py App.test_app -c 1:5:10:15:20:30:40:50 -D 45 -m 0.1 -M .5 -s 1 $(FLOPS)
         -fl-build-report $(LOG_HOME)/app-bench.xml --html -o $(REPORT)
-    
+
     clean:
         -find . "(" -name "*~" -or  -name ".#*" -or  -name "*.pyc" ")" -print0 | xargs -0 rm -f
 
 
 It can be used like this::
-   
+
    make test
    make test URL=http://override-url/
    # add extra parameters to the FunkLoad command
@@ -355,7 +359,7 @@ It can be used like this::
    make bench
 
 
-How to write fluent tests ?
+How can I write fluent tests ?
 -----------------------------
 
 You can use the `PageObject 
@@ -379,12 +383,11 @@ to write test like this::
                .logout())
 
 
-How to receive release announcement ?
+How can I get release announcements ?
 ---------------------------------------
 
-Subscribe to the freshmeat project:
-http://freshmeat.net/projects/funkload
-
+Watch the github repository:
+https://github.com/nuxeo/FunkLoad
 
 
 
