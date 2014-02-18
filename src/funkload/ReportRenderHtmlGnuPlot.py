@@ -67,7 +67,7 @@ class FakeMonitorConfig:
 class RenderHtmlGnuPlot(RenderHtmlBase):
     """Render stats in html using gnuplot
 
-    Simply render stuff in ReST than ask docutils to build an html doc.
+    Simply render stuff in ReST then ask docutils to build an html doc.
     """
     chart_size = (640, 540)
     #big_chart_size = (640, 480)
