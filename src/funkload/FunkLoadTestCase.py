@@ -385,16 +385,24 @@ class FunkLoadTestCase(unittest.TestCase):
 
         return response
 
-    def post(self, url, params=None, description=None, ok_codes=None, load_auto_links=True):
-        """POST method on url with params."""
+    def post(self, url, params=None, description=None, ok_codes=None,
+             load_auto_links=True):
+        """Make an HTTP POST request to the specified url with params.
+
+        Returns a webunit.webunittest.HTTPResponse object.
+        """
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
                                 method="post", load_auto_links=load_auto_links)
         return response
 
-    def get(self, url, params=None, description=None, ok_codes=None, load_auto_links=True):
-        """GET method on url adding params."""
+    def get(self, url, params=None, description=None, ok_codes=None,
+            load_auto_links=True):
+        """Make an HTTP GET request to the specified url with params.
+
+        Returns a webunit.webunittest.HTTPResponse object.
+        """
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
@@ -403,8 +411,11 @@ class FunkLoadTestCase(unittest.TestCase):
 
     def method(self, method, url, params=None, description=None,
                ok_codes=None, load_auto_links=True):
-        """Generic method request can be used to submit MOVE, MKCOL or
-        whatever method name request."""
+        """Generic HTTP request method.
+        Can be used to make MOVE, MKCOL, etc method name HTTP requests.
+
+        Returns a webunit.webunittest.HTTPResponse object.
+        """
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
@@ -413,25 +424,25 @@ class FunkLoadTestCase(unittest.TestCase):
 
     def put(self, url, params=None, description=None, ok_codes=None,
             load_auto_links=True):
-        """PUT method."""
-        return self.method('put', url, params, description, ok_codes, 
+        """Make an HTTP PUT request to the specified url with params."""
+        return self.method('put', url, params, description, ok_codes,
                 load_auto_links=load_auto_links)
 
     def delete(self, url, description=None, ok_codes=None):
-        """DELETE method on url."""
+        """Make an HTTP DELETE request to the specified url."""
         return self.method('delete', url, None, description, ok_codes)
 
     def head(self, url, description=None, ok_codes=None):
-        """HEAD method on url adding params."""
+        """Make an HTTP HEAD request to the specified url with params."""
         return self.method('head', url, None, description, ok_codes)
 
     def options(self, url, description=None, ok_codes=None):
-        """OPTIONS method on url."""
+        """Make an HTTP OPTIONS request to the specified url."""
         return self.method('options', url, None, description, ok_codes)
 
     def propfind(self, url, params=None, depth=None, description=None,
                  ok_codes=None):
-        """DAV PROPFIND method."""
+        """Make a DAV PROPFIND request to the specified url with params."""
         if ok_codes is None:
             codes = [207, ]
         else:
