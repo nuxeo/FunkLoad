@@ -19,7 +19,7 @@ url=%(server_url)s
 
 
 # ------------------------------------------------------------
-# Tests description and configuration
+# Test description and configuration
 #
 [test_%(test_name)s]
 description=XXX the test case description
@@ -39,8 +39,8 @@ port=8007
 [monitor]
 #hosts=localhost
 
-# Each host in [monitor]hosts should have a section
-# with a 'port' and 'description' keys
+# Each host in [monitor] should have a section
+# with 'port' and 'description' keys
 [localhost]
 port=8008
 description=The benching machine
@@ -56,21 +56,19 @@ description=The benching machine
 # file - to a file
 log_to = console file
 
-# log_path = path and file name to store log file
+# log_path = full path to the log file (assumes ./ if no leading /)
 log_path = %(test_name)s-test.log
 
-# result_path = path to store the xml result file
+# result_path = full path to the xml result file
 result_path = %(test_name)s-test.xml
 
-# ok_codes = list of successfull HTTP response code default is 200:301:302
+# ok_codes = list of HTTP response codes to consider "successful"
 # ok_codes =  200:301:302
 
-# sleeptime_min = minimum amount of time in seconds to sleep between requests
-#                 to the host
+# sleeptime_min / sleeptime_max =
+#       minimum / maximum amount of time in seconds to sleep between
+#       requests to the host
 sleep_time_min = 0
-
-# sleeptime_max = maximum amount of time in seconds to sleep between requests
-#                 to the host
 sleep_time_max = 0
 
 
@@ -94,7 +92,7 @@ sleep_time = 1
 # cycle_time = time to wait between cycle in seconds
 cycle_time = 1
 
-# same keys than in [ftest] section
+# same keys as in [ftest] section - see descriptions above
 log_to = file
 log_path = %(test_name)s-bench.log
 result_path = %(test_name)s-bench.xml
@@ -103,7 +101,7 @@ sleep_time_min = 0
 sleep_time_max = 2
 
 # ------------------------------------------------------------
-# Distributed mode
+# Configuration for using the --distribute flag in fl-run-bench
 #
 [distribute]
 log_path = log-distributed

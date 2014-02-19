@@ -30,7 +30,7 @@ from ReportRenderRst import RenderRst, rst_title
 class RenderHtmlBase(RenderRst):
     """Render stats in html.
 
-    Simply render stuff in ReST than ask docutils to build an html doc.
+    Simply render stuff in ReST then ask docutils to build an html doc.
     """
     chart_size = (350, 250)
     big_chart_size = (640, 480)

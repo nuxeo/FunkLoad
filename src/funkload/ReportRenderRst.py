@@ -50,6 +50,11 @@ def get_apdex_label(score):
         return "Good"
     return "Excellent"
 
+def dumb_pluralize(num, word):
+    #Doesn't follow all English rules, but sufficent for our purpose
+    return ' %s %s' % (num, word + ['s',''][num==1])
+
+
 
 class BaseRst:
     """Base class for ReST renderer."""
@@ -336,11 +341,11 @@ class RenderRst:
         self.append(LI + " Target server: %s" % config['server_url'])
         self.append(LI + " Cycles of concurrent users: %s" % config['cycles'])
         self.append(LI + " Cycle duration: %ss" % config['duration'])
-        self.append(LI + " Sleeptime between request: from %ss to %ss" % (
+        self.append(LI + " Sleeptime between requests: from %ss to %ss" % (
             config['sleep_time_min'], config['sleep_time_max']))
-        self.append(LI + " Sleeptime between test case: %ss" %
+        self.append(LI + " Sleeptime between test cases: %ss" %
                     config['sleep_time'])
-        self.append(LI + " Startup delay between thread: %ss" %
+        self.append(LI + " Startup delay between threads: %ss" %
                     config['startup_delay'])
         self.append(LI + " Apdex: |APDEXT|")
         self.append(LI + " FunkLoad_ version: %s" % config['version'])
@@ -359,16 +364,17 @@ class RenderRst:
 
     def renderTestContent(self, test):
         """Render global information about test content."""
+
         self.append(rst_title("Bench content", 2))
         config = self.config
         self.append('The test ``%s.%s`` contains: ' % (config['class'],
                                                        config['method']))
         self.append('')
-        self.append(LI + " %s page(s)" % test.pages)
-        self.append(LI + " %s redirect(s)" % test.redirects)
-        self.append(LI + " %s link(s)" % test.links)
-        self.append(LI + " %s image(s)" % test.images)
-        self.append(LI + " %s XML RPC call(s)" % test.xmlrpc)
+        self.append(LI + dumb_pluralize(test.pages, 'page'))
+        self.append(LI + dumb_pluralize(test.redirects, 'redirect'))
+        self.append(LI + dumb_pluralize(test.links, 'link'))
+        self.append(LI + dumb_pluralize(test.images, 'image'))
+        self.append(LI + dumb_pluralize(test.xmlrpc, 'XML-RPC call'))
         self.append('')
 
         self.append('The bench contains:')
@@ -392,13 +398,15 @@ class RenderRst:
                 total_responses += stats[cycle]['response'].count
                 total_responses_error += stats[cycle]['response'].error
         self.append('')
+        pluralized_t_errs = dumb_pluralize(total_tests_error, 'error')
+        pluralized_p_errs = dumb_pluralize(total_pages_error, 'error')
+        pluralized_r_errs = dumb_pluralize(total_responses_error, 'error')
         self.append(LI + " %s tests" % total_tests + (
-            total_tests_error and ", %s error(s)" % total_tests_error or ''))
+            total_tests_error and "," + pluralized_t_errs or ''))
         self.append(LI + " %s pages" % total_pages + (
-            total_pages_error and ", %s error(s)" % total_pages_error or ''))
+            total_pages_error and "," + pluralized_p_errs or ''))
         self.append(LI + " %s requests" % total_responses + (
-            total_responses_error and ", %s error(s)" %
-            total_responses_error or ''))
+            total_responses_error and "," + pluralized_r_errs or ''))
         self.append('')
 
 
@@ -546,10 +554,11 @@ class RenderRst:
             self.append(rst_title(status + 's', 3))
             for err_type in err_types:
                 stat = errors[err_type][0]
+                pluralized_times = dumb_pluralize(len(errors[err_type]), 'time')
                 if err_type[1]:
-                    self.append(LI + ' %s time(s), code: %s, %s\n'
+                    self.append(LI + '%s, code: %s, %s\n'
                                 '  in %s, line %s: %s' %(
-                        len(errors[err_type]),
+                        pluralized_times,
                         err_type[0],
                         header.get('bobo-exception-type'),
                         err_type[1], err_type[2],
@@ -557,9 +566,9 @@ class RenderRst:
                 else:
                     traceback = stat.traceback and stat.traceback.replace(
                         'File ', '\n    File ') or 'No traceback.'
-                    self.append(LI + ' %s time(s), code: %s::\n\n'
+                    self.append(LI + '%s, code: %s::\n\n'
                                 '    %s\n' %(
-                        len(errors[err_type]),
+                        pluralized_times,
                         err_type[0], traceback))
 
     def renderDefinitions(self):
@@ -567,9 +576,9 @@ class RenderRst:
         self.append(rst_title("Definitions", 2))
         self.append(LI + ' CUs: Concurrent users or number of concurrent threads'
                     ' executing tests.')
-        self.append(LI + ' Request: a single GET/POST/redirect/xmlrpc request.')
+        self.append(LI + ' Request: a single GET/POST/redirect/XML-RPC request.')
         self.append(LI + ' Page: a request with redirects and resource'
-                    ' links (image, css, js) for an html page.')
+                    ' links (image, css, js) for an HTML page.')
         self.append(LI + ' STPS: Successful tests per second.')
         self.append(LI + ' SPPS: Successful pages per second.')
         self.append(LI + ' RPS: Requests per second, successful or not.')
@@ -600,16 +609,16 @@ class RenderRst:
   - Frustrated: Performance with a response time greater than 4*T
     seconds is unacceptable, and users may abandon the process.
 
-    By default T is set to 1.5s this means that response time between 0
+    By default T is set to 1.5s. This means that response time between 0
     and 1.5s the user is fully productive, between 1.5 and 6s the
-    responsivness is tolerating and above 6s the user is frustrated.
+    responsivness is tolerable and above 6s the user is frustrated.
 
     The Apdex score converts many measurements into one number on a
     uniform scale of 0-to-1 (0 = no users satisfied, 1 = all users
     satisfied).
 
     Visit http://www.apdex.org/ for more information.''')
-        self.append(LI + ''' Rating: To ease interpretation the Apdex
+        self.append(LI + ''' Rating: To ease interpretation, the Apdex
   score is also represented as a rating:
 
   - U for UNACCEPTABLE represented in gray for a score between 0 and 0.5
@@ -646,10 +655,10 @@ class RenderRst:
         self.renderCyclesStat('page', 'Page stats',
                               'The number of Successful **Pages** Per Second '
                               '(SPPS) over Concurrent Users (CUs).\n'
-                              'Note that an XML RPC call count like a page.')
+                              'Note: an XML-RPC call counts as a page.')
         self.renderCyclesStat('response', 'Request stats',
                               'The number of **Requests** Per Second (RPS) '
-                              'successful or not over Concurrent Users (CUs).')
+                              '(successful or not) over Concurrent Users (CUs).')
         self.renderSlowestRequests(self.slowest_items)
         self.renderMonitors()
         self.renderPageDetail(cycle_r)
