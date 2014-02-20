@@ -171,8 +171,8 @@ There are many ways:
      log_path = log-distributed
      funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.16.1.tar.gz
 
-  You can multiple benchers per server by defining many workers with
-  the same host name in your configuration file. Add a workers section
+  You can have multiple benchers per server by defining many workers with
+  the same hostname in your configuration file. Add a workers section
   to your configuration file::
 
       [workers]
@@ -186,7 +186,7 @@ There are many ways:
       password = password
 
       [host1cpu2]
-      host = host2
+      host = host1
       username = user
       password = password
 
