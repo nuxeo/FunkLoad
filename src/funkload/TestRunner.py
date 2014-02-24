@@ -168,69 +168,27 @@ class TestLoader(unittest.TestLoader):
 
 
 
+
+class ColoredStream(object):
+    def __init__(self, stream):
+        self.stream = stream
+
+    def write(self, arg):
+        if arg in ['OK', 'Ok', 'ok', '.']:
+            arg = green_str(arg)
+        elif arg in ['ERROR', 'E', 'FAILED', 'FAIL', 'F']:
+            arg = red_str(arg)
+        sys.stderr.write(arg)
+
+    def __getattr__(self, attr):
+        return getattr(self.stream, attr)
+
 class _ColoredTextTestResult(unittest._TextTestResult):
     """Colored version."""
-    def addSuccess(self, test):
-        unittest.TestResult.addSuccess(self, test)
-        if self.showAll:
-            self.stream.writeln(green_str("Ok"))
-        elif self.dots:
-            self.stream.write(green_str('.'))
-
-    def addError(self, test, err):
-        unittest.TestResult.addError(self, test, err)
-        if self.showAll:
-            self.stream.writeln(red_str("ERROR"))
-        elif self.dots:
-            self.stream.write(red_str('E'))
-
-    def addFailure(self, test, err):
-        unittest.TestResult.addFailure(self, test, err)
-        if self.showAll:
-            self.stream.writeln(red_str("FAIL"))
-        elif self.dots:
-            self.stream.write(red_str('F'))
-
     def printErrorList(self, flavour, errors):
-        for test, err in errors:
-            self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (red_str(flavour),
-                                            self.getDescription(test)))
-            self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
+        flavour = red_str(flavour)
+        super(_ColoredTextTestResult, self).printErrorList(flavour, errors)
 
-
-class ColoredTextTestRunner(unittest.TextTestRunner):
-    """Override to be color powered."""
-    def _makeResult(self):
-        return _ColoredTextTestResult(self.stream,
-                                      self.descriptions, self.verbosity)
-
-    def run(self, test):
-        "Run the given test case or test suite."
-        result = self._makeResult()
-        startTime = time.time()
-        test(result)
-        stopTime = time.time()
-        timeTaken = float(stopTime - startTime)
-        result.printErrors()
-        self.stream.writeln(result.separator2)
-        run = result.testsRun
-        self.stream.writeln("Ran %d test%s in %.3fs" %
-                            (run, run != 1 and "s" or "", timeTaken))
-        self.stream.writeln()
-        if not result.wasSuccessful():
-            self.stream.write(red_str("FAILED") + " (")
-            failed, errored = map(len, (result.failures, result.errors))
-            if failed:
-                self.stream.write("failures=%d" % failed)
-            if errored:
-                if failed: self.stream.write(", ")
-                self.stream.write("errors=%d" % errored)
-            self.stream.writeln(")")
-        else:
-            self.stream.writeln(green_str("OK"))
-        return result
 
 def filter_testcases(suite, cpattern, negative_pattern=False):
     """Filter a suite with test names that match the compiled regex pattern."""
@@ -474,8 +432,10 @@ Examples
         """Launch the tests."""
         if self.testRunner is None:
             if self.color:
-                self.testRunner = ColoredTextTestRunner(
-                    verbosity=self.verbosity)
+                self.testRunner = unittest.TextTestRunner(
+                    stream =ColoredStream(sys.stderr),
+                    resultclass = _ColoredTextTestResult,
+                    verbosity = self.verbosity)
             else:
                 self.testRunner = unittest.TextTestRunner(
                     verbosity=self.verbosity)
