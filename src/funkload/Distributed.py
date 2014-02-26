@@ -291,10 +291,12 @@ class DistributionMgr(threading.Thread):
         self.options = options
         self.cmd_args = cmd_args
 
-        self.cmd_args += " --is-distributed"
-
+        wanted = lambda x: ('distribute' not in x) and ('discover' != x)
+        self.cmd_args = filter(wanted, self.cmd_args)
+        self.cmd_args.append("--is-distributed")
+        # ? Won't this double the --feedback option?
         if options.feedback:
-            self.cmd_args += " --feedback"
+            self.cmd_args.append("--feedback")
 
         module = load_module(module_name)
         module_file = module.__file__
@@ -571,7 +573,7 @@ class DistributionMgr(threading.Thread):
             remote_res_dir = os.path.join(self.remote_res_dir, worker.name)
             venv = os.path.join(remote_res_dir, self.tarred_testsdir)
             obj = worker.threaded_execute(
-                'bin/fl-run-bench %s' % self.cmd_args,
+                'bin/fl-run-bench ' + ' '.join(self.cmd_args),
                 cwdir=venv)
             trace(".")
             threads.append(obj)

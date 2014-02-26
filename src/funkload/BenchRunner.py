@@ -679,8 +679,9 @@ def discover(sys_args):
         class_name = test['class_name']
         method_name = test['method_name']
         if options.distribute:
-            dist_args = " ".join([k for k in sys_args
-                                  if '--distribute' not in k])
+            dist_args = sys_args[:]
+            dist_args.append(module_name)
+            dist_args.append('%s.%s' % (class_name, method_name))
             ret = run_distributed(options, module_name, class_name,
                                    method_name, dist_args)
         else:
@@ -874,17 +875,18 @@ def get_shared_OptionParser():
                       help="Stop on first fail or error. (For discover mode)")
     return parser
 
-def run_distributed(options, module_name, class_name, method_name, dist_args):
+def run_distributed(options, module_name, class_name, method_name, sys_args):
     ret = None
     from funkload.Distributed import DistributionMgr
     global _manager
     
     try:
         distmgr = DistributionMgr(
-            module_name, class_name, method_name, options, dist_args)
+            module_name, class_name, method_name, options, sys_args)
         _manager = distmgr
     except UserWarning, error:
         trace(red_str("Distribution failed with:%s \n" % (error)))
+        return 1
     
     try:
         try:
@@ -932,15 +934,11 @@ def main(sys_args=sys.argv[1:]):
     if sys_args and sys_args[0].lower() == 'discover':
         return discover(sys_args)
     
-    # XXX What exactly is this checking for here??
-    dist_args = " ".join([k for k in sys_args
-                           if k.find('--distribute') < 0])
-    
     options, args, module_name = parse_sys_args(sys_args)
     
     klass, method = args[1].split('.')
     if options.distribute:
-        return run_distributed(options, module_name, klass, method, dist_args)
+        return run_distributed(options, module_name, klass, method, sys_args)
     else:
         return run_local(options, module_name, klass, method)
 
