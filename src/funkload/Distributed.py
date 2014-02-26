@@ -291,7 +291,7 @@ class DistributionMgr(threading.Thread):
         self.options = options
         self.cmd_args = cmd_args
 
-        wanted = lambda x: ('distribute' not in x) and ('discover' != x)
+        wanted = lambda x: ('--distribute' not in x) and ('discover' != x)
         self.cmd_args = filter(wanted, self.cmd_args)
         self.cmd_args.append("--is-distributed")
         # ? Won't this double the --feedback option?
