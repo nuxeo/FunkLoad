@@ -40,3 +40,4 @@ Dylan Jay: multiple bencher and monitor per server support
 Seong-Kook Shin: Additional RPS chart where X axis represents the time in 
   seconds
 Tarek Ziade: distributed mode improvment, greenlets rt feedback and more.
+Shandy (Andy) Brown: fl-run-bench discover mode and doc review.
