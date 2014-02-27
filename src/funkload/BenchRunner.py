@@ -37,6 +37,7 @@ from thread import error as ThreadError
 from xmlrpclib import ServerProxy, Fault
 import signal
 
+from FunkLoadTestCase import FunkLoadTestCase
 from FunkLoadHTTPServer import FunkLoadHTTPServer
 from utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
                   trace, red_str, green_str, get_version
@@ -53,8 +54,8 @@ USAGE = """%prog [options] file class.method
 
 %prog launch a FunkLoad unit test as load test.
 
-A FunkLoad unittest use a configuration file named [class].conf, this
-configuration is overriden by the command line options.
+A FunkLoad unittest uses a configuration file named [class].conf. This
+configuration may be overriden by the command line options.
 
 See http://funkload.nuxeo.org/ for more information.
 
@@ -66,10 +67,16 @@ Examples
   %prog -u http://localhost:8080 -c 10:20 -D 30 myFile.py \\
       MyTestCase.testSomething
                         Bench MyTestCase.testSomething on localhost:8080
-                        with 2 cycles of 10 and 20 users during 30s.
+                        with 2 cycles of 10 and 20 users for a duration of 30s.
   %prog -h
                         More options.
+
+Alternative Usage:
+  %prog discover [options]
+                        Discover test modules in the current directory and
+                        bench all of them.
 """
+
 try:
     import psyco
     psyco.full()
@@ -633,6 +640,59 @@ class BenchRunner:
         return '\n'.join(text)
 
 
+class BenchLoader(unittest.TestLoader):
+    suiteClass = list
+    def loadTestsFromTestCase(self, testCaseClass):
+        if not issubclass(testCaseClass, FunkLoadTestCase):
+            trace(red_str("Skipping "+ testCaseClass))
+            return []
+        testCaseNames = self.getTestCaseNames(testCaseClass)
+        if not testCaseNames and hasattr(testCaseClass, 'runTest'):
+            testCaseNames = ['runTest']
+
+        return [dict(module_name = testCaseClass.__module__,
+                     class_name = testCaseClass.__name__,
+                     method_name = x)
+                for x in testCaseNames]
+
+def discover(sys_args):
+    parser = get_shared_OptionParser()
+    options, args = parser.parse_args(sys_args)
+    options.label = None
+
+    loader = BenchLoader()
+    suite = loader.discover('.')
+
+    def flatten_test_suite(suite):
+        if type(suite) != BenchLoader.suiteClass:
+            # Wasn't a TestSuite - must have been a Test
+            return [suite]
+        flat = []
+        for x in suite:
+            flat += flatten_test_suite(x)
+        return flat
+
+    flattened = flatten_test_suite(suite)
+    retval = 0
+    for test in flattened:
+        module_name = test['module_name']
+        class_name = test['class_name']
+        method_name = test['method_name']
+        if options.distribute:
+            dist_args = sys_args[:]
+            dist_args.append(module_name)
+            dist_args.append('%s.%s' % (class_name, method_name))
+            ret = run_distributed(options, module_name, class_name,
+                                   method_name, dist_args)
+        else:
+            ret = run_local(options, module_name, class_name, method_name)
+        # Handle failures
+        if ret != 0:
+            retval = ret
+            if options.failfast:
+                break
+    return retval
+
 _manager = None
 
 def shutdown(*args):
@@ -651,15 +711,8 @@ def get_runner_class(class_path):
     _module = __import__(module_path, globals(), locals(), class_name, -1)
     return getattr(_module, class_name)
 
-
-def main(args=sys.argv[1:]):
-    """Default main."""
-    # enable to load module in the current path
-    cur_path = os.path.abspath(os.path.curdir)
-    sys.path.insert(0, cur_path)
-
-    parser = OptionParser(USAGE, formatter=TitledHelpFormatter(),
-                          version="FunkLoad %s" % get_version())
+def parse_sys_args(sys_args):
+    parser = get_shared_OptionParser()
     parser.add_option("", "--config",
                       type="string",
                       dest="config",
@@ -699,6 +752,40 @@ def main(args=sys.argv[1:]):
                       action="store_true",
                       help="Remove sleep times between requests and between "
                            "tests, shortcut for -m0 -M0 -t0")
+    parser.add_option("-l", "--label",
+                      type="string",
+                      help="Add a label to this bench run for easier "
+                           "identification (it will be appended to the "
+                           "directory name for reports generated from it).")
+
+    options, args = parser.parse_args(sys_args)
+
+    if len(args) != 2:
+        parser.error("incorrect number of arguments")
+
+    if not args[1].count('.'):
+        parser.error("invalid argument; should be [class].[method]")
+
+    if options.as_fast_as_possible:
+        options.bench_sleep_time_min = '0'
+        options.bench_sleep_time_max = '0'
+        options.bench_sleep_time = '0'
+
+    if os.path.exists(args[0]):
+        # We were passed a file for the first argument
+        module_name = os.path.basename(os.path.splitext(args[0])[0])
+    else:
+        # We were passed a module name
+        module_name = args[0]
+
+    return options, args, module_name
+
+def get_shared_OptionParser():
+    '''Make an OptionParser that can be used in both normal mode and in
+    discover mode.
+    '''
+    parser = OptionParser(USAGE, formatter=TitledHelpFormatter(),
+                          version="FunkLoad %s" % get_version())
     parser.add_option("-r", "--runner-class",
                       type="string",
                       dest="bench_runner_class",
@@ -715,11 +802,6 @@ def main(args=sys.argv[1:]):
                       dest="bench_simple_fetch",
                       help="Don't load additional links like css or images "
                            "when fetching an html page.")
-    parser.add_option("-l", "--label",
-                      type="string",
-                      help="Add a label to this bench run for easier "
-                           "identification (it will be appended to the "
-                           "directory name for reports generated from it).")
     parser.add_option("--enable-debug-server",
                       action="store_true",
                       dest="debugserver",
@@ -742,7 +824,7 @@ def main(args=sys.argv[1:]):
     parser.add_option("--distribute-workers",
                       type="string",
                       dest="workerlist",
-                      help="This parameter will  over-ride the list of "
+                      help="This parameter will  override the list of "
                            "workers defined in the config file. expected "
                            "notation is uname@host,uname:pwd@host or just "
                            "host...")
@@ -754,7 +836,7 @@ def main(args=sys.argv[1:]):
     parser.add_option("--is-distributed",
                       action="store_true",
                       dest="is_distributed",
-                      help="This parameter is for internal use only. it "
+                      help="This parameter is for internal use only. It "
                            "signals to a worker node that it is in "
                            "distributed mode and shouldn't perform certain "
                            "actions.")
@@ -787,30 +869,60 @@ def main(args=sys.argv[1:]):
                       action="store_true",
                       dest="feedback",
                       help="Activates the realtime feedback")
+    parser.add_option("--failfast",
+                      action="store_true",
+                      dest="failfast",
+                      help="Stop on first fail or error. (For discover mode)")
+    return parser
 
-    # XXX What exactly is this checking for here??
-    cmd_args = " ".join([k for k in args
-                           if k.find('--distribute') < 0])
+def run_distributed(options, module_name, class_name, method_name, sys_args):
+    ret = None
+    from funkload.Distributed import DistributionMgr
+    global _manager
+    
+    try:
+        distmgr = DistributionMgr(
+            module_name, class_name, method_name, options, sys_args)
+        _manager = distmgr
+    except UserWarning, error:
+        trace(red_str("Distribution failed with:%s \n" % (error)))
+        return 1
+    
+    try:
+        try:
+            distmgr.prepare_workers(allow_errors=True)
+            ret = distmgr.run()
+            distmgr.final_collect()
+        except KeyboardInterrupt:
+            trace("* ^C received *")
+    finally:
+        # in any case we want to stop the workers at the end
+        distmgr.abort()
+    
+    _manager = None
+    return ret
+    
+def run_local(options, module_name, class_name, method_name):
+    ret = None
+    RunnerClass = get_runner_class(options.bench_runner_class)
+    bench = RunnerClass(module_name, class_name, method_name, options)
+    
+    # Start a HTTP server optionally
+    if options.debugserver:
+        http_server_thread = FunkLoadHTTPServer(bench, options.debugport)
+        http_server_thread.start()
+    
+    try:
+        ret = bench.run()
+    except KeyboardInterrupt:
+        trace("* ^C received *")
+    return ret
 
-    options, args = parser.parse_args(args)
-
-    if len(args) != 2:
-        parser.error("incorrect number of arguments")
-
-    if not args[1].count('.'):
-        parser.error("invalid argument; should be [class].[method]")
-
-    if options.as_fast_as_possible:
-        options.bench_sleep_time_min = '0'
-        options.bench_sleep_time_max = '0'
-        options.bench_sleep_time = '0'
-
-    if os.path.exists(args[0]):
-        # We were passed a file for the first argument
-        module_name = os.path.basename(os.path.splitext(args[0])[0])
-    else:
-        # We were passed a module name
-        module_name = args[0]
+def main(sys_args=sys.argv[1:]):
+    """Default main."""
+    # enable loading of modules in the current path
+    cur_path = os.path.abspath(os.path.curdir)
+    sys.path.insert(0, cur_path)
 
     # registering signals
     if not sys.platform.lower().startswith('win'):
@@ -818,47 +930,17 @@ def main(args=sys.argv[1:]):
         signal.signal(signal.SIGINT, shutdown)
         signal.signal(signal.SIGQUIT, shutdown)
 
+    # special case: 'discover' argument
+    if sys_args and sys_args[0].lower() == 'discover':
+        return discover(sys_args)
+    
+    options, args, module_name = parse_sys_args(sys_args)
+    
     klass, method = args[1].split('.')
     if options.distribute:
-        from funkload.Distributed import DistributionMgr
-        ret = None
-        global _manager
-
-        try:
-            distmgr = DistributionMgr(
-                module_name, klass, method, options, cmd_args)
-            _manager = distmgr
-        except UserWarning, error:
-            trace(red_str("Distribution failed with:%s \n" % (error)))
-
-        try:
-            try:
-                distmgr.prepare_workers(allow_errors=True)
-                ret = distmgr.run()
-                distmgr.final_collect()
-            except KeyboardInterrupt:
-                trace("* ^C received *")
-        finally:
-            # in any case we want to stop the workers at the end
-            distmgr.abort()
-
-        _manager = None
-        return ret
+        return run_distributed(options, module_name, klass, method, sys_args)
     else:
-        RunnerClass = get_runner_class(options.bench_runner_class)
-        bench = RunnerClass(module_name, klass, method, options)
-
-        # Start a HTTP server optionally
-        if options.debugserver:
-            http_server_thread = FunkLoadHTTPServer(bench, options.debugport)
-            http_server_thread.start()
-
-        ret = None
-        try:
-            ret = bench.run()
-        except KeyboardInterrupt:
-            trace("* ^C received *")
-        return ret
+        return run_local(options, module_name, klass, method)
 
 if __name__ == '__main__':
     ret = main()
