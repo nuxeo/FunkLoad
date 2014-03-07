@@ -77,7 +77,7 @@ BaseRst.sep = '|'
 
 
 class RenderOrg(RenderRst):
-    """Render stats in ReST format."""
+    """Render stats in emacs org-mode format."""
     # number of slowest requests to display
     slowest_items = 5
     with_chart = True
