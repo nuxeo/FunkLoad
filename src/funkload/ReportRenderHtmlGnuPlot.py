@@ -388,9 +388,9 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             "FF0000",
             "FF8C00",
                    ];
-        i = 0
-        last_cycle = self.cycles[-1]
-        for cycle in self.cycles:
+        for i, cycle in enumerate(self.cycles):
+            if i != 0:
+                plot_line += ', \\\n'
             dpath = gnuplot_scriptpath(self.report_dir,
                                        'time_rps-{0}.data'.format(cycle))
             #lines.append('set size 1,1\n')
@@ -405,9 +405,6 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             plot_line += ' w linespoints lw 1 lt 2 lc ' + \
                          'rgbcolor "#{0}" t "{1} CUs"'.format(colors[i % len(colors)],
                                                                      stats[cycle]['response'].cvus)
-            if cycle != last_cycle:
-                plot_line += ', \\\n'
-            i += 1
         lines.append(plot_line)
         #lines.append('unset multiplot\n')
         lines = self.fixXLabels('\n'.join(lines) + '\n')
