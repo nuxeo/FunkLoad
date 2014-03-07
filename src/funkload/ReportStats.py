@@ -20,6 +20,8 @@
 $Id: ReportStats.py 24737 2005-08-31 09:00:16Z bdelbosc $
 """
 
+from apdex import Apdex
+
 
 class MonitorStat:
     """Collect system monitor info."""
@@ -84,35 +86,29 @@ class Percentiles:
 
 
 class ApdexStat:
-    def __init__(self, apdex_t):
+    def __init__(self):
         self.apdex_satisfied = 0
         self.apdex_tolerating = 0
-        self.apdex_frustrating = 0
-        self.apdex_satisfied_t = apdex_t
-        self.apdex_tolerating_t = 4 * apdex_t
-        self.apdex_t = apdex_t
+        self.apdex_frustrated = 0
         self.count = 0
 
     def add(self, duration):
-        if duration < self.apdex_satisfied_t:
+        if Apdex.satisfying(duration):
             self.apdex_satisfied += 1
-        elif duration < self.apdex_tolerating_t:
+        elif Apdex.tolerable(duration):
             self.apdex_tolerating += 1
         else:
-            self.apdex_frustrating += 1
+            self.apdex_frustrated += 1
         self.count += 1
 
     def getScore(self):
-        score = 0
-        if self.count:
-            score = (self.apdex_satisfied + (self.apdex_tolerating / 2.0)
-                     ) / self.count
-        return score
+        return Apdex.score(self.apdex_satisfied, self.apdex_tolerating,
+                           self.apdex_frustrated)
 
 
 class AllResponseStat:
     """Collect stat for all response in a cycle."""
-    def __init__(self, cycle, cycle_duration, cvus, apdex_t):
+    def __init__(self, cycle, cycle_duration, cvus):
         self.cycle = cycle
         self.cycle_duration = cycle_duration
         self.cvus = int(cvus)
@@ -130,7 +126,7 @@ class AllResponseStat:
         self.rps_max = 0
         self.finalized = False
         self.percentiles = Percentiles(stepsize=5, name=cycle)
-        self.apdex = ApdexStat(apdex_t)
+        self.apdex = ApdexStat()
         self.apdex_score = None
 
     def add(self, date, result, duration):
@@ -205,8 +201,8 @@ class SinglePageStat:
 
 class PageStat(AllResponseStat):
     """Collect stat for asked pages in a cycle."""
-    def __init__(self, cycle, cycle_duration, cvus, apdex_t):
-        AllResponseStat.__init__(self, cycle, cycle_duration, cvus, apdex_t)
+    def __init__(self, cycle, cycle_duration, cvus):
+        AllResponseStat.__init__(self, cycle, cycle_duration, cvus)
         self.threads = {}
 
     def add(self, thread, step,  date, result, duration, rtype):
@@ -258,7 +254,7 @@ class PageStat(AllResponseStat):
 
 class ResponseStat:
     """Collect stat a specific response in a cycle."""
-    def __init__(self, step, number, cvus, apdex_t):
+    def __init__(self, step, number, cvus):
         self.step = step
         self.number = number
         self.cvus = int(cvus)
@@ -275,7 +271,7 @@ class ResponseStat:
         self.type = '?'
         self.finalized = False
         self.percentiles = Percentiles(stepsize=5, name=step)
-        self.apdex = ApdexStat(apdex_t)
+        self.apdex = ApdexStat()
         self.apdex_score = None
 
     def add(self, rtype, result, url, duration, description=None):

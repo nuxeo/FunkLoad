@@ -69,6 +69,7 @@ from ReportRenderDiff import RenderDiff
 from ReportRenderTrend import RenderTrend
 from MergeResultFiles import MergeResultFiles
 from utils import trace, get_version
+from apdex import Apdex
 
 
 # ------------------------------------------------------------
@@ -76,9 +77,8 @@ from utils import trace, get_version
 #
 class FunkLoadXmlParser:
     """Parse a funkload xml results."""
-    def __init__(self, apdex_t):
+    def __init__(self):
         """Init setup expat handlers."""
-        self.apdex_t = apdex_t
         parser = xml.parsers.expat.ParserCreate()
         parser.CharacterDataHandler = self.handleCharacterData
         parser.StartElementHandler = self.handleStartElement
@@ -156,13 +156,12 @@ class FunkLoadXmlParser:
             stats = self.stats.setdefault(cycle, {'response_step':{}})
             stat = stats.setdefault(
                 'response', AllResponseStat(cycle, self.cycle_duration,
-                                            attrs['cvus'], self.apdex_t))
+                                            attrs['cvus']))
             stat.add(attrs['time'], attrs['result'], attrs['duration'])
             stats['response'] = stat
 
             stat = stats.setdefault(
-                'page', PageStat(cycle, self.cycle_duration, attrs['cvus'],
-                                 self.apdex_t))
+                'page', PageStat(cycle, self.cycle_duration, attrs['cvus']))
             stat.add(attrs['thread'], attrs['step'], attrs['time'],
                      attrs['result'], attrs['duration'], attrs['type'])
             stats['page'] = stat
@@ -170,7 +169,7 @@ class FunkLoadXmlParser:
             step = '%s.%s' % (attrs['step'], attrs['number'])
             stat = stats['response_step'].setdefault(
                 step, ResponseStat(attrs['step'], attrs['number'],
-                                   attrs['cvus'], self.apdex_t))
+                                   attrs['cvus']))
             stat.add(attrs['type'], attrs['result'], attrs['url'],
                      attrs['duration'], attrs.get('description'))
             stats['response_step'][step] = stat
@@ -250,7 +249,7 @@ def main():
                       dest="apdex_t",
                       help="Apdex T constant in second, default is set to 1.5s. "
                       "Visit http://www.apdex.org/ for more information.",
-                      default=1.5)
+                      default=Apdex.T)
     parser.add_option("-x", "--css", type="string",
                       dest="css_file",
                       help="Custom CSS file to use for the HTML reports",
@@ -293,7 +292,8 @@ def main():
             trace("Results merged in tmp file: %s\n" % os.path.abspath(tmp_file))
             args = [tmp_file]
         options.xml_file = args[0]
-        xml_parser = FunkLoadXmlParser(options.apdex_t)
+        Apdex.T = options.apdex_t
+        xml_parser = FunkLoadXmlParser()
         xml_parser.parse(options.xml_file)
         if options.html:
             trace("Creating html report: ...")
