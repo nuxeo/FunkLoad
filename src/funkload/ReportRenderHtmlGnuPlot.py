@@ -25,6 +25,7 @@ import os
 import sys
 import re
 from commands import getstatusoutput
+from apdex import Apdex
 from ReportRenderRst import rst_title
 from ReportRenderHtmlBase import RenderHtmlBase
 from datetime import datetime
@@ -204,7 +205,6 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         lines = ["CUs SPPS ERROR MIN AVG MAX P10 P50 P90 P95 APDEX E G F P U"]
         cvus = []
         has_error = False
-        apdex_t = 0
         for cycle in self.cycles:
             if not stats[cycle].has_key('page'):
                 continue
@@ -225,19 +225,16 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
             values.append(str(page.percentiles.perc90))
             values.append(str(page.percentiles.perc95))
             score = page.apdex_score
-            apdex_t = page.apdex.apdex_t
             values.append(str(score))
+
             apdex = ['0', '0', '0', '0', '0']
-            if score < 0.5:
-                apdex[4] = str(score)
-            elif score < 0.7:
-                apdex[3] = str(score)
-            elif score < 0.85:
-                apdex[2] = str(score)
-            elif score < 0.94:
-                apdex[1] = str(score)
-            else:
-                apdex[0] = str(score)
+            score_cls = Apdex.get_score_class(score)
+            score_classes = Apdex.score_classes[:] #copy
+            #flip from worst-to-best to best-to-worst
+            score_classes.reverse()
+            index = score_classes.index(score_cls)
+            apdex[index] = str(score)
+
             values = values + apdex
             lines.append(' '.join(values))
         if len(lines) == 1:
@@ -271,7 +268,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         # apdex
         lines.append('set boxwidth 0.8')
         lines.append('set style fill solid .7')
-        lines.append('set ylabel "Apdex %.1f" ' % apdex_t)
+        lines.append('set ylabel "Apdex %.1f" ' % Apdex.T)
         lines.append('set yrange [0:1]')
         lines.append('set key outside top')
         if has_error:

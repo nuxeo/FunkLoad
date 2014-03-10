@@ -21,6 +21,7 @@ $Id$
 """
 import os
 from utils import get_version
+from apdex import Apdex
 from MonitorPluginsDefault import MonitorCPU, MonitorMemFree, MonitorNetwork, MonitorCUs
 
 LI = '*'
@@ -38,17 +39,6 @@ def rst_title(title, level=1, newpage=True):
     rst.append(rst_level[level] * len(title))
     rst.append('')
     return '\n'.join(rst)
-
-def get_apdex_label(score):
-    if score < 0.5:
-        return "UNACCEPTABLE"
-    if score < 0.7:
-        return "POOR"
-    if score < 0.85:
-        return "FAIR"
-    if score < 0.94:
-        return "Good"
-    return "Excellent"
 
 def dumb_pluralize(num, word):
     #Doesn't follow all English rules, but sufficent for our purpose
@@ -154,7 +144,7 @@ class AllResponseRst(BaseRst):
         ret.append(self.fmt_int % stats.cvus)
         if self.with_apdex:
             ret.append(self.fmt_float % stats.apdex_score)
-            ret.append(self.fmt_str % get_apdex_label(stats.apdex_score))
+            ret.append(self.fmt_str % Apdex.get_label(stats.apdex_score))
         ret.append(self.fmt_float % stats.rps)
         ret.append(self.fmt_float % stats.rps_max)
         ret.append(self.fmt_int % stats.count)
@@ -196,7 +186,7 @@ class ResponseRst(BaseRst):
         ret = [' ' * self.indent]
         ret.append(self.fmt_int % stats.cvus)
         ret.append(self.fmt_float % stats.apdex_score)
-        ret.append(self.fmt_str % get_apdex_label(stats.apdex_score))
+        ret.append(self.fmt_str % Apdex.get_label(stats.apdex_score))
         ret.append(self.fmt_int % stats.count)
         ret.append(self.fmt_int % stats.success)
         ret.append(self.fmt_percent % stats.error_percent)
@@ -529,7 +519,7 @@ class RenderRst:
         for item in items[:number]:
             self.append(LI + ' In page %s, Apdex rating: %s, avg response time: %3.2fs, %s: ``%s``\n'
                         '  `%s`' % (
-                item[1], get_apdex_label(item[5]), item[0], item[2], item[3], item[4]))
+                item[1], Apdex.get_label(item[5]), item[0], item[2], item[3], item[4]))
 
     def renderErrors(self):
         """Render error list."""
@@ -595,41 +585,8 @@ class RenderRst:
                     ' of pages or requests are delivered.')
         self.append(LI + ' P95: 95th percentile, response time where 95 percent'
                     ' of pages or requests are delivered.')
-        self.append(LI + ''' Apdex T: Application Performance Index,
-  this is a numerical measure of user satisfaction, it is based
-  on three zones of application responsiveness:
-
-  - Satisfied: The user is fully productive. This represents the
-    time value (T seconds) below which users are not impeded by
-    application response time.
-
-  - Tolerating: The user notices performance lagging within
-    responses greater than T, but continues the process.
-
-  - Frustrated: Performance with a response time greater than 4*T
-    seconds is unacceptable, and users may abandon the process.
-
-    By default T is set to 1.5s. This means that response time between 0
-    and 1.5s the user is fully productive, between 1.5 and 6s the
-    responsivness is tolerable and above 6s the user is frustrated.
-
-    The Apdex score converts many measurements into one number on a
-    uniform scale of 0-to-1 (0 = no users satisfied, 1 = all users
-    satisfied).
-
-    Visit http://www.apdex.org/ for more information.''')
-        self.append(LI + ''' Rating: To ease interpretation, the Apdex
-  score is also represented as a rating:
-
-  - U for UNACCEPTABLE represented in gray for a score between 0 and 0.5
-
-  - P for POOR represented in red for a score between 0.5 and 0.7
-
-  - F for FAIR represented in yellow for a score between 0.7 and 0.85
-
-  - G for Good represented in green for a score between 0.85 and 0.94
-
-  - E for Excellent represented in blue for a score between 0.94 and 1.''')
+        self.append(LI + Apdex.description_para)
+        self.append(LI + Apdex.rating_para)
         self.append('')
         self.append('Report generated with FunkLoad_ ' + get_version() +
                     ', more information available on the '
