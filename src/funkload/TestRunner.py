@@ -450,8 +450,6 @@ Examples
             options.ftest_debug_level = 1
             options.ftest_log_to = 'console file'
             g_doctest_verbose = True
-        else:
-            options.ftest_log_to = 'file'
         if options.debug_level:
             options.ftest_debug_level = int(options.debug_level)
         if sys.platform.lower().startswith('win'):
