@@ -718,40 +718,6 @@ def parse_sys_args(sys_args):
                       dest="config",
                       metavar='CONFIG',
                       help="Path to alternative config file")
-    parser.add_option("-u", "--url",
-                      type="string",
-                      dest="main_url",
-                      help="Base URL to bench.")
-    parser.add_option("-c", "--cycles",
-                      type="string",
-                      dest="bench_cycles",
-                      help="Cycles to bench, colon-separated list of "
-                           "virtual concurrent users. To run a bench with 3 "
-                           "cycles of 5, 10 and 20 users, use: -c 5:10:20")
-    parser.add_option("-D", "--duration",
-                      type="string",
-                      dest="bench_duration",
-                      help="Duration of a cycle in seconds.")
-    parser.add_option("-m", "--sleep-time-min",
-                      type="string",
-                      dest="bench_sleep_time_min",
-                      help="Minimum sleep time between requests.")
-    parser.add_option("-M", "--sleep-time-max",
-                      type="string",
-                      dest="bench_sleep_time_max",
-                      help="Maximum sleep time between requests.")
-    parser.add_option("-t", "--test-sleep-time",
-                      type="string",
-                      dest="bench_sleep_time",
-                      help="Sleep time between tests.")
-    parser.add_option("-s", "--startup-delay",
-                      type="string",
-                      dest="bench_startup_delay",
-                      help="Startup delay between thread.")
-    parser.add_option("-f", "--as-fast-as-possible",
-                      action="store_true",
-                      help="Remove sleep times between requests and between "
-                           "tests, shortcut for -m0 -M0 -t0")
     parser.add_option("-l", "--label",
                       type="string",
                       help="Add a label to this bench run for easier "
@@ -873,6 +839,40 @@ def get_shared_OptionParser():
                       action="store_true",
                       dest="failfast",
                       help="Stop on first fail or error. (For discover mode)")
+    parser.add_option("-u", "--url",
+                      type="string",
+                      dest="main_url",
+                      help="Base URL to bench.")
+    parser.add_option("-c", "--cycles",
+                      type="string",
+                      dest="bench_cycles",
+                      help="Cycles to bench, colon-separated list of "
+                           "virtual concurrent users. To run a bench with 3 "
+                           "cycles of 5, 10 and 20 users, use: -c 5:10:20")
+    parser.add_option("-D", "--duration",
+                      type="string",
+                      dest="bench_duration",
+                      help="Duration of a cycle in seconds.")
+    parser.add_option("-m", "--sleep-time-min",
+                      type="string",
+                      dest="bench_sleep_time_min",
+                      help="Minimum sleep time between requests.")
+    parser.add_option("-M", "--sleep-time-max",
+                      type="string",
+                      dest="bench_sleep_time_max",
+                      help="Maximum sleep time between requests.")
+    parser.add_option("-t", "--test-sleep-time",
+                      type="string",
+                      dest="bench_sleep_time",
+                      help="Sleep time between tests.")
+    parser.add_option("-s", "--startup-delay",
+                      type="string",
+                      dest="bench_startup_delay",
+                      help="Startup delay between thread.")
+    parser.add_option("-f", "--as-fast-as-possible",
+                      action="store_true",
+                      help="Remove sleep times between requests and between "
+                           "tests, shortcut for -m0 -M0 -t0")
     return parser
 
 def run_distributed(options, module_name, class_name, method_name, sys_args):
@@ -901,7 +901,7 @@ def run_distributed(options, module_name, class_name, method_name, sys_args):
     
     _manager = None
     return ret
-    
+
 def run_local(options, module_name, class_name, method_name):
     ret = None
     RunnerClass = get_runner_class(options.bench_runner_class)
@@ -933,9 +933,9 @@ def main(sys_args=sys.argv[1:]):
     # special case: 'discover' argument
     if sys_args and sys_args[0].lower() == 'discover':
         return discover(sys_args)
-    
+
     options, args, module_name = parse_sys_args(sys_args)
-    
+
     klass, method = args[1].split('.')
     if options.distribute:
         return run_distributed(options, module_name, klass, method, sys_args)
