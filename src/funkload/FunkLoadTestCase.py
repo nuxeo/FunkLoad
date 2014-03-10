@@ -23,6 +23,7 @@ $Id: FunkLoadTestCase.py 24757 2005-08-31 12:22:19Z bdelbosc $
 import os
 import sys
 import time
+import string
 import re
 import logging
 import gzip
@@ -53,6 +54,27 @@ _marker = []
 # ------------------------------------------------------------
 # Classes
 #
+class ConfSectionFinder(object):
+    '''Convenience class.  Lets us access conf sections and attrs by
+    doing MyTestCase().conf.sectionName.attrName
+    '''
+    allowedChars = string.ascii_letters + string.digits + '_'
+    def __init__(self, testcase):
+        self.testcase = testcase
+        self.quiet = False
+
+    def __getattr__(self, section):
+        class ConfKeyFinder(object):
+            def __getattr__(sself, attr):
+                assert sself.validInput(section, attr), \
+                       'To use the convenient .section.attr access to your'\
+                       ' config variables, they can not contain any special'\
+                       ' characters (alphanumeric and _ only)'
+                return self.testcase.conf_get(section, attr, quiet=self.quiet)
+            def validInput(sself, section, attr):
+                return set(section+attr).issubset(self.allowedChars)
+        return ConfKeyFinder()
+
 class FunkLoadTestCase(unittest.TestCase):
     """Unit test with browser and configuration capabilties."""
     # ------------------------------------------------------------
@@ -93,7 +115,7 @@ class FunkLoadTestCase(unittest.TestCase):
             self._dump_dir = mkdtemp('_funkload')
         self._loop_mode = getattr(options, 'loop_steps', False)
         if self._loop_mode:
-            if options.loop_steps.count(':'):
+            if ':' in options.loop_steps:
                 steps = options.loop_steps.split(':')
                 self._loop_steps = range(int(steps[0]), int(steps[1]))
             else:
@@ -120,6 +142,7 @@ class FunkLoadTestCase(unittest.TestCase):
         config.read(config_path)
         self._config = config
         self._config_path = config_path
+        self.conf = ConfSectionFinder(self)
         self.default_user_agent = self.conf_get('main', 'user_agent',
                                                 'FunkLoad/%s' % get_version(),
                                                 quiet=True)
@@ -162,7 +185,7 @@ class FunkLoadTestCase(unittest.TestCase):
     
     def setOkCodes(self, ok_codes):
         """Set ok codes."""
-        self.ok_codes = map(int, ok_codes) 
+        self.ok_codes = map(int, ok_codes)
     
     
     def clearContext(self):
@@ -729,7 +752,7 @@ class FunkLoadTestCase(unittest.TestCase):
             return value
         if separator is None:
             separator = ':'
-        if value.count(separator):
+        if separator in value:
             return value.split(separator)
         return [value]
 
