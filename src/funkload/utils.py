@@ -126,6 +126,13 @@ def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
     if logger.handlers:
         # already setup
         return logger
+    if log_path:
+        log_dir = os.path.dirname(log_path)
+        if log_dir and not os.path.exists(log_dir):
+            try:
+                os.makedirs(log_dir)
+            except Exception, e:
+                raise Exception("%s, (%s) (%s)" % (e, log_dir, log_path))
     if log_to.count("console"):
         hdlr = logging.StreamHandler()
         logger.addHandler(hdlr)
