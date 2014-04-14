@@ -34,7 +34,8 @@ On the bench server add to your test configuration file the following section::
   description = The application server
   port = 8008
 
-or if you need to have multiple ports for the same IP, for instance if you are using ssh tunneling
+or if you need to have multiple ports for the same IP, for instance if you are
+using ssh tunneling::
 
   [monitor]
   hosts = monitor1
