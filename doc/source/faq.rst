@@ -206,7 +206,7 @@ There are many ways:
       [worker1]
       host = worker1
       username = user
-      ssh_key = /path/to/my_key_name.pub
+      ssh_key = /path/to/my_key_name.private.key
 
   Then run adding just the --distribute option::
 
