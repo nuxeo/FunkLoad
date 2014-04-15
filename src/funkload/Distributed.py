@@ -34,7 +34,7 @@ import sys
 import paramiko
 
 from utils import mmn_encode, trace, package_tests, get_virtualenv_script, \
-                  get_version
+    get_version
 
 try:
     from funkload.rtfeedback import (FeedbackPublisher,
@@ -117,7 +117,7 @@ class SSHDistributor(DistributorBase):
         self.connection.load_system_host_keys()
         self.connection.set_missing_host_key_policy(paramiko.WarningPolicy())
         self.error = ""
-        self.name = name #So we can have multiples tests per host
+        self.name = name  # So we can have multiples tests per host
         self.channel_timeout = channel_timeout
         credentials = {}
         if username and password:
@@ -151,8 +151,8 @@ class SSHDistributor(DistributorBase):
             sftp = self.connection.open_sftp()
             sftp.get(remote_path, local_path)
         except Exception, error:
-            trace("failed to get %s->%s with error %s\n" % \
-                   (local_path, remote_path, error))
+            trace("failed to get %s->%s with error %s\n" %
+                  (local_path, remote_path, error))
 
     @requiresconnection
     def put(self, local_path, remote_path):
@@ -164,8 +164,8 @@ class SSHDistributor(DistributorBase):
             sftp = self.connection.open_sftp()
             sftp.put(local_path, remote_path)
         except Exception, error:
-            trace("failed to put %s->%s with error %s\n" % \
-                   (local_path, remote_path, error))
+            trace("failed to put %s->%s with error %s\n" %
+                  (local_path, remote_path, error))
 
     @requiresconnection
     def execute(self, cmd_string, shell_interpreter="bash -c", cwdir=None):
@@ -194,7 +194,7 @@ class SSHDistributor(DistributorBase):
 
     @requiresconnection
     def threaded_execute(self, cmd_string, shell_interpreter="bash -c",
-                                                                cwdir=None):
+                         cwdir=None):
         """
         basically the same as :meth:`execute` execept that it returns
         a started :mod:`threading.Thread` object instead of the output.
@@ -219,14 +219,16 @@ class SSHDistributor(DistributorBase):
                 #trace("DEBUG: %s\n" %exec_str)
                 try:
                     self_.input, self_.output, self_.err = \
-                        self_.exec_command(self.connection, exec_str, bufsize=1,
-                                                timeout=self.channel_timeout)
+                        self_.exec_command(self.connection, exec_str,
+                                           bufsize=1,
+                                           timeout=self.channel_timeout)
                 except Exception, e:
                     if not self.killed:
                         raise
 
             def exec_command(self, connection, command, bufsize=-1, timeout=None):
-                # Override to set timeout properly see http://mohangk.org/blog/2011/07/paramiko-sshclient-exec_command-timeout-workaround/
+                # Override to set timeout properly see
+                # http://mohangk.org/blog/2011/07/paramiko-sshclient-exec_command-timeout-workaround/
                 chan = connection._transport.open_session()
                 chan.settimeout(timeout)
                 print command
@@ -280,7 +282,7 @@ class DistributionMgr(threading.Thread):
     the bench over multiple machines.
     """
     def __init__(self, module_name, class_name, method_name, options,
-                                                                cmd_args):
+                 cmd_args):
         """
         mirrors the initialization of :class:`funkload.BenchRunner.BenchRunner`
         """
@@ -322,7 +324,7 @@ class DistributionMgr(threading.Thread):
         self.sleep_time_max = test.conf_getFloat('bench', 'sleep_time_max')
         if test.conf_get('distribute', 'channel_timeout', '', quiet=True):
             self.channel_timeout = test.conf_getFloat(
-                                        'distribute', 'channel_timeout')
+                'distribute', 'channel_timeout')
         else:
             self.channel_timeout = None
         self.threads = []  # Contains list of ThreadData objects
@@ -339,7 +341,7 @@ class DistributionMgr(threading.Thread):
             self.distributed_packages = options.distributed_packages
         else:
             self.distributed_packages = test.conf_get(
-                                                'distribute', 'packages', '')
+                'distribute', 'packages', '')
 
         try:
             desc = getattr(test, self.method_name).__doc__.strip()
@@ -366,7 +368,7 @@ class DistributionMgr(threading.Thread):
         # check if hosts are in options
         workers = []                  # list of (host, port, descr)
         if options.workerlist:
-            for h in  options.workerlist.split(","):
+            for h in options.workerlist.split(","):
                 cred_host = h.split("@")
                 if len(cred_host) == 1:
                     uname, pwd, host = None, None, cred_host[0]
@@ -417,8 +419,9 @@ class DistributionMgr(threading.Thread):
             hosts = test.conf_get('monitor', 'hosts', '', quiet=True).split()
             for host in sorted(hosts):
                 name = host
-                host = test.conf_get(host,'host',host.strip())
-                monitor_hosts.append((name, host, test.conf_getInt(name, 'port'),
+                host = test.conf_get(host, 'host', host.strip())
+                monitor_hosts.append((name, host,
+                                      test.conf_getInt(name, 'port'),
                                       test.conf_get(name, 'description', '')))
         self.monitor_hosts = monitor_hosts
         # keep the test to use the result logger for monitoring
@@ -429,11 +432,10 @@ class DistributionMgr(threading.Thread):
         if LIVE_FEEDBACK and options.feedback:
             trace("* Starting the Feedback Publisher\n")
             self.feedback = FeedbackPublisher(
-                    endpoint=options.feedback_endpoint or DEFAULT_ENDPOINT,
-                    pubsub_endpoint=options.feedback_pubsub_endpoint or
-                    DEFAULT_PUBSUB,
-                    handler=_print_rt
-                    )
+                endpoint=options.feedback_endpoint or DEFAULT_ENDPOINT,
+                pubsub_endpoint=options.feedback_pubsub_endpoint or
+                DEFAULT_PUBSUB,
+                handler=_print_rt)
             self.feedback.start()
         else:
             self.feedback = None
@@ -453,7 +455,7 @@ class DistributionMgr(threading.Thread):
         text.append("* Configuration file: %s" % self.config_path)
         text.append("* Distributed output: %s" % self.distribution_output)
         size = os.path.getsize(self.tarred_tests)
-        text.append("* Tarred tests: %0.2fMB"%(float(size)/10.0**6))
+        text.append("* Tarred tests: %0.2fMB" % (float(size) / 10.0 ** 6))
         text.append("* Server: %s" % self.test_url)
         text.append("* Cycles: %s" % self.cycles)
         text.append("* Cycle duration: %ss" % self.duration)
@@ -465,7 +467,7 @@ class DistributionMgr(threading.Thread):
         text.append("* Channel timeout: %s%s" % (
             self.channel_timeout, "s" if self.channel_timeout else ""))
         text.append("* Workers :%s\n\n" % ",".join(
-                                                w.name for w in self._workers))
+                    w.name for w in self._workers))
         return '\n'.join(text)
 
     def prepare_workers(self, allow_errors=False):
@@ -509,7 +511,7 @@ class DistributionMgr(threading.Thread):
 
             worker.execute(cmd, cwdir=virtual_env)
 
-            #unpackage tests.
+            # unpackage tests.
             worker.put(
                 self.tarred_tests, os.path.join(remote_res_dir, tarball))
             worker.execute(
@@ -526,8 +528,8 @@ class DistributionMgr(threading.Thread):
         for worker in list(self._workers):
             if not worker.connected:
                 if allow_errors:
-                    trace("%s is not connected, removing from pool.\n" % \
-                                                                 worker.name)
+                    trace("%s is not connected, removing from pool.\n" %
+                          worker.name)
                     self._workers.remove(worker)
                     continue
                 else:
@@ -537,7 +539,7 @@ class DistributionMgr(threading.Thread):
 
             # Verify that the Python binary is available
             which_python = "test -x `which %s 2>&1 > /dev/null` && echo true" \
-                    % (self.python_bin)
+                % (self.python_bin)
             out, err = worker.execute(which_python)
 
             if out.strip() == "true":
@@ -545,7 +547,7 @@ class DistributionMgr(threading.Thread):
                     target=local_prep_worker,
                     args=(worker,)))
             elif allow_errors:
-                trace("Cannot find Python binary at path `%s` on %s, " + \
+                trace("Cannot find Python binary at path `%s` on %s, " +
                       "removing from pool" % (self.python_bin, worker.name))
                 self._workers.remove(worker)
             else:
@@ -593,8 +595,8 @@ class DistributionMgr(threading.Thread):
             trace("* [%s] returned\n" % worker.name)
             err_string = thread.err.read()
             if err_string:
-                trace("\n".join("  [%s]: %s" % (worker.name, k) for k \
-                        in err_string.split("\n") if k.strip()))
+                trace("\n".join("  [%s]: %s" % (worker.name, k) for k
+                                in err_string.split("\n") if k.strip()))
             trace("\n")
 
         self.stopMonitors()
@@ -611,7 +613,8 @@ class DistributionMgr(threading.Thread):
                     self.distribution_output, "%s-%s" % (
                         worker.name, filename))
                 if os.access(local_file, os.F_OK):
-                    os.rename(local_file, local_file + '.bak-' + str(int(time.time())))
+                    os.rename(local_file, local_file + '.bak-' +
+                              str(int(time.time())))
                 worker.get(remote_file, local_file)
                 trace("* Received bench log from [%s] into %s\n" % (
                     worker.name, local_file))
@@ -684,11 +687,11 @@ class DistributionMgr(threading.Thread):
 
         with open(path, "w+") as fd:
             fd.write('<funkload version="{version}" time="{time}">\n'.format(
-                            version=get_version(), time=time.time()))
+                     version=get_version(), time=time.time()))
             for key, value in config.items():
                 # Write out the config values
                 fd.write('<config key="{key}" value="{value}"/>\n'.format(
-                                                        key=key, value=value))
+                         key=key, value=value))
             for xml in successful_results:
                 fd.write(xml)
                 fd.write("\n")
