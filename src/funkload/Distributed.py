@@ -122,7 +122,7 @@ class SSHDistributor(DistributorBase):
         credentials = {}
         if username and password:
             credentials = {"username": username, "password": password}
-        if username and key_filename:
+        elif username and key_filename:
             credentials = {"username": username, "key_filename": key_filename}
         elif username:
             credentials = {"username": username}
@@ -133,6 +133,7 @@ class SSHDistributor(DistributorBase):
         else:
             port = 22
         try:
+            # print "connect to " + host + " port " + str(port)  + " " + str(credentials)
             self.connection.connect(host, timeout=5, port=port, **credentials)
             self.connected = True
         except socket.gaierror, error:
@@ -381,7 +382,7 @@ class DistributionMgr(threading.Thread):
                     else:
                         uname, pwd = uname_pwd
 
-                worker = {"name": host,
+                worker = {"name": host.replace(":", "_"),
                           "host": host,
                           "password": pwd,
                           "username": uname,
@@ -401,7 +402,7 @@ class DistributionMgr(threading.Thread):
                     key_filename = test.conf_get(host, 'ssh_key', '')
 
                 workers.append({
-                    "name": host,
+                    "name": host.replace(":", "_"),
                     "host": test.conf_get(host, "host", host),
                     "password": test.conf_get(host, 'password', ''),
                     "username": test.conf_get(host, 'username', ''),
@@ -496,7 +497,7 @@ class DistributionMgr(threading.Thread):
             trace(".")
             worker.execute(
                 "%s virtualenv.py %s" % (
-                    self.python_bin, self.tarred_testsdir),
+                    self.python_bin, os.path.join(remote_res_dir, self.tarred_testsdir)),
                 cwdir=remote_res_dir)
 
             tarball = os.path.split(self.tarred_tests)[1]
