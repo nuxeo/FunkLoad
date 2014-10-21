@@ -317,11 +317,20 @@ def get_virtualenv_script():
     installed in the system. if it doesn't exist returns
     None.
     """
-    pkg = pkg_resources.get_distribution('virtualenv')
-    script_path =  os.path.join( pkg.location, 'virtualenv.py')
+    try:
+        import virtualenv
+    except ImportError:
+        raise ImportError('No module named virtualenv')
 
-    if os.path.isfile( script_path ):
-        return script_path
+
+    pkg = pkg_resources.get_distribution('virtualenv')
+    output = virtualenv.create_bootstrap_script('import os')
+    fpath = os.path.join(os.path.realpath(__file__),'virtualenv.py')
+    f = open(fpath, 'w').write(output)
+    # script_path =  os.path.join( pkg.location, 'virtualenv.py')
+    
+    if os.path.isfile( fpath ):
+        return fpath
     else:
         return None
 
