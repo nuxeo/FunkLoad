@@ -218,7 +218,7 @@ def decodeCookies(url, server, headers, cookies):
         if maxage != '':
             timedelta = int(maxage)
             if timedelta > 0:
-                expire = now + timedelta
+                expire = now + datetime.timedelta(seconds=timedelta)
         else:
             if cookie['expires'] == '':
                 expire = datetime.datetime.max

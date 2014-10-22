@@ -492,11 +492,13 @@ class DistributionMgr(threading.Thread):
             worker.execute("mkdir -p %s" % virtual_env)
             worker.put(
                 get_virtualenv_script(),
-                os.path.join(remote_res_dir, "virtualenv.py"))
+                ## os.path.join(remote_res_dir, "virtualenv.py"))
+                os.path.join(remote_res_dir, "tmpvenv.py"))
 
             trace(".")
             worker.execute(
-                "%s virtualenv.py %s" % (
+                # "%s virtualenv.py %s" % (
+                "%s tmpvenv.py %s" % (
                     self.python_bin, os.path.join(remote_res_dir, self.tarred_testsdir)),
                 cwdir=remote_res_dir)
 
