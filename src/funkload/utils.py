@@ -322,14 +322,15 @@ def get_virtualenv_script():
     except ImportError:
         raise ImportError('No module named virtualenv')
 
-
     pkg = pkg_resources.get_distribution('virtualenv')
     output = virtualenv.create_bootstrap_script('import os')
-    fpath = os.path.join(os.path.realpath(__file__),'virtualenv.py')
+    fpath = os.path.join(os.path.abspath('/tmp'),'tmpvenv.py')
+    print fpath
     f = open(fpath, 'w').write(output)
     # script_path =  os.path.join( pkg.location, 'virtualenv.py')
     
     if os.path.isfile( fpath ):
+        print 'Ciao'
         return fpath
     else:
         return None
