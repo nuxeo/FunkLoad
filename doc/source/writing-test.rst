@@ -162,10 +162,10 @@ You can get information from the configuration file, using the
 appropriate ``self.conf_get*(section, key)`` methods::
 
    # Getting value from the main section
-   value = self.get_conf('main', 'key', 'default')
-   count = self.get_confInt('main', 'nb_docs', 10)
-   percent = self.get_confFloat('main', 'percent', 5.5)
-   items = self.get_confList('main', 'names')
+   value = self.conf_get('main', 'key', 'default')
+   count = self.conf_getInt('main', 'nb_docs', 10)
+   percent = self.conf_getFloat('main', 'percent', 5.5)
+   items = self.conf_getList('main', 'names')
    # The names in the conf file are separated with a colon
    # names=name1:name2:name3
 
