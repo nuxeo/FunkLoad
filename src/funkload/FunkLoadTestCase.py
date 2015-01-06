@@ -155,7 +155,7 @@ class FunkLoadTestCase(unittest.TestCase):
                                            quiet=True) )
         self.sleep_time_min = self.conf_getFloat(section, 'sleep_time_min', 0)
         self.sleep_time_max = self.conf_getFloat(section, 'sleep_time_max', 0)
-        self._simple_fetch = self.conf_getInt(section, 'simple_fetch', 0, 
+        self._simple_fetch = self.conf_getInt(section, 'simple_fetch', 0,
                                               quiet=True)
         self.log_to = self.conf_get(section, 'log_to', 'console file')
         self.log_path = self.conf_get(section, 'log_path', 'funkload.log')
@@ -181,13 +181,13 @@ class FunkLoadTestCase(unittest.TestCase):
         self.clearContext()
 
         #self.logd('# FunkLoadTestCase._funkload_init done')
-    
-    
+
+
     def setOkCodes(self, ok_codes):
         """Set ok codes."""
         self.ok_codes = map(int, ok_codes)
-    
-    
+
+
     def clearContext(self):
         """Reset the testcase."""
         self._browser.clearContext()
@@ -346,7 +346,7 @@ class FunkLoadTestCase(unittest.TestCase):
                 if response.code in (302, 303):
                     method = 'get'
                 if response.code == 303:
-                    # 303 is HTTP/1.1, make sure the connection 
+                    # 303 is HTTP/1.1, make sure the connection
                     # is not in keep alive mode
                     self.setHeader('Connection', 'close')
                 response = self._connect(url, None, ok_codes, rtype=method,
@@ -409,7 +409,7 @@ class FunkLoadTestCase(unittest.TestCase):
         return response
 
     def post(self, url, params=None, description=None, ok_codes=None,
-             load_auto_links=True):
+             load_auto_links=True, follow_redirect=True):
         """Make an HTTP POST request to the specified url with params.
 
         Returns a webunit.webunittest.HTTPResponse object.
@@ -417,11 +417,12 @@ class FunkLoadTestCase(unittest.TestCase):
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
-                                method="post", load_auto_links=load_auto_links)
+                                method="post", load_auto_links=load_auto_links,
+                                follow_redirect=follow_redirect)
         return response
 
     def get(self, url, params=None, description=None, ok_codes=None,
-            load_auto_links=True):
+            load_auto_links=True, follow_redirect=True):
         """Make an HTTP GET request to the specified url with params.
 
         Returns a webunit.webunittest.HTTPResponse object.
@@ -429,7 +430,8 @@ class FunkLoadTestCase(unittest.TestCase):
         self.steps += 1
         self.page_responses = 0
         response = self._browse(url, params, description, ok_codes,
-                                method="get", load_auto_links=load_auto_links)
+                                method="get", load_auto_links=load_auto_links,
+                                follow_redirect=follow_redirect)
         return response
 
     def method(self, method, url, params=None, description=None,
