@@ -762,7 +762,11 @@ class FunkLoadTestCase(unittest.TestCase):
     # Extend unittest.TestCase to provide bench cycle hook
     #
     def setUpCycle(self):
-        """Called on bench mode before a cycle start."""
+        """Called on bench mode before a cycle start.
+
+        Note that you can not initialize your testcase instance with this
+        method, you need to use the setUp method instead.
+        """
         pass
 
     def midCycle(self, cycle, cvus):
@@ -777,7 +781,12 @@ class FunkLoadTestCase(unittest.TestCase):
     # Extend unittest.TestCase to provide bench setup/teardown hook
     #
     def setUpBench(self):
-        """Called before the start of the bench."""
+        """Called before the start of the bench.
+
+        Note that you can not initialize your testcase instance with this
+        method, you need to use the setUp method instead.
+        """
+
         pass
 
     def tearDownBench(self):
