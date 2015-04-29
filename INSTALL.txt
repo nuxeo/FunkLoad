@@ -3,11 +3,10 @@ Installation
 
 This document describes how to install the FunkLoad_ tool.
 
-.. toctree::
 
 
-Quick installation guide for Debian and Ubuntu
------------------------------------------------
+Debian and Ubuntu quick installation
+------------------------------------
 
 With Debian Lenny or Ubuntu 8.10, 9.04, 10.04 ..., you can install the
 latest snapshot this way ::
@@ -18,13 +17,13 @@ latest snapshot this way ::
   sudo easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
 
 To install the latest stable release replace the last line with ::
- 
+
   sudo easy_install -U funkload
 
 If you want to use the distributed mode (since 1.14.0) you need to
-install paramiko and virtualenv::
-  
-  sudo aptitude install python-paramiko, python-virtualenv
+install paramiko and virtualenv_ ::
+
+  sudo aptitude install python-paramiko python-virtualenv
 
 That's all.
 
@@ -33,8 +32,9 @@ installed this way::
 
   sudo aptitude install python-webunit funkload
 
-Quick installation guide for CentOS
-------------------------------------
+
+CentOS quick installation
+-------------------------
 
 As root ::
 
@@ -47,14 +47,14 @@ As root ::
   easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
 
 
-Installing on Mac
+Mac OS installation
 --------------------
 
 See http://pyfunc.blogspot.com/2011/12/installing-funkload-on-mac.html.
 
 
-Installing on Windows
------------------------
+Windows installation
+--------------------
 
 - Install Python 2.7
 - Install Gnuplot
@@ -67,8 +67,9 @@ Installing on Windows
     python setup.py install
     easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
 
-Other OS
-----------
+
+Generic installation (all OS)
+-----------------------------
 
 Some parts are OS specific:
 
@@ -108,6 +109,13 @@ Required packages
 Optional packages
 ~~~~~~~~~~~~~~~~~~
 
+* To avoid soiling your system's Python modules and dependencies, it's a good
+  practice to use a virtualenv_ to confine what's needed only for FunkLoad.
+
+  For example for Debian/Ubuntu here is what to do to use virtualenv::
+
+    sudo aptitude install python-virtualenv
+
 * To produce charts with FunkLoad >= 1.9.0: gnuplot 4.2, either use a
   package or visit the http://www.gnuplot.info/ site.
 
@@ -123,8 +131,9 @@ Optional packages
     sudo python setup.py install
 
 
-Installation
-~~~~~~~~~~~~~
+
+Different installation flavors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Easy installation
 __________________
@@ -139,21 +148,51 @@ __________________
 
     sudo easy_install -f http://funkload.nuxeo.org/snapshots/ -U funkload
 
-* Install the development version
 
-  If you want to try the latest unstable sources from git ::
+Installation from source
+________________________
+
+You can install from source, typically to test/use the development version
+(which may be unstable).
+
+First to avoid soiling your system's Python modules and dependencies, it's a
+good practice to use a virtualenv_ to confine what's needed only for
+FunkLoad. Especially if you are experimenting and developing.
+
+This approach is also handy if you don't have `sudo` power.
+
+So let's install a virtualenv dedicated to Funkload in, let's say, `~/opt`::
+
+    mkdir --parent ~/opt
+    virtualenv ~/opt/funkload.virtualenv
+    . ~/opt/funkload.virtualenv/bin/activate
+
+Then you can cleanly build and install Funkload::
 
     git clone git://github.com/nuxeo/FunkLoad.git
+    cd FunkLoad/
+    python setup.py build
+    python setup.py install
 
-  then::
+Now everytime you want to use the version of FunkLoad you've built, you will
+have to specify which virtualenv to use::
 
+    . ~/opt/funkload.virtualenv/bin/activate
+    fl-run-test --version
+
+Alternatively it's possible to do the following to not use a virtualenv (but
+you've been warned)::
+
+    git clone git://github.com/nuxeo/FunkLoad.git
     cd FunkLoad/
     python setup.py build
     sudo python setup.py install
 
 
-Installing without sudo power
-______________________________
+Installation with buildout
+__________________________
+
+This approach might be handy if you don't have `sudo` power.
 
 Get the FunkLoad package from pypi:
 http://pypi.python.org/pypi/funkload/ or a snapshot from:
@@ -169,7 +208,7 @@ Then use the buildout::
 Then your executable are ready on the bin directory.
 
 
-Installing without network access
+Installation without network access
 ___________________________________
 
 Transfer all the archives from http://funkload.nuxeo.org/3dparty/ in a
@@ -178,19 +217,18 @@ directory::
   mkdir -p /tmp/fl
   cd /tmp/fl
   wget -r -l1 -nd http://funkload.nuxeo.org/3dparty/
-  
+
 Transfer the latest FunkLoad package
 ::
- 
+
   # get setuptools package and untar
   python setup.py install
-  
+
   easy_install docutils*
   easy_install tcpwatch*
   easy_install webunit*
   easy_install funkload*
 
-  
 
 Test it
 --------
@@ -320,10 +358,10 @@ Problems ?
 .. _ez_setup.py: http://peak.telecommunity.com/dist/ez_setup.py
 .. _docutils: http://docutils.sourceforge.net/
 .. _TCPWatch: http://hathawaymix.org/Software/TCPWatch/
+.. _virtualenv: https://virtualenv.pypa.io/
 
 
 .. Local Variables:
 .. mode: rst
 .. End:
 .. vim: set filetype=rst:
-
