@@ -16,7 +16,17 @@ FunkLoad GIT master
 
 :git: https://github.com/nuxeo/FunkLoad
 
-:Target: 1.17.0
+:Target: 1.17.1
+
+
+FunkLoad 1.17.0
+------------------
+
+:Package: http://pypi.python.org/packages/source/f/funkload/funkload-1.17.0.tar.gz
+
+:github: https://github.com/nuxeo/FunkLoad/tree/1.17.0
+
+:Released date: 2015-05-06
 
 
 New Features

@@ -25,9 +25,6 @@ sdist:
 	python setup.py $(PKGTAG) sdist
 
 egg:
-	-python2.4 setup.py $(PKGTAG) bdist_egg
-	-python2.5 setup.py $(PKGTAG) bdist_egg
-	-python2.6 setup.py $(PKGTAG) bdist_egg
 	-python2.7 setup.py $(PKGTAG) bdist_egg
 
 distrib:
@@ -38,9 +35,7 @@ install:
 	python setup.py $(PKGTAG) install
 
 register:
-	-python2.6 setup.py register sdist bdist_egg upload
 	-python2.7 setup.py register bdist_egg upload
-	-python2.5 setup.py register bdist_egg upload
 
 
 uninstall:
