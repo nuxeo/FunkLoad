@@ -169,7 +169,7 @@ There are many ways:
 
      [distribute]
      log_path = log-distributed
-     funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.17.0.tar.gz
+     funkload_location=http://pypi.python.org/packages/source/f/funkload/funkload-1.17.1.tar.gz
 
   You can have multiple benchers per server by defining many workers with
   the same hostname in your configuration file. Add a workers section
