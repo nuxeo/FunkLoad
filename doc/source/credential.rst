@@ -20,7 +20,7 @@ The group file format is::
   group1:user3
   ...
 
-The credential server use a configuration file to point to the user
+The credential server uses a configuration file to point to the user
 and group file and define the listening port::
   
   [server]

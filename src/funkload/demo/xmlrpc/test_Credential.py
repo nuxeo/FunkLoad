@@ -8,7 +8,7 @@ from random import random
 from funkload.FunkLoadTestCase import FunkLoadTestCase
 
 class Credential(FunkLoadTestCase):
-    """This test use a configuration file Credential.conf."""
+    """This test uses the configuration file Credential.conf."""
 
     def setUp(self):
         """Setting up test."""

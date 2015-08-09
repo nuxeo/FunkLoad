@@ -14,7 +14,7 @@ from funkload.Lipsum import Lipsum
 class SeamBooking(FunkLoadTestCase):
     """Simple test to register a new user and book an hotel.
 
-    This test use a configuration file SeamBooking.conf.
+    This test uses the configuration file SeamBooking.conf.
     """
 
     jsf_tag_tree = '<input type="hidden" name="jsf_tree_64" id="jsf_tree_64" value="'

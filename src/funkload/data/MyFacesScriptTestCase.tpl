@@ -12,7 +12,7 @@ from funkload.utils import Data
 class %(class_name)s(FunkLoadTestCase):
     """XXX
 
-    This test use a configuration file %(class_name)s.conf.
+    This test uses the configuration file %(class_name)s.conf.
        """
     MYFACES_STATE = 'org.apache.myfaces.trinidad.faces.STATE'
     MYFACES_FORM = 'org.apache.myfaces.trinidad.faces.FORM'

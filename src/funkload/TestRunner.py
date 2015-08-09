@@ -226,7 +226,7 @@ class TestProgram(unittest.TestProgram):
 
 %prog launch a FunkLoad unit test.
 
-A FunkLoad unittest use a configuration file named [class].conf, this
+A FunkLoad unittest uses a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
 See http://funkload.nuxeo.org/ for more information.
