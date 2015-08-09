@@ -22,7 +22,7 @@ Here is an extract of the simple demo test case ``test_Simple.py``::
   from funkload.FunkLoadTestCase import FunkLoadTestCase
   
   class Simple(FunkLoadTestCase):
-      """This test use a configuration file Simple.conf."""
+      """This test uses the configuration file Simple.conf."""
       def setUp(self):
           """Setting up test."""
           self.server_url = self.conf_get('main', 'url')

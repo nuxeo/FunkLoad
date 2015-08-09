@@ -27,7 +27,7 @@ from funkload.Lipsum import Lipsum
 class Zope(ZopeTestCase):
     """Testing the funkload ZopeTestCase
 
-    This test use a configuration file Zope.conf.
+    This test uses the configuration file Zope.conf.
     """
 
     def setUp(self):

@@ -84,7 +84,7 @@ class CmfTestCase(FunkLoadTestCase):
 class Cmf(CmfTestCase):
     """Simple test of default CMF Site
 
-    This test use a configuration file Cmf.conf.
+    This test uses the configuration file Cmf.conf.
     """
     def setUp(self):
         """Setting up test."""

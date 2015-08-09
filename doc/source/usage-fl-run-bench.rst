@@ -5,7 +5,7 @@ fl-run-bench [options] file class.method
 
 fl-run-bench launch a FunkLoad unit test as load test.
 
-A FunkLoad unittest use a configuration file named [class].conf, this
+A FunkLoad unittest uses a configuration file named [class].conf, this
 configuration is overriden by the command line options.
 
 See http://funkload.nuxeo.org/ for more information.

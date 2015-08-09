@@ -8,7 +8,7 @@ from random import random
 from funkload.FunkLoadTestCase import FunkLoadTestCase
 
 class Simple(FunkLoadTestCase):
-    """This test use a configuration file Simple.conf."""
+    """This test uses the configuration file Simple.conf."""
 
     def setUp(self):
         """Setting up test."""
