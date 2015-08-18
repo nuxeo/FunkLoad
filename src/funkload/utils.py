@@ -65,14 +65,14 @@ def create_daemon():
     """
     try:
         pid = os.fork()
-    except OSError, msg:
-        raise Exception, "%s [%d]" % (msg.strerror, msg.errno)
+    except OSError as msg:
+        raise Exception("%s [%d]" % (msg.strerror, msg.errno))
     if (pid == 0):
         os.setsid()
         try:
             pid = os.fork()
-        except OSError, msg:
-            raise Exception, "%s [%d]" % (msg.strerror, msg.errno)
+        except OSError as msg:
+            raise Exception("%s [%d]" % (msg.strerror, msg.errno))
         if (pid == 0):
             os.umask(0)
         else:
@@ -131,7 +131,7 @@ def get_default_logger(log_to, log_path=None, level=logging.DEBUG,
         if log_dir and not os.path.exists(log_dir):
             try:
                 os.makedirs(log_dir)
-            except Exception, e:
+            except Exception as e:
                 raise Exception("%s, (%s) (%s)" % (e, log_dir, log_path))
     if log_to.count("console"):
         hdlr = logging.StreamHandler()

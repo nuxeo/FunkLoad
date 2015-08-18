@@ -19,12 +19,13 @@
 
 $Id: ReportRenderHtml.py 53544 2009-03-09 16:28:58Z tlazar $
 """
+from __future__ import absolute_import
 
 try:
     # 1/ gnuplot
-    from ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml
+    from .ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml
 except ImportError:
     # 2/ no charts
-    from ReportRenderHtmlBase import RenderHtmlBase as RenderHtml
+    from .ReportRenderHtmlBase import RenderHtmlBase as RenderHtml
 
-from ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml
+from .ReportRenderHtmlGnuPlot import RenderHtmlGnuPlot as RenderHtml

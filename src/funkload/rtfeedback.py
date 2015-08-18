@@ -1,3 +1,4 @@
+from __future__ import print_function
 import json
 import socket
 try:
@@ -33,7 +34,7 @@ class FeedbackPublisher(Process):
         self.pub_sock.send_multipart(['feedback', msg[0]])
 
     def run(self):
-        print 'publisher running in a thread'
+        print('publisher running in a thread')
         self.context = self.context or zmq.Context.instance()
         self.sock = self.context.socket(zmq.PULL)
         self.sock.bind(self.endpoint)
@@ -80,7 +81,7 @@ class FeedbackSubscriber(Process):
         topic, msg = msg
         msg = json.loads(msg)
         if self.handler is None:
-            print msg
+            print(msg)
         else:
             self.handler(msg, **self.kw)
 
@@ -99,11 +100,11 @@ class FeedbackSubscriber(Process):
 
 
 if __name__ == '__main__':
-    print 'Starting subscriber'
+    print('Starting subscriber')
     sub = FeedbackSubscriber()
-    print 'Listening to events on %r' % sub.pubsub_endpoint
+    print('Listening to events on %r' % sub.pubsub_endpoint)
     try:
         sub.run()
     except KeyboardInterrupt:
         sub.stop()
-        print 'Bye!'
+        print('Bye!')

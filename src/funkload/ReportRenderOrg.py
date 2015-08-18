@@ -17,11 +17,12 @@
 #
 """Classes that render statistics in emacs org-mode format.
 """
+from __future__ import absolute_import
 import re
-from ReportRenderRst import RenderRst
-from ReportRenderRst import BaseRst
-import ReportRenderRst
-from MonitorPlugins import MonitorPlugins
+from .ReportRenderRst import RenderRst
+from .ReportRenderRst import BaseRst
+from . import ReportRenderRst
+from .MonitorPlugins import MonitorPlugins
 
 FL_SITE = "http://funkload.nuxeo.org"
 

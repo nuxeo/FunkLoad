@@ -32,6 +32,8 @@
 
 $Id: PatchWebunit.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 import time
@@ -49,7 +51,7 @@ from webunit.webunittest import WebTestCase, WebFetcher
 from webunit.webunittest import HTTPResponse, HTTPError, VERBOSE
 from webunit.utility import Upload
 
-from utils import thread_sleep, Data
+from .utils import thread_sleep, Data
 import re
 
 valid_url = re.compile(r'^(http|https)://[a-z0-9\.\-\:]+(\/[^\ \t\<\>]*)?$',
@@ -115,7 +117,7 @@ class FKLIMGSucker(IMGSucker):
                     continue
                 # TODO: figure the re-write path
                 # newattributes.append((name, path))
-                if not self.session.images.has_key(url):
+                if url not in self.session.images:
                     self.ftestcase.logdd('    img: %s ...' % url)
                     t_start = time.time()
                     self.session.images[url] = self.session.fetch(url)
@@ -146,7 +148,7 @@ class FKLIMGSucker(IMGSucker):
                     continue
                 # TODO: figure the re-write path
                 # newattributes.append((name, path))
-                if not self.session.css.has_key(url):
+                if url not in self.session.css:
                     self.ftestcase.logdd('    link: %s ...' % url)
                     t_start = time.time()
                     self.session.css[url] = self.session.fetch(url)
@@ -341,7 +343,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         else:
             host_header = '%s:%s' % (server, port)
     else:
-        raise ValueError, protocol
+        raise ValueError(protocol)
 
     headers = []
     params = None
@@ -440,7 +442,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
 
     if self.debug_headers:
         for header in headers:
-            print "Putting header -- %s: %s" % header
+            print("Putting header -- %s: %s" % header)
 
     if params is not None:
         h.send(params)
@@ -451,7 +453,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
         errcode = r.status
         errmsg = r.reason
         headers = r.msg
-        if headers is None or headers.has_key('content-length') and headers['content-length'] == "0":
+        if headers is None or 'content-length' in headers and headers['content-length'] == "0":
             data = None
         else:
             data = r.read()
@@ -462,7 +464,7 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
     else:
         # get the body and save it
         errcode, errmsg, headers = h.getreply()
-        if headers is None or headers.has_key('content-length') and headers['content-length'] == "0":
+        if headers is None or 'content-length' in headers and headers['content-length'] == "0":
             response = HTTPResponse(self.cookies, protocol, server, port, url,
                                     errcode, errmsg, headers, None,
                                     self.error_content)
@@ -514,11 +516,11 @@ def WF_fetch(self, url, postdata=None, server=None, port=None, protocol=None,
                 msg = "Matched error: %s" % content
                 if hasattr(self, 'results') and self.results:
                     self.writeError(url, msg)
-                self.log('Matched error'+`(url, content)`, data)
+                self.log('Matched error'+repr((url, content)), data)
                 if VERBOSE:
                     sys.stdout.write('c')
                     sys.stdout.flush()
-                raise self.failureException, msg
+                raise self.failureException(msg)
 
     if VERBOSE:
         sys.stdout.write('_')

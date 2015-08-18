@@ -19,10 +19,12 @@
 
 $Id$
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import os
-from ReportRenderRst import rst_title
-from ReportRenderHtmlBase import RenderHtmlBase
-from ReportRenderHtmlGnuPlot import gnuplot
+from .ReportRenderRst import rst_title
+from .ReportRenderHtmlBase import RenderHtmlBase
+from .ReportRenderHtmlGnuPlot import gnuplot
 
 def getReadableDiffReportName(a, b):
     """Return a readeable diff report name using 2 reports"""
@@ -82,7 +84,7 @@ class RenderDiff(RenderHtmlBase):
         report_dir = os.path.join(output_dir, getReadableDiffReportName(
             self.report_dir1, self.report_dir2))
         if not os.access(report_dir, os.W_OK):
-            os.mkdir(report_dir, 0775)
+            os.mkdir(report_dir, 0o775)
         return report_dir
 
     def createCharts(self):
@@ -147,7 +149,7 @@ class RenderDiff(RenderHtmlBase):
         try:
             idx = lines.index("%s stats\n" % tag)
         except ValueError:
-            print "ERROR tag %s not found in rst report %s" % (tag, report_dir)
+            print("ERROR tag %s not found in rst report %s" % (tag, report_dir))
             return []
         delim = 0
         ret =  []

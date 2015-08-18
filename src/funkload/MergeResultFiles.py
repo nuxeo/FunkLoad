@@ -17,8 +17,10 @@
 #
 """Merge FunkLoad result files to produce a report for distributed bench
 reports."""
+from __future__ import print_function
+from __future__ import absolute_import
 import xml.parsers.expat
-from utils import trace
+from .utils import trace
 
 class EndOfConfig(Exception):
     pass
@@ -42,23 +44,23 @@ class FunkLoadConfigXmlParser:
         parser.StartElementHandler = self.handleStartElement
         try:
             parser.ParseFile(file(xml_file))
-        except xml.parsers.expat.ExpatError, msg:
+        except xml.parsers.expat.ExpatError as msg:
             if (self.current_element[-1]['name'] == 'funkload'
                 and str(msg).startswith('no element found')):
-                print "Missing </funkload> tag."
+                print("Missing </funkload> tag.")
             else:
-                print 'Error: invalid xml bench result file'
+                print('Error: invalid xml bench result file')
                 if len(self.current_element) <= 1 or (
                     self.current_element[1]['name'] != 'funkload'):
-                    print """Note that you can generate a report only for a
+                    print("""Note that you can generate a report only for a
                     bench result done with fl-run-bench (and not on a test
-                    result done with fl-run-test)."""
+                    result done with fl-run-test).""")
                 else:
-                    print """You may need to remove non ascii char that comes
+                    print("""You may need to remove non ascii char that comes
                     from error pages catched during the bench. iconv
-                    or recode may help you."""
-                print 'Xml parser element stack: %s' % [
-                    x['name'] for x in self.current_element]
+                    or recode may help you.""")
+                print('Xml parser element stack: %s' % [
+                    x['name'] for x in self.current_element])
                 raise
         except EndOfConfig:
             return
@@ -132,7 +134,7 @@ class MergeResultFiles:
                 c += 1
 
             f = open(input_file)
-            for line in f.xreadlines():
+            for line in f:
                 if "</funkload>" in line:
                     continue
                 elif i > 0 and ('<funkload' in line or '<config' in line):

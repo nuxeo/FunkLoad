@@ -19,10 +19,11 @@
 
 $Id$
 """
+from __future__ import absolute_import
 import os
 from tempfile import gettempdir
-from FunkLoadTestCase import FunkLoadTestCase
-import PatchWebunit
+from .FunkLoadTestCase import FunkLoadTestCase
+from . import PatchWebunit
 
 class FunkLoadDocTest(FunkLoadTestCase):
     """Class to use in doctest.

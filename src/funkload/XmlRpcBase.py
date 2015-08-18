@@ -19,6 +19,7 @@
 
 $Id$
 """
+from __future__ import absolute_import
 import sys, os
 from socket import error as SocketError
 from time import sleep
@@ -28,8 +29,8 @@ from xmlrpclib import ServerProxy
 import logging
 from optparse import OptionParser, TitledHelpFormatter
 
-from utils import create_daemon, get_default_logger, close_logger
-from utils import trace, get_version
+from .utils import create_daemon, get_default_logger, close_logger
+from .utils import trace, get_version
 
 
 def is_server_running(host, port):

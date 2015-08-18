@@ -19,11 +19,12 @@
 
 $Id$
 """
+from __future__ import absolute_import
 import sys
 
-from Lipsum import Lipsum
-from XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
-from CredentialBase import CredentialBaseServer
+from .Lipsum import Lipsum
+from .XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
+from .CredentialBase import CredentialBaseServer
 
 # ------------------------------------------------------------
 # Server

@@ -19,11 +19,12 @@
 #
 """A Linux monitor server/controller.
 """
+from __future__ import absolute_import
 import sys
 from time import time, sleep
 from threading import Thread
-from XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
-from MonitorPlugins import MonitorPlugins
+from .XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
+from .MonitorPlugins import MonitorPlugins
 
 # ------------------------------------------------------------
 # classes
@@ -134,7 +135,7 @@ class MonitorServer(XmlRpcBaseServer):
     def startRecord(self, key):
         """Start to monitor if it is the first key."""
         self.logd('startRecord %s' % key)
-        if not self._keys.has_key(key) or self._keys[key][1] is not None:
+        if key not in self._keys or self._keys[key][1] is not None:
             self._monitor.startRecord()
         self._keys[key] = [len(self.records), None]
         return 1
@@ -142,7 +143,7 @@ class MonitorServer(XmlRpcBaseServer):
     def stopRecord(self, key):
         """Stop to monitor if it is the last key."""
         self.logd('stopRecord %s' % key)
-        if not self._keys.has_key(key) or self._keys[key][1] is not None:
+        if key not in self._keys or self._keys[key][1] is not None:
             return 0
         self._keys[key] = [self._keys[key][0], len(self.records)]
         self._monitor.stopRecord()

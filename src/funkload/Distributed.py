@@ -16,6 +16,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
+from __future__ import print_function
+from __future__ import absolute_import
 import os
 import platform
 import re
@@ -33,7 +35,7 @@ import sys
 
 import paramiko
 
-from utils import mmn_encode, trace, package_tests, get_virtualenv_script, \
+from .utils import mmn_encode, trace, package_tests, get_virtualenv_script, \
     get_version
 
 try:
@@ -91,7 +93,7 @@ def requiresconnection(fn):
     def _requiresconnect(self, *args, **kwargs):
         if not self.connected:
             raise RuntimeError(
-                "%s requires an ssh connection to be created" % fn.func_name)
+                "%s requires an ssh connection to be created" % fn.__name__)
         return fn(self, *args, **kwargs)
     _requiresconnect.__name__ = fn.__name__
     _requiresconnect.__doc__ = fn.__doc__
@@ -136,9 +138,9 @@ class SSHDistributor(DistributorBase):
             # print "connect to " + host + " port " + str(port)  + " " + str(credentials)
             self.connection.connect(host, timeout=5, port=port, **credentials)
             self.connected = True
-        except socket.gaierror, error:
+        except socket.gaierror as error:
             self.error = error
-        except socket.timeout, error:
+        except socket.timeout as error:
             self.error = error
         self.killed = False
 
@@ -151,7 +153,7 @@ class SSHDistributor(DistributorBase):
         try:
             sftp = self.connection.open_sftp()
             sftp.get(remote_path, local_path)
-        except Exception, error:
+        except Exception as error:
             trace("failed to get %s->%s with error %s\n" %
                   (local_path, remote_path, error))
 
@@ -164,7 +166,7 @@ class SSHDistributor(DistributorBase):
         try:
             sftp = self.connection.open_sftp()
             sftp.put(local_path, remote_path)
-        except Exception, error:
+        except Exception as error:
             trace("failed to put %s->%s with error %s\n" %
                   (local_path, remote_path, error))
 
@@ -223,7 +225,7 @@ class SSHDistributor(DistributorBase):
                         self_.exec_command(self.connection, exec_str,
                                            bufsize=1,
                                            timeout=self.channel_timeout)
-                except Exception, e:
+                except Exception as e:
                     if not self.killed:
                         raise
 
@@ -232,7 +234,7 @@ class SSHDistributor(DistributorBase):
                 # http://mohangk.org/blog/2011/07/paramiko-sshclient-exec_command-timeout-workaround/
                 chan = connection._transport.open_session()
                 chan.settimeout(timeout)
-                print command
+                print(command)
                 chan.exec_command(command)
                 stdin = chan.makefile('wb', bufsize)
                 stdout = chan.makefile('rb', bufsize)

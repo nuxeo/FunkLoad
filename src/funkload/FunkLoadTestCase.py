@@ -20,6 +20,8 @@
 
 $Id: FunkLoadTestCase.py 24757 2005-08-31 12:22:19Z bdelbosc $
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 import time
@@ -44,9 +46,9 @@ from ConfigParser import ConfigParser, NoSectionError, NoOptionError
 
 from webunit.webunittest import WebTestCase, HTTPError
 
-import PatchWebunit
-from utils import get_default_logger, mmn_is_bench, mmn_decode, Data
-from utils import recording, thread_sleep, is_html, get_version, trace
+from . import PatchWebunit
+from .utils import get_default_logger, mmn_is_bench, mmn_decode, Data
+from .utils import recording, thread_sleep, is_html, get_version, trace
 from xmlrpclib import ServerProxy
 
 _marker = []
@@ -242,7 +244,7 @@ class FunkLoadTestCase(unittest.TestCase):
                                    t_start, t_stop, log_body=True)
                 if self._dumping:
                     self._dump_content(value.response, description)
-                raise self.failureException, str(value.response)
+                raise self.failureException(str(value.response))
             else:
                 self._log_response_error(url, rtype, description, t_start,
                                          t_stop)
@@ -365,7 +367,7 @@ class FunkLoadTestCase(unittest.TestCase):
             try:
                 # pageImages is patched to call _log_response on all links
                 self._browser.pageImages(url, page, self)
-            except HTTPError, error:
+            except HTTPError as error:
                 if self._accept_invalid_links:
                     if not self.in_bench_mode:
                         self.logd('  ' + str(error))
@@ -378,7 +380,7 @@ class FunkLoadTestCase(unittest.TestCase):
                     # XXX The duration logged for this response is wrong
                     self._log_response(error.response, 'link', None,
                                        t_start, t_stop, log_body=True)
-                    raise self.failureException, str(error)
+                    raise self.failureException(str(error))
             c_stop = self.total_time
             self.logd('  Done in %.3fs' % (c_stop - c_start))
         if sleep:
@@ -810,7 +812,7 @@ class FunkLoadTestCase(unittest.TestCase):
         if hasattr(self, 'logger'):
             self.logger.info(self.meta_method_name+': '+message)
         else:
-            print self.meta_method_name+': '+message
+            print(self.meta_method_name+': '+message)
 
     def _logr(self, message, force=False):
         """Log a result."""
@@ -965,7 +967,7 @@ class FunkLoadTestCase(unittest.TestCase):
         if not response.body:
             return
         if not os.access(dump_dir, os.W_OK):
-            os.mkdir(dump_dir, 0775)
+            os.mkdir(dump_dir, 0o775)
         content_type = response.headers.get('content-type')
         if content_type == 'text/xml':
             ext = '.xml'

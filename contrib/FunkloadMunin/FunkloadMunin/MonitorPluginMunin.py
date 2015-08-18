@@ -88,15 +88,15 @@ class MonitorMunin(MonitorPlugin):
             count=False
             data_name=self._nameResult(name, field)
 
-            if output_parsed.has_key("%s.label"%field):
+            if "%s.label"%field in output_parsed:
                 label=output_parsed["%s.label"%field]
 #            if output_parsed.has_key("%s.info"%field):
 #                label=output_parsed["%s.info"%field]
             
-            if output_parsed.has_key("%s.negative"%field):
+            if "%s.negative"%field in output_parsed:
                 neg=self._nameResult(name, output_parsed["%s.negative"%field])
 
-            if output_parsed.has_key("%s.type"%field):
+            if "%s.type"%field in output_parsed:
                 t=output_parsed["%s.type"%field]
                 if t=='COUNTER' or t=='DERIVE':
                     count=True
@@ -104,7 +104,7 @@ class MonitorMunin(MonitorPlugin):
             ret.append((data_name, label, neg, count))
 
         title=None
-        if output_parsed.has_key('graph_vlabel'):
+        if 'graph_vlabel' in output_parsed:
             title=output_parsed['graph_vlabel']
             
         return [title, ret]

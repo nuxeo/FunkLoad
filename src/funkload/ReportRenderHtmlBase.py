@@ -22,9 +22,11 @@
 
 $Id$
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import os
 from shutil import copyfile
-from ReportRenderRst import RenderRst, rst_title
+from .ReportRenderRst import RenderRst, rst_title
 
 
 class RenderHtmlBase(RenderRst):
@@ -74,11 +76,11 @@ class RenderHtmlBase(RenderRst):
             # init output dir
             output_dir = os.path.abspath(self.options.output_dir)
             if not os.access(output_dir, os.W_OK):
-                os.mkdir(output_dir, 0775)
+                os.mkdir(output_dir, 0o775)
             # init report dir
             report_dir = self.generateReportDirectory(output_dir)
         if not os.access(report_dir, os.W_OK):
-            os.mkdir(report_dir, 0775)
+            os.mkdir(report_dir, 0o775)
         self.report_dir = report_dir
 
     def createRstFile(self):
@@ -133,7 +135,7 @@ class RenderHtmlBase(RenderRst):
             self.generateHtml()
             pass
         except ImportError:
-            print "WARNING docutils not found, no html output."
+            print("WARNING docutils not found, no html output.")
             return ''
         self.createCharts()
         self.copyXmlResult()
