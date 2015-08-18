@@ -20,6 +20,7 @@
 
 $Id$
 """
+from __future__ import print_function
 import os
 import sys
 import unittest
@@ -89,14 +90,14 @@ class TestInstall(unittest.TestCase):
         else:
             ret = commands.getstatusoutput('gnuplot --version')
 
-        print ret[1]
+        print(ret[1])
         if ret[0]:
             print ("WARNING: gnuplot is missing, no charts available in "
                    "HTML reports.")
 
         from funkload.TestRunner import g_has_doctest
         if not g_has_doctest:
-            print "WARNING: Python 2.4 is required to support doctest"
+            print("WARNING: Python 2.4 is required to support doctest")
 
 
     def test_testloader(self):

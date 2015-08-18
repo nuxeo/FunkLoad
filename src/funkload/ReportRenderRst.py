@@ -19,10 +19,11 @@
 
 $Id$
 """
+from __future__ import absolute_import
 import os
-from utils import get_version
-from apdex import Apdex
-from MonitorPluginsDefault import MonitorCPU, MonitorMemFree, MonitorNetwork, MonitorCUs
+from .utils import get_version
+from .apdex import Apdex
+from .MonitorPluginsDefault import MonitorCPU, MonitorMemFree, MonitorNetwork, MonitorCUs
 
 LI = '*'
 # ------------------------------------------------------------
@@ -264,7 +265,7 @@ class RenderRst:
         max_stps = -1
         cycle_r = None
         for cycle in self.cycles:
-            if not stats[cycle].has_key('test'):
+            if 'test' not in stats[cycle]:
                 continue
             stps = stats[cycle]['test'].tps
             if stps > max_stps:
@@ -281,7 +282,7 @@ class RenderRst:
         max_spps = -1
         cycle_r = None
         for cycle in self.cycles:
-            if not stats[cycle].has_key('page'):
+            if 'page' not in stats[cycle]:
                 continue
             if stats[cycle]['page'].apdex_score < 0.85:
                 continue
@@ -376,15 +377,15 @@ class RenderRst:
         total_responses_error = 0
         stats = self.stats
         for cycle in self.cycles:
-            if stats[cycle].has_key('test'):
+            if 'test' in stats[cycle]:
                 total_tests += stats[cycle]['test'].count
                 total_tests_error += stats[cycle]['test'].error
-            if stats[cycle].has_key('page'):
+            if 'page' in stats[cycle]:
                 stat = stats[cycle]['page']
                 stat.finalize()
                 total_pages += stat.count
                 total_pages_error += stat.error
-            if stats[cycle].has_key('response'):
+            if 'response' in stats[cycle]:
                 total_responses += stats[cycle]['response'].count
                 total_responses_error += stats[cycle]['response'].error
         self.append('')
@@ -416,7 +417,7 @@ class RenderRst:
             self.append('')
         renderer = None
         for cycle in self.cycles:
-            if not stats[cycle].has_key(key):
+            if key not in stats[cycle]:
                 continue
             renderer = klass(stats[cycle][key])
             if first:
@@ -499,7 +500,7 @@ class RenderRst:
         self.append(rst_title("Slowest requests", 2))
         cycle = self.getBestCycle()
         cycle_name = None
-        if not (cycle and stats[cycle].has_key('response_step')):
+        if not (cycle and 'response_step' in stats[cycle]):
             return
         steps = stats[cycle]['response_step'].keys()
         items = []
@@ -527,7 +528,7 @@ class RenderRst:
             return
         self.append(rst_title("Failures and Errors", 2))
         for status in ('Failure', 'Error'):
-            if not self.error.has_key(status):
+            if status not in self.error:
                 continue
             stats = self.error[status]
             errors = {}
@@ -603,7 +604,7 @@ class RenderRst:
             return '\n'.join(self.rst)
         cycle_r = self.getRepresentativeCycleStat()
 
-        if cycle_r.has_key('test'):
+        if 'test' in cycle_r:
             self.renderTestContent(cycle_r['test'])
 
         self.renderCyclesStat('test', 'Test stats',

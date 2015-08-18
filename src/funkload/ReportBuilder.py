@@ -23,6 +23,8 @@ Producing html and png chart require python-docutils and gnuplot
 
 $Id: ReportBuilder.py 24737 2005-08-31 09:00:16Z bdelbosc $
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 USAGE = """%prog [options] xmlfile [xmlfile...]
 
@@ -61,15 +63,15 @@ import xml.parsers.expat
 from optparse import OptionParser, TitledHelpFormatter
 from tempfile import NamedTemporaryFile
 
-from ReportStats import AllResponseStat, PageStat, ResponseStat, TestStat
-from ReportStats import MonitorStat, ErrorStat
-from ReportRenderRst import RenderRst
-from ReportRenderHtml import RenderHtml
-from ReportRenderDiff import RenderDiff
-from ReportRenderTrend import RenderTrend
-from MergeResultFiles import MergeResultFiles
-from utils import trace, get_version
-from apdex import Apdex
+from .ReportStats import AllResponseStat, PageStat, ResponseStat, TestStat
+from .ReportStats import MonitorStat, ErrorStat
+from .ReportRenderRst import RenderRst
+from .ReportRenderHtml import RenderHtml
+from .ReportRenderDiff import RenderDiff
+from .ReportRenderTrend import RenderTrend
+from .MergeResultFiles import MergeResultFiles
+from .utils import trace, get_version
+from .apdex import Apdex
 
 
 # ------------------------------------------------------------
@@ -102,23 +104,23 @@ class FunkLoadXmlParser:
         """Do the parsing."""
         try:
             self.parser.ParseFile(file(xml_file))
-        except xml.parsers.expat.ExpatError, msg:
+        except xml.parsers.expat.ExpatError as msg:
             if (self.current_element[-1]['name'] == 'funkload'
                 and str(msg).startswith('no element found')):
-                print "Missing </funkload> tag."
+                print("Missing </funkload> tag.")
             else:
-                print 'Error: invalid xml bench result file'
+                print('Error: invalid xml bench result file')
                 if len(self.current_element) <= 1 or (
                     self.current_element[1]['name'] != 'funkload'):
-                    print """Note that you can generate a report only for a
+                    print("""Note that you can generate a report only for a
                     bench result done with fl-run-bench (and not on a test
-                    resu1lt done with fl-run-test)."""
+                    resu1lt done with fl-run-test).""")
                 else:
-                    print """You may need to remove non ascii characters which
+                    print("""You may need to remove non ascii characters which
                     come from error pages caught during the bench test. iconv
-                    or recode may help you."""
-                print 'Xml parser element stack: %s' % [
-                    x['name'] for x in self.current_element]
+                    or recode may help you.""")
+                print('Xml parser element stack: %s' % [
+                    x['name'] for x in self.current_element])
                 raise
 
     def handleStartElement(self, name, attrs):
@@ -305,14 +307,14 @@ def main():
             trace("done: \n")
             trace(html_path + "\n")
         elif options.org:
-            from ReportRenderOrg import RenderOrg
-            print unicode(RenderOrg(xml_parser.config, xml_parser.stats,
+            from .ReportRenderOrg import RenderOrg
+            print(unicode(RenderOrg(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
-                                xml_parser.monitorconfig, options)).encode("utf-8")
+                                xml_parser.monitorconfig, options)).encode("utf-8"))
         else:
-            print unicode(RenderRst(xml_parser.config, xml_parser.stats,
+            print(unicode(RenderRst(xml_parser.config, xml_parser.stats,
                                 xml_parser.error, xml_parser.monitor,
-                                xml_parser.monitorconfig, options)).encode("utf-8")
+                                xml_parser.monitorconfig, options)).encode("utf-8"))
 
 
 if __name__ == '__main__':

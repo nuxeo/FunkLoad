@@ -25,6 +25,8 @@ Credits goes to Ian Bicking for parsing tcpwatch files.
 
 $Id$
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 import re
@@ -34,7 +36,7 @@ from tempfile import mkdtemp
 import rfc822
 from cgi import FieldStorage
 from urlparse import urlsplit
-from utils import truncate, trace, get_version, Data
+from .utils import truncate, trace, get_version, Data
 
 
 def get_null_file():
@@ -278,7 +280,7 @@ Examples
         items.sort()
         return [(v['request'], v['response'])
                 for name, v in items
-                if v.has_key('response')]
+                if 'response' in v]
 
     def extractRequests(self, files):
         """Filter and extract request from tcpwatch files."""
@@ -404,7 +406,7 @@ Examples
         while count:
             count -= 1
             if count:
-                print "Remaining loop: %i" % count
+                print("Remaining loop: %i" % count)
             if self.tcpwatch_path is None:
                 self.startProxy()
             script = self.extractScript()
@@ -415,8 +417,8 @@ Examples
                 self.writeScript(script)
                 self.writeConfiguration()
             else:
-                print script
-                print
+                print(script)
+                print()
             self.tcpwatch_path = None
 
 

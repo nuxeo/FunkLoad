@@ -24,11 +24,13 @@ label:short label to be displayed in the graph
 anykey:anyvalue
 a multi line description in ReST will be displayed in the listing parts
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import os
-from ReportRenderRst import rst_title
-from ReportRenderHtmlBase import RenderHtmlBase
-from ReportRenderHtmlGnuPlot import gnuplot
-from ReportRenderDiff import getRPath
+from .ReportRenderRst import rst_title
+from .ReportRenderHtmlBase import RenderHtmlBase
+from .ReportRenderHtmlGnuPlot import gnuplot
+from .ReportRenderDiff import getRPath
 
 def extract(report_dir, startswith):
     """Extract line form the ReST index file."""
@@ -48,7 +50,7 @@ def extract_date(report_dir):
     tag = "* Launched: "
     value = extract(report_dir, tag)
     if value is None:
-        print "ERROR no date found in rst report %s" % report_dir
+        print("ERROR no date found in rst report %s" % report_dir)
         return "NA"
     return value
 
@@ -58,7 +60,7 @@ def extract_max_cus(report_dir):
     tag = "* Cycles of concurrent users: "
     value = extract(report_dir, tag)
     if value is None:
-        print "ERROR no max CUs found in rst report %s" % report_dir
+        print("ERROR no max CUs found in rst report %s" % report_dir)
         return "NA"
     return value.split(', ')[-1][:-1]
 
@@ -95,7 +97,7 @@ def extract_stat(tag, report_dir):
     try:
         idx = lines.index("%s stats\n" % tag)
     except ValueError:
-        print "ERROR tag %s not found in rst report %s" % (tag, report_dir)
+        print("ERROR tag %s not found in rst report %s" % (tag, report_dir))
         return []
     delim = 0
     ret =  []
@@ -150,7 +152,7 @@ class RenderTrend(RenderHtmlBase):
         output_dir = os.path.abspath(output_dir)
         report_dir = os.path.join(output_dir, 'trend-report')
         if not os.access(report_dir, os.W_OK):
-            os.mkdir(report_dir, 0775)
+            os.mkdir(report_dir, 0o775)
         report_dir.replace('\\', '/')
         return report_dir
 

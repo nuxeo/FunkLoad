@@ -17,11 +17,12 @@
 # 02111-1307, USA.
 
 """Debug HTTPServer module for Funkload."""
+from __future__ import absolute_import
 
 import BaseHTTPServer
 import threading
 import urlparse
-from utils import trace
+from .utils import trace
 
 class FunkLoadHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """Handles HTTP requests from client in debug bench mode.

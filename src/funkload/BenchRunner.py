@@ -23,6 +23,7 @@
 
 $Id: BenchRunner.py 24746 2005-08-31 09:59:27Z bdelbosc $
 """
+from __future__ import absolute_import
 import os
 import platform
 import sys
@@ -37,9 +38,9 @@ from thread import error as ThreadError
 from xmlrpclib import ServerProxy, Fault
 import signal
 
-from FunkLoadTestCase import FunkLoadTestCase
-from FunkLoadHTTPServer import FunkLoadHTTPServer
-from utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
+from .FunkLoadTestCase import FunkLoadTestCase
+from .FunkLoadHTTPServer import FunkLoadHTTPServer
+from .utils import mmn_encode, set_recording_flag, recording, thread_sleep, \
                   trace, red_str, green_str, get_version
 try:
     from funkload.rtfeedback import (FeedbackSender, DEFAULT_ENDPOINT,
@@ -884,7 +885,7 @@ def run_distributed(options, module_name, class_name, method_name, sys_args):
         distmgr = DistributionMgr(
             module_name, class_name, method_name, options, sys_args)
         _manager = distmgr
-    except UserWarning, error:
+    except UserWarning as error:
         trace(red_str("Distribution failed with:%s \n" % (error)))
         return 1
     

@@ -20,6 +20,7 @@
 
 $Id: Lipsum.py 24649 2005-08-29 14:20:19Z bdelbosc $
 """
+from __future__ import print_function
 import random
 
 # vacabulary simple ascii
@@ -166,27 +167,27 @@ class Lipsum:
 
 def main():
     """Testing."""
-    print 'Word: %s\n' % (Lipsum().getWord())
-    print 'UniqWord: %s\n' % (Lipsum().getUniqWord())
-    print 'Subject: %s\n' % (Lipsum().getSubject())
-    print 'Subject uniq: %s\n' % (Lipsum().getSubject(uniq=True))
-    print 'Sentence: %s\n' % (Lipsum().getSentence())
-    print 'Paragraph: %s\n' % (Lipsum().getParagraph())
-    print 'Message: %s\n' % (Lipsum().getMessage())
-    print 'Phone number: %s\n' % Lipsum().getPhoneNumber()
-    print 'Phone number fr short: %s\n' % Lipsum().getPhoneNumber(
-        lang="fr", format="short")
-    print 'Phone number fr medium: %s\n' % Lipsum().getPhoneNumber(
-        lang="fr", format="medium")
-    print 'Phone number fr long: %s\n' % Lipsum().getPhoneNumber(
-        lang="fr", format="long")
-    print 'Phone number en_US short: %s\n' % Lipsum().getPhoneNumber(
-        lang="en_US", format="short")
-    print 'Phone number en_US medium: %s\n' % Lipsum().getPhoneNumber(
-        lang="en_US", format="medium")
-    print 'Phone number en_US long: %s\n' % Lipsum().getPhoneNumber(
-        lang="en_US", format="long")
-    print 'Address default: %s' % Lipsum().getAddress()
+    print('Word: %s\n' % (Lipsum().getWord()))
+    print('UniqWord: %s\n' % (Lipsum().getUniqWord()))
+    print('Subject: %s\n' % (Lipsum().getSubject()))
+    print('Subject uniq: %s\n' % (Lipsum().getSubject(uniq=True)))
+    print('Sentence: %s\n' % (Lipsum().getSentence()))
+    print('Paragraph: %s\n' % (Lipsum().getParagraph()))
+    print('Message: %s\n' % (Lipsum().getMessage()))
+    print('Phone number: %s\n' % Lipsum().getPhoneNumber())
+    print('Phone number fr short: %s\n' % Lipsum().getPhoneNumber(
+        lang="fr", format="short"))
+    print('Phone number fr medium: %s\n' % Lipsum().getPhoneNumber(
+        lang="fr", format="medium"))
+    print('Phone number fr long: %s\n' % Lipsum().getPhoneNumber(
+        lang="fr", format="long"))
+    print('Phone number en_US short: %s\n' % Lipsum().getPhoneNumber(
+        lang="en_US", format="short"))
+    print('Phone number en_US medium: %s\n' % Lipsum().getPhoneNumber(
+        lang="en_US", format="medium"))
+    print('Phone number en_US long: %s\n' % Lipsum().getPhoneNumber(
+        lang="en_US", format="long"))
+    print('Address default: %s' % Lipsum().getAddress())
 
 
 if __name__ == '__main__':

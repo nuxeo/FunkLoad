@@ -26,6 +26,8 @@ Similar to unittest.TestProgram but:
 
 $Id: TestRunner.py 24758 2005-08-31 12:33:00Z bdelbosc $
 """
+from __future__ import print_function
+from __future__ import absolute_import
 try:
     import psyco
     psyco.full()
@@ -39,7 +41,7 @@ import unittest
 import re
 from StringIO import StringIO
 from optparse import OptionParser, TitledHelpFormatter
-from utils import red_str, green_str, get_version
+from .utils import red_str, green_str, get_version
 from funkload.FunkLoadTestCase import FunkLoadTestCase
 
 # ------------------------------------------------------------
@@ -77,7 +79,7 @@ else:
         if failures:
             raise self.failureException(self.format_failure(new.getvalue()))
         elif g_doctest_verbose:
-            print new.getvalue()
+            print(new.getvalue())
 
     DocTestCase.runTest = DTC_runTest
 
@@ -109,7 +111,7 @@ class TestLoader(unittest.TestLoader):
                 pass
         for name in dir(module):
             obj = getattr(module, name)
-            if (isinstance(obj, (type, types.ClassType)) and
+            if (isinstance(obj, type) and
                 issubclass(obj, unittest.TestCase)):
                 tests.append(self.loadTestsFromTestCase(obj))
         suite = self.suiteClass(tests)
@@ -130,7 +132,7 @@ class TestLoader(unittest.TestLoader):
         parts = name.split('.')
         if module is None:
             if not parts:
-                raise ValueError, "incomplete test name: %s" % name
+                raise ValueError("incomplete test name: %s" % name)
             else:
                 parts_copy = parts[:]
                 while parts_copy:
@@ -147,24 +149,23 @@ class TestLoader(unittest.TestLoader):
         import unittest
         if type(obj) == types.ModuleType:
             return self.loadTestsFromModule(obj)
-        elif (isinstance(obj, (type, types.ClassType)) and
+        elif (isinstance(obj, type) and
               issubclass(obj, unittest.TestCase)):
             return self.loadTestsFromTestCase(obj)
         elif type(obj) == types.UnboundMethodType:
             # pass funkload options
-            if issubclass(obj.im_class, FunkLoadTestCase):
-                return obj.im_class(obj.__name__, self.options)
+            if issubclass(obj.__self__.__class__, FunkLoadTestCase):
+                return obj.__self__.__class__(obj.__name__, self.options)
             else:
-                return obj.im_class(obj.__name__)
+                return obj.__self__.__class__(obj.__name__)
         elif callable(obj):
             test = obj()
             if not isinstance(test, unittest.TestCase) and \
                not isinstance(test, unittest.TestSuite):
-                raise ValueError, \
-                      "calling %s returned %s, not a test" % (obj,test)
+                raise ValueError("calling %s returned %s, not a test" % (obj,test))
             return test
         else:
-            raise ValueError, "don't know how to make test from: %s" % obj
+            raise ValueError("don't know how to make test from: %s" % obj)
 
 
 
@@ -215,7 +216,7 @@ def display_testcases(suite):
         if isinstance(test, unittest.TestCase):
             name = test.id()
             name = name[1 + name.find('.'):]
-            print name
+            print(name)
         else:
             display_testcases(test)
 

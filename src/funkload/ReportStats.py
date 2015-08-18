@@ -19,8 +19,9 @@
 
 $Id: ReportStats.py 24737 2005-08-31 09:00:16Z bdelbosc $
 """
+from __future__ import absolute_import
 
-from apdex import Apdex
+from .apdex import Apdex
 
 
 class MonitorStat:

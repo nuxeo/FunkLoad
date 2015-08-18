@@ -19,11 +19,12 @@
 
 $Id$
 """
+from __future__ import absolute_import
 import sys
 from ConfigParser import NoOptionError
 
-from XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
-from CredentialBase import CredentialBaseServer
+from .XmlRpcBase import XmlRpcBaseServer, XmlRpcBaseController
+from .CredentialBase import CredentialBaseServer
 
 
 # ------------------------------------------------------------
@@ -132,7 +133,7 @@ class CredentialFileServer(XmlRpcBaseServer, CredentialBaseServer):
             for user in users:
                 if self.lofc and len(group) >= self.lofc:
                     break
-                if self._passwords.has_key(user):
+                if user in self._passwords:
                     group.add(user)
                 else:
                     self.logd('Missing password for %s in group %s' % (user,
@@ -144,7 +145,7 @@ class CredentialFileServer(XmlRpcBaseServer, CredentialBaseServer):
 
         Credential are taken incrementally in a loop.
         """
-        user = self._groups[group].next()
+        user = next(self._groups[group])
         password = self._passwords[user]
         self.logd("getCredential(%s) return (%s, %s)" % (
             group, user, password))

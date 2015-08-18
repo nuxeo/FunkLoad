@@ -1,5 +1,6 @@
+from __future__ import absolute_import
 from django.conf.urls.defaults import *
-import views
+from . import views
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse
 

@@ -58,7 +58,7 @@ class MonitorPlugins():
 
     def configure(self, config):
         for plugin in self.MONITORS.values():
-            if config.has_key(plugin.name):
+            if plugin.name in config:
                 plugin.setConfig(config[plugin.name])
 
 

@@ -20,17 +20,19 @@
 
 $Id$
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import sys
 import re
 from commands import getstatusoutput
-from apdex import Apdex
-from ReportRenderRst import rst_title
-from ReportRenderHtmlBase import RenderHtmlBase
+from .apdex import Apdex
+from .ReportRenderRst import rst_title
+from .ReportRenderHtmlBase import RenderHtmlBase
 from datetime import datetime
-from MonitorPlugins import MonitorPlugins
-from MonitorPluginsDefault import MonitorCPU, MonitorMemFree, MonitorNetwork, MonitorCUs
+from .MonitorPlugins import MonitorPlugins
+from .MonitorPluginsDefault import MonitorCPU, MonitorMemFree, MonitorNetwork, MonitorCUs
 
 def gnuplot(script_path):
     """Execute a gnuplot script."""
@@ -124,7 +126,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         cvus = []
         has_error = False
         for cycle in self.cycles:
-            if not stats[cycle].has_key('test'):
+            if 'test' not in stats[cycle]:
                 continue
             values = []
             test = stats[cycle]['test']
@@ -206,7 +208,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         cvus = []
         has_error = False
         for cycle in self.cycles:
-            if not stats[cycle].has_key('page'):
+            if 'page' not in stats[cycle]:
                 continue
             values = []
             page = stats[cycle]['page']
@@ -318,7 +320,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         
         stats = self.stats
 
-        start_timeline = sys.maxint
+        start_timeline = sys.maxsize
         end_timeline = -1
         max_rps = 0
         min_rps = 0
@@ -342,7 +344,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
                         
                     f.write('{0} {1}\n'.format(k, st.per_second[k]))
             except Exception as e:
-                print "Exception: {0}".format(e)
+                print("Exception: {0}".format(e))
             finally:
                 f.close
         #print "max rps: {0}".format(max_rps)
@@ -424,7 +426,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         cvus = []
         has_error = False
         for cycle in self.cycles:
-            if not stats[cycle].has_key('response'):
+            if 'response' not in stats[cycle]:
                 continue
             values = []
             resp = stats[cycle]['response']
@@ -513,7 +515,7 @@ class RenderHtmlGnuPlot(RenderHtmlBase):
         cvus = []
         has_error = False
         for cycle in self.cycles:
-            if not stats[cycle]['response_step'].has_key(step):
+            if step not in stats[cycle]['response_step']:
                 continue
             values = []
             resp = stats[cycle]['response_step'].get(step)
