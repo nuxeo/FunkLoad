@@ -29,7 +29,7 @@ from xmlrpclib import ServerProxy
 import logging
 from optparse import OptionParser, TitledHelpFormatter
 
-from .utils import create_daemon, get_default_logger, close_logger
+from .utils import get_default_logger, close_logger
 from .utils import trace, get_version
 
 
@@ -119,7 +119,7 @@ Start %prog XML/RPC daemon.
         if not options.debug:
             trace(' as daemon.\n')
             close_logger(self.server_name)
-            create_daemon()
+            self.create_daemon()
             # re init the logger
             self.logger = get_default_logger(log_to, log_path, level=level,
                                              name=self.server_name)
@@ -196,7 +196,48 @@ Start %prog XML/RPC daemon.
         return "%s running pid = %s" % (self.server_name, os.getpid())
 
 
-
+    # ------------------------------------------------------------
+    # daemon
+    #
+    # See the Chad J. Schroeder example for a full explanation
+    # this version does not chdir to '/' to keep relative path
+    def create_daemon(self):
+        """Detach a process from the controlling terminal and run it in the
+        background as a daemon.
+        """
+        try:
+            pid = os.fork()
+        except OSError as msg:
+            raise Exception("%s [%d]" % (msg.strerror, msg.errno))
+        if (pid == 0):
+            # child
+            os.setsid()
+            try:
+                pid = os.fork()
+            except OSError as msg:
+                raise Exception("%s [%d]" % (msg.strerror, msg.errno))
+            if (pid == 0):
+                # child
+                os.umask(0)
+            else:
+                os._exit(0)
+        else:
+            while (not is_server_running(self.host, self.port)):
+                sleep(1)
+            os._exit(0)
+        import resource
+        maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+        if (maxfd == resource.RLIM_INFINITY):
+            maxfd = 1024
+        for fd in range(0, maxfd):
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        os.open('/dev/null', os.O_RDWR)
+        os.dup2(0, 1)
+        os.dup2(0, 2)
+        return(0)
 
 
 # ------------------------------------------------------------
